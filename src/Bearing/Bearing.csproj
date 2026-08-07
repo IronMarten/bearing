@@ -37,8 +37,7 @@
     <RepositoryUrl>https://github.com/ironmarten/bearing</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <!-- TODO: add icon.png at the repo root and uncomment (embedded icon, not iconUrl) -->
-    <!-- <PackageIcon>icon.png</PackageIcon> -->
+    <PackageIcon>icon.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
