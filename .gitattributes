@@ -1,0 +1,15 @@
+# Normalize line endings on commit; check out native.
+* text=auto
+
+*.cs      text diff=csharp
+*.csproj  text
+*.sln     text eol=crlf
+*.md      text
+*.json    text
+*.yml     text
+*.csv     text
+
+*.png     binary
+*.ico     binary
+*.nupkg   binary
+*.snupkg  binary
