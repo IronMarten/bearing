@@ -1,0 +1,26 @@
+## .NET
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+.idea/
+
+## NuGet
+*.nupkg
+*.snupkg
+nuget.config.user
+
+## Bearing output
+bearing-out/
+archprobe-out/
+*-out/
+
+## OS
+Thumbs.db
+.DS_Store

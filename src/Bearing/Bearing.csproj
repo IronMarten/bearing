@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>bearing</AssemblyName>
+    <RootNamespace>IronMarten.Bearing</RootNamespace>
+  </PropertyGroup>
+
+  <!-- dotnet tool packaging -->
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>bearing</ToolCommandName>
+    <PackageId>IronMarten.Bearing</PackageId>
+    <Version>0.0.1-preview.1</Version>
+  </PropertyGroup>
+
+  <!--
+    Package metadata. The NuGet ID-prefix reservation criteria check that identifying
+    properties are "clear and consistent (especially the package author)", that the
+    licence uses the `license` element rather than the deprecated `licenseUrl`, and
+    that any icon is embedded rather than an `iconUrl`. Keep all of this consistent
+    across every IronMarten.* package.
+  -->
+  <PropertyGroup>
+    <Authors>Iron Marten</Authors>
+    <Company>Iron Marten</Company>
+    <Product>Bearing</Product>
+    <Copyright>Copyright (c) Iron Marten</Copyright>
+    <Description>Get your bearings in a .NET codebase. Bearing reads a solution and reports a map of the system and a short list of the components that are unusual for what they are — relative to their structural peers, never as a score.</Description>
+    <PackageTags>architecture;analysis;roslyn;static-analysis;dependency-graph;code-quality;dotnet-tool</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ironmarten/bearing</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ironmarten/bearing</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- TODO: add icon.png at the repo root and uncomment (embedded icon, not iconUrl) -->
+    <!-- <PackageIcon>icon.png</PackageIcon> -->
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <!-- Deterministic, source-linked builds -->
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <!-- <None Include="..\..\icon.png" Pack="true" PackagePath="\" /> -->
+  </ItemGroup>
+
+</Project>
