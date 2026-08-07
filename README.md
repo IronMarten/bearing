@@ -79,4 +79,4 @@ with missing references and the results are silently understated.
 
 ## Licence
 
-[Apache-2.0](LICENSE) © Iron Marten
+[Apache-2.0](https://github.com/ironmarten/bearing/blob/main/LICENSE) © Iron Marten
