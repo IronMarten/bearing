@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ArchProbe</RootNamespace>
+    <AssemblyName>archprobe</AssemblyName>
+    <!-- MSBuildLocator requires that MSBuild assemblies are NOT copied local. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0" />
+  </ItemGroup>
+
+  <!-- Microsoft.Build.* must be resolved from the located SDK at runtime, not from our bin. -->
+  <Target Name="RemoveMSBuildAssemblies" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+                               Condition="'%(Filename)' == 'Microsoft.Build'
+                                       or '%(Filename)' == 'Microsoft.Build.Framework'
+                                       or '%(Filename)' == 'Microsoft.Build.Tasks.Core'
+                                       or '%(Filename)' == 'Microsoft.Build.Utilities.Core'" />
+    </ItemGroup>
+  </Target>
+
+</Project>
