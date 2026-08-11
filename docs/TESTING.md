@@ -137,12 +137,17 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **72 type rows** from **73 declarations**, 71 methods, 157 edges, 11 cohorts, 2 excluded,
+- **89 type rows** from **90 declarations**, 88 methods, 202 edges, 13 cohorts, 2 excluded,
   **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
   planted identity collision below, and it is the expected answer until Core keys types on
   `(assembly, FQN)`.
 - namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
+- breaks alone: `TariffReconciler` fires; `MethodReconciler` also fires and **should not** — see
+  the note below. Cohort `suffix:Reconciler` (9 members), medians fan-out 2, fan-in 1,
+  max-member-cc 3. The three suppression companions each satisfy every *other* condition:
+  `ReconciliationController` (ApiBoundary), `RateReconciler` (nominated as a concealed
+  decision), `AuditReconciler` (fan-in 0)
 - blast radius: `ShipmentLedger` alone, in cohort `suffix:Ledger` (12 members) — fan-in 11,
   `FanInPctl` 95.83, `FanInXMedian` 11, cc 18, `CyclomaticPctl` 95.83. All four conditions with
   margin; the cohort is twelve rather than ten so the case does not sit on the boundary
@@ -179,17 +184,34 @@ fails the day detection lands, which is when each category has to be named.
 > is named anywhere. Both are in the fixture now, one as trap and one as contrast, so the
 > distinction cannot be lost again.
 
-**For two existing findings (Job B). `BUG BLAST RADIUS` filled; `BREAKS ALONE` still open**,
-along with the SPANS roll-call collapse branch. A section that emits no output produces the
-same bytes whatever its thresholds are — so the goldens carry no record of how the finding
-behaves, and its thresholds could be changed to any value, or the finding deleted, with the
-suite still green.
+**~~For two existing findings (Job B).~~ Both filled.** The SPANS roll-call collapse branch is
+still uncovered, as are suppression rows 4–7. A section that emits no output produces the same
+bytes whatever its thresholds are — so the goldens carried no record of how either finding
+behaved, and their thresholds could have been changed to any value, or the findings deleted,
+with the suite still green.
 
-Breaks alone is the one that matters: it carries three suppression rules, including *never
+Breaks alone was the one that mattered: it carries three suppression rules, including *never
 imply safety at a boundary* and *never contradict yourself about one component*, and removing
-any of them turns empty output into empty output. `FixtureCoverageTests` asserts the gap so it
-cannot be mistaken for coverage. Filling it is a prerequisite for extraction —
-`TECHREQ-job-b.md` §8.
+any of them turned empty output into empty output. `SuppressionTests` covers those three rows
+now, each with a companion that satisfies **every other condition** of the finding — without
+that second half, a companion that quietly stopped qualifying would still pass and the
+suppression would be untested again with nobody noticing.
+
+> **Filling breaks alone found a suppression that is missing.** §4 row 2 suppresses the finding
+> for a type "already nominated as a concealed decision", and the implementation captures
+> **type-level** nominations only. §3.3 nominates the same signal on *methods*, and §3.3 is the
+> primary of the two — type-level came back empty on real code while method-level found the
+> right thing.
+>
+> So the case that matters most is the case the suppression misses. `MethodReconciler` is
+> nominated at method level and then told it breaks alone: *"this method is making business
+> judgements"* and *"if it breaks, it breaks alone"*, about one component, in one report — the
+> contradiction invariant 3 exists to prevent. `RateReconciler` is the contrast, nominated at
+> both levels and correctly suppressed. The two differ only in whether the type-level nomination
+> happened to fire, which is not a difference a user would accept as meaningful.
+>
+> Pinned by `KnownDefectTests.A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
+> §4 row 2 is amended at source to read "at type level (§3.2) or on any of its methods (§3.3)".
 
 > **Filling blast radius found the reason it was empty, and it was not the fixture.**
 > `Percentile` is midrank — `100 * (below + 0.5 * equal) / n` — so a unique maximum scores

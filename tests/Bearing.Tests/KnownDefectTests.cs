@@ -66,6 +66,59 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// A method-level concealed decision does not suppress breaks alone on its declaring type,
+    /// so the report contradicts itself about one component.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The suppression captures type-level nominations only — <c>concealed.Select(t =&gt; t.Id)</c>
+    /// in <c>PrintNominations</c>, where <c>concealed</c> is the §3.2 list. §3.3 nominates the
+    /// same signal on methods, and §3.3 is the <b>primary</b> of the two: type-level came back
+    /// empty on real code while method-level found the right thing, because a type whose total
+    /// complexity is ordinary can still hide one 47-branch method.
+    /// </para>
+    /// <para>
+    /// So the case that matters most is the case the suppression misses. On the fixture,
+    /// <c>MethodReconciler</c> is nominated at method level and then told it breaks alone —
+    /// "this method is making business judgements" and "if it breaks, it breaks alone", about
+    /// one type, in one report. That is exactly the contradiction invariant 3 exists to prevent.
+    /// </para>
+    /// <para>
+    /// <c>RateReconciler</c> is the contrast: nominated at BOTH levels, so the type-level
+    /// suppression catches it and breaks alone stays quiet. The two differ only in whether the
+    /// type-level nomination happened to fire, which is not a difference a user would accept as
+    /// meaningful.
+    /// </para>
+    /// <para>
+    /// Superseded by <c>TECHREQ-job-b.md</c> §4 row 2, amended to read "at type level (§3.2) or
+    /// on any of its methods (§3.3)". <c>SubjectRef</c> walks member → declaring type for this.
+    /// Fix in Core during extraction; deleting this test is the event worth seeing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_method_level_concealed_decision_does_not_suppress_breaks_alone()
+    {
+        var text = NominationText.Render(run.Result, run.Options);
+
+        var breaksAlone = NominationText.SubjectsUnder(text, "-- BREAKS ALONE");
+        var atMethodLevel = NominationText
+            .SubjectsUnder(text, "-- CONCEALED DECISION, METHOD LEVEL")
+            .Select(s => s.Split('.')[0])
+            .ToArray();
+
+        // Nominated as concealing a decision, in one of its methods.
+        Assert.Contains("MethodReconciler", atMethodLevel);
+
+        // And told it breaks alone anyway. Both sentences, one component, one report.
+        Assert.Contains("MethodReconciler", breaksAlone);
+
+        // The contrast: RateReconciler is nominated at method level too, but ALSO at type
+        // level, and the type-level nomination is the only one the suppression can see.
+        Assert.Contains("RateReconciler", atMethodLevel);
+        Assert.DoesNotContain("RateReconciler", breaksAlone);
+    }
+
+    /// <summary>
     /// BUG BLAST RADIUS cannot fire in a cohort smaller than ten, whatever the metrics are.
     /// </summary>
     /// <remarks>

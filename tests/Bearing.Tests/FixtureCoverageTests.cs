@@ -16,37 +16,37 @@ namespace Bearing.Tests;
 public sealed class FixtureCoverageTests(FixtureRun run)
 {
     /// <summary>
-    /// BREAKS ALONE still nominates nothing on TestBed, so the frozen goldens carry no record
-    /// of how it behaves. BUG BLAST RADIUS is covered now.
+    /// BUG BLAST RADIUS and BREAKS ALONE both nominate something now. Neither did before, and
+    /// the goldens carried no record of how either behaves.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is the important consequence, and it is not obvious: a section that emits no
+    /// This was the important consequence, and it was not obvious: a section that emits no
     /// output produces the same bytes whatever its thresholds are. Breaks alone's <c>0.8</c>
-    /// instability floor and <c>1</c> fan-in floor could be changed to any other value, or the
-    /// finding deleted outright, and <c>OracleGoldenTests</c> would still pass byte-for-byte.
+    /// instability floor and <c>1</c> fan-in floor could have been changed to any other value,
+    /// or the finding deleted outright, and <c>OracleGoldenTests</c> would still have passed
+    /// byte-for-byte.
     /// </para>
     /// <para>
-    /// Breaks alone is the worse of the two: it carries three of Job B's seven suppression
-    /// rules (<c>TECHREQ-job-b.md</c> §4), including the invariant-4 boundary exclusion and
-    /// the invariant-3 concealed-decision exclusion. Nothing currently fails if a suppression
-    /// is removed, because removing it changes empty output into empty output.
+    /// Breaks alone was the worse of the two: it carries three of Job B's seven suppression
+    /// rules (<c>TECHREQ-job-b.md</c> §4), including the invariant-4 boundary exclusion and the
+    /// invariant-3 concealed-decision exclusion, and nothing failed if one was removed because
+    /// removing it changed empty output into empty output. <c>SuppressionTests</c> covers those
+    /// three rows now.
     /// </para>
     /// <para>
-    /// The fix is fixture cases, not test changes — <c>TECHREQ-job-b.md</c> §8 and
-    /// <c>docs/TESTING.md</c> §6. Add, do not reshape.
+    /// Still uncovered: the SPANS roll-call collapse branch, and suppression rows 4 through 7.
     /// </para>
     /// </remarks>
     [Fact]
-    public void Breaks_alone_has_no_fixture_case()
+    public void The_two_silent_findings_now_have_fixture_cases()
     {
         var text = NominationText.Render(run.Result, run.Options);
 
-        Assert.Empty(NominationText.SubjectsUnder(text, "-- BREAKS ALONE"));
-
-        // BUG BLAST RADIUS is covered now — ShipmentLedger, the Ledger cohort. Asserted here so
-        // that filling one half of this gap cannot quietly un-fill itself.
+        // Both were empty, and an empty section produces the same bytes whatever its thresholds
+        // are. Asserted positively so that filling these gaps cannot quietly un-fill itself.
         Assert.Equal(["ShipmentLedger"], NominationText.SubjectsUnder(text, "-- BUG BLAST RADIUS"));
+        Assert.Contains("TariffReconciler", NominationText.SubjectsUnder(text, "-- BREAKS ALONE"));
 
         // Asserted alongside so this reads as a gap in two findings rather than a fact about
         // two arbitrary strings. If these ever empty out, the parser broke, not the tool.
