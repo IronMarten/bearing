@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    PLANT: the fixture had no test project, which meant the "used only by tests" dead-code
+    false positive could not be reproduced at all.
+
+    No test framework packages on purpose. The probe classifies a test project by NAME
+    (Program.cs, LooksLikeTestProject), and the fixture carries no PackageReferences anywhere.
+    Adding xunit here would buy nothing and make the fixture restore-dependent.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TestBed.Core.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="..\Core\Core.csproj" /></ItemGroup>
+</Project>

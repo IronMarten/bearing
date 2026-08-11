@@ -54,4 +54,61 @@ public sealed class FixtureCoverageTests(FixtureRun run)
         Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- LOAD-BEARING AND INTRICATE"));
         Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- SHARED MUTABLE STATE"));
     }
+
+    /// <summary>
+    /// The three dead-code traps are planted, and nothing can currently tell them apart from
+    /// code that really is unreferenced.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>TenantPolicySink</c> is reached only through a DI registration, <c>SchemaMigrationHandler</c>
+    /// only through a string literal, and <c>FixtureBuilder</c> only from <c>Core.Tests</c>, which is
+    /// skipped by default. All three therefore have a static fan-in of zero — the same reading a
+    /// genuinely dead type gives.
+    /// </para>
+    /// <para>
+    /// Type-level dead code is not implemented: the probe reports unreferenced <b>projects</b>, and
+    /// <c>TECHREQ-job-a.md</c> §5.6 ships type-level detection last precisely because this is where
+    /// the false positives live. So the plants sit in the fixture ahead of the feature, which is the
+    /// right order — the acceptance criterion is that none of the three is reported as unreferenced
+    /// without its category named, and that criterion is now testable the day the feature lands.
+    /// </para>
+    /// <para>
+    /// This test fails then, and narrowing it is the event worth seeing. Invariant 4: a tool that
+    /// says "safe to remove" about something six customers depend on has caused the burn it claimed
+    /// to prevent.
+    /// </para>
+    /// </remarks>
+    [Theory]
+    [InlineData("AuditPolicySink")]         // registered by convention — no type name anywhere
+    [InlineData("SchemaMigrationHandler")]  // resolved by string literal
+    [InlineData("FixtureBuilder")]          // used only from a skipped test project
+    public void A_dead_code_trap_reads_exactly_like_dead_code(string trap)
+    {
+        var planted = run.Result.Types.Single(t => t.Name == trap);
+
+        // Indistinguishable on the only evidence currently collected.
+        Assert.Equal(0, planted.FanIn);
+
+        // And nothing in the report mentions it — there is no section for this yet, so silence
+        // here is the absence of a feature rather than a clean bill of health.
+        Assert.DoesNotContain(trap, NominationText.Render(run.Result, run.Options), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The DI case named in the requirement is the one that needs no work.
+    /// </summary>
+    /// <remarks>
+    /// <c>TECHREQ-job-a.md</c> §5.6 asks for <c>services.AddX&lt;T&gt;()</c> to be detected as an
+    /// inbound reference. It already is — a generic type argument is a compile-time reference, so
+    /// <c>TenantPolicySink</c> has fan-in 1 and never looked dead. Asserted so the requirement is
+    /// not implemented twice, and so the distinction from <c>AuditPolicySink</c> — same container,
+    /// same lifetime, registered by convention instead, fan-in 0 — stays visible.
+    /// </remarks>
+    [Fact]
+    public void A_generic_DI_registration_is_already_a_visible_reference()
+    {
+        Assert.Equal(1, run.Result.Types.Single(t => t.Name == "TenantPolicySink").FanIn);
+        Assert.Equal(0, run.Result.Types.Single(t => t.Name == "AuditPolicySink").FanIn);
+    }
 }

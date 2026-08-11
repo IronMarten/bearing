@@ -22,7 +22,12 @@ public sealed class StructureTests(FixtureRun run)
     public void Solution_loads_with_no_warnings()
     {
         Assert.Empty(run.Result.LoadWarnings);
-        Assert.Empty(run.Result.SkippedProjects);
+
+        // Core.Tests is skipped, and that is the point of it. Test projects are excluded by
+        // default, which is what makes FixtureBuilder — used only from there — look like dead
+        // code to anything counting inbound edges. Asserted positively so the exclusion cannot
+        // quietly stop happening and take the trap with it.
+        Assert.Equal(["Core.Tests"], run.Result.SkippedProjects.Order(StringComparer.Ordinal));
     }
 
     [Fact]
@@ -31,11 +36,17 @@ public sealed class StructureTests(FixtureRun run)
         // 52 rows, not 53: the two TestBed.Shared.PayloadTag declarations are one row, because
         // type identity is keyed on name alone. That is the planted defect, pinned in
         // KnownDefectTests. When Core keys on (assembly, FQN) this becomes 53.
-        Assert.Equal(52, run.Result.Types.Count);
-        Assert.Equal(131, run.Result.Edges.Count);
+        // 59 rows, not 60: the two TestBed.Shared.PayloadTag declarations are one row, because
+        // type identity is keyed on name alone. That is the planted defect, pinned in
+        // KnownDefectTests. When Core keys on (assembly, FQN) this becomes 60.
+        //
+        // NormalizerScenarios is absent, and correctly so — it lives in Core.Tests, which is
+        // skipped.
+        Assert.Equal(59, run.Result.Types.Count);
+        Assert.Equal(135, run.Result.Edges.Count);
         // Methods are counted per declaration, so unlike Types this is not distorted by the
         // planted collision: Describe, Score and Weight are all three present.
-        Assert.Equal(47, run.Result.Methods.Count);
+        Assert.Equal(57, run.Result.Methods.Count);
     }
 
     // ---- Generated code exclusion -------------------------------------------------
@@ -157,7 +168,7 @@ public sealed class StructureTests(FixtureRun run)
 
     [Theory]
     [InlineData("NormalizationContext", 20)]
-    [InlineData("RawResponse", 18)]
+    [InlineData("RawResponse", 19)]   // +1: FixtureBuilder, the test-only dead-code trap
     [InlineData("NormalizedResponse", 15)]
     [InlineData("ModelDescription", 5)]
     public void Contract_fan_in_is_stable(string type, int fanIn) =>

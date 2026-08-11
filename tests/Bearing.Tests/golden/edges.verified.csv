@@ -8,6 +8,7 @@ global::TestBed.Core.ShipmentCoordinator,global::TestBed.Core.NormalizationConte
 global::TestBed.Core.AccessorialNormalizer,global::TestBed.Core.NormalizedResponse,5
 global::TestBed.Core.AddressNormalizer,global::TestBed.Core.NormalizedResponse,5
 global::TestBed.Core.CarrierGateway,global::TestBed.Core.RawResponse,5
+global::TestBed.Core.Composition,global::TestBed.Core.ServiceRegistry,5
 global::TestBed.Core.ShipmentController,global::TestBed.Core.NormalizedResponse,5
 global::TestBed.Core.RateNormalizer,global::TestBed.Core.NormalizedResponse,5
 global::TestBed.Core.ReferenceNormalizer,global::TestBed.Core.NormalizedResponse,5
@@ -23,6 +24,7 @@ global::TestBed.Core.TransitNormalizer,global::TestBed.Core.RawResponse,4
 global::TestBed.Tools.PayloadAuditor,global::TestBed.Core.RawResponse,4
 global::TestBed.Core.AuthenticationMiddleware,global::TestBed.Core.TenantStore,3
 global::TestBed.Core.AuthenticationMiddleware,global::TestBed.Core.NormalizationContext,3
+global::TestBed.Core.FixtureBuilder,global::TestBed.Core.RawResponse,3
 global::TestBed.Core.AbstractConsumer,global::TestBed.Core.IAuditSink,3
 global::TestBed.Core.AbstractConsumer,global::TestBed.Core.IClock,3
 global::TestBed.Core.AbstractConsumer,global::TestBed.Core.IRetryPolicy,3
@@ -90,6 +92,7 @@ global::TestBed.Core.AccessorialNormalizer,global::TestBed.Core.IResponseNormali
 global::TestBed.Core.AddressNormalizer,global::TestBed.Core.IResponseNormalizer,1
 global::TestBed.Core.AuthenticationMiddleware,global::TestBed.Core.ControllerBase,1
 global::TestBed.Core.CarrierGateway,global::TestBed.Core.NormalizationContext,1
+global::TestBed.Core.Composition,global::TestBed.Core.TenantPolicySink,1
 global::TestBed.Core.IResponseNormalizer,global::TestBed.Core.NormalizedResponse,1
 global::TestBed.Core.IResponseNormalizer,global::TestBed.Core.RawResponse,1
 global::TestBed.Core.IResponseNormalizer,global::TestBed.Core.NormalizationContext,1
@@ -106,6 +109,7 @@ global::TestBed.Core.DocumentController,global::TestBed.Core.ControllerBase,1
 global::TestBed.Core.DocumentController,global::TestBed.Core.NormalizedResponse,1
 global::TestBed.Core.DocumentController,global::TestBed.Core.RawResponse,1
 global::TestBed.Core.ShipmentController,global::TestBed.Core.ControllerBase,1
+global::TestBed.Core.AuditPolicySink,global::TestBed.Core.IPolicySink,1
 global::TestBed.Core.AuditSink,global::TestBed.Core.IAuditSink,1
 global::TestBed.Core.SystemClock,global::TestBed.Core.IClock,1
 global::TestBed.Core.RetryPolicy,global::TestBed.Core.IRetryPolicy,1

@@ -11,8 +11,8 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    GuaranteedServiceNormalizer.Normalize — looks like plumbing but is in the top 7% of internal complexity among your 7 IResponseNormalizer. (3.5x the peer median; cc 21, dsm 16, fan-in 1, fan-out 5)
 
 -- CONCEALED DECISION, METHOD LEVEL ----------------------------
-   TariffCalculator.Apply — 22x the median complexity of its 24 peers (cc 22, dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
-   ShipmentCoordinator.Coordinate — 13x the median complexity of its 24 peers (cc 13, dsm 11, nesting 1, 25 lines) — ShipmentCoordinator.cs:18
+   TariffCalculator.Apply — 22x the median complexity of its 28 peers (cc 22, dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
+   ShipmentCoordinator.Coordinate — 13x the median complexity of its 28 peers (cc 13, dsm 11, nesting 1, 25 lines) — ShipmentCoordinator.cs:18
    ShipmentController.Post — 12x the median complexity of its 6 peers (cc 12, dsm 4, nesting 2, 20 lines) — Controllers.cs:44
    AuthenticationMiddleware.Authenticate — 5x the median complexity of its 6 peers (cc 5, dsm 2, nesting 1, 12 lines) — AuthenticationMiddleware.cs:13
    GuaranteedServiceNormalizer.Normalize — 3.5x the median complexity of its 8 peers (cc 21, dsm 15, nesting 4, 57 lines) — GuaranteedServiceNormalizer.cs:6
@@ -23,7 +23,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
 -- CHANGE COST -------------------------------------------------
    (many internal callers on a contract-shaped type)
    NormalizationContext — 20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
-   RawResponse — 18 internal callers depend on this contract (3 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
+   RawResponse — 19 internal callers depend on this contract (3 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
    NormalizedResponse — 15 internal callers depend on this contract (5 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
    ModelDescription — 5 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
 
@@ -34,7 +34,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    INTEGRATION MAP — external systems, by how many types touch them:
      System.Data                                2 types
      System.Net.Http                            2 types
-     (16 language/runtime references omitted as plumbing)
+     (20 language/runtime references omitted as plumbing)
 
    BOUNDARIES CARRYING REAL LOGIC — decisions made at the edge:
      ShipmentController — Post is cc 12. Business decisions at an external edge are the hardest kind to change later.
@@ -86,7 +86,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.1, D 0.9  (Ca 2 depend on it, Ce 0 reach out, 5/48 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.11, D 0.89  (Ca 2 depend on it, Ce 0 reach out, 6/55 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -98,15 +98,15 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      appears here. Verify before deleting.
 
 -- NO PEER GROUP -----------------------------------------------
-   5 of 52 types (9.6%) sit in cohorts below --min-cohort (5).
+   5 of 59 types (8.5%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these. They are absent from the
    nominations above and from prediction-sheet.csv, and their Pctl/XMedian
    columns are blank where a cohort of one made them meaningless.
 
    Extreme against the WHOLE SOLUTION despite having no peer group.
    Weaker evidence — this compares unlike things — but not nothing:
-     OrderRepository [DataAccess] — top 5% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
-     PayloadTag [Internal] — top 8% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
+     OrderRepository [DataAccess] — top 4% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
+     PayloadTag [Internal] — top 7% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
      SurchargeTable — fan-in 1, cc 4, cohort 'Table' (size 1)

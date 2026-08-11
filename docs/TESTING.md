@@ -137,12 +137,19 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **52 type rows** from **53 declarations**, 47 methods, 131 edges, 9 cohorts, 2 excluded,
-  **zero load warnings**. The row/declaration gap is the planted identity collision below, and
-  it is the expected answer until Core keys types on `(assembly, FQN)`.
+- **59 type rows** from **60 declarations**, 57 methods, 135 edges, 10 cohorts, 2 excluded,
+  **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
+  planted identity collision below, and it is the expected answer until Core keys types on
+  `(assembly, FQN)`.
 - namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
-- unreferenced projects: `Data`, `Tools`
+- unreferenced projects: `Data`, `Tools`. **Not** `Core.Tests` — it is skipped, not dead
+- dead-code traps, all fan-in 0 and currently indistinguishable from genuinely dead code:
+  `AuditPolicySink` (registered by convention, named nowhere), `SchemaMigrationHandler` (named
+  only by a string literal), `FixtureBuilder` (used only from the skipped `Core.Tests`)
+- `TenantPolicySink` is the **contrast**: registered by `AddSingleton<T>()`, fan-in **1**. A
+  generic type argument is a compile-time reference, so the DI case §5.6 names as needing
+  detection already works. The case that does not is convention registration
 - boundary: 8 contact points, 6 inbound, 2 outbound
 - `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
 - project Martin metrics: `Core` I 0 A 0.1 D 0.9 (zone of pain); `Data` and `Tools` I 1 A 0 D 0
@@ -155,14 +162,19 @@ Tidying it up changes the expected answers.
 
 ### The fixture's known gaps
 
-**For dead code (Job A).** It has **no DI-registered type, no reflection-resolved type, and
-no test project** — which is precisely the set of dead-code false positives that must not be
-produced. Dead-code detection cannot be honestly tested until these are planted, and each
-plant needs an assertion that it is **not** reported as unreferenced without its category
-named.
+**~~For dead code (Job A).~~ Filled — the plants are in ahead of the feature.** `Core.Tests`
+exists, and `AuditPolicySink`, `SchemaMigrationHandler` and `FixtureBuilder` each read as
+unreferenced for a different legitimate reason. `FixtureCoverageTests` asserts all three have
+fan-in 0 *and* that nothing in the report mentions them — type-level dead code is not
+implemented, so that silence is a missing feature rather than a clean bill of health. The test
+fails the day detection lands, which is when each category has to be named.
 
-The trap is worth asserting on its own: these types have a static fan-in of zero, and that
-is exactly why a naive implementation kills them.
+> **Planting these corrected the requirement.** `TECHREQ-job-a.md` §5.6 asks for
+> `services.AddX<T>()` to be detected as an inbound reference. It already is — a generic type
+> argument is a compile-time reference, so `TenantPolicySink` has fan-in 1 and was never at
+> risk. The DI false positive that actually bites is **convention registration**, where no type
+> is named anywhere. Both are in the fixture now, one as trap and one as contrast, so the
+> distinction cannot be lost again.
 
 **For two existing findings (Job B).** `BUG BLAST RADIUS` and `BREAKS ALONE` nominate nothing
 on the fixture, and the SPANS roll-call collapse branch never fires. A section that emits no
