@@ -139,8 +139,8 @@ Solution
   ├─ Project[]            name, path, output kind (exe/lib/test/apihost), refs,
   │                       Ca, Ce, A, I, D
   ├─ Namespace[]          name, member types, inter-namespace edges
-  ├─ Type[]               id (FQN), name, ns, project, file, line, keyword, accessibility,
-  │                       kind + why, members, external namespaces, metrics
+  ├─ Type[]               id (assembly + FQN), name, ns, project, file, line, keyword,
+  │                       accessibility, kind + why, members, external namespaces, metrics
   ├─ Member[]             signature, file, line, cc, nesting, dsm, params
   ├─ Edge[]               from, to, weight, kind, site
   └─ ExternalDependency[] namespace, category, types touching it
@@ -187,6 +187,48 @@ a tooltip, not as a CSV column, permanently. The model therefore does not carry 
 This is a derived constraint rather than a quoted one, and the reason is mechanical: a field
 that exists gets rendered eventually, and the argument for adding it will always be made
 about the model rather than about the display.
+
+### The finding identity key — settled; the finding record is not
+
+The model above is not the finding model, and that deferral still holds for the full record:
+the HTML findings pane will say what a finding must carry, and that beats guessing. But the
+**identity** half could not wait, because three things need it before any renderer exists.
+
+- **Suppression is a relationship between findings.** "Breaks alone is suppressed for anything
+  already nominated as a concealed decision" cannot be expressed against output that has
+  already been written. Today it works by capturing nominations earlier in the same method and
+  testing membership later, which makes renderer ordering load-bearing — reorder the renderer
+  and invariant 3 breaks silently, producing *more* output, which reads as a working tool.
+- **Acknowledgment memory** needs "known and fine" to attach to something that is still the
+  same thing next run.
+- **A re-run is only informative if a finding can be new**, and new is a comparison.
+
+The key is **`(finding kind, subject)`** and nothing else. `FindingKey` and `SubjectRef` in
+`Bearing.Core`.
+
+The subject is not always a type — concealed decision is nominated at type level *and* method
+level, coverage is about the solution, and a cycle is about its members jointly — so a subject
+is one of: type, member, project, namespace, set, or solution. **A type is keyed by
+`(assembly, fully-qualified name)`, never by name alone**; see §10.
+
+**What the key excludes is the point.** File, line, metric values, threshold values, rank and
+position under `--top` are all out, because each moves when nothing meaningful changed, and any
+of them would discard an acknowledgment for a reason the user would not recognise as one.
+
+Two consequences, recorded rather than hidden:
+
+- **Magnitude is excluded.** Acknowledge a god object and it stays acknowledged if it doubles
+  in size. Banding severity into the key would make identity depend on a threshold, so a
+  retune would invalidate every stored acknowledgment and a subject on a band edge would
+  re-alert every run. Escalation is better served by storing the metrics *beside* the
+  acknowledgment and deciding the rule later — which this key does not foreclose.
+- **A rename produces a new key**, so the acknowledgment is lost and the finding returns as
+  new. Right for drift, which should surface renames as events; slightly wrong for
+  acknowledgment memory. It is the price of not building rename detection now.
+
+**Still open:** whether a *method-level* concealed decision suppresses breaks-alone on its
+declaring type. `SubjectRef` can walk member → declaring type, so either answer is expressible;
+the suppression matrix does not say which is meant.
 
 ## 5. Analysis is a function, not a process
 
@@ -286,17 +328,16 @@ decision from whether it is versioned.
 | Core is not published as a library | `Bearing.Core.csproj` — its API has no stable shape yet |
 | The probe is kept verbatim as a diff oracle | `oracle/README.md` |
 | Conventions are build errors, not warnings | `Directory.Build.props` |
+| A finding is identified by `(kind, subject)` and nothing else | §4, `FindingKey` |
+| A type is identified by `(assembly, FQN)`, never by name alone | §4, `SubjectRef` — .NET permits one FQN in two assemblies and plugin architectures use it deliberately; keying on the name merges the rows and sums their metrics |
+| The SDK is pinned | `global.json` — an unpinned toolchain picks the newest SDK on the machine, which made CI build a net8.0 project with .NET 10 and fail on rules no developer machine had |
+| Both graph artifacts are static | neither view that proved legible on a real solution needs a layout engine, so elkjs / cytoscape / d3-force come off the critical path. The only view that did need one should not ship: a two-hop ego view pulls in 24–41% of the codebase from an ordinary seed |
 
 ## 11. Decisions still open
 
 These are live, and each one changes code that has not been written yet. Full context in
 the private `TECHREQ-job-a.md` §10.
 
-- **Interactive or static dependency graph.** The largest technical fork: it sets the
-  bundle-size budget for a self-contained HTML file with no external requests, and picks
-  the layout library. Current lean — static SVG for the architecture diagram so the
-  shareable artifact is not blocked on the hard problem; interactive for the type graph
-  later.
 - **Edge kind taxonomy.** §4 commits to collecting one. *Which* set — inheritance,
   implementation, field, parameter, call, generic argument, attribute — and whether it is
   fixed or extensible, is undecided. Decide before the walkers move; §4 says why deciding
