@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The analysis half: workspace load, walkers, the structure model, graph algorithms,
+    classification. See docs/ARCHITECTURE.md.
+
+    Two rules about this project are enforced by tests/Bearing.Tests/SeamTests.cs rather
+    than by review, because prose did not stop it happening the first time — Report.cs
+    ended up 997 lines of console formatting with the interpretation baked in:
+
+      1. Bearing.Core must not reference System.Console.
+      2. Bearing.Core must not reference Bearing.Cli.
+
+    Not packed on its own. PackAsTool folds it into IronMarten.Bearing, and shipping a
+    separate library would make its API a public contract before it has a stable shape.
+  -->
+  <PropertyGroup>
+    <RootNamespace>IronMarten.Bearing</RootNamespace>
+    <AssemblyName>Bearing.Core</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+</Project>
