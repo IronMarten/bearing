@@ -137,12 +137,15 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **59 type rows** from **60 declarations**, 57 methods, 135 edges, 10 cohorts, 2 excluded,
+- **72 type rows** from **73 declarations**, 71 methods, 157 edges, 11 cohorts, 2 excluded,
   **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
   planted identity collision below, and it is the expected answer until Core keys types on
   `(assembly, FQN)`.
 - namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
+- blast radius: `ShipmentLedger` alone, in cohort `suffix:Ledger` (12 members) — fan-in 11,
+  `FanInPctl` 95.83, `FanInXMedian` 11, cc 18, `CyclomaticPctl` 95.83. All four conditions with
+  margin; the cohort is twelve rather than ten so the case does not sit on the boundary
 - unreferenced projects: `Data`, `Tools`. **Not** `Core.Tests` — it is skipped, not dead
 - dead-code traps, all fan-in 0 and currently indistinguishable from genuinely dead code:
   `AuditPolicySink` (registered by convention, named nowhere), `SchemaMigrationHandler` (named
@@ -176,17 +179,34 @@ fails the day detection lands, which is when each category has to be named.
 > is named anywhere. Both are in the fixture now, one as trap and one as contrast, so the
 > distinction cannot be lost again.
 
-**For two existing findings (Job B).** `BUG BLAST RADIUS` and `BREAKS ALONE` nominate nothing
-on the fixture, and the SPANS roll-call collapse branch never fires. A section that emits no
-output produces the same bytes whatever its thresholds are — so the goldens carry no record
-of how either finding behaves, and six of the thresholds behind them could be changed to any
-value, or the findings deleted, with the suite still green.
+**For two existing findings (Job B). `BUG BLAST RADIUS` filled; `BREAKS ALONE` still open**,
+along with the SPANS roll-call collapse branch. A section that emits no output produces the
+same bytes whatever its thresholds are — so the goldens carry no record of how the finding
+behaves, and its thresholds could be changed to any value, or the finding deleted, with the
+suite still green.
 
 Breaks alone is the one that matters: it carries three suppression rules, including *never
 imply safety at a boundary* and *never contradict yourself about one component*, and removing
 any of them turns empty output into empty output. `FixtureCoverageTests` asserts the gap so it
 cannot be mistaken for coverage. Filling it is a prerequisite for extraction —
 `TECHREQ-job-b.md` §8.
+
+> **Filling blast radius found the reason it was empty, and it was not the fixture.**
+> `Percentile` is midrank — `100 * (below + 0.5 * equal) / n` — so a unique maximum scores
+> `(n - 0.5)/n * 100`: 90.0 at n=5, **94.44 at n=9**, 95.0 at n=10. The finding requires
+> `FanInPctl >= 95`, so **no cohort of five to nine members can ever produce it**, whatever its
+> members look like, while `--min-cohort` admits cohorts of five.
+>
+> The ceiling is arithmetic, not tuning, and it is why the plant needed a twelve-member cohort
+> rather than a more extreme type. Pinned by
+> `KnownDefectTests.Blast_radius_is_unreachable_in_a_cohort_below_ten`, and it needs an answer
+> in its own right: `TECHREQ-job-b.md` §5 converts absolute gates to percentiles, and this is
+> the hazard in that direction — a percentile floor above `(n-0.5)/n` is unsatisfiable rather
+> than merely strict.
+>
+> It is also the inverse of the question that caught the original cry-wolf failure. §8 asks
+> "can this fire on 100% of a category?" Its twin — **"can this fire at all?"** — was not being
+> asked, and is now.
 
 **~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
 and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:
@@ -227,6 +247,8 @@ Each is a recurring defect class from the probe build, turned into a question:
 - Does this normalized measure have an absolute floor beside it? *(failed 5 ways)*
 - Can this fire on 100% of a category? *(failed 4 times)*
 - Can two findings contradict each other about one component?
+- **Can this fire at all?** *(new — `FanInPctl >= 95` is unsatisfiable below a cohort of ten,
+  and nothing noticed for the life of the finding)*
 - Does this claim something the tool cannot see?
 - Is a statistic being printed where none exists? *(`999x`, median-of-one)*
 

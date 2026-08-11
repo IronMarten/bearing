@@ -66,6 +66,53 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// BUG BLAST RADIUS cannot fire in a cohort smaller than ten, whatever the metrics are.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>Percentile</c> is midrank: <c>100 * (below + 0.5 * equal) / n</c>. A unique maximum
+    /// therefore scores <c>(n - 0.5)/n * 100</c> — 90.0 at n=5, 94.44 at n=9, 95.0 at n=10. The
+    /// finding requires <c>FanInPctl &gt;= 95</c>, so every cohort of five to nine members is
+    /// structurally incapable of producing it. Ties at the top score lower still.
+    /// </para>
+    /// <para>
+    /// <c>--min-cohort</c> admits cohorts of five. Four of the fixture's cohorts sit in the dead
+    /// band, and no value of fan-in, complexity or the threshold constants rescues them: the
+    /// ceiling is arithmetic, not tuning. This is why the finding nominated nothing here for so
+    /// long, and why the plant needed a twelve-member cohort rather than a more extreme type.
+    /// </para>
+    /// <para>
+    /// It is also the inverse of the review question that caught the original cry-wolf failure.
+    /// "Can this fire on 100% of a category?" has a twin — "can this fire at all?" — and nothing
+    /// was asking it.
+    /// </para>
+    /// <para>
+    /// Not superseded by any requirement yet. <c>TECHREQ-job-b.md</c> §5 converts absolute gates
+    /// to percentiles; this is the opposite direction and needs its own answer, because a
+    /// percentile floor above <c>(n-0.5)/n</c> is unsatisfiable rather than merely strict.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Blast_radius_is_unreachable_in_a_cohort_below_ten()
+    {
+        // The ceiling, computed the way the probe computes it.
+        static double MaxAchievablePctl(int cohortSize) => 100.0 * (cohortSize - 0.5) / cohortSize;
+
+        Assert.True(MaxAchievablePctl(5) < 95);    // 90.00
+        Assert.True(MaxAchievablePctl(9) < 95);    // 94.44
+        Assert.True(MaxAchievablePctl(10) >= 95);  // 95.00 — the first cohort size that can
+
+        // And the fixture agrees: no member of any cohort below ten reaches 95, including the
+        // ones that are the clear maximum of their group.
+        var stranded = run.Result.Types
+            .Where(t => t.CohortSize >= 5 && t.CohortSize < 10)
+            .ToList();
+
+        Assert.NotEmpty(stranded);
+        Assert.All(stranded, t => Assert.True(t.FanInPctl < 95));
+    }
+
+    /// <summary>
     /// Two types with the same fully-qualified name in two assemblies merge into one row, and
     /// their metrics are summed.
     /// </summary>

@@ -1,3 +1,5 @@
+using ArchProbe;
+
 namespace Bearing.Tests;
 
 /// <summary>
@@ -14,18 +16,15 @@ namespace Bearing.Tests;
 public sealed class FixtureCoverageTests(FixtureRun run)
 {
     /// <summary>
-    /// BUG BLAST RADIUS and BREAKS ALONE nominate nothing on TestBed, so the frozen goldens
-    /// carry no record of how either one behaves.
+    /// BREAKS ALONE still nominates nothing on TestBed, so the frozen goldens carry no record
+    /// of how it behaves. BUG BLAST RADIUS is covered now.
     /// </summary>
     /// <remarks>
     /// <para>
     /// This is the important consequence, and it is not obvious: a section that emits no
-    /// output produces the same bytes whatever its thresholds are. Five of the thirteen
-    /// unnamed gate literals in Job B live inside these two findings — blast radius'
-    /// <c>2.0</c> fan-in multiple, its <c>95</c> and <c>70</c> percentile floors, and breaks
-    /// alone's <c>0.8</c> instability floor and <c>1</c> fan-in floor. Every one of them
-    /// could be changed to any other value, or the findings deleted outright, and
-    /// <c>OracleGoldenTests</c> would still pass byte-for-byte.
+    /// output produces the same bytes whatever its thresholds are. Breaks alone's <c>0.8</c>
+    /// instability floor and <c>1</c> fan-in floor could be changed to any other value, or the
+    /// finding deleted outright, and <c>OracleGoldenTests</c> would still pass byte-for-byte.
     /// </para>
     /// <para>
     /// Breaks alone is the worse of the two: it carries three of Job B's seven suppression
@@ -39,12 +38,15 @@ public sealed class FixtureCoverageTests(FixtureRun run)
     /// </para>
     /// </remarks>
     [Fact]
-    public void Blast_radius_and_breaks_alone_have_no_fixture_case()
+    public void Breaks_alone_has_no_fixture_case()
     {
         var text = NominationText.Render(run.Result, run.Options);
 
-        Assert.Empty(NominationText.SubjectsUnder(text, "-- BUG BLAST RADIUS"));
         Assert.Empty(NominationText.SubjectsUnder(text, "-- BREAKS ALONE"));
+
+        // BUG BLAST RADIUS is covered now — ShipmentLedger, the Ledger cohort. Asserted here so
+        // that filling one half of this gap cannot quietly un-fill itself.
+        Assert.Equal(["ShipmentLedger"], NominationText.SubjectsUnder(text, "-- BUG BLAST RADIUS"));
 
         // Asserted alongside so this reads as a gap in two findings rather than a fact about
         // two arbitrary strings. If these ever empty out, the parser broke, not the tool.
@@ -93,6 +95,40 @@ public sealed class FixtureCoverageTests(FixtureRun run)
         // And nothing in the report mentions it — there is no section for this yet, so silence
         // here is the absence of a feature rather than a clean bill of health.
         Assert.DoesNotContain(trap, NominationText.Render(run.Result, run.Options), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The blast-radius plant moves when its thresholds move, which is the whole reason for
+    /// planting it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Output existing is not the same as a gate being observed. Before this plant, the section
+    /// was empty and would have stayed byte-identical if <c>--min-fan-in</c> had been set to any
+    /// value at all — the finding could have been deleted outright and nothing would have failed.
+    /// </para>
+    /// <para>
+    /// Only <c>MinFanIn</c> is reachable as an option; the <c>2.0</c> multiple and the <c>95</c>
+    /// and <c>70</c> percentile floors are literals inside <c>PrintNominations</c>. Those are now
+    /// covered differently but no less firmly: the nomination is in
+    /// <c>golden/nominations.verified.txt</c>, so changing any of them changes the frozen
+    /// baseline and <c>OracleGoldenTests</c> fails.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_blast_radius_plant_observes_the_fan_in_floor()
+    {
+        var atDefaults = NominationText.SubjectsUnder(
+            NominationText.Render(run.Result, run.Options), "-- BUG BLAST RADIUS");
+
+        Assert.Equal(["ShipmentLedger"], atDefaults);
+
+        // ShipmentLedger has 11 callers. Raise the floor past it and the finding goes quiet,
+        // which it could not have done before there was anything to silence.
+        var aboveThePlant = NominationText.SubjectsUnder(
+            NominationText.Render(run.Result, new Options { MinFanIn = 12 }), "-- BUG BLAST RADIUS");
+
+        Assert.Empty(aboveThePlant);
     }
 
     /// <summary>
