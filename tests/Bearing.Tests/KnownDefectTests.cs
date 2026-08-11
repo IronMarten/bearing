@@ -66,6 +66,50 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// Two types with the same fully-qualified name in two assemblies merge into one row, and
+    /// their metrics are summed.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>Model.cs</c> states the reasoning in its own comment — "types are keyed by fully-
+    /// qualified name so partials across multiple files aggregate into a single row" — and it
+    /// is correct for partials within one compilation. Across compilations it is wrong: .NET
+    /// permits the same FQN in two assemblies and plugin architectures use it deliberately.
+    /// </para>
+    /// <para>
+    /// The fixture plants the case in <c>Data</c> and <c>Tools</c>, which do not reference each
+    /// other. Confirmed on nopCommerce, where the merge also fabricated a five-project circular
+    /// reference — a shipping Job A finding computed on conflated numbers
+    /// (<c>SPIKE-job-a-prior-art.md</c> §7.5).
+    /// </para>
+    /// <para>
+    /// Superseded by <c>TECHREQ-job-b.md</c> §8 criterion 8, the one carve-out from the
+    /// byte-identical rule. When Core keys on <c>(assembly, FQN)</c> this test fails and is
+    /// deleted deliberately — and the goldens move, which is the point of planting it.
+    /// <c>SubjectRef.ForType</c> already implements the key that supersedes this.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Two_types_sharing_a_name_across_assemblies_merge_into_one_row()
+    {
+        var tags = run.Result.Types.Where(t => t.Name == "PayloadTag").ToList();
+
+        // Two declarations, two assemblies. One row.
+        Assert.Single(tags);
+
+        var merged = tags[0];
+
+        // Data's declaration carries 2 members (Label, Describe); Tools' carries 4 (_weights,
+        // Priority, Score, Weight). Neither type has six of anything.
+        Assert.Equal(6, merged.MemberCount);
+
+        // And one declaration's identity is simply lost — the surviving row attributes the
+        // whole thing to Tools, so Data's copy is invisible and its project is under-counted.
+        Assert.Equal("Tools", merged.Project);
+        Assert.EndsWith("Tools/PayloadTag.cs", merged.File.Replace('\\', '/'), StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// The contracts nominated under CHANGE COST when the fixture is rendered with
     /// <paramref name="policy"/>. Reads report text because the threshold is a literal inside
     /// <c>PrintNominations</c> and there is no model surface to assert against — see

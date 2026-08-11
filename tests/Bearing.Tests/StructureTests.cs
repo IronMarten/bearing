@@ -28,8 +28,14 @@ public sealed class StructureTests(FixtureRun run)
     [Fact]
     public void Fixture_shape_is_stable()
     {
-        Assert.Equal(51, run.Result.Types.Count);
+        // 52 rows, not 53: the two TestBed.Shared.PayloadTag declarations are one row, because
+        // type identity is keyed on name alone. That is the planted defect, pinned in
+        // KnownDefectTests. When Core keys on (assembly, FQN) this becomes 53.
+        Assert.Equal(52, run.Result.Types.Count);
         Assert.Equal(131, run.Result.Edges.Count);
+        // Methods are counted per declaration, so unlike Types this is not distorted by the
+        // planted collision: Describe, Score and Weight are all three present.
+        Assert.Equal(47, run.Result.Methods.Count);
     }
 
     // ---- Generated code exclusion -------------------------------------------------

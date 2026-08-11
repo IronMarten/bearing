@@ -137,13 +137,21 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- 51 types, 44 methods, 131 edges, 8 cohorts, 2 excluded, **zero load warnings**
+- **52 type rows** from **53 declarations**, 47 methods, 131 edges, 9 cohorts, 2 excluded,
+  **zero load warnings**. The row/declaration gap is the planted identity collision below, and
+  it is the expected answer until Core keys types on `(assembly, FQN)`.
 - namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
 - unreferenced projects: `Data`, `Tools`
 - boundary: 8 contact points, 6 inbound, 2 outbound
 - `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
 - project Martin metrics: `Core` I 0 A 0.1 D 0.9 (zone of pain); `Data` and `Tools` I 1 A 0 D 0
+- **identity collision:** `TestBed.Shared.PayloadTag` is declared `partial` in both `Data` and
+  `Tools`, which do not reference each other. The probe reports **one** row: `Project=Tools`,
+  `MemberCount 6` (Data's 2 plus Tools' 4), `Loc 42` across both files, `cc 16` while its
+  largest member is `cc 13`. Data's declaration is invisible and its project under-counted.
+  Pinned by `KnownDefectTests`; `partial` is deliberate, so a fix that stops merging partials
+  *within* one compilation is also wrong
 
 ### The fixture's known gaps
 
@@ -168,11 +176,21 @@ any of them turns empty output into empty output. `FixtureCoverageTests` asserts
 cannot be mistaken for coverage. Filling it is a prerequisite for extraction —
 `TECHREQ-job-b.md` §8.
 
-**For type identity.** No two projects in the fixture declare the same fully-qualified name. On
-a real solution that collision merges two distinct types into one row and sums their metrics
-(`TECHREQ-job-b.md` §8, criterion 8). The suite cannot currently observe the defect *or* its
-fix: the goldens stay byte-identical either way. One planted case — the same partial class name
-in the same namespace, in two projects — makes both visible.
+**~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
+and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:
+when Core keys on `(assembly, FQN)` the row count goes 52 → 53 and `KnownDefectTests` fails,
+which is the event worth seeing (`TECHREQ-job-b.md` §8, criterion 8).
+
+> **Adding to the fixture moves the frozen goldens, and §3's acceptance sentence does not
+> apply.** "The tool's behaviour changed on purpose" is not true of a fixture addition — the
+> *input* changed. Two rules keep the oracle intact:
+>
+> 1. **Regenerate in a commit that touches the fixture and nothing else.** A golden change that
+>    rides along with a Core change destroys the baseline it exists to be.
+> 2. **Expect existing rows to move.** Percentiles are population-relative, so planting one
+>    type shifted `GlobalFanInPctl` and `GlobalMaxCcPctl` on all 51 existing rows. That is
+>    arithmetic, not behaviour — but it means the diff is never purely additive, and skimming
+>    it for "only new rows" will mislead you.
 
 ## 7. The invariants are acceptance criteria
 
