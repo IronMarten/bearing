@@ -210,6 +210,78 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// The layer-span roll-call collapse groups by signature, so boilerplate arriving in a group
+    /// silences the one anomaly in it — and the examples it keeps are chosen by fan-in, which
+    /// selects for boilerplate.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Row 4 is right that six near-identical blocks are a layering pattern rather than six
+    /// discoveries. What it assumes is that a shared signature means a shared phenomenon, and
+    /// that does not hold. Four Get controllers span ApiBoundary+DataAccess+ExternalCall because
+    /// they are wired to a store and a gateway, which is boilerplate. AuthenticationMiddleware
+    /// carries the identical signature because it reaches into customer lookup and an audit
+    /// service, which is the section's own worked example of a component whose name has stopped
+    /// describing it — "a gateway policy engine wearing an auth name", per PrintLayerSpan's
+    /// summary.
+    /// </para>
+    /// <para>
+    /// Same signature, opposite meanings, and the collapse cannot tell them apart. The anomaly
+    /// keeps its name in the examples list and loses the detail block that made it actionable —
+    /// the kinds it reaches, the types it reaches them through, and the instruction to check
+    /// whether the name still fits.
+    /// </para>
+    /// <para>
+    /// Two things make it worse. The examples are ordered
+    /// <c>OrderByDescending(x =&gt; x.Type.FanIn)</c> and cut at four, and on this fixture five of
+    /// the six members tie at fan-in 0 — so which four names survive is settled by enumeration
+    /// order and nothing else. The anomaly is named here by position, not because it earned a
+    /// place, and one more boilerplate controller would displace it on a coin toss. That is the
+    /// same hazard as defect 6, arriving in report content rather than in layout.
+    /// </para>
+    /// <para>
+    /// And the collapse is triggered by population, so the more boilerplate a codebase contains
+    /// the more reliably its real finding is hidden. On either solution in the spike this branch
+    /// would fire every time.
+    /// </para>
+    /// <para>
+    /// Not superseded by any requirement yet. §4 row 4 needs to say what makes members of a
+    /// signature group equivalent, or the collapse needs to keep anomalies out of the count —
+    /// and the examples need an ordering that is not the inverse of interestingness.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_layer_span_collapse_hides_the_anomaly_it_shares_a_signature_with()
+    {
+        var text = NominationText.Render(run.Result, run.Options);
+
+        // The four boilerplate controllers and the middleware are one group, and the group
+        // collapsed.
+        Assert.Contains("a layering pattern rather than an", text, StringComparison.Ordinal);
+
+        // The middleware's own detail — the reason the section exists — is not in the report.
+        Assert.DoesNotContain("Check that the name still describes what it does", text, StringComparison.Ordinal);
+
+        // It is a genuine anomaly and not more boilerplate: it is the only member of the group
+        // reaching all three kinds through a mix of its own role and its dependencies, and the
+        // only one whose name describes a single narrow concern.
+        var middleware = run.Result.Types.Single(t => t.Name == "AuthenticationMiddleware");
+        Assert.Equal("ApiBoundary+DataAccess+ExternalCall", middleware.KindSpan);
+
+        // The ordering that picks which four to name is by fan-in, and five of the six tie at
+        // zero — so membership of the examples list is decided by enumeration order. The anomaly
+        // appears in it by position rather than on merit, and one more boilerplate controller
+        // would evict it without any threshold changing.
+        var group = run.Result.Types
+            .Where(t => t.KindSpan == "ApiBoundary+DataAccess+ExternalCall")
+            .ToList();
+
+        Assert.Equal(6, group.Count);
+        Assert.Equal(0, middleware.FanIn);
+        Assert.Equal(5, group.Count(t => t.FanIn == 0));
+    }
+
+    /// <summary>
     /// The cohort floor strips a suppression it was never meant to touch, so lowering a
     /// threshold <b>removes</b> a contradictory claim instead of adding claims.
     /// </summary>

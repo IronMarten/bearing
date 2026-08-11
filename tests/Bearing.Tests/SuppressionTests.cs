@@ -91,6 +91,49 @@ public sealed class SuppressionTests(FixtureRun run)
         Assert.DoesNotContain("AuditReconciler", BreaksAlone());
     }
 
+    /// <summary>Row 4: a signature shared by many types is a layering pattern. Invariant 2.</summary>
+    /// <remarks>
+    /// The roll-call discipline, applied to layer spans: six near-identical blocks teach nothing
+    /// and cost the section its readers, so past <c>--top / 3</c> the group collapses to one line.
+    /// Before this plant the fixture had a single spanning type and the branch had never run —
+    /// it could have been deleted with the goldens staying byte-identical.
+    /// </remarks>
+    [Fact]
+    public void Spans_layers_collapses_a_signature_shared_by_too_many_types()
+    {
+        var text = Render();
+
+        Assert.Contains(
+            "6 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern",
+            text, StringComparison.Ordinal);
+
+        // And the per-type detail is genuinely gone, rather than the summary being printed
+        // alongside it.
+        Assert.DoesNotContain(
+            "AuthenticationMiddleware [ApiBoundary] — reaches across",
+            text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Row 4's control. The floor is <c>--top / 3</c>, so lifting <c>--top</c> to 18 puts it at
+    /// exactly 6 and the six-member group stops exceeding it.
+    /// </summary>
+    /// <remarks>
+    /// The control has to move a threshold rather than build a second group: there are exactly
+    /// three <c>SignificantKinds</c> and <c>--min-kind-span</c> is 3, so every spanning type
+    /// necessarily carries the same signature and a second group cannot exist at defaults.
+    /// </remarks>
+    [Fact]
+    public void Raising_top_restores_the_per_type_layer_span_detail()
+    {
+        var text = Render(new Options { Top = 18 });
+
+        Assert.Contains(
+            "AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds",
+            text, StringComparison.Ordinal);
+        Assert.DoesNotContain("a layering pattern rather than an", text, StringComparison.Ordinal);
+    }
+
     /// <summary>Row 6: "plumbing" is an absolute claim, so an absolute floor decides it.</summary>
     /// <remarks>
     /// <para>

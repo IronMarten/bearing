@@ -35,10 +35,11 @@ public sealed class FixtureCoverageTests(FixtureRun run)
     /// three rows now.
     /// </para>
     /// <para>
-    /// Still uncovered: the SPANS roll-call collapse branch, and suppression rows 4 and 5.
-    /// Rows 6 and 7 are covered by <c>SuppressionTests</c>, and the interaction row 7 exposed —
-    /// the cohort floor stripping row 2's suppression off breaks alone — is pinned in
-    /// <c>KnownDefectTests</c>.
+    /// Still uncovered: suppression row 5. Rows 4, 6 and 7 are covered by
+    /// <c>SuppressionTests</c> — including the SPANS roll-call collapse — and the two defects
+    /// they exposed are pinned in <c>KnownDefectTests</c>: the cohort floor stripping row 2's
+    /// suppression off breaks alone, and the layer-span collapse hiding the anomaly it shares a
+    /// signature with.
     /// </para>
     /// </remarks>
     [Fact]
