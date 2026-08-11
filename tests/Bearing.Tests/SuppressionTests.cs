@@ -91,6 +91,53 @@ public sealed class SuppressionTests(FixtureRun run)
         Assert.DoesNotContain("AuditReconciler", BreaksAlone());
     }
 
+    /// <summary>Row 7: no peer group means no relative claim. Invariants 6 and 8.</summary>
+    /// <remarks>
+    /// <para>
+    /// PricingVault is planted so the cohort floor is the only thing between it and a
+    /// concealed-decision nomination — every other condition is asserted below, so absence here
+    /// can only be the gate. Nothing already in the fixture could do this job: OrderRepository
+    /// sits in a cohort of two, but its outlier factor is 1.8 against a floor of 3.0, so it is
+    /// excluded twice over and a test written on it would have passed for the wrong reason.
+    /// </para>
+    /// <para>
+    /// The claim being suppressed is <i>comparative</i> — "far above its peers" — and three peers
+    /// is not a distribution. The type is not silently dropped: it surfaces under NO PEER GROUP
+    /// with a solution-wide reading and that weaker basis stated, which is invariant 8.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_cohort_relative_finding_is_suppressed_below_the_cohort_floor()
+    {
+        var vault = Type("PricingVault");
+
+        // Every other condition of CONCEALED DECISION is met.
+        Assert.True(vault.MaxMemberCyclomatic >= run.Options.MinDecisionCc);
+        Assert.True(vault.MaxMemberCyclomaticXMedian >= run.Options.OutlierFactor);
+        Assert.True(vault.FanInXMedian <= 2.0);
+        Assert.True(vault.FanOutXMedian <= 2.0);
+
+        // And this one is not.
+        Assert.True(vault.CohortSize < run.Options.MinCohort);
+
+        Assert.DoesNotContain("PricingVault", ConcealedDecisions());
+    }
+
+    /// <summary>
+    /// Row 7's control, and the reason the test above is about the gate rather than about
+    /// absence: move the floor under the cohort and the finding comes back.
+    /// </summary>
+    /// <remarks>
+    /// Nothing else changes — the metrics were computed once, at defaults, and only the
+    /// eligibility filter differs. A suppression that stopped working would show up here as the
+    /// finding appearing at both settings; one that started over-firing would show up as neither.
+    /// </remarks>
+    [Fact]
+    public void Lowering_the_cohort_floor_restores_the_suppressed_finding()
+    {
+        Assert.Contains("PricingVault", ConcealedDecisions(new Options { MinCohort = 3 }));
+    }
+
     /// <summary>
     /// The control: with the three suppressions accounted for, the finding still fires on the
     /// type it should.
@@ -116,9 +163,16 @@ public sealed class SuppressionTests(FixtureRun run)
     /// Type-level concealed-decision subjects. The section renders <c>Type.Member</c>, so the
     /// subject is trimmed back to the type.
     /// </summary>
-    private string[] ConcealedDecisions() =>
+    private string[] ConcealedDecisions() => ConcealedDecisions(run.Options);
+
+    /// <summary>
+    /// The same, under a different threshold policy. The metrics were computed once at defaults;
+    /// only the eligibility filter inside <c>PrintNominations</c> differs, which is what lets a
+    /// gate be tested by moving it rather than by asserting an absence.
+    /// </summary>
+    private string[] ConcealedDecisions(Options policy) =>
         NominationText.SubjectsUnder(
-                NominationText.Render(run.Result, run.Options), "-- CONCEALED DECISION -")
+                NominationText.Render(run.Result, policy), "-- CONCEALED DECISION -")
             .Select(s => s.Split('.')[0])
             .ToArray();
 }

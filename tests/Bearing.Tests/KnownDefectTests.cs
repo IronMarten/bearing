@@ -210,6 +210,67 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// The cohort floor strips a suppression it was never meant to touch, so lowering a
+    /// threshold <b>removes</b> a contradictory claim instead of adding claims.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Row 7 suppresses cohort-relative findings below <c>--min-cohort</c>, which is right: three
+    /// peers is not a distribution. But BREAKS ALONE is not cohort-relative — its heading says
+    /// "no cohort required" — and it reads its row 2 suppression out of the concealed-decision
+    /// list, which <i>is</i> cohort-gated:
+    /// </para>
+    /// <code>
+    /// var concealedIds = new HashSet&lt;string&gt;(concealed.Select(t =&gt; t.Id), ...);  // from `eligible`
+    /// var breaksAlone = result.Types                                             // NOT from `eligible`
+    ///     .Where(t =&gt; !concealedIds.Contains(t.Id))
+    /// </code>
+    /// <para>
+    /// So a small peer group drops a type out of concealed decision, out of <c>concealedIds</c>,
+    /// and straight into breaks alone. Suppressing one finding switched another one on, and the
+    /// report tells the reader that a type it cannot characterise is safe to change.
+    /// </para>
+    /// <para>
+    /// This is invariant 3 again, but not the path <c>TECHREQ-job-b.md</c> §4 row 2 was amended
+    /// to cover: that amendment was about type level versus method level, and this is about
+    /// eligibility. Both share one cause — suppression is ordering inside a renderer rather than
+    /// a declared relationship between findings, so it can only see what has already been
+    /// computed by the time it runs.
+    /// </para>
+    /// <para>
+    /// Not superseded by any requirement yet. §4 needs a row saying a suppression may not be
+    /// weakened by the gate on the finding that supplies it; the fix in Core is that suppression
+    /// is evaluated over findings, not over a filtered list a renderer happened to build first.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone()
+    {
+        // At defaults its cohort of three is below the floor, so it is not a concealed decision
+        // and nothing suppresses breaks alone.
+        Assert.DoesNotContain("RoutingDepot", ConcealedSubjects(run.Options));
+        Assert.Contains("RoutingDepot", BreaksAlone(run.Options));
+
+        // Drop the floor under that same cohort and the type is nominated as a concealed
+        // decision — at which point the suppression it should always have had starts working
+        // and breaks alone goes quiet. Same type, same metrics, one threshold.
+        var floorAtThree = new Options { MinCohort = 3 };
+
+        Assert.Contains("RoutingDepot", ConcealedSubjects(floorAtThree));
+        Assert.DoesNotContain("RoutingDepot", BreaksAlone(floorAtThree));
+    }
+
+    private string[] BreaksAlone(Options policy) =>
+        NominationText.SubjectsUnder(
+            NominationText.Render(run.Result, policy), "-- BREAKS ALONE");
+
+    private string[] ConcealedSubjects(Options policy) =>
+        NominationText.SubjectsUnder(
+                NominationText.Render(run.Result, policy), "-- CONCEALED DECISION -")
+            .Select(s => s.Split('.')[0])
+            .ToArray();
+
+    /// <summary>
     /// The contracts nominated under CHANGE COST when the fixture is rendered with
     /// <paramref name="policy"/>. Reads report text because the threshold is a literal inside
     /// <c>PrintNominations</c> and there is no model surface to assert against — see

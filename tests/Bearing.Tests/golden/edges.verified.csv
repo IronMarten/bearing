@@ -118,6 +118,12 @@ global::TestBed.Core.ReferenceNormalizer,global::TestBed.Core.ShipmentCoordinato
 global::TestBed.Core.Router,global::TestBed.Core.NormalizedResponse,2
 global::TestBed.Core.ShipmentCoordinator,global::TestBed.Core.Router,2
 global::TestBed.Core.ShipmentCoordinator,global::TestBed.Core.RawResponse,2
+global::TestBed.Core.StorageCatalog,global::TestBed.Core.Vaults.PricingVault,2
+global::TestBed.Core.StorageCatalog,global::TestBed.Core.Vaults.TokenVault,2
+global::TestBed.Core.StorageCatalog,global::TestBed.Core.Vaults.SessionVault,2
+global::TestBed.Core.StorageCatalog,global::TestBed.Core.Depots.RoutingDepot,2
+global::TestBed.Core.StorageCatalog,global::TestBed.Core.Depots.LabelDepot,2
+global::TestBed.Core.StorageCatalog,global::TestBed.Core.Depots.ManifestDepot,2
 global::TestBed.Core.SurchargeApplier,global::TestBed.Core.Pricing.SurchargeTable,2
 global::TestBed.Core.TariffCalculator,global::TestBed.Core.TenantStore,2
 global::TestBed.Core.TrackingNormalizer,global::TestBed.Core.TariffCalculator,2
@@ -128,7 +134,9 @@ global::TestBed.Core.TransitNormalizer,global::TestBed.Core.TariffCalculator,2
 global::TestBed.Core.TransitNormalizer,global::TestBed.Core.AuditClient,2
 global::TestBed.Core.TransitNormalizer,global::TestBed.Core.NormalizationContext,2
 global::TestBed.Core.TransitNormalizer,global::TestBed.Core.ShipmentCoordinator,2
+global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.NormalizeStep,2
 global::TestBed.Core.Pricing.SurchargeTable,global::TestBed.Core.NormalizationContext,2
+global::TestBed.Core.Vaults.PricingVault,global::TestBed.Core.NormalizeStep,2
 global::TestBed.Core.AccessorialNormalizer,global::TestBed.Core.IResponseNormalizer,1
 global::TestBed.Core.AddressNormalizer,global::TestBed.Core.IResponseNormalizer,1
 global::TestBed.Core.AuthenticationMiddleware,global::TestBed.Core.ControllerBase,1
@@ -201,3 +209,12 @@ global::TestBed.Core.ShipmentCoordinator,global::TestBed.Core.CarrierGateway,1
 global::TestBed.Core.SurchargeApplier,global::TestBed.Core.NormalizationContext,1
 global::TestBed.Core.TrackingNormalizer,global::TestBed.Core.IResponseNormalizer,1
 global::TestBed.Core.TransitNormalizer,global::TestBed.Core.IResponseNormalizer,1
+global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.ValidateStep,1
+global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.EnrichStep,1
+global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.PriceStep,1
+global::TestBed.Core.Depots.LabelDepot,global::TestBed.Core.NormalizeStep,1
+global::TestBed.Core.Depots.LabelDepot,global::TestBed.Core.ValidateStep,1
+global::TestBed.Core.Depots.ManifestDepot,global::TestBed.Core.NormalizeStep,1
+global::TestBed.Core.Depots.ManifestDepot,global::TestBed.Core.ValidateStep,1
+global::TestBed.Core.Vaults.TokenVault,global::TestBed.Core.NormalizeStep,1
+global::TestBed.Core.Vaults.SessionVault,global::TestBed.Core.NormalizeStep,1
