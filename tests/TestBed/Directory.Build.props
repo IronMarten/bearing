@@ -1,0 +1,31 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!--
+    TestBed is the fixture, and its defects are the specification.
+
+    It contains, on purpose: a god object, a concealed decision hidden in plumbing, seven
+    near-identical normalizers with one planted outlier, a DIP contrast pair, a namespace
+    cycle between TestBed.Core and TestBed.Core.Pricing, two projects nothing references,
+    a type named like data access that is not, and scaffolded code that must be excluded.
+
+    Every assertion in tests/Bearing.Tests is a claim about this exact shape — 51 types,
+    131 edges, 8 cohorts, 2 excluded. Tidying it up, enabling nullable, or letting an
+    analyzer talk anyone into a "harmless" refactor changes the expected answers and
+    breaks the suite for reasons that have nothing to do with Bearing.
+
+    Treat this directory as data. If you need a new case, ADD to it — do not reshape what
+    is here, and update the known answers in docs/TESTING.md when you do.
+  -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AnalysisLevel>none</AnalysisLevel>
+    <WarningLevel>0</WarningLevel>
+    <NoWarn>$(NoWarn);CS0169;CS0414;CS0649;CS8618</NoWarn>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+</Project>

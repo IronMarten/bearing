@@ -1,0 +1,122 @@
+root = true
+
+# Bearing code conventions. These are enforced at build time — see Directory.Build.props.
+# oracle/ and tests/TestBed/ opt out; both have a Directory.Build.props explaining why.
+# The reasoning behind the choices is in CONTRIBUTING.md.
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{md,markdown}]
+indent_size = 2
+# Markdown uses two trailing spaces for a hard line break.
+trim_trailing_whitespace = false
+
+[*.{json,yml,yaml,csproj,props,targets,xml}]
+indent_size = 2
+
+[*.sln]
+indent_style = tab
+
+[*.csv]
+# Golden baselines. Nothing may touch these but a deliberate regeneration.
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+# ----------------------------------------------------------------------------------------
+[*.cs]
+
+# ---- Language conventions ----------------------------------------------------------
+
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_using_directive_placement = outside_namespace:warning
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+csharp_prefer_braces = when_multiline:suggestion
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+
+dotnet_style_readonly_field = true:warning
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+csharp_prefer_static_local_function = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:silent
+
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = false:silent
+dotnet_style_prefer_conditional_expression_over_return = false:silent
+
+# ---- Naming ------------------------------------------------------------------------
+
+dotnet_naming_rule.types_pascal.symbols = type_symbols
+dotnet_naming_rule.types_pascal.style = pascal_case
+dotnet_naming_rule.types_pascal.severity = warning
+dotnet_naming_symbols.type_symbols.applicable_kinds = class,struct,interface,enum,delegate,method,property,event,namespace
+dotnet_naming_symbols.type_symbols.applicable_accessibilities = *
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_rule.interfaces_i_prefix.symbols = interface_symbols
+dotnet_naming_rule.interfaces_i_prefix.style = i_prefix
+dotnet_naming_rule.interfaces_i_prefix.severity = warning
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_style.i_prefix.capitalization = pascal_case
+dotnet_naming_style.i_prefix.required_prefix = I
+
+dotnet_naming_rule.private_fields_underscore.symbols = private_field_symbols
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_symbols.private_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_field_symbols.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+dotnet_naming_style.underscore_camel.required_prefix = _
+
+# ---- Determinism: errors, not warnings ---------------------------------------------
+#
+# These are not style. Bearing's output is compared byte-for-byte against a stored
+# baseline, and a machine whose culture formats 3.5 as "3,5" produces a diff that looks
+# like a behaviour change and is not. golden/types.csv was already unusable across
+# machines for a related reason (absolute paths); this is the class of bug that causes it.
+#
+# Ordinal comparison matters for the same reason it mattered in the probe: namespace
+# matching is by segment, and System.Net.Http must never collapse to System.Net.
+
+dotnet_diagnostic.CA1305.severity = error   # specify IFormatProvider
+dotnet_diagnostic.CA1304.severity = error   # specify CultureInfo
+dotnet_diagnostic.CA1310.severity = error   # StringComparison for correctness
+dotnet_diagnostic.CA1307.severity = error   # StringComparison for clarity
+dotnet_diagnostic.CA1309.severity = error   # use ordinal StringComparison
+
+# ---- Deliberately relaxed -----------------------------------------------------------
+#
+# CA1848 wants LoggerMessage delegates; this is a CLI that runs once, not a hot server
+# path. CA1812 misfires on types only constructed by the test host or a DI container,
+# which is exactly the false positive Bearing's own dead-code detector must avoid
+# (TECHREQ-job-a.md 5.6) — we should not ship a rule we tell users is unreliable.
+
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA1014.severity = none    # CLSCompliant is not meaningful for a tool
+
+# ----------------------------------------------------------------------------------------
+[tests/**/*.cs]
+
+# Test method names are sentences: Solution_loads_with_no_warnings. That is deliberate and
+# it is how the existing suite reads, so the naming rule must not fight it.
+dotnet_naming_rule.types_pascal.severity = none
+
+# Async test methods without await, and unused locals in arrange blocks, are normal.
+dotnet_diagnostic.CA1707.severity = none    # underscores in member names
+dotnet_diagnostic.CA2007.severity = none    # ConfigureAwait is irrelevant in a test host
+dotnet_diagnostic.CA1861.severity = none    # constant arrays in InlineData/assertions
+
+# CA1711 objects to reserved suffixes, but xUnit's own idiom is a [CollectionDefinition]
+# class named *Collection. The rule is right about API design and wrong about this file.
+dotnet_diagnostic.CA1711.severity = none

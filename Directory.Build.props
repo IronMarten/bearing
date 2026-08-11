@@ -1,0 +1,60 @@
+<Project>
+
+  <!--
+    Repo-wide build settings. Two directories deliberately opt out, and both have their own
+    Directory.Build.props saying why:
+
+      oracle/          ArchProbe is frozen verbatim as the diff oracle. It carries 32
+                       analyzer warnings. Fixing them would edit the baseline we compare
+                       against, which is the one thing it exists not to do.
+      tests/TestBed/   The fixture is deliberately bad code. Its shape IS the expected
+                       answer — a god object, a namespace cycle, seven near-identical
+                       normalizers. Cleaning it up invalidates every assertion.
+
+    Everything else is strict. See CONTRIBUTING.md.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!--
+    Conventions bind or they get ignored. A warning in a build log is a convention nobody
+    follows by the third month.
+  -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>9999</WarningLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!--
+    Deterministic output. ContinuousIntegrationBuild normalises embedded paths, which is
+    also what keeps build output comparable between a developer machine and CI — the same
+    class of bug that made golden/types.csv unusable. See docs/TESTING.md.
+  -->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Shared package identity. Only Bearing.Cli actually packs; the rest set IsPackable=false. -->
+  <PropertyGroup>
+    <Authors>Iron Marten</Authors>
+    <Company>Iron Marten</Company>
+    <Product>Bearing</Product>
+    <Copyright>Copyright (c) Iron Marten</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ironmarten/bearing</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ironmarten/bearing</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>
