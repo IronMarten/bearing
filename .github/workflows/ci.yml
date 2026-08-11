@@ -1,0 +1,89 @@
+# The gate. Conventions are build errors (CONTRIBUTING.md) and the golden baselines are
+# compared on every run (docs/TESTING.md), so a green build here means both held.
+#
+# Note the workflow filename: NuGet trusted publishing (GitHub Actions OIDC) needs the
+# repository and the workflow file name in its policy, which is why the policy could not be
+# set up before this file existed. See nuget-prefix-request.md.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Verify launches a diff tool on a failing snapshot. There is nobody here to look at it.
+  DiffEngine_Disabled: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both, deliberately. The golden baselines were unusable across machines once
+        # already; a Linux run is what catches path and line-ending assumptions that a
+        # Windows-only suite would never notice.
+        os: [windows-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore Bearing.sln
+
+      # ContinuousIntegrationBuild switches on via the CI variable that the runner already
+      # sets, which normalises embedded source paths. Release so the analyzers see the same
+      # code that ships.
+      - name: Build
+        run: dotnet build Bearing.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Bearing.sln --configuration Release --no-build --verbosity normal
+
+      # A failing snapshot is only diagnosable with the file the run actually produced.
+      - name: Upload received snapshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: received-snapshots-${{ matrix.os }}
+          path: '**/*.received.*'
+          if-no-files-found: ignore
+
+  pack:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Source Link embeds commit information; a shallow clone gives it nothing to work
+          # with and the symbols point nowhere.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Proves the package still builds with its metadata intact. Publishing stays manual
+      # until the NuGet ID prefix is granted.
+      - name: Pack
+        run: dotnet pack src/Bearing.Cli/Bearing.Cli.csproj --configuration Release --output artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*

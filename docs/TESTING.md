@@ -1,0 +1,211 @@
+# Testing
+
+```
+dotnet test Bearing.sln
+```
+
+43 assertions, about 3 seconds. The workspace load is the cost centre, not the analysis, so
+the whole suite shares one analyzed fixture.
+
+---
+
+## 1. Why this suite is shaped the way it is
+
+Roughly **32 defects** were found while building the probe. Every one of them was caught by
+a human reading console output, because nothing asserted. Several were *reintroductions* —
+ties ranking at the 100th percentile, zero medians, roll-call findings — the same failure
+reappearing in a new message after being fixed elsewhere, caught the second and third time
+only by manual vigilance.
+
+Manual vigilance does not survive a restructure, and phase 1 is a restructure. That is what
+this suite is for. It is not a coverage target.
+
+## 2. The stack
+
+| Choice | Why |
+|---|---|
+| xUnit v2, bare `Assert` | already in use, no assertion-library dependency to carry |
+| Verify.Xunit | snapshot workflow: `.received.` vs `.verified.`, diff tooling, explicit accept |
+| One test project | the oracle comparison runs both implementations; a project boundary through the middle of that would help nobody |
+| `System.Reflection.Metadata` | reads compiled IL for the seam tests — no extra dependency |
+
+Deliberately **not** FluentAssertions: v8 moved to a commercial licence, and this is an
+Apache-2.0 repository with a paid tier planned downstream. Not a fight worth having later.
+
+## 3. Two snapshot regimes, and they are not the same
+
+This is the distinction most likely to be got wrong, because Verify treats both identically
+and the difference is entirely one of intent.
+
+### Frozen — `tests/Bearing.Tests/golden/`
+
+`nominations.verified.txt`, `types.verified.csv`, `edges.verified.csv`: the output of the
+pristine probe against `tests/TestBed`.
+
+These are **evidence, not output**. They record what the tool did before the extraction
+started. `OracleGoldenTests` regenerates them from the probe on every run and compares.
+
+> Accepting a change here is a claim that the tool's behaviour changed on purpose. It goes
+> in the commit message, in those words, with the reason. If you cannot write that sentence,
+> you have found a bug rather than an improvement.
+
+This was a shell command in `oracle/README.md` that somebody had to remember to run. It is
+a test now for the reason in §1.
+
+### Accept-workflow — everywhere else
+
+Snapshots of surfaces still being designed: JSON output, the HTML report, terminal
+rendering. There is no prior truth to preserve, so re-accepting as the design moves is
+normal maintenance and needs no ceremony.
+
+### Accepting a snapshot
+
+A failing snapshot writes `<name>.received.<ext>` beside the verified file. Read the diff,
+then:
+
+```
+mv golden/nominations.received.txt golden/nominations.verified.txt
+```
+
+`*.received.*` is git-ignored. In CI and headless runs set `DiffEngine_Disabled=true` so no
+diff tool is launched.
+
+## 4. Snapshots must be machine-independent, and the harness does that work
+
+**Normalisation belongs in the harness, never in the code under test.**
+
+`VerifyConfiguration.cs` holds one scrubber: it rewrites any absolute path into the fixture
+as `TestBed/…` with forward slashes. Verify's default date and GUID scrubbers are turned
+**off**, because the fixture contains neither and anything they matched would be real
+content silently replaced by a token — a green test over changed data.
+
+This is not hypothetical. The original `golden/types.csv` carried 51 rows of
+`C:\Users\…\dotnet-tool\TestBed\…` — captured from a working folder outside this repository
+entirely. The byte-for-byte gate that phase 1 depends on would have failed all 51 rows on
+its first honest run, for a reason with nothing to do with behaviour. The natural reaction
+to that failure is to regenerate the baseline, which destroys the baseline.
+
+The current baselines were re-recorded and verified identical to the originals once paths
+were normalised — same bytes, same findings, nothing behavioural changed.
+
+## 5. What is asserted
+
+**Against the model, never against report wording.** `Report.cs` is the layer being
+replaced; tests coupled to its sentences would die exactly when they are needed. The
+snapshots in §3 are the deliberate exception, and they exist to catch the wording moving.
+
+| File | Covers |
+|---|---|
+| `GraphTests` | Tarjan over synthetic input, no Roslyn. Includes a 50,000-deep chain, which pins the iterative implementation against a well-meaning recursive rewrite. |
+| `StructureTests` | load health, fixture shape, generated-code exclusion, `Kind` classification, namespace truncation, cohort discovery, contract fan-in, hub magnitudes |
+| `OracleGoldenTests` | the three frozen baselines |
+| `SeamTests` | Core references no console; Core does not depend on Cli |
+| `ToolInfoTests` | the first logic in Core |
+| `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
+| `FixtureCoverageTests` | what the fixture does *not* cover, asserted so it stays visible |
+
+### Pinning a defect you are not allowed to fix
+
+The oracle is frozen, so a defect found after the freeze cannot be fixed where it lives. It
+gets a test asserting the **wrong** behaviour instead, naming the requirement that supersedes
+it. Extraction then cannot carry it forward silently, and cannot fix it silently either — the
+day Core does the right thing the test fails, and deleting it is a deliberate act rather than
+a diff nobody reads.
+
+`Change_cost_is_gated_by_min_cohort_where_it_means_min_fan_in` is the first. It is also the
+one place the suite reads report text rather than the model, because the threshold is a
+literal inside `PrintNominations` and there is no model surface to assert against. That
+absence is the defect; only the subject names are read, never the sentence.
+
+### Order matters in `StructureTests`
+
+Load health is asserted first because everything below it is meaningless if it fails. A
+project that does not load understates fan-in everywhere it is referenced.
+
+## 6. The fixture is the specification
+
+`tests/TestBed/` is a synthetic solution with **known answers**, and its defects are
+deliberate: a god object, a concealed decision hidden in plumbing, seven near-identical
+normalizers with one planted outlier, a DIP contrast pair, a layer-spanning auth
+middleware, a namespace cycle, two unreferenced projects, a type named like data access
+that is not, and scaffolded code that must be excluded.
+
+It opts out of analyzers and warnings-as-errors (`tests/TestBed/Directory.Build.props`).
+Tidying it up changes the expected answers.
+
+**Add to it; do not reshape it.** When you add a case, record its known answer below.
+
+### Current known answers
+
+- 51 types, 44 methods, 131 edges, 8 cohorts, 2 excluded, **zero load warnings**
+- namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
+- type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
+- unreferenced projects: `Data`, `Tools`
+- boundary: 8 contact points, 6 inbound, 2 outbound
+- `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
+- project Martin metrics: `Core` I 0 A 0.1 D 0.9 (zone of pain); `Data` and `Tools` I 1 A 0 D 0
+
+### The fixture's known gaps
+
+**For dead code (Job A).** It has **no DI-registered type, no reflection-resolved type, and
+no test project** — which is precisely the set of dead-code false positives that must not be
+produced. Dead-code detection cannot be honestly tested until these are planted, and each
+plant needs an assertion that it is **not** reported as unreferenced without its category
+named.
+
+The trap is worth asserting on its own: these types have a static fan-in of zero, and that
+is exactly why a naive implementation kills them.
+
+**For two existing findings (Job B).** `BUG BLAST RADIUS` and `BREAKS ALONE` nominate nothing
+on the fixture, and the SPANS roll-call collapse branch never fires. A section that emits no
+output produces the same bytes whatever its thresholds are — so the goldens carry no record
+of how either finding behaves, and six of the thresholds behind them could be changed to any
+value, or the findings deleted, with the suite still green.
+
+Breaks alone is the one that matters: it carries three suppression rules, including *never
+imply safety at a boundary* and *never contradict yourself about one component*, and removing
+any of them turns empty output into empty output. `FixtureCoverageTests` asserts the gap so it
+cannot be mistaken for coverage. Filling it is a prerequisite for extraction —
+`TECHREQ-job-b.md` §8.
+
+**For type identity.** No two projects in the fixture declare the same fully-qualified name. On
+a real solution that collision merges two distinct types into one row and sums their metrics
+(`TECHREQ-job-b.md` §8, criterion 8). The suite cannot currently observe the defect *or* its
+fix: the goldens stay byte-identical either way. One planted case — the same partial class name
+in the same namespace, in two projects — makes both visible.
+
+## 7. The invariants are acceptance criteria
+
+From the PRD. Not style preferences — every one was learned by shipping the opposite and
+watching it produce confident, plausible, wrong output. These four are the ones the current
+work can violate:
+
+| Invariant | Test |
+|---|---|
+| 2 — anomaly, not roll-call | the integration map lists no plumbing namespace individually |
+| 4 — never imply safety at a boundary | no output contains "safe to delete/remove" |
+| 6 — blank, never fake | a project with no dependents emits blank I, not 0 |
+| 8 — state the coverage | every view reports exclusions, load failures, and what was skipped |
+
+Invariant 6 is currently enforced in the wrong place — see
+[`ARCHITECTURE.md`](ARCHITECTURE.md) §3.
+
+## 8. Review questions for any new finding
+
+Each is a recurring defect class from the probe build, turned into a question:
+
+- Does this normalized measure have an absolute floor beside it? *(failed 5 ways)*
+- Can this fire on 100% of a category? *(failed 4 times)*
+- Can two findings contradict each other about one component?
+- Does this claim something the tool cannot see?
+- Is a statistic being printed where none exists? *(`999x`, median-of-one)*
+
+## 9. A gate that cannot fail is worse than no gate
+
+Both new gates were mutation-tested when they were written: a `Console.WriteLine` added to
+`Bearing.Core` fails `SeamTests`, and moving one threshold fails `OracleGoldenTests`. Do the
+same for the next one — a snapshot suite that silently stopped covering anything looks
+exactly like a passing suite.
+
+`SeamTests.The_seam_test_is_actually_looking_at_something` exists for this reason: every
+other assertion in that file passes trivially against an assembly that is missing or empty.

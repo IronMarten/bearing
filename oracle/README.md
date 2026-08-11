@@ -14,17 +14,30 @@ replaced.
 
 ## The rule while extracting
 
-`tests/Bearing.Tests/golden/` holds `nominations.txt`, `types.csv` and `edges.csv` from a
-clean run of the pristine probe against `tests/TestBed`. After moving any computation out of
-`Report.cs`:
+`tests/Bearing.Tests/golden/` holds `nominations.verified.txt`, `types.verified.csv` and
+`edges.verified.csv` from a clean run of the pristine probe against `tests/TestBed`.
+
+Byte-identical, or the extraction changed behaviour. **This is a test now** —
+`OracleGoldenTests` regenerates all three from the probe on every run, so:
 
 ```
-dotnet run --project oracle/ArchProbe -- tests/TestBed/TestBed.sln --out ../after
-diff ../after/nominations.txt tests/Bearing.Tests/golden/nominations.txt
+dotnet test Bearing.sln
 ```
 
-Byte-identical, or the extraction changed behaviour. Regenerate the golden files only with a
-deliberate, explained reason — they are the baseline, not an output.
+It used to be the manual `diff` that lived here, which meant it only ran when somebody
+remembered. Several of the probe's defects were reintroductions caught the second and third
+time by exactly that kind of vigilance, and vigilance is what a restructure destroys.
+
+Regenerate the baselines only with a deliberate reason stated in the commit message — they
+are evidence, not output. Paths are normalised by the test harness, never by the probe; see
+`docs/TESTING.md` §4 for why that distinction cost 51 rows once already.
 
 A second pristine copy lives outside this repo, so the comparison never depends on git
 archaeology.
+
+## Why it carries 32 analyzer warnings
+
+`oracle/Directory.Build.props` turns off warnings-as-errors, analyzers and code style for
+this directory. That is deliberate and the file explains it: fixing a CA1305 here can change
+the decimals rendered into `nominations.txt`, which is a behaviour change wearing the
+costume of a lint fix. The probe is evidence, not source we maintain.
