@@ -226,9 +226,14 @@ Two consequences, recorded rather than hidden:
   new. Right for drift, which should surface renames as events; slightly wrong for
   acknowledgment memory. It is the price of not building rename detection now.
 
-**Still open:** whether a *method-level* concealed decision suppresses breaks-alone on its
-declaring type. `SubjectRef` can walk member → declaring type, so either answer is expressible;
-the suppression matrix does not say which is meant.
+**A method-level concealed decision suppresses breaks-alone on its declaring type.** The
+suppression matrix says "already nominated as a concealed decision" without saying whether a
+nomination on one of the type's methods counts. It does. The reason the suppression exists is
+that structural isolation is not safety when a component *decides* something — a normalizer
+that picks the wrong option propagates into the data going out the door rather than through the
+call graph — and that argument is about behaviour, which lives in methods. Which level happened
+to nominate it does not change whether the decision is there. `SubjectRef` walks member →
+declaring type for exactly this.
 
 ## 5. Analysis is a function, not a process
 
