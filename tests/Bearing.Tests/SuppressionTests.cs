@@ -91,6 +91,67 @@ public sealed class SuppressionTests(FixtureRun run)
         Assert.DoesNotContain("AuditReconciler", BreaksAlone());
     }
 
+    /// <summary>Row 6: "plumbing" is an absolute claim, so an absolute floor decides it.</summary>
+    /// <remarks>
+    /// <para>
+    /// The only row of the seven that suppresses a <i>claim inside</i> a finding rather than the
+    /// finding itself. The nomination fires either way; what the floor decides is whether the
+    /// sentence is allowed to say "looks like plumbing".
+    /// </para>
+    /// <para>
+    /// It has to, because the selection filter is relative — <c>FanInXMedian &lt;= 2.0</c> — and in
+    /// a cohort where everything is heavily used, ordinary for its peers still means widely
+    /// depended on. ThroughputGauge is exactly that: fan-in 5, and fan-in 5 is also the cohort
+    /// median. Relative says unremarkable, absolute says five callers, and only one of those two
+    /// readings can be put in front of a developer without being laughed at.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_plumbing_wording_is_suppressed_above_the_fan_in_floor()
+    {
+        var gauge = Type("ThroughputGauge");
+
+        Assert.True(gauge.FanIn >= run.Options.MinFanIn);
+        Assert.True(gauge.FanInXMedian <= 2.0);
+
+        // The finding itself is not suppressed — asserting only the absence below would pass
+        // just as well if the nomination had stopped firing altogether.
+        Assert.Contains("ThroughputGauge", ConcealedDecisions());
+
+        Assert.Contains(
+            "ThroughputGauge.Sample — connectivity is unremarkable for its peers",
+            Render(), StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "ThroughputGauge.Sample — looks like plumbing",
+            Render(), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Row 6's control. Raise the floor past the same type and the plumbing wording comes back,
+    /// which is what proves the branch is live rather than merely unvisited.
+    /// </summary>
+    [Fact]
+    public void Raising_the_fan_in_floor_restores_the_plumbing_wording()
+    {
+        Assert.Contains(
+            "ThroughputGauge.Sample — looks like plumbing",
+            Render(new Options { MinFanIn = 6 }), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// And the contrast: below the floor the plumbing wording is accurate, and still used. Both
+    /// branches are reachable on one fixture at one setting.
+    /// </summary>
+    [Fact]
+    public void Below_the_fan_in_floor_the_plumbing_wording_still_applies()
+    {
+        Assert.True(Type("RateReconciler").FanIn < run.Options.MinFanIn);
+
+        Assert.Contains(
+            "RateReconciler.Reconcile — looks like plumbing",
+            Render(), StringComparison.Ordinal);
+    }
+
     /// <summary>Row 7: no peer group means no relative claim. Invariants 6 and 8.</summary>
     /// <remarks>
     /// <para>
@@ -154,6 +215,16 @@ public sealed class SuppressionTests(FixtureRun run)
 
     private TypeMetrics Type(string name) =>
         run.Result.Types.Single(t => t.Name == name);
+
+    /// <summary>
+    /// The rendered nominations. Row 6 is the one row that has to be asserted against wording,
+    /// because wording is what it suppresses — there is no model surface carrying the distinction
+    /// between "plumbing" and "unremarkable for its peers", and that absence is itself part of
+    /// what extraction has to fix.
+    /// </summary>
+    private string Render() => Render(run.Options);
+
+    private string Render(Options policy) => NominationText.Render(run.Result, policy);
 
     private string[] BreaksAlone() =>
         NominationText.SubjectsUnder(

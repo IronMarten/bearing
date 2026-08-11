@@ -7,16 +7,18 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
 -- CONCEALED DECISION ------------------------------------------
    (complexity far above peers, connectivity ordinary)
    ShipmentController.Post — looks like plumbing but is in the top 7% of internal complexity among your 7 ControllerBase. (12x the peer median; cc 12, dsm 4, fan-in 0, fan-out 5)
+   ThroughputGauge.Sample — connectivity is unremarkable for its peers, but it is in the top 10% of internal complexity among your 5 Gauge. (8x the peer median; cc 8, dsm 0, fan-in 5, fan-out 1)
    AuthenticationMiddleware.Authenticate — looks like plumbing but is in the top 36% of internal complexity among your 7 ControllerBase. (5x the peer median; cc 5, dsm 2, fan-in 0, fan-out 5)
    RateReconciler.Reconcile — looks like plumbing but is in the top 11% of internal complexity among your 9 Reconciler. (4.33x the peer median; cc 13, dsm 0, fan-in 1, fan-out 4)
    GuaranteedServiceNormalizer.Normalize — looks like plumbing but is in the top 7% of internal complexity among your 7 IResponseNormalizer. (3.5x the peer median; cc 21, dsm 16, fan-in 1, fan-out 5)
 
 -- CONCEALED DECISION, METHOD LEVEL ----------------------------
-   TariffCalculator.Apply — 22x the median complexity of its 31 peers (cc 22, dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
+   TariffCalculator.Apply — 22x the median complexity of its 32 peers (cc 22, dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
    ShipmentLedger.Record — 16x the median complexity of its 13 peers (cc 16, dsm 1, nesting 1, 26 lines) — Ledgers.cs:40
-   ShipmentCoordinator.Coordinate — 13x the median complexity of its 31 peers (cc 13, dsm 11, nesting 1, 25 lines) — ShipmentCoordinator.cs:18
+   ShipmentCoordinator.Coordinate — 13x the median complexity of its 32 peers (cc 13, dsm 11, nesting 1, 25 lines) — ShipmentCoordinator.cs:18
    ShipmentController.Post — 12x the median complexity of its 7 peers (cc 12, dsm 4, nesting 2, 20 lines) — Controllers.cs:44
    ReconciliationController.Reconcile — 11x the median complexity of its 7 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:291
+   ThroughputGauge.Sample — 8x the median complexity of its 5 peers (cc 8, dsm 0, nesting 1, 15 lines) — Gauges.cs:55
    AuthenticationMiddleware.Authenticate — 5x the median complexity of its 7 peers (cc 5, dsm 2, nesting 1, 12 lines) — AuthenticationMiddleware.cs:13
    RateReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:120
    MethodReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:188
@@ -98,7 +100,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.07, D 0.93  (Ca 2 depend on it, Ce 0 reach out, 6/92 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.06, D 0.94  (Ca 2 depend on it, Ce 0 reach out, 6/103 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -110,16 +112,16 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      appears here. Verify before deleting.
 
 -- NO PEER GROUP -----------------------------------------------
-   11 of 96 types (11.5%) sit in cohorts below --min-cohort (5).
+   11 of 107 types (10.3%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these. They are absent from the
    nominations above and from prediction-sheet.csv, and their Pctl/XMedian
    columns are blank where a cohort of one made them meaningless.
 
    Extreme against the WHOLE SOLUTION despite having no peer group.
    Weaker evidence — this compares unlike things — but not nothing:
-     OrderRepository [DataAccess] — top 3% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
+     OrderRepository [DataAccess] — top 2% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
      PayloadTag [Internal] — top 6% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
-     RoutingDepot [Internal] — top 9% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
+     RoutingDepot [Internal] — top 8% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
      RoutingDepot — fan-in 1, cc 12, cohort 'Depot' (size 3)
