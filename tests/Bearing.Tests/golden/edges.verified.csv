@@ -1,4 +1,4 @@
-From,To,Weight
+﻿From,To,Weight
 global::TestBed.Core.GuaranteedServiceNormalizer,global::TestBed.Core.NormalizedResponse,27
 global::TestBed.Core.GuaranteedServiceNormalizer,global::TestBed.Core.GuaranteedServiceNormalizer.ServiceOption,21
 global::TestBed.Core.ShipmentCoordinator,global::TestBed.Core.NormalizedResponse,16

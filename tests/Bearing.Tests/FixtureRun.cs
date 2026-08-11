@@ -35,9 +35,19 @@ public sealed class FixtureRun
     internal AnalysisResult Result { get; }
     internal IReadOnlyDictionary<string, TypeMetrics> ByName { get; }
 
+    /// <summary>
+    /// The options the fixture was analysed with — defaults throughout.
+    /// </summary>
+    /// <remarks>
+    /// Exposed because the golden baselines were recorded with defaults, and the renderers
+    /// take <see cref="Options"/> as an argument. A test that reproduced them by hand would
+    /// be asserting against its own copy of the thresholds rather than the tool's.
+    /// </remarks>
+    internal Options Options { get; }
+
     public FixtureRun()
     {
-        var options = new Options { SolutionPath = SolutionPath() };
+        var options = Options = new Options { SolutionPath = RepoPaths.TestBedSolution };
 
         Result = new SolutionAnalyzer(options)
             .RunAsync(CancellationToken.None)
@@ -58,19 +68,6 @@ public sealed class FixtureRun
             ? t
             : throw new InvalidOperationException(
                 $"TestBed has no type '{name}'. Present: {string.Join(", ", ByName.Keys.Order())}");
-
-    static string SolutionPath()
-    {
-        // Walk up from the test binaries to the repo root.
-        var dir = AppContext.BaseDirectory;
-        while (dir is not null && !Directory.Exists(Path.Combine(dir, "tests", "TestBed")))
-            dir = Path.GetDirectoryName(dir);
-
-        if (dir is null)
-            throw new InvalidOperationException("Could not locate tests/TestBed from " + AppContext.BaseDirectory);
-
-        return Path.Combine(dir, "tests", "TestBed", "TestBed.sln");
-    }
 }
 
 [CollectionDefinition(Name)]

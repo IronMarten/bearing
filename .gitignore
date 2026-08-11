@@ -21,6 +21,10 @@ bearing-out/
 archprobe-out/
 *-out/
 
+## Verify: what a failing snapshot produced. The *.verified.* files ARE committed —
+## they are the baseline. See docs/TESTING.md.
+*.received.*
+
 ## OS
 Thumbs.db
 .DS_Store
