@@ -38,9 +38,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # global-json-file, not dotnet-version. The runner image ships a newer SDK
+      # preinstalled, and `dotnet-version` only ADDS an SDK — it does not select one.
+      # Without global.json the newest wins, which is how the first CI run built with
+      # .NET 10 against a net8.0 target and failed on analyzer rules that do not exist
+      # in the SDK this project builds with locally.
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          global-json-file: global.json
+
+      - name: Verify the SDK actually in use
+        run: dotnet --version
 
       - name: Restore
         run: dotnet restore Bearing.sln
@@ -74,9 +82,11 @@ jobs:
           # with and the symbols point nowhere.
           fetch-depth: 0
 
+      # Same pin as the build job. A package built by a different SDK than the one the
+      # tests ran under is not the artifact that was verified.
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          global-json-file: global.json
 
       # Proves the package still builds with its metadata intact. Publishing stays manual
       # until the NuGet ID prefix is granted.

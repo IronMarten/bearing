@@ -12,7 +12,7 @@ namespace Bearing.Tests;
 /// </summary>
 public sealed class GraphTests
 {
-    static Dictionary<string, List<string>> Graph(params (string From, string[] To)[] edges) =>
+    private static Dictionary<string, List<string>> Graph(params (string From, string[] To)[] edges) =>
         edges.ToDictionary(e => e.From, e => e.To.ToList(), StringComparer.Ordinal);
 
     [Fact]
