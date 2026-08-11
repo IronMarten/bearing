@@ -134,6 +134,23 @@ public sealed class SuppressionTests(FixtureRun run)
         Assert.DoesNotContain("a layering pattern rather than an", text, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Row 5 has no behavioural test, and this records why rather than leaving a gap that looks
+    /// like an oversight.
+    /// </summary>
+    /// <remarks>
+    /// The widest-contract-surface suppression cannot fire at any boundary count: its filter is
+    /// median-relative and therefore already caps the qualifying set at half the boundaries,
+    /// which is the same number the suppression asks it to exceed. Proof and the general case
+    /// are in <c>KnownDefectTests</c>. All that can be asserted here is the unsuppressed state —
+    /// which is the only state there is.
+    /// </remarks>
+    [Fact]
+    public void Widest_contract_surface_is_the_row_that_only_ever_fires()
+    {
+        Assert.Contains("WIDEST CONTRACT SURFACE", Render(), StringComparison.Ordinal);
+    }
+
     /// <summary>Row 6: "plumbing" is an absolute claim, so an absolute floor decides it.</summary>
     /// <remarks>
     /// <para>

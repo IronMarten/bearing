@@ -35,11 +35,14 @@ public sealed class FixtureCoverageTests(FixtureRun run)
     /// three rows now.
     /// </para>
     /// <para>
-    /// Still uncovered: suppression row 5. Rows 4, 6 and 7 are covered by
-    /// <c>SuppressionTests</c> — including the SPANS roll-call collapse — and the two defects
-    /// they exposed are pinned in <c>KnownDefectTests</c>: the cohort floor stripping row 2's
-    /// suppression off breaks alone, and the layer-span collapse hiding the anomaly it shares a
-    /// signature with.
+    /// All seven suppression rows are now addressed. Six have behavioural tests in
+    /// <c>SuppressionTests</c>, each with a control that moves the threshold rather than merely
+    /// asserting an absence. Row 5 has none and cannot: the widest-contract-surface suppression
+    /// is unreachable at every boundary count, proved in <c>KnownDefectTests</c>.
+    ///
+    /// Three defects came out of writing them, all pinned: the cohort floor stripping row 2's
+    /// suppression off breaks alone, the layer-span collapse hiding the anomaly it shares a
+    /// signature with, and row 5 itself.
     /// </para>
     /// </remarks>
     [Fact]

@@ -210,6 +210,89 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// WIDEST CONTRACT SURFACE can never be suppressed, at any number of boundaries. Its filter
+    /// and its suppression threshold are the same number.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Row 5 says the section is suppressed when the qualifying set exceeds half the boundaries,
+    /// because a list that long is not discriminating and is therefore noise. The implementation:
+    /// </para>
+    /// <code>
+    /// var bigSurface = boundaries
+    ///     .Where(t =&gt; t.DataShape &gt;= Math.Max(surfaceMedian * 1.5, 1))
+    ///     .OrderByDescending(t =&gt; t.DataShape).Take(5).ToList();
+    /// if (bigSurface.Count &gt; 0 &amp;&amp; bigSurface.Count &lt;= Math.Max(1, boundaries.Count / 2))
+    /// </code>
+    /// <para>
+    /// A value at or above 1.5x a positive median is strictly above that median, so every
+    /// qualifying boundary comes from the upper half of the distribution and the qualifying set
+    /// can never hold more than <c>floor(n / 2)</c> members. When the median is zero the
+    /// threshold falls back to 1, and the members at or below the median are all zero, so the
+    /// bound is the same or tighter. Either way the count tops out at exactly the value it is
+    /// required to EXCEED. It lands on the boundary at every n and never crosses it.
+    /// </para>
+    /// <para>
+    /// The <c>Take(5)</c> is a second, independent ceiling that bites from ten boundaries up,
+    /// but it is not what makes this unreachable — removing it changes nothing, because the
+    /// median-relative filter has already capped the set at half.
+    /// </para>
+    /// <para>
+    /// So this is the third finding in the fixture whose real question is "can this fire at
+    /// all?", after BUG BLAST RADIUS below a cohort of ten and the layer-span examples list. It
+    /// is also the one that most deserved the question: the rule exists to protect readers of
+    /// LARGE codebases from an undiscriminating list, and it has never run anywhere.
+    /// </para>
+    /// <para>
+    /// Not superseded by any requirement yet, and unlike the other rows this one cannot be fixed
+    /// by moving a constant — a proportional suppression cannot sit on top of a filter that is
+    /// itself proportional to the same distribution. The gate has to be expressed against
+    /// something the filter does not already bound: an absolute surface floor, or a dispersion
+    /// test that asks whether the top of the distribution is actually separated from the middle.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Widest_contract_surface_can_never_be_suppressed()
+    {
+        // The probe's own arithmetic, reproduced so the claim is about the rule and not about
+        // one fixture. Median matches Report.Median; the rest is PrintBoundaries.
+        static double Median(double[] v)
+        {
+            var s = (double[])v.Clone();
+            Array.Sort(s);
+            var mid = s.Length / 2;
+            return s.Length % 2 == 1 ? s[mid] : (s[mid - 1] + s[mid]) / 2.0;
+        }
+
+        static bool Suppressed(double[] shapes)
+        {
+            var qualifying = Math.Min(shapes.Count(s => s >= Math.Max(Median(shapes) * 1.5, 1)), 5);
+            return qualifying > 0 && qualifying > Math.Max(1, shapes.Length / 2);
+        }
+
+        // The fixture's own nine boundaries: one qualifies against a ceiling of four.
+        var fixtureShapes = run.Result.Types
+            .Where(t => t.Kind is "ApiBoundary" or "ExternalCall")
+            .Select(t => (double)t.DataShape)
+            .ToArray();
+
+        Assert.Equal(9, fixtureShapes.Length);
+        Assert.False(Suppressed(fixtureShapes));
+
+        // And the distributions that MAXIMISE the qualifying set — half the boundaries at zero,
+        // half as wide as you like. Every one lands exactly on the threshold and none crosses
+        // it, which is the signature of a gate measured against its own filter.
+        Assert.False(Suppressed([0, 100]));
+        Assert.False(Suppressed([0, 0, 100, 100]));
+        Assert.False(Suppressed([0, 0, 0, 0, 0, 100, 100, 100, 100]));
+        Assert.False(Suppressed([0, 0, 0, 0, 0, 100, 100, 100, 100, 100]));
+        Assert.False(Suppressed([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 100, 100, 100]));
+
+        // Including when the spread is extreme rather than binary.
+        Assert.False(Suppressed([1, 2, 3, 4, 5, 600, 700, 800, 900]));
+    }
+
+    /// <summary>
     /// The layer-span roll-call collapse groups by signature, so boilerplate arriving in a group
     /// silences the one anomaly in it — and the examples it keeps are chosen by fan-in, which
     /// selects for boilerplate.
