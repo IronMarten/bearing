@@ -213,7 +213,7 @@ This is a derived constraint rather than a quoted one, and the reason is mechani
 that exists gets rendered eventually, and the argument for adding it will always be made
 about the model rather than about the display.
 
-### The finding identity key — settled; the finding record is not
+### The finding identity key — settled; the finding record is deferred but no longer empty
 
 The model above is not the finding model, and that deferral still holds for the full record:
 the HTML findings pane will say what a finding must carry, and that beats guessing. But the
@@ -258,7 +258,31 @@ that structural isolation is not safety when a component *decides* something —
 that picks the wrong option propagates into the data going out the door rather than through the
 call graph — and that argument is about behaviour, which lives in methods. Which level happened
 to nominate it does not change whether the decision is there. `SubjectRef` walks member →
-declaring type for exactly this.
+declaring type for exactly this, and `FindingSet.ContainsAbout` is the query that expresses it.
+
+### What a finding carries, and what is still deferred
+
+The record stayed deferred; three parts of it could not, because the first two findings to move
+needed them and none is a guess about what the HTML pane will want.
+
+| On `Finding` | Why it exists now |
+|---|---|
+| `Receipts` | §6 — a claim whose basis is not available is worthless even when it is correct. Each names the `AnalysisPolicy` value it was tested against rather than copying the number, so a finding and the policy cannot disagree about what gated it, and the mapping is checkable |
+| `Qualifiers` | §4 row 6 suppresses a *sentence* rather than a finding, and there was no model surface carrying the distinction — so the only thing testable was the probe's prose. Core decides whether the qualifying fact holds; Cli decides the words |
+| `Participants` | invariant 7 — the model retains the named participants of a claim, not only its magnitude |
+
+Severity, rank and position stay out, for the reasons the key excludes them.
+
+**Detection and suppression are separate passes** (`Analysis`). Every detector sees the model
+and nothing else, so no detector can depend on having run after another one; relationships
+between findings are resolved afterwards against the whole `FindingSet`. In the probe they are
+resolved by where the code sits in a 1,066-line method, which is what makes reordering it break
+invariant 3 without failing anything.
+
+**Core does not truncate.** `Top` is a display cap and applying it in the model leaves every
+renderer unable to say how much it is not showing (`DEFECTS.md` §3). It also silently weakens
+suppression: in the probe the set breaks-alone tests membership against is the truncated one, so
+a type nominated below the cap suppresses nothing.
 
 ## 5. Analysis is a function, not a process
 
@@ -368,6 +392,9 @@ decision from whether it is versioned.
 | `StableThreshold` and `IsolatedThreshold` are independent | the defaults are 0.2 and 0.8 and the symmetry is coincidence, not maintained. They gate different findings over different populations; deriving one from the other would make one flag move two findings |
 | A method-level concealed decision suppresses breaks-alone on its declaring type | the reason the suppression exists is behavioural, and behaviour lives in methods — so the level that *nominated* it is not what decides. `SubjectRef` walks member → declaring type to express it. Not yet implemented: `DEFECTS.md` §15 |
 | Every emitted artifact is ordered by a total key | a stable sort on a non-total key reproduces on one machine without being a property of the tool, and Core is a reimplementation that will not inherit the probe's enumeration order. `TESTING.md` §5, `DEFECTS.md` §6 |
+| A finding carries receipts, qualifiers and participants; the rest of the record stays deferred | §4 — each of the three is load-bearing for a finding that has already moved, and none anticipates the findings pane |
+| Detection and suppression are separate passes over the whole finding set | §4 — a detector that can only be correct if it runs after another one is the probe's ordering dependence with different syntax |
+| Core emits every finding; `Top` is applied by the renderer | §4 — a truncating model cannot disclose what it dropped, and in the probe truncation silently weakens suppression |
 
 ## 11. Decisions still open
 
