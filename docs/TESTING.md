@@ -484,10 +484,17 @@ type that clears the rank and complexity gates while failing one of those two, a
 exclusion needs a type depending on *abstractions* rather than concrete ones. Confirmed by
 re-running those three mutations after the plant — all three still pass.
 
-**~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
-and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:
-when Core keys on `(assembly, FQN)` the row count goes 52 → 53 and `KnownDefectTests` fails,
-which is the event worth seeing (`TECHREQ-job-b.md` §8, criterion 8).
+**~~For type identity.~~ Filled, and half of what it promised did not happen.**
+`TestBed.Shared.PayloadTag` is declared in both `Data` and `Tools`, and the goldens record the
+merged row. Core has since keyed on `(assembly, FQN)` — it reports 133 types against the probe's
+132 — so the fix is real and `WalkerEquivalenceTests` asserts it (`TECHREQ-job-b.md` §8,
+criterion 8). But `KnownDefectTests` did **not** fail on that day and never will: it asserts
+against the probe's run, and the probe is frozen.
+
+The plant makes the *defect* visible and not its consequence. Both declarations have fan-in 0, so
+the merged type is in no cycle and no nomination that depends on inbound edges — merged and split
+give identical output everywhere it could matter. Listed in §6 as unobservable; `TASKS.md` P8 is
+the plant that would close it.
 
 > **Adding to the fixture moves the frozen goldens, and §3's acceptance sentence does not
 > apply.** "The tool's behaviour changed on purpose" is not true of a fixture addition — the
@@ -569,6 +576,15 @@ nothing for these:
 | `SurfaceOutlierMultiple`, `SurfaceOutlierFloor`, `SurfaceDiscriminationDivisor` | §3.10 | **not ported yet** — Core reads none of them |
 | `GlobalFanInPercentile`, `GlobalComplexityPercentile`, `GlobalComplexityFloor` | §3.11 | **not ported yet**, and two are dead on the fixture besides — see below |
 | `MinTangle` 4 | graphs | not ported yet |
+
+**One divergence the fixture cannot see, and it is not a constant.** Core keys type identity on
+`(assembly, FQN)` and the probe keys on the FQN alone — `DEFECTS.md` §1, the one carve-out from
+the byte-identical rule. The plant that was supposed to make it observable, `PayloadTag` in `Data`
+and `Tools`, gives both declarations fan-in 0. Nothing points at either, so the merged type is in
+no strongly-connected component and no nomination that reads inbound edges: merged and split
+produce the same output everywhere except the type count itself. **S2 will therefore agree with
+the probe on cycles for a reason that has nothing to do with S2 being right.** `TASKS.md` P8 —
+a *new* colliding pair, wired so the merge closes a cycle the split does not.
 
 **The three findings that were still in the probe, inventoried ahead of their ports.** This is the
 part that was never done before, and it paid: every prediction below held when the ports landed,

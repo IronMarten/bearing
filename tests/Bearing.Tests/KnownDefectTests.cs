@@ -13,10 +13,22 @@ namespace Bearing.Tests;
 /// that states the <b>wrong</b> behaviour as the current behaviour.
 /// </para>
 /// <para>
-/// That cuts both ways on purpose. Extraction cannot carry the defect forward silently,
-/// because the requirement is written down beside it — and it cannot fix it silently either,
-/// because the day <c>Bearing.Core</c> does the right thing this test fails and somebody has
-/// to delete it deliberately. Deleting it is the event worth seeing.
+/// That stops extraction carrying a defect forward silently, because the requirement is
+/// written down beside the behaviour.
+/// </para>
+/// <para>
+/// <b>It does not stop extraction fixing one silently, and this comment used to claim it did.</b>
+/// Every assertion here runs against <c>run.Result</c> — the probe's run — so none of these tests
+/// can fail when <c>Bearing.Core</c> starts doing the right thing. Defect 1 is the proof: Core has
+/// keyed type identity on <c>(assembly, FQN)</c> since <c>ModelBuilder</c> adopted
+/// <c>SubjectRef</c>, and the pin below is still green. These are a record of the oracle's
+/// behaviour and they retire with the oracle at R2.
+/// </para>
+/// <para>
+/// What catches a silent fix is the equivalence suite, which runs both implementations and
+/// compares them — <c>WalkerEquivalenceTests</c>, <c>CoreEquivalenceTests</c>,
+/// <c>FindingEquivalenceTests</c>. A defect Core is expected to fix belongs there too, stated as
+/// an intended divergence.
 /// </para>
 /// <para>
 /// Every entry names the requirement that supersedes it.
@@ -186,8 +198,8 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
-    /// Two types with the same fully-qualified name in two assemblies merge into one row, and
-    /// their metrics are summed.
+    /// In the probe, two types with the same fully-qualified name in two assemblies merge into
+    /// one row and their metrics are summed. Core does not; see the remarks.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -204,9 +216,15 @@ public sealed class KnownDefectTests(FixtureRun run)
     /// </para>
     /// <para>
     /// Superseded by <c>TECHREQ-job-b.md</c> §8 criterion 8, the one carve-out from the
-    /// byte-identical rule. When Core keys on <c>(assembly, FQN)</c> this test fails and is
-    /// deleted deliberately — and the goldens move, which is the point of planting it.
-    /// <c>SubjectRef.ForType</c> already implements the key that supersedes this.
+    /// byte-identical rule — and <b>Core has already taken it</b>. <c>ModelBuilder</c> keys both
+    /// the type table and the edge map on <c>SubjectRef.ForType(assembly, fqn).Canonical</c>, so
+    /// Core keeps the two declarations apart; <c>WalkerEquivalenceTests</c> is where that is
+    /// asserted.
+    /// </para>
+    /// <para>
+    /// This test therefore does <b>not</b> fail on the fix, because it asserts against the
+    /// probe's run and the probe is frozen. It records what the oracle does, and it retires with
+    /// the oracle at R2 rather than on the day Core gets it right — that day has passed.
     /// </para>
     /// </remarks>
     [Fact]

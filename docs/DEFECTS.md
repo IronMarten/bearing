@@ -49,11 +49,31 @@ every measure stays byte-identical, and it takes the project abstractness ratio 
 finding's *identity*, not just its severity, can differ between two machines analysing the same
 commit.
 
-**Half remedied.** `SubjectRef.ForType(assembly, fqn)` is the correct key and is tested — see
-`ARCHITECTURE.md` §4. Nothing computes with it yet; the walkers still key on name, so the defect
-is live until extraction adopts it.
+**Fixed in Core.** `SubjectRef.ForType(assembly, fqn)` is the correct key — `ARCHITECTURE.md` §4 —
+and Core computes with it: `ModelBuilder.GetOrAdd` keys the type table on `subject.Canonical`, and
+`CollectReferences` keys the edge map on the canonical pair, so nodes *and* edges are
+assembly-qualified. This is the one behaviour extraction is permitted to change
+(`TECHREQ-job-b.md` §8 criterion 8), and `WalkerEquivalenceTests` asserts the divergence from
+three sides: Core reports exactly one type more than the probe, it keeps both `PayloadTag`
+declarations, and each is attributed to the project that declares it rather than to whichever
+loaded first.
 
-Pinned: `Two_types_sharing_a_name_across_assemblies_merge_into_one_row`.
+**Live in the probe, and it stays there.** The oracle is frozen, so the merge remains in the
+goldens until the renderer moves off them at R1.
+
+**Still owed: a case where the difference decides something.** Both `PayloadTag` declarations have
+fan-in 0, and the type appears in neither the namespace cycle nor the eight-type tangle. A type
+with no inbound edges cannot be in a strongly-connected component, so merging or splitting it
+yields identical components — Core's cycle output will match the probe's exactly, and the
+nopCommerce fabrication has no fixture analogue. The obvious repair is the wrong one: giving
+`PayloadTag` fan-in adds inbound edges to a type that already exists and disarms the
+unreferenced-type traps that name it (`FixtureCoverageTests`, and both fan-in-0 lists in the
+goldens). The plant is a **new** colliding pair, declared in two assemblies and sitting inside a
+cycle. Until it exists, this fix is asserted and not observed — `docs/TESTING.md` §6.
+
+Pinned: `Two_types_sharing_a_name_across_assemblies_merge_into_one_row` — a pin on the **probe's**
+behaviour, not a guard on Core's. It asserts against the probe's run, and the probe cannot change,
+so it can never fire. It retires with the oracle at R2.
 
 ### 2. Absolute gates saturate; percentile gates do not — **one of three converted**
 

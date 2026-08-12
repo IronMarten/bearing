@@ -34,8 +34,9 @@ public sealed class StructureTests(FixtureRun run)
     public void Fixture_shape_is_stable()
     {
         // 132 rows, not 133: the two TestBed.Shared.PayloadTag declarations are one row, because
-        // type identity is keyed on name alone. That is the planted defect, pinned in
-        // KnownDefectTests. When Core keys on (assembly, FQN) this becomes 133.
+        // the probe keys type identity on name alone. That is the planted defect, pinned in
+        // KnownDefectTests. This count is the probe's and stays 132 — Core already keys on
+        // (assembly, FQN) and reports 133; WalkerEquivalenceTests asserts the difference.
         //
         // NormalizerScenarios is absent, and correctly so — it lives in Core.Tests, which is
         // skipped.
