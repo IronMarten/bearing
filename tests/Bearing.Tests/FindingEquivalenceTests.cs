@@ -160,6 +160,119 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Null(bearing.ValueOf("CohortSize"));
     }
 
+    // ------------------------------------------------ hubs and static state ------------
+
+    /// <summary>
+    /// Hubs agree with the probe. The <b>disjunction</b> is what changes, not the population.
+    /// </summary>
+    /// <remarks>
+    /// The subjects are read out of the rendered section rather than re-derived, with the standing
+    /// note about routers and mediators dropped — <c>NominationText</c> warns that this section
+    /// prints one and that its lines would otherwise read as nominations. The note itself is
+    /// required by §3.8 and is a rendering concern, so nothing here asserts on it.
+    /// </remarks>
+    [Fact]
+    public void Hub_nominations_are_the_probes()
+    {
+        var expected = ProbeNominations("-- HUBS AND GOD OBJECTS", stopAt: "NOTE:");
+        var actual = CoreTypeNominations(FindingKind.HubOrGodObject);
+
+        Assert.Equal(expected, actual);
+        Assert.NotEmpty(actual);
+    }
+
+    /// <summary>
+    /// The two arms of §3.8's disjunction say different things, which is <c>DEFECTS.md</c> §16.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The probe prints one sentence for both arms — <i>"it both depends on and is depended on by
+    /// much of the system, AND carries real logic"</i> — and on the size arm that is false by
+    /// construction, because the arm exists precisely for types with bulk and no logic.
+    /// <c>DispatchRegistry</c> is told it carries real logic in a sentence whose own receipts say
+    /// twenty-three members and a worst method of cc 1. Invariant 5 puts interpretation first and
+    /// math as receipts, and there the interpretation refutes its own receipts.
+    /// </para>
+    /// <para>
+    /// Core carries the arms as two independent qualifiers, so a renderer cannot make the claim by
+    /// accident. The fixture supplies one type per combination, which is what makes this a gate
+    /// rather than a comment: complexity alone, size alone, and neither.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_hub_disjunction_has_two_arms_that_say_different_things()
+    {
+        var registry = Hub("DispatchRegistry");
+        var coordinator = Hub("ShipmentCoordinator");
+        var router = Hub("Router");
+
+        // Size alone. The receipts that refute the probe's sentence, on the finding that makes it.
+        Assert.True(registry.Holds(Qualifiers.TooLargeToHold));
+        Assert.False(registry.Holds(Qualifiers.CarriesRealLogic));
+        Assert.Equal(1, registry.ValueOf("MaxMemberCyclomatic"));
+
+        // Complexity alone — the arm where the probe's wording was true all along.
+        Assert.True(coordinator.Holds(Qualifiers.CarriesRealLogic));
+        Assert.False(coordinator.Holds(Qualifiers.TooLargeToHold));
+
+        // And neither, which is the wiring hub. All three are still hubs: the split decides what
+        // is said about them, never whether they are nominated.
+        Assert.False(router.Holds(Qualifiers.CarriesRealLogic));
+        Assert.False(router.Holds(Qualifiers.TooLargeToHold));
+
+        // The gate is the minimum of the two magnitudes, not the maximum. Router is the case that
+        // separates them from below and IResponseNormalizer the one that separates them from
+        // above: fan-in 8 and fan-out 3, so a max-based gate would nominate it and this one must
+        // not. SESSION-NOTES.md #14 — a ratio cannot see this finding at all.
+        var normalizer = core.Model.Types.Single(t => t.Name == "IResponseNormalizer");
+        Assert.True(Math.Max(normalizer.FanIn, normalizer.FanOut) >= core.Model.Policy.HubMin);
+        Assert.True(Math.Min(normalizer.FanIn, normalizer.FanOut) < core.Model.Policy.HubMin);
+        Assert.DoesNotContain(
+            Analysis.FindingsFor(core.Model).About(normalizer.Subject),
+            f => f.Kind == FindingKind.HubOrGodObject);
+    }
+
+    [Fact]
+    public void Shared_mutable_state_nominations_are_the_probes()
+    {
+        var expected = ProbeNominations("-- SHARED MUTABLE STATE");
+        var actual = CoreTypeNominations(FindingKind.SharedMutableState);
+
+        Assert.Equal(expected, actual);
+        Assert.NotEmpty(actual);
+    }
+
+    /// <summary>
+    /// The finding names the members that write, rather than leaving the reader a count.
+    /// </summary>
+    /// <remarks>
+    /// Invariant 7, and the increment case that <c>SESSION-NOTES.md</c> #20 records as a real
+    /// defect: <c>DispatchCounter.Record</c> is a single <c>++</c>, a non-atomic read-modify-write
+    /// that shares state exactly as much as an assignment. Stop counting increments and this
+    /// finding empties, which is the whole of its gate — so the count is asserted exactly rather
+    /// than as "more than none".
+    /// </remarks>
+    [Fact]
+    public void Shared_mutable_state_names_the_members_that_write()
+    {
+        var counter = Assert.Single(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.SharedMutableState),
+            f => core.Model.Find(f.Subject)!.Name == "DispatchCounter");
+
+        Assert.Equal(1, counter.ValueOf("StaticMutations"));
+        Assert.Equal(["Record"], MemberNames(counter));
+
+        // Two writes, two members named. The pre-existing case, which could not protect the
+        // increment fix because it also carries a plain assignment.
+        var assembler = Assert.Single(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.SharedMutableState),
+            f => core.Model.Find(f.Subject)!.Name == "QuoteAssembler");
+
+        Assert.Equal(2, assembler.ValueOf("StaticMutations"));
+        Assert.Equal(["Build", "Reset"], MemberNames(assembler));
+    }
+
+
     // ----------------------------------------------------- breaks alone, and §4's rows ----
 
     /// <summary>
@@ -453,6 +566,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         }
     }
 
+
     /// <summary>
     /// The fixture ties, so the tiebreak above is exercised rather than merely present.
     /// </summary>
@@ -484,8 +598,33 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// breaks ties on identity, and which of the two orderings a tied pair lands in is not what
     /// equivalence is about. The order Core emits is asserted separately.
     /// </remarks>
-    private List<string> ProbeNominations(string header) =>
-        NominationText.SubjectsUnder(NominationText.Render(probe.Result, Uncapped), header)
+    /// <param name="stopAt">
+    /// The first word of a trailing standing note, where the section prints one. HUBS AND GOD
+    /// OBJECTS closes with the note that routers and mediators legitimately live there, and its
+    /// lines would otherwise be read as nominated subjects.
+    /// </param>
+    private List<string> ProbeNominations(string header, string? stopAt = null)
+    {
+        var subjects = NominationText.SubjectsUnder(
+            NominationText.Render(probe.Result, Uncapped), header);
+
+        return (stopAt is null
+                ? subjects
+                : subjects.TakeWhile(s => !string.Equals(s, stopAt, StringComparison.Ordinal)))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+    }
+
+
+    private Finding Hub(string typeName) =>
+        Assert.Single(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.HubOrGodObject),
+            f => core.Model.Find(f.Subject)!.Name == typeName);
+
+    /// <summary>The member names a finding names as participants.</summary>
+    private List<string> MemberNames(Finding finding) =>
+        finding.Participants
+            .Select(p => core.Model.Find(p.DeclaringType!)!.Members.Single(m => m.Subject == p).Name)
             .Order(StringComparer.Ordinal)
             .ToList();
 

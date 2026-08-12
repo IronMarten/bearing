@@ -69,6 +69,28 @@ public static class Qualifiers
     /// <c>SESSION-NOTES.md</c> #17.
     /// </remarks>
     public const string LowAbsoluteConnectivity = "low-absolute-connectivity";
+
+    /// <summary>
+    /// There is real logic inside, so the risk is in reasoning about the subject rather than in
+    /// re-routing it.
+    /// </summary>
+    /// <remarks>
+    /// One arm of §3.8's disjunction, and half of <c>docs/DEFECTS.md</c> §16's repair. The probe
+    /// prints <i>"AND carries real logic"</i> for either arm, which is false by construction on
+    /// the other one — a type reaches the size arm precisely by having bulk and no logic.
+    /// </remarks>
+    public const string CarriesRealLogic = "carries-real-logic";
+
+    /// <summary>
+    /// The subject is large enough that no one holds it in their head, whatever is or is not
+    /// inside it.
+    /// </summary>
+    /// <remarks>
+    /// §3.8's other arm. It is a different danger from <see cref="CarriesRealLogic"/> rather than
+    /// a weaker grade of it, and the two are independent: a type may hold both, either, or — for a
+    /// hub — neither, which is what makes it wiring.
+    /// </remarks>
+    public const string TooLargeToHold = "too-large-to-hold";
 }
 
 /// <summary>
