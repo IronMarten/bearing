@@ -162,12 +162,22 @@ solution to reconstruct. Deciding late is the expensive option.
 
 The taxonomy for `Edge.kind` is still open — §11.
 
-### Project metrics are model data
+### Project metrics are model data — **moved**
 
-Ca, Ce, A, I and D are computed inside the oracle's print routine and were never modelled. So
-are the cohort statistics — sizes, percentiles and multiples of the peer median, the substrate
-of every Job B claim. Both are §3's failure mode in its purest form, and moving them is what
-phase 1 actually is (`TECHREQ-job-a.md` §4).
+Ca, Ce, A, I and D were computed inside the oracle's print routine and never modelled. So were
+the cohort statistics — sizes, percentiles and multiples of the peer median, the substrate of
+every Job B claim. Both were §3's failure mode in its purest form, and moving them is what phase
+1 actually is (`TECHREQ-job-a.md` §4).
+
+Both now live in Core, as `Distribution` and `ProjectCoupling`, with `CoreEquivalenceTests`
+holding them to the probe's numbers on the fixture. The probe still computes its own copies —
+it is the oracle, and it stays verbatim — so this is the reimplementation existing and agreeing,
+not the probe delegating.
+
+The corollary in §3 is discharged along with it. `Distribution.Read` returns nothing for a group
+of fewer than two rather than the arithmetically-correct-and-meaningless 50, and
+`ProjectCoupling.Instability` is null where there is no cross-project coupling. Invariant 6 now
+holds in the model, so a renderer cannot miss it by omission.
 
 ### Two properties extraction must not lose
 

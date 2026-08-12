@@ -100,6 +100,8 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `StructureTests` | load health, fixture shape, generated-code exclusion, `Kind` classification, namespace truncation, cohort discovery, contract fan-in, hub magnitudes |
 | `OracleGoldenTests` | the three frozen baselines |
 | `OrderingTests` | that every artifact is a function of the analysis and not of its enumeration order — see below |
+| `DistributionTests` | the comparative substrate — midrank, medians, and when a reading is refused — without Roslyn |
+| `CoreEquivalenceTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
@@ -122,6 +124,31 @@ can be carried forward silently.
 one place the suite reads report text rather than the model, because the threshold is a
 literal inside `PrintNominations` and there is no model surface to assert against. That
 absence is the defect; only the subject names are read, never the sentence.
+
+### The extraction gate is agreement, not byte-identity
+
+`OracleGoldenTests` asks whether the probe's output moved. That catches a regression in the
+probe and says nothing about the rewrite, because Core is not in the picture at all.
+
+`CoreEquivalenceTests` asks the question extraction actually poses: **does the reimplementation
+agree with the oracle?** Every cohort reading, every method reading, every solution-wide
+percentile and every project's coupling, computed twice and compared on the real fixture. Core
+is a rewrite rather than a port, so agreement is a result rather than a tautology — each
+assertion is a place the two could differ and do not.
+
+As each piece of `Report.cs` moves, its equivalence check lands here first and the probe's
+version becomes the expectation. When a piece has no model surface to assert against — the
+project metrics exist only as the sentence written out of them — the test reads the probe's
+prose and says so. That is the same licence `KnownDefectTests` takes, for the same reason: the
+absence of a model surface *is* the defect being fixed, and the parser is deleted when the
+renderer starts reading the model.
+
+**Deliberate divergences are asserted, not described.** Core refuses to state a number with no
+basis: a peer group of one has no reading, a project with no cross-project coupling has no
+instability. The test pins both halves — what Core declines to say, and what the probe says
+instead — plus the proof that the difference is invisible in current output, because the CSV
+already blanks exactly those values. That proof is what makes it safe to land a behaviour
+difference before the renderers move.
 
 ### A snapshot that reproduces is not the same as a snapshot that is determined
 
