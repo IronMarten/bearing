@@ -105,6 +105,28 @@ public static class Qualifiers
     /// is <c>docs/DEFECTS.md</c> §11.
     /// </remarks>
     public const string PartOfALayeringPattern = "part-of-a-layering-pattern";
+
+    /// <summary>
+    /// The subject has no peer group, but is extreme by fan-in against the <b>whole solution</b> —
+    /// so something can still be said, with the comparison named.
+    /// </summary>
+    /// <remarks>
+    /// Weaker evidence than a peer-relative claim, because it compares unlike things, and the
+    /// wording has to carry that rather than borrow the confidence of a cohort. The alternative is
+    /// silence about a lone <c>DbContext</c> that half the system depends on, which is invariant 8
+    /// failing in the one section that exists to prevent it. <c>SESSION-NOTES.md</c> #7.
+    /// </remarks>
+    public const string GloballyExtremeFanIn = "globally-extreme-fan-in";
+
+    /// <summary>The same, by complexity.</summary>
+    /// <remarks>
+    /// Gated by a percentile <b>and</b> an absolute floor, and the qualifier names only the first
+    /// because it carries one gate — the floor travels as a receipt. Without it, in a codebase
+    /// where most types have no branching, a max-member complexity of 1 lands at a high midrank
+    /// percentile and the tool says <i>"top 86% by complexity, cc 1"</i>. <c>SESSION-NOTES.md</c>
+    /// #8.
+    /// </remarks>
+    public const string GloballyExtremeComplexity = "globally-extreme-complexity";
 }
 
 /// <summary>

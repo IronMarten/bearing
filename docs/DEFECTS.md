@@ -414,6 +414,31 @@ Not pinned, and it stays that way: the sentence is wording, and `docs/TESTING.md
 that this suite asserts against the model rather than against report prose. The golden holds the
 probe's exact string and the probe is unchanged, so the wording moves at R1 and is visible there.
 
+### 17. `NO PEER GROUP` claims an absence that is not true
+
+The section states, in fixed prose on every run: *"No PEER comparison was possible for these. They
+are absent from the nominations above."* The first sentence is true and the second is false — by
+design rather than by accident. **The cohort-free findings do not consult a cohort**, so a type
+with no viable peer group is fully eligible for every one of them; §3.6, §3.7, §3.8 and §3.9 all
+carry *"no cohort required"* in their own headings.
+
+Three types appear in both places at once: `RoutingDepot` is told it breaks alone,
+`DispatchRegistry` is a hub and a god object, `DispatchCounter` holds shared mutable state. All
+three are then listed as having been left out.
+
+Found by porting §3.11, and it is a **wording** defect rather than a gate defect — no nomination
+is wrong and the coverage population is right. What is wrong is a sentence telling the reader not
+to look for these names above, when the most important thing the tool says about `RoutingDepot` is
+above. Invariant 8 is about silence not reading as safety; this is its inverse, a disclosure that
+overstates what it disclosed.
+
+**Fix at R1**, when Cli renders from the model: the sentence has to say "absent from the
+*cohort-relative* nominations", and the section should name which of its types were nominated
+anyway. Core already has what that needs — coverage and the other findings share one `FindingSet`,
+so the renderer can ask rather than assert.
+
+Pinned: `The_coverage_section_claims_an_absence_that_is_not_true`.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.

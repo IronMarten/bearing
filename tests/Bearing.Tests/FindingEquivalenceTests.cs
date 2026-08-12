@@ -160,6 +160,89 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Null(bearing.ValueOf("CohortSize"));
     }
 
+    // -------------------------------------------------------------------- coverage ----
+
+    /// <summary>
+    /// Coverage reports exactly the population the probe reports: every type below the floor.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The only finding whose population is defined by what could <i>not</i> be computed, so
+    /// agreement here is agreement about the cohort assignment underneath rather than about a
+    /// threshold. Invariant 8: silence must never read as a clean bill of health, and this is the
+    /// section that makes the rest of the report readable.
+    /// </para>
+    /// <para>
+    /// <b>And it is where <c>docs/DEFECTS.md</c> §1 finally shows up in a finding.</b> Core reports
+    /// fourteen where the probe reports thirteen, because <c>TestBed.Shared.PayloadTag</c> is
+    /// declared <c>partial</c> in two assemblies that do not reference each other. The probe keys
+    /// types on the fully-qualified name alone and merges the two declarations into one row,
+    /// summing their metrics; Core keys on <c>(assembly, FQN)</c> and keeps them apart. That is the
+    /// one behaviour extraction is permitted to change, the fixture plants the collision
+    /// deliberately, and until now it was visible only in the walk. A section whose entire job is
+    /// completeness is the right place for it to surface.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_coverage_population_is_the_probes_plus_the_identity_collision()
+    {
+        var expected = ProbeNominations("   All types with no usable peer group, by fan-in:", stopAt: "NOTE:");
+        var actual = CoreTypeNominations(FindingKind.Coverage);
+
+        Assert.Equal(13, expected.Count);
+        Assert.Equal(14, actual.Count);
+
+        // Same components, and the extra entry is the second declaration rather than a new subject.
+        Assert.Equal(expected, actual.Distinct(StringComparer.Ordinal).ToList());
+
+        var collided = Analysis.FindingsFor(core.Model)
+            .OfKind(FindingKind.Coverage)
+            .Select(f => core.Model.Find(f.Subject)!)
+            .Where(t => t.Name == "PayloadTag")
+            .ToList();
+
+        Assert.Equal(2, collided.Count);
+        Assert.Equal(["Data", "Tools"], collided.Select(t => t.Assembly).Order(StringComparer.Ordinal));
+        Assert.Single(collided.Select(t => t.FullyQualifiedName).Distinct(StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// The weaker global claim is made about exactly three types, and all three are complexity.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// §3.11's second half: a type with no peers can still be extreme against the whole solution,
+    /// and going quiet about it is not an option. The claim is labelled weaker because it compares
+    /// unlike things, and the qualifier is what lets a renderer say so instead of borrowing a
+    /// peer-relative sentence.
+    /// </para>
+    /// <para>
+    /// <b>Not one of the thirteen clears the fan-in percentile</b>, which is asserted here rather
+    /// than left implicit — it is a dead gate and close to a structural one, since a type with no
+    /// peers usually has few callers. <c>FixtureCoverageTests</c> carries the record.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_weaker_global_claim_is_complexity_and_names_three()
+    {
+        var coverage = Analysis.FindingsFor(core.Model).OfKind(FindingKind.Coverage);
+
+        Assert.Equal(
+            ["OrderRepository", "PayloadTag", "RoutingDepot"],
+            coverage
+                .Where(f => f.Holds(Qualifiers.GloballyExtremeComplexity))
+                .Select(f => core.Model.Find(f.Subject)!.Name)
+                .Order(StringComparer.Ordinal));
+
+        Assert.DoesNotContain(coverage, f => f.Holds(Qualifiers.GloballyExtremeFanIn));
+
+        // And it is the floor, not the percentile, that would let a cc-1 type in — so the floor is
+        // asserted as applied even though nothing on this fixture depends on it.
+        Assert.All(
+            coverage.Where(f => f.Holds(Qualifiers.GloballyExtremeComplexity)),
+            f => Assert.True(f.ValueOf("MaxMemberCyclomatic") > f.ValueOf("GlobalComplexityFloor")));
+    }
+
     // ------------------------------------------------------------- boundary marking ----
 
     /// <summary>

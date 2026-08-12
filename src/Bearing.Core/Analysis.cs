@@ -18,11 +18,11 @@ namespace IronMarten.Bearing;
 /// 1,066-line method, which means reordering it breaks invariant 3 without failing anything.
 /// </para>
 /// <para>
-/// Ten of §3's findings are wired up — layer span, both concealed-decision nominations, blast
-/// radius, change cost, load-bearing, breaks alone, hubs, shared mutable state and both halves of
-/// boundary marking — and six of §4's seven rows: breaks alone's three and the contract-surface
-/// ceiling as suppressions, and rows 4 and 6 as qualifiers, because each of those silences a
-/// <i>sentence</i> rather than a claim. Only coverage is left, and it arrives the same way. Note that blast radius and load-bearing overlap on "widely depended on and
+/// <b>All eleven of §3's findings are wired up</b>, and six of §4's seven rows: breaks alone's
+/// three and the contract-surface ceiling as suppressions, and rows 4 and 6 as qualifiers, because
+/// each of those silences a <i>sentence</i> rather than a claim. The seventh is row 7, which is
+/// not a rule over findings at all — it is the cohort floor inside each cohort-relative detector,
+/// and the types it removes are exactly the population <see cref="NoPeerGroup"/> reports. Note that blast radius and load-bearing overlap on "widely depended on and
 /// complex" and are still two findings, both allowed to fire on one type; that is a
 /// <c>PRD-free-tier.md</c> §7.2 decision, not an oversight here.
 /// </para>
@@ -50,6 +50,7 @@ public static class Analysis
         SharedMutableState.Detect,
         BoundaryMarking.CarryingRealLogic,
         BoundaryMarking.WidestSurfaces,
+        NoPeerGroup.Detect,
     ];
 
     /// <summary>The claims this model supports, with the suppression matrix applied.</summary>

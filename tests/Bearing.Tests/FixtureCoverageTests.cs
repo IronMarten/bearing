@@ -638,6 +638,45 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// Coverage's two global gates: one is half-observed, the other is dead.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>GlobalComplexityFloor</c> decides nothing.</b> It exists so that a max-member
+    /// complexity of 1 cannot be reported as <i>"top 86% by complexity"</i> in a codebase with
+    /// little branching (<c>SESSION-NOTES.md</c> #8), and on this fixture no below-floor type
+    /// clears the percentile while failing the floor — so removing it changes no output. The plant
+    /// it needs is a peerless type with cc 1 sitting high on the solution-wide complexity
+    /// percentile, which takes a codebase flatter than this one.
+    /// </para>
+    /// <para>
+    /// <b><c>GlobalFanInPercentile</c> is observable in one direction only.</b> Not one of the
+    /// thirteen reaches the 90th percentile by fan-in solution-wide, so raising it changes
+    /// nothing; the assertion below is what stops it being <i>lowered</i> silently, which is worth
+    /// having but is half a gate. This is close to structural rather than accidental — a type with
+    /// no peer group usually has few callers — so the plant has to be deliberate: a lone component
+    /// that much of the system depends on, which is exactly the case §3.11 exists for and the one
+    /// the fixture has never had.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Coverages_global_gates_are_one_dead_and_one_half_observed()
+    {
+        var policy = core.Model.Policy;
+        var coverage = Analysis.FindingsFor(core.Model).OfKind(FindingKind.Coverage);
+
+        // Nothing is near the fan-in bar, so only the loosening direction can be caught.
+        Assert.DoesNotContain(coverage, f => f.ValueOf("GlobalFanInPctl") >= policy.GlobalFanInPercentile);
+
+        // And nothing clears the complexity percentile while failing the floor, which is the only
+        // configuration in which the floor decides anything.
+        Assert.DoesNotContain(
+            coverage,
+            f => f.ValueOf("GlobalMaxCcPctl") >= policy.GlobalComplexityPercentile &&
+                 f.ValueOf("MaxMemberCyclomatic") <= policy.GlobalComplexityFloor);
+    }
+
+    /// <summary>
     /// The three dead-code traps are planted, and nothing can currently tell them apart from
     /// code that really is unreferenced.
     /// </summary>

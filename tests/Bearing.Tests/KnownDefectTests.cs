@@ -327,6 +327,63 @@ public sealed class KnownDefectTests(FixtureRun run)
     }
 
     /// <summary>
+    /// <c>NO PEER GROUP</c> says its types are absent from the nominations above. Three of them
+    /// are not.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The section states, in the fixed prose of every run: <i>"No PEER comparison was possible
+    /// for these. They are absent from the nominations above."</i> The first sentence is true. The
+    /// second is false, and it is false by design rather than by accident — <b>the cohort-free
+    /// findings do not consult a cohort</b>, so a type with no viable peer group is fully eligible
+    /// for every one of them. §3.6, §3.7, §3.8 and §3.9 all carry "no cohort required" in their
+    /// own headings.
+    /// </para>
+    /// <para>
+    /// Three types on this fixture appear in both places at once. <c>RoutingDepot</c> is told it
+    /// breaks alone; <c>DispatchRegistry</c> is a hub and a god object; <c>DispatchCounter</c>
+    /// holds shared mutable state. All three are then listed as having been left out.
+    /// </para>
+    /// <para>
+    /// <b>Found by porting §3.11, and it is a wording defect rather than a gate defect</b> — no
+    /// nomination is wrong, and the coverage population is right. What is wrong is a sentence that
+    /// tells the reader not to look for these names above, when the most important thing the tool
+    /// says about <c>RoutingDepot</c> is above. Invariant 8 is about silence not reading as safety;
+    /// this is its inverse, a disclosure that overstates what it disclosed.
+    /// </para>
+    /// <para>
+    /// Fix at R1, when Cli renders from the model: the sentence has to say "absent from the
+    /// cohort-relative nominations", and the section should say which of its types were nominated
+    /// anyway. Core already has what that needs — the coverage finding and the others are in one
+    /// <c>FindingSet</c>, so the renderer can ask.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_coverage_section_claims_an_absence_that_is_not_true()
+    {
+        var text = NominationText.Render(run.Result, run.Options);
+
+        // The claim, verbatim from the section.
+        Assert.Contains("They are absent from the", text, StringComparison.Ordinal);
+
+        var belowFloor = run.Result.Types
+            .Where(t => t.CohortSize < run.Options.MinCohort)
+            .Select(t => t.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        // And the cohort-free sections that nominate them anyway. Read off the rendered report
+        // rather than re-derived, so this is about what the reader is actually shown.
+        var alsoNominated = new[] { "-- BREAKS ALONE", "-- HUBS AND GOD OBJECTS", "-- SHARED MUTABLE STATE" }
+            .SelectMany(section => NominationText.SubjectsUnder(text, section))
+            .Where(belowFloor.Contains)
+            .Order(StringComparer.Ordinal)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(["DispatchCounter", "DispatchRegistry", "RoutingDepot"], alsoNominated);
+    }
+
+    /// <summary>
     /// The layer-span roll-call collapse groups by signature, so boilerplate arriving in a group
     /// silences the one anomaly in it — and the examples it keeps are chosen by fan-in, which
     /// selects for boilerplate.
