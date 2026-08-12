@@ -39,7 +39,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    ModelDescription — 5 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
 
 -- BOUNDARY: HERE BE DRAGONS -----------------------------------
-   10 external contact point(s): 8 inbound API, 2 outbound. Consumer impact of
+   15 external contact point(s): 13 inbound API, 2 outbound. Consumer impact of
    changes at ANY of these is outside what static analysis can see.
 
    INTEGRATION MAP — external systems, by how many types touch them:
@@ -53,6 +53,10 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
 
    WIDEST CONTRACT SURFACE — most to get wrong, most to break:
      ShipmentController — 12 fields/params across 1 public member.
+     DocumentController — 8 fields/params across 1 public member.
+     QuoteController — 8 fields/params across 1 public member.
+     RateController — 8 fields/params across 1 public member.
+     TrackingController — 8 fields/params across 1 public member.
 
 -- LOAD-BEARING AND INTRICATE (no cohort required) -------------
    (instability <= 0.2 — much depends on it, it depends on
@@ -101,7 +105,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.05, D 0.95  (Ca 2 depend on it, Ce 0 reach out, 6/123 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.05, D 0.95  (Ca 2 depend on it, Ce 0 reach out, 6/128 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -113,7 +117,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      appears here. Verify before deleting.
 
 -- NO PEER GROUP -----------------------------------------------
-   13 of 127 types (10.2%) sit in cohorts below --min-cohort (5).
+   13 of 132 types (9.8%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these. They are absent from the
    nominations above and from prediction-sheet.csv, and their Pctl/XMedian
    columns are blank where a cohort of one made them meaningless.

@@ -290,19 +290,27 @@ public sealed class KnownDefectTests(FixtureRun run)
             return qualifying > 0 && qualifying > Math.Max(1, shapes.Length / 2);
         }
 
-        // The fixture's own ten boundaries: one qualifies against a ceiling of five.
+        // The fixture's own fifteen boundaries — and this is now the sharpest demonstration of
+        // the defect anywhere in the suite. P4 dragged the median down until SEVEN boundaries
+        // qualify, which is more than half of nothing and well past any absolute ceiling worth
+        // having. The proportional gate still does not suppress: the Take(5) caps the qualifying
+        // count at five while the ceiling rose with the population to seven. Adding qualifiers
+        // made the gate LESS able to fire.
         //
-        // This count is bookkeeping and nothing rests on it. Three separate records once claimed
-        // a tenth boundary would change whether this suppression is reachable — in opposite
-        // directions — and all three were wrong: the proof below is over arbitrary distributions
-        // and does not mention the fixture. Planting DispatchCallbackController moved the literal
-        // from 9 to 10 and moved nothing else, which is decision X1's evidence.
+        // The count itself is bookkeeping and nothing rests on it. Three records once claimed a
+        // tenth boundary would change whether this suppression is reachable, in opposite
+        // directions, and all three were wrong: the proof below is over arbitrary distributions
+        // and does not mention the fixture. Decision X1.
         var fixtureShapes = run.Result.Types
             .Where(t => t.Kind is "ApiBoundary" or "ExternalCall")
             .Select(t => (double)t.DataShape)
             .ToArray();
 
-        Assert.Equal(10, fixtureShapes.Length);
+        Assert.Equal(15, fixtureShapes.Length);
+
+        // Seven qualify, five are named, and none of it reaches the ceiling.
+        var median = Median(fixtureShapes);
+        Assert.Equal(7, fixtureShapes.Count(s => s >= Math.Max(median * 1.5, 1)));
         Assert.False(Suppressed(fixtureShapes));
 
         // And the distributions that MAXIMISE the qualifying set — half the boundaries at zero,
