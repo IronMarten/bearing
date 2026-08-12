@@ -327,6 +327,31 @@ probe on the fixture, and two gaps came out of getting them there. Both are in
   permuted one to render from. It will not stay harmless — a detector reading
   `TypeNode.Members`, which is declaration order, inherits no such guarantee.
 
+**For blast radius and load-bearing, once they moved into Core.** Both agree with the probe
+exactly, and the interesting result came from mutating rather than from running. Twenty-one
+mutations over §3.4 and §3.6: sixteen failed a test, **five did not**, and each can be deleted
+today with the suite green. In `FixtureCoverageTests.The_new_findings_have_gates_the_fixture_cannot_observe`.
+
+- **Blast radius' `FanIn >= MinFanIn`, its `FanInXMedian >= 2.0`, and its cohort floor.** The
+  first is invariant 1's canonical gate — the one whose absence ranked eight one-caller
+  normalizers at the 100th percentile and fired on all of them. One nomination clears all four
+  conditions at once, so no single condition is the deciding one.
+- **Load-bearing reading *effective* rather than raw fan-out.** `SESSION-NOTES.md` #22 says this
+  exclusion does 100% of the discriminating, on a controlled pair that has never been in this
+  suite. Both nominees here have `FanOut == FanOutEffective`, so it subtracts nothing and
+  swapping in `InstabilityRaw` changes no output.
+- **The defect 14 repair itself.** The stranded cohorts contain types that now clear the rank
+  gate — `NormalizationContext` at rank 1 of eight, `RawResponse` at rank 2 — and every one
+  fails on complexity instead. Only `DistributionTests` catches the floor being removed.
+
+> **The two implementations are not protected by the same thing, and that is the lesson.**
+> `The_blast_radius_plant_observes_the_fan_in_floor` reasons that the probe's literals are pinned
+> because changing them changes the frozen golden. True — of the probe, which renders it. Core
+> renders nothing yet, so its re-implementation of the same gate is held only by the equivalence
+> check, and a gate that is redundant on this fixture can be dropped from Core without moving
+> Core's nomination set. **Extraction silently halves the protection on every gate it copies**,
+> and it will keep doing so until Cli renders from the model.
+
 **~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
 and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:
 when Core keys on `(assembly, FQN)` the row count goes 52 → 53 and `KnownDefectTests` fails,

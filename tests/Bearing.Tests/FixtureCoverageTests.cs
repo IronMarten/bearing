@@ -157,6 +157,73 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// Firing is not the same as being gated: five of Core's new conditions are unobserved.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The plant made blast radius produce output; it did not make its gates testable.</b>
+    /// Twenty-one mutations were run over §3.4 and §3.6 as they moved into Core. Sixteen failed a
+    /// test. These five did not, and each one can be deleted today with all 220 tests green:
+    /// </para>
+    /// <list type="number">
+    ///   <item><description>blast radius' <c>FanIn &gt;= MinFanIn</c> — <b>invariant 1's canonical
+    ///     gate</b>, the one whose absence produced the original cry-wolf failure;</description></item>
+    ///   <item><description>blast radius' <c>FanInXMedian &gt;= 2.0</c>;</description></item>
+    ///   <item><description>blast radius' cohort floor — row 7 of the suppression matrix;</description></item>
+    ///   <item><description>load-bearing reading <b>effective</b> rather than raw fan-out — the
+    ///     dependency-inversion exclusion of <c>SESSION-NOTES.md</c> #22;</description></item>
+    ///   <item><description>the identity tiebreak in <c>Nomination</c>, already known unobservable
+    ///     and re-confirmed above.</description></item>
+    /// </list>
+    /// <para>
+    /// <b>Why the golden does not cover these the way it covers the probe's.</b>
+    /// <c>The_blast_radius_plant_observes_the_fan_in_floor</c> reasons that the <c>2.0</c> and the
+    /// percentile floors are pinned because changing them changes
+    /// <c>golden/nominations.verified.txt</c>. That is true of the literals <i>in the probe</i>,
+    /// which renders the golden. Core renders nothing yet, so its re-implementation of the same
+    /// gate is held only by <c>FindingEquivalenceTests</c> — and a gate that is redundant on this
+    /// fixture can be dropped from Core without moving Core's nomination set. The two
+    /// implementations are protected by different things, and only one of them is protected here.
+    /// </para>
+    /// <para>
+    /// What each needs is a plant, and the assertions below are the facts that make them
+    /// redundant, so filling any gap fails this test rather than silently closing it. Add, do not
+    /// reshape, and record the known answer in <c>docs/TESTING.md</c> §6.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_new_findings_have_gates_the_fixture_cannot_observe()
+    {
+        var policy = core.Model.Policy;
+
+        // 1-3. One nomination, clearing every gate at once, so no gate is the deciding one. Its
+        // cohort is twelve, which is also why the rank repair is invisible: the percentile form
+        // it replaced was satisfiable here.
+        var ledger = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
+        Assert.Equal(11, ledger.FanIn);
+        Assert.True(ledger.FanIn >= policy.MinFanIn);
+        Assert.True(ledger.CohortSize >= 10);
+
+        // 4. Neither load-bearing nominee depends on an abstraction, so excluding abstractions
+        // subtracts nothing. The controlled pair that proves the exclusion discriminates lives in
+        // SESSION-NOTES.md #22 and has never been in this suite.
+        foreach (var name in (string[])["ShipmentLedger", "TariffCalculator"])
+        {
+            var type = core.Model.Types.Single(t => t.Name == name);
+            Assert.Equal(type.FanOut, type.EffectiveFanOut);
+            Assert.Equal(type.InstabilityRaw, type.Instability);
+        }
+
+        // And the null-instability guard is a different case from the four above: it is not
+        // merely unobserved, it is unreachable. Instability is null only when FanIn and
+        // EffectiveFanOut are both zero, which fails the fan-in floor two lines later. It stays
+        // because MinFanIn is a policy value and could be set to zero.
+        Assert.All(
+            core.Model.Types.Where(t => t.Instability is null),
+            t => Assert.True(t.FanIn < policy.MinFanIn));
+    }
+
+    /// <summary>
     /// The three dead-code traps are planted, and nothing can currently tell them apart from
     /// code that really is unreferenced.
     /// </summary>
