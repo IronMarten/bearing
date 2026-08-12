@@ -103,7 +103,7 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `DistributionTests` | the comparative substrate — midrank, medians, and when a reading is refused — without Roslyn |
 | `CoreEquivalenceTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
 | `AnalysisPolicyTests` | that every threshold is named and reviewable, including the thirteen that were literals |
-| `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation |
+| `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation — plus full cohort equivalence with the probe |
 | `WalkerEquivalenceTests` | Core's walk against the probe's: every type, measure, edge, member and external namespace |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
@@ -140,11 +140,20 @@ is a rewrite rather than a port, so agreement is a result rather than a tautolog
 assertion is a place the two could differ and do not.
 
 As each piece of `Report.cs` moves, its equivalence check lands here first and the probe's
-version becomes the expectation. When a piece has no model surface to assert against — the
-project metrics exist only as the sentence written out of them — the test reads the probe's
-prose and says so. That is the same licence `KnownDefectTests` takes, for the same reason: the
-absence of a model surface *is* the defect being fixed, and the parser is deleted when the
-renderer starts reading the model.
+version becomes the expectation.
+
+**An equivalence check has a shelf life, and knowing when it expires matters.** The project
+metrics had no model surface on either side, so the test read the probe's sentence and parsed
+the numbers back out — the same licence `KnownDefectTests` takes, because the absence of a model
+surface *was* the defect. Once Core walked the solution itself, that check became redundant
+rather than merely ugly: the walk equivalence establishes that Core's types and edges are the
+probe's, coupling is a pure function of those two, and the function has its own tests. Composing
+those three proves what the parser proved. It was deleted and replaced with the fixture's known
+answers, stated rather than parsed.
+
+The general shape: an end-to-end comparison earns its place while the pieces underneath are
+unverified, and becomes a liability once they are — at which point it is a regex over prose that
+can break for reasons that have nothing to do with correctness.
 
 **Deliberate divergences are asserted, not described.** Core refuses to state a number with no
 basis: a peer group of one has no reading, a project with no cross-project coupling has no

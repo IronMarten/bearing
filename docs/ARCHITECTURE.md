@@ -185,6 +185,10 @@ candidates — which needs to know what a type is — is separate from choosing 
 does not. The choosing half is pure, which is what makes stranding and starvation testable
 directly rather than through a solution that happens to exhibit them.
 
+`SolutionWalker` then closed the loop: Core loads the solution, builds the model, and assigns
+cohorts as part of the walk, so a `TypeNode` carries its peer group and its size. Every type in
+the fixture lands in the same group the probe put it in.
+
 The corollary in §3 is discharged along with it. `Distribution.Read` returns nothing for a group
 of fewer than two rather than the arithmetically-correct-and-meaningless 50, and
 `ProjectCoupling.Instability` is null where there is no cross-project coupling. Invariant 6 now
