@@ -395,6 +395,7 @@ decision from whether it is versioned.
 | A finding carries receipts, qualifiers and participants; the rest of the record stays deferred | §4 — each of the three is load-bearing for a finding that has already moved, and none anticipates the findings pane |
 | Detection and suppression are separate passes over the whole finding set | §4 — a detector that can only be correct if it runs after another one is the probe's ordering dependence with different syntax |
 | Core emits every finding; `Top` is applied by the renderer | §4 — a truncating model cannot disclose what it dropped, and in the probe truncation silently weakens suppression |
+| A member's kind is model data | §4 — the findings do not all read the same population, and "has an executable body" is a different set from "is a method or constructor" |
 
 ## 11. Decisions still open
 

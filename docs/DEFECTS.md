@@ -197,6 +197,13 @@ The decision is closed — a method-level concealed decision *does* suppress bre
 declaring type, and `SubjectRef` walks member → declaring type to express it. What remains is
 the fix in Core.
 
+**The mechanism is in place; the finding that consumes it is not.** `FindingSet.ContainsAbout`
+is the query, tested on synthetic input, and both concealed-decision nominations now produce
+findings for it to search. Breaks-alone has not moved, so nothing asks yet. When it does, the
+fixture will show the fix: `MethodReconciler` and `TariffReconciler` are both nominated at
+method level and both currently told they break alone, and `RoutingDepot` — nominated at
+neither level — is the third, which survives as the control.
+
 Pinned: `A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
 
 ## How these were found

@@ -2,7 +2,7 @@
 
 ```
 dotnet build Bearing.sln      # warnings are errors
-dotnet test  Bearing.sln      # 43 assertions, ~3s
+dotnet test  Bearing.sln      # 202 assertions, ~3s
 ```
 
 Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first — it is short, and it explains

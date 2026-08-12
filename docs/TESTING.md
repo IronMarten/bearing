@@ -105,6 +105,7 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `AnalysisPolicyTests` | that every threshold is named and reviewable, including the thirteen that were literals |
 | `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation — plus full cohort equivalence with the probe |
 | `FindingSetTests` | finding identity and the member → declaring type query suppression is written against, on synthetic input |
+| `FindingEquivalenceTests` | Core's concealed-decision nominations against the probe's, both levels, plus the rules that are now model facts rather than wording |
 | `WalkerEquivalenceTests` | Core's walk against the probe's: every type, measure, edge, member and external namespace |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
@@ -218,6 +219,14 @@ Tidying it up changes the expected answers.
   max-member-cc 3. The three suppression companions each satisfy every *other* condition:
   `ReconciliationController` (ApiBoundary), `RateReconciler` (nominated as a concealed
   decision), `AuditReconciler` (fan-in 0)
+- **concealed decision, method level: 12 nominations**, led by `TariffCalculator.Apply` at 22x
+  its peer median. Two tie groups — `MethodReconciler`/`RateReconciler` at 4.333 and
+  `AuditReconciler`/`TariffReconciler` at 3.667 — which is what exercises the ordering tiebreak
+- **concealed decision, type level: 5 nominations** — `ShipmentController` 12x,
+  `ThroughputGauge` 8x, `AuthenticationMiddleware` 5x, `RateReconciler` 4.333x,
+  `GuaranteedServiceNormalizer` 3.5x. No ties, and every one of the five is also nominated at
+  method level: on this fixture type level adds no subject of its own, which is a gap rather
+  than a property — see below
 - blast radius: `ShipmentLedger` alone, in cohort `suffix:Ledger` (12 members) — fan-in 11,
   `FanInPctl` 95.83, `FanInXMedian` 11, cc 18, `CyclomaticPctl` 95.83. All four conditions with
   margin; the cohort is twelve rather than ten so the case does not sit on the boundary
@@ -299,6 +308,24 @@ suppression would be untested again with nobody noticing.
 > It is also the inverse of the question that caught the original cry-wolf failure. §8 asks
 > "can this fire on 100% of a category?" Its twin — **"can this fire at all?"** — was not being
 > asked, and is now.
+
+**For the two concealed-decision nominations, once they moved into Core.** Both agree with the
+probe on the fixture, and two gaps came out of getting them there. Both are in
+`FixtureCoverageTests`, so they fail the day they are filled.
+
+- **Type level adds no subject of its own.** All five of its nominations are also nominated at
+  method level, so an extraction that quietly reduced §3.2 to a filter over §3.3 would still
+  agree with the probe. The missing case is a type whose complexity is spread across several
+  ordinary-looking methods; every complex type in TestBed concentrates it in one. The
+  interesting direction *is* covered — seven types are found at method level and nowhere else,
+  which is why §3.3 is primary.
+- **The identity tiebreak on a finding's order is not observable.** `SolutionModel.Types`
+  arrives ordered by identity and LINQ's sort is stable, so a tie group is already in identity
+  order before the tiebreak runs — removing it leaves the output byte-identical, confirmed by
+  removing it. This is `OrderingTests`'s lesson one level up, and the shuffle that caught it
+  there is not available: a `SolutionModel` can only be produced by a walk, so there is no
+  permuted one to render from. It will not stay harmless — a detector reading
+  `TypeNode.Members`, which is declaration order, inherits no such guarantee.
 
 **~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
 and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:

@@ -102,6 +102,7 @@ internal sealed class ModelBuilder
             node.Members.Add(new Member(
                 MemberSubject(node, symbol, member),
                 MemberName(member),
+                KindOf(member),
                 symbol?.DeclaredAccessibility.ToString() ?? "",
                 new SourceLocation(memberSpan.Path ?? "", memberSpan.StartLinePosition.Line + 1),
                 complexity.Cyclomatic + (hasBody ? 1 : 0),
@@ -410,6 +411,25 @@ internal sealed class ModelBuilder
         FieldDeclarationSyntax f => f.Declaration.Variables.FirstOrDefault()?.Identifier.ValueText ?? "<field>",
         EventDeclarationSyntax e => e.Identifier.ValueText,
         _ => member.Kind().ToString(),
+    };
+
+    /// <summary>
+    /// Which population a member belongs to.
+    /// </summary>
+    /// <remarks>
+    /// <c>EventFieldDeclarationSyntax</c> is the ordinary <c>event Action Changed;</c> form and
+    /// <c>EventDeclarationSyntax</c> is the one with accessors; they are different syntax nodes
+    /// for the same kind of member, and separating them here would put half the events in
+    /// <see cref="MemberKind.Other"/> for a reason no reader of the model could guess.
+    /// </remarks>
+    private static MemberKind KindOf(MemberDeclarationSyntax member) => member switch
+    {
+        MethodDeclarationSyntax => MemberKind.Method,
+        ConstructorDeclarationSyntax => MemberKind.Constructor,
+        PropertyDeclarationSyntax => MemberKind.Property,
+        FieldDeclarationSyntax => MemberKind.Field,
+        EventDeclarationSyntax or EventFieldDeclarationSyntax => MemberKind.Event,
+        _ => MemberKind.Other,
     };
 
     private static string Fq(ISymbol symbol) => symbol.ToDisplayString(TypeFormat);

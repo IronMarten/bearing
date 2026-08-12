@@ -65,12 +65,43 @@ public readonly record struct TypeClassification(string Kind, string Evidence)
     public static TypeClassification Internal { get; } = new("Internal", "no classifying evidence");
 }
 
+/// <summary>What kind of member a declaration is.</summary>
+/// <remarks>
+/// Carried because the findings do not all read the same population. Concealed decision at
+/// method level is about methods and constructors — a property is a member, and a member with a
+/// computed body can hide a decision, but it is not what "the method is 4x the median
+/// complexity of its peers" is comparing against. Without this the model can only offer "has an
+/// executable body", which admits property accessors and excludes abstract declarations, and is
+/// therefore a different set from the one the claim is about.
+/// </remarks>
+public enum MemberKind
+{
+    /// <summary>A method.</summary>
+    Method,
+
+    /// <summary>An instance or static constructor.</summary>
+    Constructor,
+
+    /// <summary>A property.</summary>
+    Property,
+
+    /// <summary>A field.</summary>
+    Field,
+
+    /// <summary>An event.</summary>
+    Event,
+
+    /// <summary>An indexer, operator, finalizer, or anything else a type can declare.</summary>
+    Other,
+}
+
 /// <summary>One member of a type.</summary>
 public sealed class Member
 {
     internal Member(
         SubjectRef subject,
         string name,
+        MemberKind kind,
         string accessibility,
         SourceLocation location,
         int cyclomatic,
@@ -83,6 +114,7 @@ public sealed class Member
     {
         Subject = subject;
         Name = name;
+        Kind = kind;
         Accessibility = accessibility;
         Location = location;
         Cyclomatic = cyclomatic;
@@ -106,6 +138,15 @@ public sealed class Member
 
     /// <summary>The member's own name, e.g. <c>Reconcile</c> or <c>.ctor</c>.</summary>
     public string Name { get; }
+
+    /// <summary>What kind of declaration it is.</summary>
+    public MemberKind Kind { get; }
+
+    /// <summary>
+    /// Whether this is the kind of member a method-level finding is about — a method or a
+    /// constructor.
+    /// </summary>
+    public bool IsMethodLike => Kind is MemberKind.Method or MemberKind.Constructor;
 
     /// <summary>Declared accessibility.</summary>
     public string Accessibility { get; }
@@ -234,6 +275,30 @@ public sealed class TypeNode
 
     /// <summary>The most complex single member, or zero when there are none.</summary>
     public int MaxMemberCyclomatic => Members.Count == 0 ? 0 : Members.Max(m => m.Cyclomatic);
+
+    /// <summary>
+    /// The member <see cref="MaxMemberCyclomatic"/> measures, or <see langword="null"/> when the
+    /// type declares none.
+    /// </summary>
+    /// <remarks>
+    /// Invariant 7: a finding about a type whose complexity is concentrated in one member has to
+    /// be able to name it, or the reader has to go looking for what the tool already knew.
+    /// <para>
+    /// The tie-break is total and grounded in source position. The probe keeps the first member
+    /// to reach the maximum, which is declaration order — fine within one file, and for a
+    /// partial type it is the order Roslyn hands back the declarations, which is not a property
+    /// of the code. Two members tied at the maximum is the normal case in a type with no
+    /// branching at all.
+    /// </para>
+    /// </remarks>
+    public Member? MostComplexMember => Members.Count == 0
+        ? null
+        : Members
+            .OrderByDescending(m => m.Cyclomatic)
+            .ThenBy(m => m.Location.File, StringComparer.Ordinal)
+            .ThenBy(m => m.Location.Line)
+            .ThenBy(m => m.Subject.Canonical, StringComparer.Ordinal)
+            .First();
 
     /// <summary>Destructive mutation summed over members.</summary>
     public int Dsm => Members.Sum(m => m.Dsm);

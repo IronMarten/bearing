@@ -1,4 +1,5 @@
 using ArchProbe;
+using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -13,8 +14,99 @@ namespace Bearing.Tests;
 /// the assertion here is narrowed.
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class FixtureCoverageTests(FixtureRun run)
+public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
 {
+    /// <summary>
+    /// Every type nominated as a concealed decision at type level is also nominated at method
+    /// level, so type level adds no subject of its own on this fixture.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The interesting direction is covered — <c>FindingEquivalenceTests</c> asserts that seven
+    /// types are found at method level and nowhere else, which is the reason §3.3 is the primary
+    /// of the two. This is the direction that is not: nothing here would notice if the type-level
+    /// nomination were reduced to a filter over the method-level one, because on this fixture
+    /// that is what it looks like.
+    /// </para>
+    /// <para>
+    /// The gap is in the fixture, not in the finding. A type whose complexity is spread evenly
+    /// across several ordinary-looking methods is exactly the case type level exists for, and
+    /// TestBed has none: its complex types all concentrate it in one method. Planting one closes
+    /// this and fails this test, which is the event worth seeing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Type_level_concealed_decision_adds_no_subject_of_its_own()
+    {
+        var findings = Analysis.FindingsFor(core.Model);
+
+        var byMethod = findings.OfKind(FindingKind.ConcealedDecisionMethod)
+            .Select(f => f.Subject.DeclaringType!.Canonical)
+            .ToHashSet(StringComparer.Ordinal);
+        var byType = findings.OfKind(FindingKind.ConcealedDecisionType)
+            .Select(f => f.Subject.Canonical);
+
+        Assert.Empty(byType.Except(byMethod, StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// No two type-level nominations tie, so their ordering tiebreak is never exercised.
+    /// </summary>
+    /// <remarks>
+    /// The five nominations sit at 12, 8, 5, 4.333 and 3.5 times their peer median, so the sort
+    /// is decided entirely by rank and the <c>ThenBy</c> on identity could be deleted without
+    /// failing anything. Method level does tie, twice, which is what currently covers the
+    /// tiebreak at all — but a tiebreak covered on one finding and not the other is one
+    /// reimplementation away from being covered on neither.
+    /// </remarks>
+    [Fact]
+    public void Type_level_concealed_decisions_never_tie()
+    {
+        var ranks = Analysis.FindingsFor(core.Model)
+            .OfKind(FindingKind.ConcealedDecisionType)
+            .Select(f => f.ValueOf("MaxMemberCyclomaticXMedian"))
+            .ToList();
+
+        Assert.Equal(ranks.Count, ranks.Distinct().Count());
+    }
+
+    /// <summary>
+    /// The identity tiebreak on a finding's order is correct and <b>not independently
+    /// observable</b>. Deleting it changes nothing that any test can see.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two things conspire. <c>SolutionModel.Types</c> arrives ordered by identity, and LINQ's
+    /// sort is stable — so a tie group is already in identity order before the tiebreak runs.
+    /// Removing the <c>ThenBy</c> from <c>ConcealedDecision</c> leaves the emitted order
+    /// byte-identical, which was confirmed by removing it.
+    /// </para>
+    /// <para>
+    /// This is the failure <c>OrderingTests</c> exists for, one level up: the probe's writers
+    /// also reproduced perfectly while sorting on non-total keys, and it took shuffling the input
+    /// to see it. That shuffle is not available here — a <c>SolutionModel</c> can only be
+    /// produced by a walk, so there is no permuted one to render from — and until it is, the
+    /// tiebreak is a correctness argument rather than a tested property.
+    /// </para>
+    /// <para>
+    /// It matters because it will not stay true. A detector that reads
+    /// <c>TypeNode.Members</c> — declaration order, not identity order — or one that groups
+    /// before it ranks, inherits no such guarantee, and it would emit a walk-order tie group
+    /// with nothing failing. The assertion below pins the property this currently rests on, so
+    /// the day the model stops arriving sorted, that shows up here rather than as an unstable
+    /// artifact.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_finding_order_currently_rests_on_the_model_arriving_sorted()
+    {
+        var identityOrder = core.Model.Types
+            .Select(t => t.Subject.Canonical)
+            .Order(StringComparer.Ordinal);
+
+        Assert.Equal(identityOrder, core.Model.Types.Select(t => t.Subject.Canonical));
+    }
+
     /// <summary>
     /// BUG BLAST RADIUS and BREAKS ALONE both nominate something now. Neither did before, and
     /// the goldens carried no record of how either behaves.
