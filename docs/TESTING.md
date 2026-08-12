@@ -570,8 +570,10 @@ nothing for these:
 | `GlobalFanInPercentile`, `GlobalComplexityPercentile`, `GlobalComplexityFloor` | §3.11 | **not ported yet**, and two are dead on the fixture besides — see below |
 | `MinTangle` 4 | graphs | not ported yet |
 
-**The three findings still in the probe, inventoried ahead of their ports.** This is the part that
-was never done before, and it is the cheap half:
+**The three findings that were still in the probe, inventoried ahead of their ports.** This is the
+part that was never done before, and it paid: every prediction below held when the ports landed,
+including both of coverage's dead gates. It is also the cheap half — it needs no code, only the
+model.
 
 - **§3.5 change cost — ported, and the arm went dead again for a better reason.** `or ApiBoundary`
   was dead under the absolute gate and the `DispatchCallbackController` plant closed it *in the
@@ -584,17 +586,19 @@ was never done before, and it is the cheap half:
   fixture has at `ControllerBase` fan-in 8 but classifies `Internal` for want of the name suffix.
   Reaching a limit of 6.9 takes fan-in 11. Recorded rather than forced, because the alternative is
   picking `ChangeCostTopFraction` to admit our own plant.
-- **§3.10 boundary marking.** *Boundaries carrying real logic* discriminates — two of ten qualify
-  (`ShipmentController` cc 12, `ReconciliationController` cc 11) and eight do not. *Widest contract
-  surface* discriminates — one of ten. Its **suppression cannot fire at any size**, which is
-  defect 12 and needs P4's twelve boundaries, now unblocked.
-- **§3.11 coverage.** Thirteen types sit below the floor. `GlobalComplexityPercentile` discriminates
-  — three of the thirteen clear it (`OrderRepository` 98, `PayloadTag` 95.2, `RoutingDepot` 91.7).
-  **`GlobalFanInPercentile` is dead: not one below-floor type reaches the 90th percentile by
-  fan-in solution-wide**, which is close to structural — a type with no peers usually has few
-  callers. **`GlobalComplexityFloor` is dead too**: no orphan clears the percentile while failing
-  the floor, so the absolute floor beside it never decides. Both need plants before F10 ports, and
-  F10 is the finding whose whole job is to say what the tool stayed silent about.
+- **§3.10 boundary marking — ported.** *Boundaries carrying real logic* discriminates, two of
+  fifteen. *Widest contract surface* discriminates, seven of fifteen after P4 — and its suppression
+  is reachable from both sides for the first time. All four mutations over the detector and the new
+  row fail a test.
+- **§3.11 coverage — ported, and the inventory called both gates correctly in advance.**
+  `GlobalComplexityPercentile` discriminates: three of the thirteen clear it (`OrderRepository` 98,
+  `PayloadTag` 95.2, `RoutingDepot` 91.7). **`GlobalComplexityFloor` is dead** — no below-floor type
+  clears the percentile while failing the floor, so the absolute floor never decides.
+  **`GlobalFanInPercentile` is observable downward only**: not one of the thirteen reaches the 90th
+  percentile by fan-in solution-wide, so raising it changes nothing and only the negative assertion
+  stops it being lowered. That is close to structural — a type with no peers usually has few
+  callers — so its plant has to be deliberate: a lone component much of the system depends on,
+  which is the case §3.11 exists for and the fixture has never had.
 
 > **The one structural finding, and it explains the rest.** Loosening a threshold by one notch
 > moves output for **3 of 23** values. Nearly every gate has slack on both sides: types clear a
