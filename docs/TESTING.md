@@ -104,6 +104,7 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `CoreEquivalenceTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
 | `AnalysisPolicyTests` | that every threshold is named and reviewable, including the thirteen that were literals |
 | `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation |
+| `WalkerEquivalenceTests` | Core's walk against the probe's: every type, measure, edge, member and external namespace |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |

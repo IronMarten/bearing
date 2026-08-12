@@ -146,10 +146,14 @@ Solution
   └─ ExternalDependency[] namespace, category, types touching it
 ```
 
-### Three fields to collect during the walk, not after
+### Three fields to collect during the walk, not after — **all three collected**
 
 Each is nearly free inside the existing pass and costs a second full traversal of the
 solution to reconstruct. Deciding late is the expensive option.
+
+`SolutionWalker` collects all three. `Edge` carries every individual `TypeReference` with its
+kind and site rather than only a weight, so the weight is now a count of things that each know
+where they came from.
 
 - **`Edge.kind`** — inheritance, interface implementation, field, constructor parameter,
   method call, generic argument, attribute. Without it the only filter a dependency-graph UI
@@ -354,6 +358,8 @@ decision from whether it is versioned.
 | A type is identified by `(assembly, FQN)`, never by name alone | §4, `SubjectRef` — .NET permits one FQN in two assemblies and plugin architectures use it deliberately; keying on the name merges the rows and sums their metrics |
 | The SDK is pinned | `global.json` — an unpinned toolchain picks the newest SDK on the machine, which made CI build a net8.0 project with .NET 10 and fail on rules no developer machine had |
 | Both graph artifacts are static | neither view that proved legible on a real solution needs a layout engine, so elkjs / cytoscape / d3-force come off the critical path. The only view that did need one should not ship: a two-hop ego view pulls in 24–41% of the codebase from an ordinary seed |
+| `EdgeKind` is a fixed enum, not an open set | decided when the walkers moved. The set is closed by the language — there is a finite number of syntactic ways one type can name another. An open taxonomy pushes the cost onto every renderer, which then has to decide what to do with a kind it has never seen, and in practice shows everything: the failure the filter exists to prevent. Adding a member later is a compatible change |
+| A type is identified in the model by `SubjectRef`, so the FQN collision no longer merges | `DEFECTS.md` §1's remedy, and the one behaviour extraction is permitted to change. TestBed plants the collision so the fix is observable rather than asserted |
 | Every threshold is a named value on `AnalysisPolicy`, including the thirteen that were literals | a policy carrying ten of twenty-three misrepresents which policy produced a finding, which is the failure it exists to prevent |
 | `StableThreshold` and `IsolatedThreshold` are independent | the defaults are 0.2 and 0.8 and the symmetry is coincidence, not maintained. They gate different findings over different populations; deriving one from the other would make one flag move two findings |
 | A method-level concealed decision suppresses breaks-alone on its declaring type | the reason the suppression exists is behavioural, and behaviour lives in methods — so the level that *nominated* it is not what decides. `SubjectRef` walks member → declaring type to express it. Not yet implemented: `DEFECTS.md` §15 |
@@ -367,11 +373,6 @@ the private `TECHREQ-job-a.md` §10.
 Distinct from [`DEFECTS.md`](DEFECTS.md): that is behaviour known to be wrong, with a remedy
 already understood. These are questions with no answer yet.
 
-- **Edge kind taxonomy.** §4 commits to collecting one. *Which* set — inheritance,
-  implementation, field, parameter, call, generic argument, attribute — and whether it is
-  fixed or extensible, is undecided. Decide before the walkers move; §4 says why deciding
-  after them is expensive. The filter is worth building either way: abstraction and contract
-  edges are 39–50% of all out-edges.
 - **How `WIDEST CONTRACT SURFACE` should be gated at all.** `DEFECTS.md` §12 is the one row
   that cannot be fixed by moving a constant, so extraction cannot simply port it. An absolute
   surface floor and a dispersion test — is the top of the distribution actually separated from

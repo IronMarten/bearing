@@ -70,8 +70,17 @@ public sealed class FixtureRun
                 $"TestBed has no type '{name}'. Present: {string.Join(", ", ByName.Keys.Order())}");
 }
 
+/// <summary>
+/// Both analyses of TestBed — the probe's and Core's — share one collection.
+/// </summary>
+/// <remarks>
+/// One collection rather than two because each analysis opens an <c>MSBuildWorkspace</c>, and
+/// two collections would run them in parallel against the same solution. That doubles the
+/// slowest part of the suite and makes the workspace emit load diagnostics that the
+/// single-analysis case does not.
+/// </remarks>
 [CollectionDefinition(Name)]
-public sealed class FixtureCollection : ICollectionFixture<FixtureRun>
+public sealed class FixtureCollection : ICollectionFixture<FixtureRun>, ICollectionFixture<CoreWalkFixture>
 {
     public const string Name = "TestBed fixture";
 }

@@ -18,6 +18,28 @@
     <RootNamespace>IronMarten.Bearing</RootNamespace>
     <AssemblyName>Bearing.Core</AssemblyName>
     <IsPackable>false</IsPackable>
+    <!-- MSBuildLocator requires that MSBuild assemblies are NOT copied local. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0" />
+  </ItemGroup>
+
+  <!--
+    Microsoft.Build.* must be resolved from the located SDK at runtime, not from our bin.
+    Registering the SDK is the host's job — Bearing.Cli calls MSBuildLocator — because a
+    library that registers a global singleton on load cannot be composed.
+  -->
+  <Target Name="RemoveMSBuildAssemblies" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+                               Condition="'%(Filename)' == 'Microsoft.Build'
+                                       or '%(Filename)' == 'Microsoft.Build.Framework'
+                                       or '%(Filename)' == 'Microsoft.Build.Tasks.Core'
+                                       or '%(Filename)' == 'Microsoft.Build.Utilities.Core'" />
+    </ItemGroup>
+  </Target>
 
 </Project>
