@@ -573,8 +573,11 @@ nothing for these:
 | `BlastFanInMultiple` 2.0 | §3.4 | the one nominee is at 11× |
 | `BlastComplexityPercentile` 70 | §3.4 | the one nominee is at 95.8 |
 | `Top` 15 | §3.1 via `RollCallThreshold` | Core does not truncate, and 14/3 and 16/3 both floor to the same threshold |
-| `SurfaceOutlierMultiple`, `SurfaceOutlierFloor`, `SurfaceDiscriminationDivisor` | §3.10 | **not ported yet** — Core reads none of them |
-| `GlobalFanInPercentile`, `GlobalComplexityPercentile`, `GlobalComplexityFloor` | §3.11 | **not ported yet**, and two are dead on the fixture besides — see below |
+| `SurfaceDiscriminationDivisor` | §3.10 | **retired, not unported** — D12 replaced the proportional ceiling with `MaxNamedSurfaces`, and Core has no such value to read |
+| `SurfaceOutlierFloor` 1 | §3.10 | `median × 1.5` clears it on every boundary distribution the fixture produces, so the floor never binds — 0 and 2 both change nothing |
+| `SurfaceOutlierMultiple` 1.5 | §3.10 | **observable upward only**: 1.6 moves the finding set, 1.4 does not. The qualifying surfaces sit at 8 and 12 against a bar of 6, so there is room below the gate and none above it |
+| `GlobalComplexityFloor` | §3.11 | dead on the fixture: no below-floor type clears the percentile while failing the floor, so the floor never decides — see below |
+| `GlobalFanInPercentile` 90 | §3.11 | observable downward only — see below |
 | `MinTangle` 4 | graphs | **ported at S2, and measured dead**: the fixture holds one tangle of 8 and *no* mutual pairs or triples, so 3 and 5 both change nothing — 2 does not either |
 
 **The circular-reference section has one of everything, which is one short of a test.** S2 landed
@@ -613,7 +616,11 @@ model.
 - **§3.10 boundary marking — ported.** *Boundaries carrying real logic* discriminates, two of
   fifteen. *Widest contract surface* discriminates, seven of fifteen after P4 — and its suppression
   is reachable from both sides for the first time. All four mutations over the detector and the new
-  row fail a test.
+  row fail a test. **Its two constants were swept at S4/S5 and neither is fully observed**: the
+  floor never binds, and the multiple moves the set upward but not downward. Both are in the table
+  above. Note that the value pins in `AnalysisPolicyTests` fail on *any* change to either, which is
+  not the same question — a pin says the number is what the probe gates on, and the nudge asks
+  whether the number decides anything.
 - **§3.11 coverage — ported, and the inventory called both gates correctly in advance.**
   `GlobalComplexityPercentile` discriminates: three of the thirteen clear it (`OrderRepository` 98,
   `PayloadTag` 95.2, `RoutingDepot` 91.7). **`GlobalComplexityFloor` is dead** — no below-floor type

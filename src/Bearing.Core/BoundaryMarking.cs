@@ -12,11 +12,18 @@ namespace IronMarten.Bearing;
 /// separate claims.
 /// </para>
 /// <para>
-/// The count of contact points, split inbound and outbound, is the section's third part and is
-/// not a claim about any subject. It is a property of the solution and the renderer reads it from
-/// the model, the way it reads coverage. Its accompanying statement — that consumer impact of
-/// changes at any of them is outside what static analysis can see — is invariant 4 and is not
-/// optional wording.
+/// <b>The section has two owners and this class is one of them.</b> The count of contact points
+/// and the integration map are properties of the solution rather than claims about any subject,
+/// so they are Job A's and live on the model — <see cref="SolutionModel.ContactPoints"/> and
+/// <see cref="SolutionModel.Integrations"/>. What is here is Job B's: the two ways an individual
+/// boundary can be unusual, each of which can be right or wrong about a particular type and
+/// therefore has to be suppressible. The renderer assembles one section from both halves; nothing
+/// else joins them, and neither half may be derived from the other.
+/// </para>
+/// <para>
+/// The contact-point statement — that consumer impact of changes at any of them is outside what
+/// static analysis can see — is invariant 4 and is not optional wording. It belongs to the count,
+/// so it belongs to Job A.
 /// </para>
 /// </remarks>
 public static class BoundaryMarking

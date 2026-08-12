@@ -508,6 +508,21 @@ public sealed class SolutionModel
         }
     }
 
+    /// <summary>
+    /// The solution's external contact points, split inbound and outbound.
+    /// </summary>
+    public ContactPoints ContactPoints => ExternalSurface.Of(this);
+
+    /// <summary>
+    /// External systems this codebase talks to, with the plumbing filtered out and counted.
+    /// </summary>
+    /// <remarks>
+    /// The judged view of <see cref="ExternalDependencies"/>, which stays unfiltered — deciding
+    /// that <c>System.Linq</c> is not an integration is a judgement, and the raw list is what
+    /// makes the judgement checkable.
+    /// </remarks>
+    public IntegrationMap Integrations => ExternalSurface.Integrations(this);
+
     /// <summary>Every namespace outside the solution that analysed types touch.</summary>
     public IReadOnlyList<ExternalDependency> ExternalDependencies =>
         Types

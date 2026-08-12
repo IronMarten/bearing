@@ -413,6 +413,69 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         Assert.Empty(unreferenced);
     }
 
+    // ------------------------------------------------------------ external surface ----
+
+    [Fact]
+    public void Contact_points_over_the_fixture_are_what_they_should_be()
+    {
+        var contact = core.Model.ContactPoints;
+
+        Assert.Equal(13, contact.Inbound.Count);
+        Assert.Equal(2, contact.Outbound.Count);
+        Assert.Equal(15, contact.Count);
+
+        // Same population BoundaryMarking judges, counted a different way. The two halves of the
+        // section have to be talking about the same set or the renderer joins two answers to
+        // different questions.
+        Assert.Equal(
+            contact.Count,
+            core.Model.Types.Count(t => t.Classification.Kind is "ApiBoundary" or "ExternalCall"));
+    }
+
+    [Fact]
+    public void The_integration_map_over_the_fixture_is_what_it_should_be()
+    {
+        var map = core.Model.Integrations;
+
+        Assert.Equal(
+            [("System.Data", 2), ("System.Net.Http", 2)],
+            map.Systems.Select(d => (d.Namespace, d.TypesTouching)));
+
+        Assert.Equal(21, map.PlumbingReferences);
+    }
+
+    /// <summary>
+    /// Nothing is dropped: every external reference is either an integration or counted as
+    /// plumbing.
+    /// </summary>
+    /// <remarks>
+    /// The filter is the whole of this section's risk. A namespace that fell out of both halves
+    /// would be invisible without being disclosed, which is the failure the omitted-count exists
+    /// to prevent — and it would be invisible in exactly the way that looks like a short list
+    /// rather than a bug.
+    /// </remarks>
+    [Fact]
+    public void The_integration_map_omits_nothing_silently()
+    {
+        var map = core.Model.Integrations;
+
+        Assert.Equal(
+            core.Model.ExternalDependencies.Sum(d => d.TypesTouching),
+            map.Systems.Sum(d => d.TypesTouching) + map.PlumbingReferences);
+    }
+
+    [Theory]
+    [InlineData("System", true)]
+    [InlineData("System.Linq", true)]
+    [InlineData("System.Text.Json", true)]          // prefix match, no separator boundary
+    [InlineData("Microsoft.Extensions.Logging", true)]
+    [InlineData("System.Data", false)]              // a database is an integration
+    [InlineData("System.Net.Http", false)]          // so is an outbound call
+    [InlineData("Azure.Messaging.ServiceBus", false)]
+    [InlineData("Systematic.Reporting", false)]     // not System, despite the prefix
+    public void Plumbing_is_what_the_map_is_not_about(string @namespace, bool expected) =>
+        Assert.Equal(expected, ExternalSurface.IsPlumbing(@namespace));
+
     // ------------------------------------------------------------------ adapters ----
 
     private static double ValueOf(TypeMetrics t, string dimension) => dimension switch
