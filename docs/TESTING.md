@@ -609,18 +609,65 @@ three survivors belong to §3.1.
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
 every session. This is the whole of it, measured rather than reasoned, by two sweeps over the
-**26 named policy values** (`AnalysisPolicy.Values`, pinned in `AnalysisPolicyTests`) and every guard in every Core detector. Re-run both when a plant lands.
+**26 named policy values** (`AnalysisPolicy.Values`, pinned in `AnalysisPolicyTests`) and every
+gate in every Core detector.
 
-**Method.** *Leave-one-out*: delete each `if (…) continue;` in turn and run the suite — this asks
+**Method.** *Leave-one-out*: delete each gate in turn and see whether anything notices — this asks
 whether the **condition** discriminates. *Nudge*: move each policy value one notch each way and
 compare the finding set including qualifiers — this asks whether the **constant** does. They are
 different questions and a gate can pass one and fail the other, which is why both are here.
 `MinKindSpan` is the case that shows it: deleting the condition admits every type in the solution,
 so it looks observed, while moving the floor from 3 to 2 changes nothing at all.
 
-**Conditions that discriminate: 20 of 22.** The two that do not are blast radius' absolute fan-in
-floor and its multiple-of-median, both already recorded above. This half is still run by hand — it
-needs source edits — and it has not been re-run since P6.
+**Neither half is run from memory any more.** The nudge is `PolicySweepTests`, snapshotted, so it
+runs on every build. Leave-one-out needs source edits and cannot live in the suite, so it is
+`tools/leave-one-out.sh` — run it when a plant lands, and paste the verdict table below. Both were
+last run **after P6**.
+
+**Conditions that discriminate: 26 of 29, and three are deletable today.** Re-measured after P6 by
+`tools/leave-one-out.sh`, which is the script rather than the memory of having run one. The
+inventory of which `if` is a gate is hand-maintained inside it, on purpose: telling a gate from a
+null-extraction is a judgement, and a regex that guessed would drop one and report a smaller,
+healthier-looking number. The earlier count of 20 of 22 was over a different enumeration, not a
+different result.
+
+| Verdict | Count | What it means |
+|---|---|---|
+| `output-moves` | 24 | deleting the gate changes the report at defaults |
+| `suite-only` | 2 | the report at defaults is byte-identical and a test still fails |
+| **`DEAD`** | **3** | no change at defaults, whole suite green — deletable today |
+
+**The three dead ones are all blast radius**, and they are the same three this section already
+recorded: the cohort floor, `FanIn >= MinFanIn`, and `FanInXMedian >= 2.0`. **P6 did not disturb
+them** — it was never going to, since it plants no cohort with a fan-in spread. They are what P1
+and P2 are for.
+
+**The two `suite-only` gates are the category the old binary could not express**, and both are
+worth knowing about:
+
+- **`BoundaryMarking`'s surface threshold** is invisible at defaults because the section is
+  *suppressed* at defaults — seven qualifiers against a ceiling of five. Deleting the threshold
+  changes which types qualify, but the section renders empty either way. It is held by
+  `The_widest_surface_set_is_suppressed_where_the_probe_names_five` and
+  `The_named_surface_ceiling_is_reachable_from_both_sides`, both of which lift the ceiling to look
+  underneath. This is the same masking the nudge sweep found on that section's three constants,
+  arrived at from the other direction.
+- **Change cost's `MinFanIn` floor** is invisible at defaults because the share gate is stricter
+  than the floor on this fixture — everything the floor would exclude, the rank gate already has.
+  It is held by `Change_cost_reads_the_fan_in_floor_and_not_the_cohort_floor`, which is D9's pin
+  and moves `MinFanIn` to 16 precisely to prove the right knob works.
+
+> **Both are held by exactly one kind of test, and it is the kind this suite keeps having to
+> invent.** Neither gate can be seen from the default report; both are seen only by a test that
+> deliberately moves a threshold to a value nobody ships. That is a control, and the pattern is
+> now general enough to state: **where a gate is masked — by a suppression above it, or by a
+> stricter gate beside it — the control is the only thing holding it, and deleting the control
+> silently retires the gate.**
+
+**`MinKindSpan` is the case that shows the two halves ask different questions**, and it still is:
+deleting the condition admits every type in the solution (`output-moves`), while moving the floor
+from 3 to 2 changes nothing (the sweep reports `-` downward). Observed and vacuous at once, which
+is why both halves are run.
 
 **Constants the fixture cannot see — and the table is no longer written here.**
 `PolicySweepTests.The_whole_policy_swept_one_notch_each_way.verified.txt` **is** the table: every
