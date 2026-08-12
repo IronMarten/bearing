@@ -221,11 +221,14 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **132 type rows** from **133 declarations**, 138 methods, 290 edges, 22 cohorts, 2 excluded,
+- **144 type rows** from **145 declarations**, 149 methods, 317 edges, 2 excluded,
   **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
   planted identity collision below. **It is the probe's answer and it is now permanent** — Core
-  keys types on `(assembly, FQN)` and reports 133, which is the one divergence extraction is
+  keys types on `(assembly, FQN)` and reports 145, which is the one divergence extraction is
   allowed; the probe is frozen, so this gap closes when the probe retires and not before.
+  P6 moved all of these: twelve types and twenty-seven edges — 8 × 3 dependency fields, plus three
+  `[Route]` usages, which are references like any other. Held by
+  `StructureTests.Fixture_shape_is_stable`, which pins the first three.
 
   > These four numbers were **89 / 90 / 88 / 202** in this file until they were checked against
   > the goldens, having drifted through every plant since they were written. Nothing asserted
@@ -265,30 +268,45 @@ Tidying it up changes the expected answers.
 - `TenantPolicySink` is the **contrast**: registered by `AddSingleton<T>()`, fan-in **1**. A
   generic type argument is a compile-time reference, so the DI case §5.6 names as needing
   detection already works. The case that does not is convention registration
-- boundary: **10** contact points, 8 inbound, 2 outbound. Shapes
-  `2,3,4,6,7,8,8,8,8,12`, median 7.5, so `WIDEST CONTRACT SURFACE` threshold 11.25 and
-  `ShipmentController` at 12 is the sole qualifier — one against a ceiling of five, which is
-  `docs/DEFECTS.md` §12 and why row 5 still cannot fire
-- change cost: **the probe says 5, Core says 3**, and the difference is the saturation conversion.
-  The probe's five are four contracts — `NormalizationContext` 20, `RawResponse` 19,
-  `NormalizedResponse` 15, `ModelDescription` 5 — plus `DispatchCallbackController` at 5, the only
-  `ApiBoundary` ever to clear the absolute floor. Core drops the two at fan-in 5: both sit at
-  solution rank 20.5 of 128, which is not the most-depended-on part of the application. Core's
-  three are identical at `ChangeCostTopFraction` 0.05, 0.10 and 0.15 — the population has a gap
-  between fan-in 15 and 5 and the gate falls in it — and narrow to two at 0.02
+- boundary: **19** contact points, 16 inbound, 3 outbound. Shapes
+  `1,1,1,1,1,2,3,4,4,4,5,5,6,7,8,8,8,8,12`, median 4, so `WIDEST CONTRACT SURFACE` threshold 6 and
+  **seven qualify** against a ceiling of five, which is `docs/DEFECTS.md` §12 and why row 5 still
+  cannot fire. **P6's four new boundaries were given surfaces 4, 4, 5 and 5 on purpose**: the
+  median is the 10th of 19 and stays at 4, so the qualifying set is the same seven it was at
+  fifteen boundaries. Anything above the median would have emptied the finding to one and taken
+  P4's plant with it
+- change cost: **the probe says 6, Core says 3**, and the difference is the saturation conversion.
+  The probe's six are four contracts — `NormalizationContext` 20, `RawResponse` 19,
+  `NormalizedResponse` 15, `ModelDescription` 5 — plus two `ApiBoundary` clearing the absolute
+  floor: `DispatchCallbackController` at 5, planted for the arm, and `LayeringEndpoint` at 8,
+  which is P6's and reached it without being built to. Core drops all three: `ModelDescription`
+  and `DispatchCallbackController` sit at solution rank 20.5 and `LayeringEndpoint` at midrank 9
+  against a limit of 7.2, none of which is the most-depended-on part of the application
+  > **`ChangeCostTopFraction` stopped being insensitive at P6, and that is a real loss.** Core's
+  > three used to be identical at 0.05, 0.10 and 0.15 — the population had a gap between fan-in 15
+  > and 5 and the gate fell in it — and that insensitivity was the argument that the *value* did
+  > not matter, which is what X2 leaned on. P6's three targets sit at fan-in 8 and fill the gap, so
+  > 0.10 now admits `LayeringEndpoint` and 0.02 still narrows to two. The default's answer is
+  > unchanged and nothing was tuned. By this section's own standard it is a gain — the constant was
+  > unobserved and now decides — and by X2's it is a loss, and both are true at once
 - `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
-- **layer span: 6 nominations**, and every one of them sits exactly on `minKindSpan`. Three
+- **layer span: 14 nominations**, and every one of them sits exactly on `minKindSpan`. Three
   significant kinds and a floor of three make "spans the minimum" and "spans everything" the same
   condition, so the floor cannot discriminate at any solution size — `TASKS.md` X4. Nothing on the
   fixture reaches exactly two, either, so lowering it admits nobody
-- **layering patterns: three of them**, grouped on the type's own role plus its named dependencies
+- **layering patterns: five of them**, grouped on the type's own role plus its named dependencies
   rather than on the kind signature (`docs/DEFECTS.md` §11). `QuoteController`,
   `DocumentController`, `RateController` and `TrackingController` are one pattern of four —
   `ApiBoundary`, reaching `TenantStore` and `CarrierGateway`. `AuthenticationMiddleware`
   (`TenantStore`, `AuditClient`) and `PolicyBridge` (`Internal`, reaching `QuoteController`,
-  `TenantStore` and `CarrierGateway`) are patterns of one. Four is below the roll-call threshold of
-  five, so **nothing collapses** and every nomination keeps its detail. Under the probe's
-  kind-signature grouping all six were one pattern and the whole section collapsed to a line
+  `TenantStore` and `CarrierGateway`) are patterns of one. **P6 adds the two the section was
+  missing**: six `*Conduit` types reaching `LayeringEndpoint`, `LayeringArchive` and
+  `LayeringBeacon` — a pattern of six, the only one past the roll-call threshold of five, and the
+  only nominations whose detail collapses — and `PublicIntakeConduit` / `PublicRelayConduit`, a
+  pattern of two reaching the *identical* three components and separated from the six by nothing
+  but their own `ApiBoundary` role. Under the probe's kind-signature grouping all fourteen are one
+  pattern and the whole section collapses to a line, which is `DEFECTS.md` §11 stated as loudly as
+  the fixture can state it
 - five of the six need their own architectural role to reach the span — the four controllers and
   the middleware, all at two kinds through dependencies. `PolicyBridge` is the control: three
   through dependencies alone
@@ -546,18 +564,34 @@ three survivors belong to §3.1.
   a decision rather than a type. Recorded in
   `FixtureCoverageTests.The_layer_span_floor_cannot_discriminate_at_three_significant_kinds`, which
   also asserts the fixture half: nothing reaches exactly two, so even a fourth kind would need a
-  plant before the floor decided anything.
-- **The roll-call collapse has no case**, and closing `DEFECTS.md` §11 is what took it away. The
-  largest pattern fell from six to four against a threshold of five. Before the fix the collapse
-  was the *only* branch the fixture exercised and the per-type detail had none, so this is a trade
-  rather than a loss — and the better half to owe, because the collapse removes detail that §3.1
-  calls the finding.
-- **Whether a type's own role belongs in the pattern key is undecidable here.** No two spanning
-  subjects share a dependency set while differing in their role, so grouping on dependencies alone
-  gives the identical partition and dropping the role from the key moves nothing.
+  plant before the floor decided anything. **Still open — P6 did not touch it**, because all
+  fourteen spanning types still sit exactly on the floor.
+- ~~**The roll-call collapse has no case.**~~ ~~**Whether a type's own role belongs in the pattern
+  key is undecidable here.**~~ **Both filled by P6, and one plant did it** —
+  `tests/TestBed/Core/Layering/`. Eight types reach the identical three components: six `Internal`,
+  which is the group of six the threshold of five needs, and two `ApiBoundary`, which differ in
+  nothing but their own role. The partition is 6 + 2 with the role in the key and one group of 8
+  without it, so each half is the other's control. Held by
+  `The_roll_call_collapse_fires_for_the_pattern_and_spares_the_pair`,
+  `The_roll_call_threshold_decides_in_both_directions` and
+  `A_types_own_role_is_part_of_the_pattern_key`.
 
-  Both need one plant: six types sharing a dependency set for the threshold, two of them differing
-  in their own role for the key. `TASKS.md` P6.
+  > **The dependency set had to be new, and that is what fixed the plant's size.** No new fan-in
+  > on anything that already exists — so eight shared dependents means three new targets, one per
+  > significant kind, because the six are `Internal` and reach all three through dependencies
+  > alone. A smaller set would force the two role groups onto different dependency sets, which is
+  > the one thing the plant has to hold constant.
+  >
+  > **Two collateral effects were designed out and one was accepted.** The four new boundaries
+  > carry surfaces 4, 4, 5 and 5, which keeps the boundary median at 4 and the
+  > widest-contract-surface set at the same seven types — four above the median would have emptied
+  > that finding to one and disarmed P4. The pair is `ApiBoundary` rather than `DataAccess`
+  > because `DataAccess` plus the target reaches `MinCohort` and forms a `kind:DataAccess` cohort
+  > that outranks `TenantStore`'s namespace candidate, moving a peer group. What was accepted:
+  > `OrderRepository` moved from `Repository` to `DataAccess` and `RateRepository` is now alone,
+  > through the *fallback* branch of cohort assignment — largest candidate when none is viable —
+  > which one new `DataAccess` type was enough to reorder. Both types are below `MinCohort` before
+  > and after, so both are peerless either way and no finding moves.
 
 > **A stale claim in the requirement, settled by the golden.** `TECHREQ-job-b.md` §3.1 and §5 both
 > say the fixture *"exercises only the detail branch"* of the roll-call collapse. It was the exact
@@ -591,6 +625,17 @@ floor and its multiple-of-median, both already recorded above.
 changes nothing for these. The policy now carries **26**: the sweep predates three of them, and
 re-running it over the current list is owed. `AnalysisPolicyTests` fails if the count moves again.
 
+> **This table is one plant out of date, and the sweep is the next thing owed.** P6 moved three
+> values without having been run over the whole policy: `GlobalFanInPercentile` is observed,
+> `RollCallDivisor` is observed in both directions, and `ChangeCostTopFraction` has stopped being
+> insensitive. `Top` is unchanged — 14/3 and 16/3 still floor to the same threshold.
+>
+> **Which three values the sweep has never seen is recorded nowhere.** The "23" is a count of what
+> was nudged rather than a snapshot of the policy, and diffing `AnalysisPolicy.Values` back through
+> the ports does not recover it — the policy has carried 26 since before the commit that wrote this
+> section down. So the three can only come out of the re-run. Do that next, over all 26, before
+> building P7 against a table this stale.
+
 | Value | Read by | Why nothing moves |
 |---|---|---|
 | `OutlierFactor` 3.0 | §3.2, §3.3 | nominations sit at 3.5×–22×; nothing is near the bar |
@@ -605,7 +650,7 @@ re-running it over the current list is owed. `AnalysisPolicyTests` fails if the 
 | `SurfaceOutlierFloor` 1 | §3.10 | `median × 1.5` clears it on every boundary distribution the fixture produces, so the floor never binds — 0 and 2 both change nothing |
 | `SurfaceOutlierMultiple` 1.5 | §3.10 | **observable upward only**: 1.6 moves the finding set, 1.4 does not. The qualifying surfaces sit at 8 and 12 against a bar of 6, so there is room below the gate and none above it |
 | `GlobalComplexityFloor` | §3.11 | dead on the fixture: no below-floor type clears the percentile while failing the floor, so the floor never decides — see below |
-| `GlobalFanInPercentile` 90 | §3.11 | observable downward only — see below |
+| ~~`GlobalFanInPercentile` 90~~ | §3.11 | **closed by P6, and by accident** — its three shared dependency targets each carry fan-in 8 with no peer group, which is the deliberate plant this row said would never arrive on its own. See below |
 | `MinTangle` 4 | graphs | **ported at S2, and measured dead**: the fixture holds one tangle of 8 and *no* mutual pairs or triples, so 3 and 5 both change nothing — 2 does not either |
 
 **The circular-reference section has one of everything, which is one short of a test.** S2 landed
@@ -639,8 +684,11 @@ model.
   and the probe no longer gate the same way, and the plant was built for the probe's. Closing it
   needs a boundary in the solution's top slice — realistically a base controller, which this
   fixture has at `ControllerBase` fan-in 8 but classifies `Internal` for want of the name suffix.
-  Reaching a limit of 6.9 takes fan-in 11. Recorded rather than forced, because the alternative is
-  picking `ChangeCostTopFraction` to admit our own plant.
+  Recorded rather than forced, because the alternative is picking `ChangeCostTopFraction` to admit
+  our own plant. **Still open after P6**, and it came close: `LayeringEndpoint` is an `ApiBoundary`
+  at fan-in 8 that clears the probe's floor, so the probe's half of the arm no longer rests on a
+  single plant — but at solution midrank 9 against a limit of 7.2 it is outside Core's slice, and
+  the arm is still deletable there with the suite green. It would take fan-in 11.
 - **§3.10 boundary marking — ported.** *Boundaries carrying real logic* discriminates, two of
   fifteen. *Widest contract surface* discriminates, seven of fifteen after P4 — and its suppression
   is reachable from both sides for the first time. All four mutations over the detector and the new
@@ -653,11 +701,20 @@ model.
   `GlobalComplexityPercentile` discriminates: three of the thirteen clear it (`OrderRepository` 98,
   `PayloadTag` 95.2, `RoutingDepot` 91.7). **`GlobalComplexityFloor` is dead** — no below-floor type
   clears the percentile while failing the floor, so the absolute floor never decides.
-  **`GlobalFanInPercentile` is observable downward only**: not one of the thirteen reaches the 90th
-  percentile by fan-in solution-wide, so raising it changes nothing and only the negative assertion
-  stops it being lowered. That is close to structural — a type with no peers usually has few
-  callers — so its plant has to be deliberate: a lone component much of the system depends on,
-  which is the case §3.11 exists for and the fixture has never had.
+  ~~**`GlobalFanInPercentile` is observable downward only**~~ — **closed at P6, which was not
+  trying to.** The record said the plant would have to be deliberate, *a lone component much of the
+  system depends on*, and called it close to structural because a type with no peers usually has
+  few callers. P6's shared dependency set is that description without having meant to be: eight
+  conduits reach three targets, each target lands in a cohort too small to compare against, and
+  each carries fan-in 8 against a solution where most types have none. The finding now makes the
+  weaker global claim in both flavours.
+
+  **Recorded rather than celebrated.** Nothing about it is load-bearing for P6, so reshaping the
+  conduits would retire the gate again with nothing saying so — which is why
+  `FindingEquivalenceTests.The_weaker_global_claim_is_made_in_both_flavours` names the three types
+  instead of counting them. **Two of the fixture's gate closures now rest on plants built for
+  something else**, this one and change cost's, and that is a pattern worth watching rather than
+  a run of luck.
 
 > **The one structural finding, and it explains the rest.** Loosening a threshold by one notch
 > moves output for **3 of the 23 swept** values. Nearly every gate has slack on both sides: types clear a
