@@ -70,6 +70,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    (fan-in AND fan-out both >= 5 — a ratio cannot see these, since
     high-in + high-out lands mid-range, same as a trivial one-in one-out leaf)
    ShipmentCoordinator [Internal] — fan-in 7, fan-out 7, instability 0.3. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
+   DispatchRegistry [Internal] — fan-in 5, fan-out 5, instability 0.5. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (23 members, worst method Registered at cc 1, dsm 0). Cross-domain orchestration and shared state tend to collect here.
    Router [Internal] — fan-in 5, fan-out 11, instability 0.583. Wiring hub: high coupling both ways but little logic inside (worst method cc 2). Risky to re-route, not to reason about.
    NOTE: routers, mediators and composition roots legitimately live here. That
    does not make the flag wrong — those are exactly the things not to change
@@ -93,12 +94,13 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
 -- SHARED MUTABLE STATE (no cohort required) -------------------
    (writes to static mutable state — every caller on every thread shares these)
    QuoteAssembler — 2 writes to static state, and 0 types call into it. Whether these are genuinely contended is a runtime question this probe cannot answer — but the sharing is certain from the code.
+   DispatchCounter — 1 write to static state, and 5 types call into it. Whether these are genuinely contended is a runtime question this probe cannot answer — but the sharing is certain from the code.
 
 -- PROJECT STABILITY vs ABSTRACTNESS ---------------------------
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.05, D 0.95  (Ca 2 depend on it, Ce 0 reach out, 6/110 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.05, D 0.95  (Ca 2 depend on it, Ce 0 reach out, 6/122 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -110,7 +112,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      appears here. Verify before deleting.
 
 -- NO PEER GROUP -----------------------------------------------
-   11 of 114 types (9.6%) sit in cohorts below --min-cohort (5).
+   13 of 126 types (10.3%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these. They are absent from the
    nominations above and from prediction-sheet.csv, and their Pctl/XMedian
    columns are blank where a cohort of one made them meaningless.
@@ -119,9 +121,11 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    Weaker evidence — this compares unlike things — but not nothing:
      OrderRepository [DataAccess] — top 2% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
      PayloadTag [Internal] — top 5% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
-     RoutingDepot [Internal] — top 9% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
+     RoutingDepot [Internal] — top 8% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
+     DispatchCounter — fan-in 5, cc 2, cohort 'Dispatch' (size 2)
+     DispatchRegistry — fan-in 5, cc 1, cohort 'Dispatch' (size 2)
      LabelDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
      ManifestDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
      RoutingDepot — fan-in 1, cc 12, cohort 'Depot' (size 3)

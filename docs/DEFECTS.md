@@ -283,6 +283,37 @@ A suppression may silence, never nominate. `Breaks_alone_diverges_from_the_probe
 The probe keeps the defect and its pin, `A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
 It is the oracle, not the product.
 
+### 16. A god object by size is told it carries real logic
+
+`HUBS AND GOD OBJECTS` splits on `MaxMemberCyclomatic >= highCc` **or** `MemberCount >=
+godObjectMembers`, and both branches print the same sentence: *"Architectural bottleneck: it
+both depends on and is depended on by much of the system, AND carries real logic."* The
+disjunction has two arms and the wording only describes one of them. On the size arm the claim
+is false by construction — that arm exists precisely for types with bulk and no logic.
+
+Visible on the fixture the moment a case for the size arm existed:
+
+> `DispatchRegistry` — … Architectural bottleneck: … **AND carries real logic** (23 members,
+> worst method `Registered` at **cc 1**, dsm 0).
+
+Twenty-three members and a worst method of cc 1. The receipts in the same sentence refute the
+claim the sentence makes, which is the failure invariant 5 exists to prevent — interpretation
+first, math as receipts, and here the interpretation contradicts its own receipts.
+
+Not caught earlier because the size arm had never decided anything: `ShipmentCoordinator` is the
+only other bottleneck and reaches the branch on complexity, where the sentence is true. This is
+the *second* thing the same plant found — the first was that the arm was untested at all.
+
+**Fix it in Core when §3.8 ports**, as two sentences rather than one. The size arm should say
+what it actually means: coupled both ways and large enough that no one holds it in their head,
+with nothing complex inside. That is a different danger from a bottleneck carrying logic, and
+§3.8's whole design is that the split names two different dangers — the wording currently
+collapses them back together.
+
+Not pinned: the sentence is wording, and `docs/TESTING.md` §5 is explicit that this suite
+asserts against the model rather than against report prose. The golden holds the exact string,
+so the change will be visible there.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.

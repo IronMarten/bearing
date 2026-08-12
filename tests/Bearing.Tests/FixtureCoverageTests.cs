@@ -370,6 +370,78 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// The god-object half of the hub disjunction decides something now.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// §3.8 splits a hub into a bottleneck or a wiring hub on
+    /// <c>MaxMemberCyclomatic &gt;= highCc</c> <b>or</b> <c>MemberCount &gt;= godObjectMembers</c>.
+    /// Only <c>ShipmentCoordinator</c> reached the bottleneck branch and it did so on complexity,
+    /// so the member-count half had never decided anything: deleting it changed no output.
+    /// </para>
+    /// <para>
+    /// <c>DispatchRegistry</c> reaches it on size alone — 23 members, worst method cc 1. The
+    /// control moves the threshold past it and watches the verdict change rather than merely
+    /// asserting the finding exists, because a hub that is a bottleneck and a hub that is wiring
+    /// are both output and only one of them is right.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_god_object_plant_observes_the_member_count()
+    {
+        var registry = run.Type("DispatchRegistry");
+
+        // Reaches the branch on size, and could not reach it on complexity.
+        Assert.True(registry.MemberCount >= run.Options.GodObjectMembers);
+        Assert.True(registry.MaxMemberCyclomatic < run.Options.HighCc);
+        Assert.True(Math.Min(registry.FanIn, registry.FanOut) >= run.Options.HubMin);
+
+        var atDefaults = NominationText.Render(run.Result, run.Options);
+        Assert.Contains("DispatchRegistry", atDefaults, StringComparison.Ordinal);
+        Assert.Contains("Architectural bottleneck", atDefaults, StringComparison.Ordinal);
+
+        // Raise the floor past 23 and the same type reads as wiring instead. It is still a hub,
+        // so this is the disjunction moving rather than the finding disappearing.
+        var raised = NominationText.Render(
+            run.Result, new Options { GodObjectMembers = registry.MemberCount + 1 });
+
+        Assert.Contains("DispatchRegistry", raised, StringComparison.Ordinal);
+        Assert.Contains("Wiring hub", raised, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// <c>++</c> is the only static write on one type, so dropping support for it empties a
+    /// finding.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>SESSION-NOTES.md</c> #20: counting only assignments and missing increment was a real
+    /// defect, and <c>++</c> is a non-atomic read-modify-write that shares state exactly as much
+    /// as an assignment does. The case planted for it did not protect the fix —
+    /// <c>QuoteAssembler</c> carries an increment <i>and</i> a plain assignment, so its
+    /// <c>StaticMutations</c> falls from 2 to 1 without the support and the finding still fires.
+    /// </para>
+    /// <para>
+    /// <c>DispatchCounter</c> has one static field and one write, an increment. Stop counting
+    /// increments and its count is zero, which is the whole gate — so the exact counts are
+    /// asserted rather than "greater than zero", because that is the assertion that moves.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_increment_plant_is_the_only_static_write_that_is_one()
+    {
+        Assert.Equal(1, run.Type("DispatchCounter").StaticMutations);
+
+        // The pre-existing case, and why it could not do this job.
+        Assert.Equal(2, run.Type("QuoteAssembler").StaticMutations);
+
+        Assert.Contains(
+            "DispatchCounter",
+            NominationText.Render(run.Result, run.Options),
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// The three dead-code traps are planted, and nothing can currently tell them apart from
     /// code that really is unreferenced.
     /// </summary>

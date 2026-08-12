@@ -404,7 +404,40 @@ found two dead gates; seven types in `Core/Rating/Evaluators.cs` now make both f
 > on nothing either, so their instability is undefined and they never reach the finding. Read the
 > finding set; do not restate the conditions that built it.
 
-**Still open, and not closed by that plant.** Three gates from §3.4 and §3.6 remain unobserved —
+**For the unported findings, measured before porting them.** A gate inventory over §3.1, §3.5,
+§3.8 and §3.9 — for each condition, is there a case where that condition is the one deciding?
+Two were dead and are now planted in `Core/Dispatch/Dispatch.cs`:
+
+- **`MemberCount >= godObjectMembers`.** `ShipmentCoordinator` is the only other bottleneck and
+  reaches the branch on complexity, so the size arm of the disjunction never decided anything.
+  `DispatchRegistry` reaches it on size alone — 23 members, worst method cc 1. The control moves
+  the threshold past it and watches the verdict change from bottleneck to wiring hub, because
+  both are output and only one is right.
+- **`++` as a static write.** `SESSION-NOTES.md` #20 records missing increment as a real defect,
+  and the case planted for it does not protect the fix: `QuoteAssembler` carries an increment
+  *and* an assignment, so its count falls 2 → 1 without the support and the finding still fires.
+  `DispatchCounter`'s only write is an increment, so its count falls to 0.
+
+> **The inventory corrected itself once, which is the reason to run it rather than reason it.**
+> It reported the spans roll-call collapse as one type short of firing. It was not: the
+> measurement grouped types by their *dependency* kinds while the finding groups by the whole
+> spanning signature, so all six land in one group and the golden has shown the collapsed line
+> since `Bridges.cs` was planted. A gate inventory is itself a model of the finding, and a wrong
+> model reports a gap that is not there.
+
+> **And it found a wording defect the moment the gate had a case.** The size arm of the hub
+> disjunction prints *"AND carries real logic"* about a type whose worst method is cc 1 —
+> `DEFECTS.md` §16. The receipts in the same sentence refute it. Nothing could have seen that
+> while the arm was unreachable.
+
+> **Two constraints on any further plant, both still binding.** `Bridges.cs` records them: no new
+> `ApiBoundary` or `ExternalCall` type, because the fixture sits at nine boundaries and row 5's
+> suppression stops being reachable at ten; and no new fan-in on anything that already exists.
+> The second is easy to violate by accident — naming the new types `*Handler` pulled
+> `SchemaMigrationHandler` into the new suffix cohort and shrank an unrelated peer population
+> from 33 to 32. Caught in the golden diff, not by reasoning. Renamed to `*Dispatcher`.
+
+**Still open, and not closed by either plant.** Three gates from §3.4 and §3.6 remain unobserved —
 blast radius' absolute fan-in floor and its multiple-of-median, and load-bearing's use of
 effective rather than raw fan-out. The evaluator cohort does not reach them: blast radius needs a
 type that clears the rank and complexity gates while failing one of those two, and the fan-out
