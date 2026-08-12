@@ -120,6 +120,26 @@ public static class Suppression
                 model.Find(finding.Subject) is { } type &&
                 type.FanIn < model.Policy.BreaksAloneMinFanIn,
         },
+
+        new SuppressionRule(
+            "widest-surface-is-not-discriminating",
+            FindingKind.WidestContractSurface,
+            Invariant: "2",
+            "it is not discriminating, so it is noise — the section promises to name what stands " +
+            "out and a list of seven is not that")
+        {
+            // The first row that suppresses a SET rather than a subject: every member goes or
+            // none does, because what is wrong is the size of the set and not anything about the
+            // type. docs/DEFECTS.md §12.
+            //
+            // An absolute count, and that is the whole repair. The probe asks whether the
+            // qualifying set exceeds half the boundaries, and the qualifying filter is already
+            // proportional to the same distribution — so the set lands on the threshold and never
+            // crosses it, at any boundary count. A gate cannot sit on a filter that has already
+            // bounded the thing it measures.
+            Applies = (_, detected, model) =>
+                detected.OfKind(FindingKind.WidestContractSurface).Count > model.Policy.MaxNamedSurfaces,
+        },
     ];
 
     /// <summary>

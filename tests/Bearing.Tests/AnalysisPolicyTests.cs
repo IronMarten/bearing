@@ -34,7 +34,10 @@ public sealed class AnalysisPolicyTests
         "BreaksAloneMinFanIn",
         "RollCallDivisor",
         "SurfaceOutlierMultiple",
-        "SurfaceDiscriminationDivisor",
+        // Renamed when docs/DEFECTS.md §12 was decided: the gate it named was a proportion,
+        // and a proportion cannot sit on a filter proportional to the same distribution. The
+        // literal it replaced is still one of the thirteen.
+        "MaxNamedSurfaces",
         "GlobalFanInPercentile",
         "GlobalComplexityPercentile",
         "GlobalComplexityFloor",
@@ -87,7 +90,7 @@ public sealed class AnalysisPolicyTests
         Assert.Equal(3, p.RollCallDivisor);                      // members.Count > Top / 3
         Assert.Equal(1.5, p.SurfaceOutlierMultiple);             // DataShape >= median * 1.5
         Assert.Equal(1, p.SurfaceOutlierFloor);                  // ...floored at 1
-        Assert.Equal(2, p.SurfaceDiscriminationDivisor);         // count <= boundaries / 2
+        Assert.Equal(5, p.MaxNamedSurfaces);                     // count <= 5, absolute
         Assert.Equal(90, p.GlobalFanInPercentile);               // GlobalFanInPctl >= 90
         Assert.Equal(90, p.GlobalComplexityPercentile);          // GlobalMaxCcPctl >= 90
         Assert.Equal(1, p.GlobalComplexityFloor);                // MaxMemberCyclomatic > 1
@@ -103,8 +106,6 @@ public sealed class AnalysisPolicyTests
         Assert.Equal(p.Top / 3, p.RollCallThreshold);
         Assert.Equal(5, p.RollCallThreshold);
 
-        foreach (var boundaries in new[] { 0, 1, 2, 5, 10, 61 })
-            Assert.Equal(Math.Max(1, boundaries / 2), p.MaxDiscriminatingSurfaces(boundaries));
 
         foreach (var median in new[] { 0.0, 0.5, 4.0, 12.0 })
             Assert.Equal(Math.Max(median * 1.5, 1), p.SurfaceOutlierThreshold(median));
@@ -157,7 +158,7 @@ public sealed class AnalysisPolicyTests
         AnalysisPolicy.Default with { BlastTopFraction = 1.5 },
         AnalysisPolicy.Default with { GlobalComplexityPercentile = -1 },
         AnalysisPolicy.Default with { RollCallDivisor = 0 },
-        AnalysisPolicy.Default with { SurfaceDiscriminationDivisor = 0 },
+        AnalysisPolicy.Default with { MaxNamedSurfaces = 0 },
         AnalysisPolicy.Default with { MinCohort = 1 },
         AnalysisPolicy.Default with { OutlierFactor = double.NaN },
         AnalysisPolicy.Default with { StableThreshold = double.PositiveInfinity },

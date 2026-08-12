@@ -160,6 +160,87 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Null(bearing.ValueOf("CohortSize"));
     }
 
+    // ------------------------------------------------------------- boundary marking ----
+
+    /// <summary>
+    /// Boundaries carrying real logic are the probe's, read off the section's own subsection.
+    /// </summary>
+    [Fact]
+    public void Boundaries_carrying_real_logic_are_the_probes()
+    {
+        var expected = ProbeNominations("   BOUNDARIES CARRYING REAL LOGIC", stopAt: "WIDEST");
+        var actual = CoreTypeNominations(FindingKind.BoundaryCarriesLogic);
+
+        Assert.Equal(expected, actual);
+        Assert.Equal(["ReconciliationController", "ShipmentController"], actual);
+    }
+
+    /// <summary>
+    /// <b>Defect 12, fixed.</b> The probe names five surfaces; Core names none, because seven
+    /// qualify.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The fourth deliberate divergence, and the first where the probe's output is visibly the
+    /// failure.</b> §3.10 says the section prints only when it discriminates, and the probe
+    /// expresses that as a proportion — suppress when the qualifying set exceeds half the
+    /// boundaries. It cannot fire at any boundary count, because the qualifying filter is
+    /// <c>DataShape &gt;= 1.5 × median</c> and is therefore already bounded by the share the
+    /// ceiling tests for. So the probe prints an arbitrary five of the seven qualifiers, silently
+    /// truncated: a roll-call of controllers, which is the exact thing this section replaced.
+    /// </para>
+    /// <para>
+    /// Core detects all seven and suppression removes the set as a set. The count is what bounds a
+    /// list, and five is the number the probe's own <c>Take</c> already imposed — so the change is
+    /// from a silent truncation to a stated silence.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_widest_surface_set_is_suppressed_where_the_probe_names_five()
+    {
+        var detected = Analysis.Detected(core.Model);
+        var surfaces = detected.OfKind(FindingKind.WidestContractSurface);
+
+        // Seven qualify, which is what P4 was planted to produce.
+        Assert.Equal(7, surfaces.Count);
+        Assert.True(surfaces.Count > core.Model.Policy.MaxNamedSurfaces);
+
+        // And every one of them is withdrawn, by the row that has never been able to fire.
+        Assert.All(
+            surfaces,
+            f => Assert.Equal(
+                "widest-surface-is-not-discriminating",
+                Suppression.Silencing(f, detected, core.Model)!.Name));
+
+        Assert.Empty(Analysis.FindingsFor(core.Model).OfKind(FindingKind.WidestContractSurface));
+
+        // The probe, meanwhile, names five of the seven and says nothing about the two it dropped.
+        Assert.Equal(
+            ["DocumentController", "QuoteController", "RateController", "ShipmentController", "TrackingController"],
+            ProbeNominations("   WIDEST CONTRACT SURFACE"));
+    }
+
+    /// <summary>
+    /// The ceiling is a gate in both directions, which the proportional form could never be.
+    /// </summary>
+    /// <remarks>
+    /// Raising it past the qualifying set brings all seven back. That control is the whole
+    /// difference between this and what it replaced: <c>KnownDefectTests</c> proves the old gate
+    /// cannot fire at any boundary count or distribution, so it had no reachable other branch to
+    /// test against.
+    /// </remarks>
+    [Fact]
+    public void The_named_surface_ceiling_is_reachable_from_both_sides()
+    {
+        var raised = SurfacesUnder(core.Model.Policy with { MaxNamedSurfaces = 7 });
+        Assert.Equal(7, raised.Count);
+        Assert.Contains("ShipmentController", raised);
+
+        // And one below the set is still suppression, so the boundary of the gate is the count
+        // rather than anything about the types.
+        Assert.Empty(SurfacesUnder(core.Model.Policy with { MaxNamedSurfaces = 6 }));
+    }
+
     // ------------------------------------------------------------------ change cost ----
 
     /// <summary>
@@ -901,6 +982,24 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
 
         return Analysis.FindingsFor(model)
             .OfKind(FindingKind.ChangeCost)
+            .Select(f => model.Find(f.Subject)!.Name)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    /// <summary>The surfaces that survive suppression under a different ceiling.</summary>
+    /// <remarks>
+    /// A re-walk rather than a re-render, for the same reason as <see cref="ChangeCostUnder"/>:
+    /// cohort assignment reads the policy during the walk, so a policy is a model rather than a
+    /// view.
+    /// </remarks>
+    private static List<string> SurfacesUnder(AnalysisPolicy policy)
+    {
+        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        return Analysis.FindingsFor(model)
+            .OfKind(FindingKind.WidestContractSurface)
             .Select(f => model.Find(f.Subject)!.Name)
             .Order(StringComparer.Ordinal)
             .ToList();

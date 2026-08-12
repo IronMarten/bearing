@@ -211,10 +211,28 @@ public sealed record AnalysisPolicy
     public double SurfaceOutlierFloor { get; init; } = 1;
 
     /// <summary>
-    /// Divides the boundary count to give the largest qualifying set that still discriminates.
-    /// See <see cref="MaxDiscriminatingSurfaces"/>.
+    /// The largest set of contract surfaces that can be named before the section stops
+    /// discriminating and becomes a list.
     /// </summary>
-    public int SurfaceDiscriminationDivisor { get; init; } = 2;
+    /// <remarks>
+    /// <para>
+    /// <b>An absolute count, replacing the proportional ceiling, and that is
+    /// <c>docs/DEFECTS.md</c> §12's whole point.</b> The probe suppresses when the qualifying set
+    /// exceeds half the boundaries, and the qualifying filter is
+    /// <see cref="SurfaceOutlierMultiple"/> against the median of the same distribution — so the
+    /// set is already bounded by the share the ceiling tests for. It lands on the threshold at
+    /// every boundary count and never crosses. A gate phrased as "too large a share" cannot sit on
+    /// a filter proportional to the same statistic, and no value of a divisor repairs that.
+    /// </para>
+    /// <para>
+    /// What actually goes wrong is not a proportion. The section promises to name what stands out
+    /// and instead reads a list, and a count is what bounds a list. Five is the number the probe's
+    /// <c>Take(5)</c> already imposed — so this changes a silent truncation into the gate itself:
+    /// past the ceiling the section says nothing rather than naming an arbitrary five of the
+    /// qualifiers.
+    /// </para>
+    /// </remarks>
+    public int MaxNamedSurfaces { get; init; } = 5;
 
     // ------------------------------------------------------------- no cohort ----
 
@@ -239,19 +257,6 @@ public sealed record AnalysisPolicy
 
     /// <summary>Smallest type tangle worth reporting; mutual pairs and triples are ordinary C#.</summary>
     public int MinTangle { get; init; } = 4;
-
-    /// <summary>
-    /// The largest qualifying set that still discriminates, for a solution with
-    /// <paramref name="boundaryCount"/> boundaries. A set larger than this is a roll-call of the
-    /// whole population rather than a finding about part of it.
-    /// </summary>
-    /// <remarks>
-    /// Worth knowing before tuning: because the qualifying filter is itself proportional to the
-    /// same distribution, the qualifying set can never <i>exceed</i> this number — it lands on
-    /// it and never crosses. <c>docs/DEFECTS.md</c> §12.
-    /// </remarks>
-    public int MaxDiscriminatingSurfaces(int boundaryCount) =>
-        Math.Max(1, boundaryCount / SurfaceDiscriminationDivisor);
 
     /// <summary>The minimum surface a boundary needs to count as unusually wide.</summary>
     public double SurfaceOutlierThreshold(double medianSurface) =>
@@ -283,7 +288,7 @@ public sealed record AnalysisPolicy
         (nameof(RollCallDivisor), RollCallDivisor),
         (nameof(SurfaceOutlierMultiple), SurfaceOutlierMultiple),
         (nameof(SurfaceOutlierFloor), SurfaceOutlierFloor),
-        (nameof(SurfaceDiscriminationDivisor), SurfaceDiscriminationDivisor),
+        (nameof(MaxNamedSurfaces), MaxNamedSurfaces),
         (nameof(GlobalFanInPercentile), GlobalFanInPercentile),
         (nameof(GlobalComplexityPercentile), GlobalComplexityPercentile),
         (nameof(GlobalComplexityFloor), GlobalComplexityFloor),
@@ -352,8 +357,10 @@ public sealed record AnalysisPolicy
 
         if (RollCallDivisor < 1)
             throw new ArgumentOutOfRangeException(nameof(RollCallDivisor), RollCallDivisor, "RollCallDivisor must be at least 1.");
-        if (SurfaceDiscriminationDivisor < 1)
-            throw new ArgumentOutOfRangeException(nameof(SurfaceDiscriminationDivisor), SurfaceDiscriminationDivisor, "SurfaceDiscriminationDivisor must be at least 1.");
+        // Zero would suppress the section wherever a single wide surface qualifies, which is the
+        // finding never speaking rather than speaking too often.
+        if (MaxNamedSurfaces < 1)
+            throw new ArgumentOutOfRangeException(nameof(MaxNamedSurfaces), MaxNamedSurfaces, "MaxNamedSurfaces must be at least 1.");
         if (MinCohort < 2)
             throw new ArgumentOutOfRangeException(nameof(MinCohort), MinCohort, "A cohort of fewer than two has no comparative reading at all.");
     }

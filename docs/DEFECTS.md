@@ -213,7 +213,7 @@ exercised and the per-type detail had none. Recorded in
 `FixtureCoverageTests.The_roll_call_collapse_has_no_case_under_the_named_dependency_grouping`, with
 the plant it needs.
 
-### 12. `WIDEST CONTRACT SURFACE` can never be suppressed, at any boundary count
+### 12. `WIDEST CONTRACT SURFACE` can never be suppressed, at any boundary count — **fixed in Core**
 
 The filter is `DataShape >= max(1.5 × median, 1)`, so qualifying boundaries always come from the
 upper half and the set can never exceed `floor(n/2)` — precisely the number the suppression
@@ -260,7 +260,28 @@ the `Take(5)` cap catches it, so the claim *"removing it changes nothing"* is th
 wrong rather than the verdict. Worth keeping: the decided replacement is an absolute count, and
 this is the second way the proportional form misbehaves.
 
-Pinned: `Widest_contract_surface_can_never_be_suppressed`.
+**Built, and observable from both sides for the first time.** `AnalysisPolicy.MaxNamedSurfaces`
+replaces the proportional ceiling, and P4 planted the population that reaches it: five ops
+endpoints of surface 1 drag the median from 7.5 to 4, which takes the qualifying set from one to
+seven. Suppression row 5 withdraws the set as a set — the first row that suppresses a *set* rather
+than a subject, because what is wrong is its size and not anything about the types in it. Raising
+the ceiling to seven brings all of them back, which is the control the proportional form could
+never offer.
+
+**The plant works from below, and that is the defect restated as a construction.** It adds no wide
+surfaces; it adds narrow ones. A filter proportional to the median can be driven from below by
+boilerplate, so a codebase full of thin endpoints makes its own broad surfaces "stand out" without
+one of them changing.
+
+**The probe's output is now visibly the failure**, which is worth more than the argument was: it
+names five of the seven qualifiers, silently truncated by `Take(5)` — a roll-call of controllers,
+the exact thing §3.10 says this section replaced. Core names none and says so. Fourth deliberate
+divergence.
+
+Pinned: `Widest_contract_surface_can_never_be_suppressed`, and the pin is sharper than it was.
+With seven qualifiers the proportional gate *still* cannot fire, because the `Take(5)` caps the
+count at five while the ceiling rose with the population to seven. **Adding qualifiers made it
+less able to fire.**
 
 ### 13. `MethodMetrics.Id` is not an identifier — it is the bare method name
 

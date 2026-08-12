@@ -34,8 +34,22 @@ public enum FindingKind
     /// <summary>§3.9. Shared mutable state.</summary>
     SharedMutableState,
 
-    /// <summary>§3.10. Boundary marking.</summary>
-    BoundaryMarking,
+    /// <summary>
+    /// §3.10. A boundary that carries real logic — decisions at an external edge are the hardest
+    /// kind to change later.
+    /// </summary>
+    BoundaryCarriesLogic,
+
+    /// <summary>§3.10. A boundary with an unusually wide contract surface.</summary>
+    /// <remarks>
+    /// <b>§3.10 is one section and two claims, so it is two kinds.</b> A finding is identified by
+    /// <c>(kind, subject)</c> and nothing else, and one boundary can be both — on this fixture
+    /// <c>ShipmentController</c> is, at cc 12 and a surface of 12. One kind would make those a
+    /// duplicate key, which <see cref="FindingSet"/> rejects rather than merges, and merging is
+    /// what would lose one of the two claims. The section's third part, the contact-point count,
+    /// is not a claim about any subject and is computed by the renderer from the model.
+    /// </remarks>
+    WidestContractSurface,
 
     /// <summary>§3.11. What the run could not see. Part of the output, not a footnote.</summary>
     Coverage,
