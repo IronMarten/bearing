@@ -1,16 +1,17 @@
 ﻿
 ================================================================
-NOMINATED INSTANCES
-Draft sentences. Receipts in parentheses. Rewrite before the session.
+BEARING {version} — TestBed.sln
+145 types in 3 projects. Unusual findings first, then structure.
+Every claim shows the numbers behind it.
 ================================================================
 
 -- CONCEALED DECISION ------------------------------------------
    (complexity far above peers, connectivity ordinary)
-   ShipmentController.Post — looks like plumbing but is in the top 6% of internal complexity among your 8 ControllerBase. (12x the peer median; cc 12, dsm 4, fan-in 0, fan-out 5)
-   ThroughputGauge.Sample — connectivity is unremarkable for its peers, but it is in the top 10% of internal complexity among your 5 Gauge. (8x the peer median; cc 8, dsm 0, fan-in 5, fan-out 1)
-   AuthenticationMiddleware.Authenticate — looks like plumbing but is in the top 31% of internal complexity among your 8 ControllerBase. (5x the peer median; cc 5, dsm 2, fan-in 0, fan-out 5)
-   RateReconciler.Reconcile — looks like plumbing but is in the top 11% of internal complexity among your 9 Reconciler. (4.33x the peer median; cc 13, dsm 0, fan-in 1, fan-out 4)
-   GuaranteedServiceNormalizer.Normalize — looks like plumbing but is in the top 7% of internal complexity among your 7 IResponseNormalizer. (3.5x the peer median; cc 21, dsm 16, fan-in 1, fan-out 5)
+   ShipmentController.Post — looks like plumbing but is in the top 6% of internal complexity among the 8 types deriving from ControllerBase. (12x the peer median; cc 12, dsm 4, fan-in 0, fan-out 5)
+   ThroughputGauge.Sample — connectivity is unremarkable for its peers, but it is in the top 10% of internal complexity among the 5 types whose name ends in Gauge. (8x the peer median; cc 8, dsm 0, fan-in 5, fan-out 1)
+   AuthenticationMiddleware.Authenticate — looks like plumbing but is in the top 31% of internal complexity among the 8 types deriving from ControllerBase. (5x the peer median; cc 5, dsm 2, fan-in 0, fan-out 5)
+   RateReconciler.Reconcile — looks like plumbing but is in the top 11% of internal complexity among the 9 types whose name ends in Reconciler. (4.33x the peer median; cc 13, dsm 0, fan-in 1, fan-out 4)
+   GuaranteedServiceNormalizer.Normalize — looks like plumbing but is in the top 7% of internal complexity among the 7 implementations of IResponseNormalizer. (3.5x the peer median; cc 21, dsm 16, fan-in 1, fan-out 5)
 
 -- CONCEALED DECISION, METHOD LEVEL ----------------------------
    TariffCalculator.Apply — 22x the median complexity of its 33 peers (cc 22, dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
@@ -37,10 +38,11 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    NormalizedResponse — 15 internal callers depend on this contract (5 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis. (Contract)
 
 -- BOUNDARY: HERE BE DRAGONS -----------------------------------
-   19 external contact point(s): 16 inbound API, 3 outbound. Consumer impact of
+   19 external contact points: 16 inbound API, 3 outbound. Consumer impact of
    changes at ANY of these is outside what static analysis can see.
 
-   INTEGRATION MAP — external systems, by how many types touch them:
+   INTEGRATION MAP — external systems this solution calls into,
+   by how many of its types touch them:
      System.Data                                3 types
      System.Net.Http                            3 types
      (22 language/runtime references omitted as plumbing)
@@ -163,21 +165,21 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      PayloadTag [Internal] — top 4% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
-     LayeringArchive — fan-in 8, cc 2, cohort 'Layering' (size 3)
-     LayeringBeacon — fan-in 8, cc 2, cohort 'Layering' (size 3)
-     LayeringEndpoint — fan-in 8, cc 1, cohort 'ApiBoundary' (size 1)
-     DispatchCounter — fan-in 5, cc 2, cohort 'Dispatch' (size 2)
-     DispatchRegistry — fan-in 5, cc 1, cohort 'Dispatch' (size 2)
-     RouteAttribute — fan-in 3, cc 0, cohort 'Layering' (size 3)
-     LabelDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
-     ManifestDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
-     RoutingDepot — fan-in 1, cc 12, cohort 'Depot' (size 3)
-     SurchargeTable — fan-in 1, cc 4, cohort 'Table' (size 1)
-     PricingVault — fan-in 1, cc 8, cohort 'Vault' (size 3)
-     SessionVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
-     TokenVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
-     OrderRepository — fan-in 0, cc 19, cohort 'DataAccess' (size 1)
-     RateRepository — fan-in 0, cc 2, cohort 'Repository' (size 1)
+     LayeringArchive — fan-in 8, cc 2, 2 peers (types in TestBed.Core.Layering)
+     LayeringBeacon — fan-in 8, cc 2, 2 peers (types in TestBed.Core.Layering)
+     LayeringEndpoint — fan-in 8, cc 1, 0 peers (types classified as ApiBoundary)
+     DispatchCounter — fan-in 5, cc 2, 1 peer (types in TestBed.Core.Dispatch)
+     DispatchRegistry — fan-in 5, cc 1, 1 peer (types in TestBed.Core.Dispatch)
+     RouteAttribute — fan-in 3, cc 0, 2 peers (types in TestBed.Core.Layering)
+     LabelDepot — fan-in 1, cc 1, 2 peers (types whose name ends in Depot)
+     ManifestDepot — fan-in 1, cc 1, 2 peers (types whose name ends in Depot)
+     RoutingDepot — fan-in 1, cc 12, 2 peers (types whose name ends in Depot)
+     SurchargeTable — fan-in 1, cc 4, 0 peers (types whose name ends in Table)
+     PricingVault — fan-in 1, cc 8, 2 peers (types whose name ends in Vault)
+     SessionVault — fan-in 1, cc 1, 2 peers (types whose name ends in Vault)
+     TokenVault — fan-in 1, cc 1, 2 peers (types whose name ends in Vault)
+     OrderRepository — fan-in 0, cc 19, 0 peers (types classified as DataAccess)
+     RateRepository — fan-in 0, cc 2, 0 peers (types whose name ends in Repository)
      (3 types not shown of 18 — raise --top to see them.)
 
    NOTE: a type with no peers still has its own METHODS as a cohort.

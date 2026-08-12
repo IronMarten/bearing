@@ -30,7 +30,7 @@ public static class Report
         ArgumentNullException.ThrowIfNull(model);
         ArgumentNullException.ThrowIfNull(findings);
 
-        foreach (var line in Header()) yield return line;
+        foreach (var line in Header(model)) yield return line;
 
         foreach (var line in FindingSections.ConcealedDecisionAtTypeLevel(model, findings)) yield return line;
         foreach (var line in FindingSections.ConcealedDecisionAtMethodLevel(model, findings)) yield return line;
@@ -57,12 +57,43 @@ public static class Report
         yield return "";
     }
 
-    private static IEnumerable<string> Header()
+    /// <summary>
+    /// What was analysed, and how to read what follows.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This replaces probe-era scaffolding that was printing to every user.</b> The old header
+    /// read <i>"NOMINATED INSTANCES / Draft sentences. Receipts in parentheses. Rewrite before the
+    /// session."</i> — an instruction to whoever was about to present the output in a review, from
+    /// a period when the only reader was the person who ran it. Shipping it told a first-time user
+    /// that the tool did not consider its own sentences finished.
+    /// </para>
+    /// <para>
+    /// <b>The version and the solution name are here because the first thing a bug report needs is
+    /// which build said this about what.</b> The counts are here because a reader cannot judge
+    /// "top 5%" without knowing 5% of what, and the alternative is discovering the scale four
+    /// sections later.
+    /// </para>
+    /// <para>
+    /// <b>The version is read from this assembly and not from
+    /// <see cref="SolutionModel.ToolVersion"/>, which is wrong.</b> That property reads
+    /// <c>Bearing.Core</c>'s assembly, and <c>&lt;Version&gt;</c> is set on <c>Bearing.Cli</c> —
+    /// so the model reports <c>1.0.0</c> where the shipped tool is <c>0.0.1-preview.1</c>. Nothing
+    /// rendered it before, so nothing caught it. The version a user quotes has to be the version
+    /// they installed, which is this one; the model's copy still needs settling before it reaches
+    /// the JSON writer, where it becomes a field somebody parses.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> Header(SolutionModel model)
     {
         yield return "";
         yield return "================================================================";
-        yield return "NOMINATED INSTANCES";
-        yield return "Draft sentences. Receipts in parentheses. Rewrite before the session.";
+        yield return $"BEARING {ToolInfo.ReadVersion(typeof(Report).Assembly)} — "
+                     + Path.GetFileName(model.SolutionPath);
+        yield return $"{Sentences.Plural(model.Types.Count, "type")} in "
+                     + $"{Sentences.Plural(model.Projects.Count, "project")}. "
+                     + "Unusual findings first, then structure.";
+        yield return "Every claim shows the numbers behind it.";
         yield return "================================================================";
     }
 

@@ -29,7 +29,7 @@ internal static class FindingSections
 
         var found = findings.OfKind(FindingKind.ConcealedDecisionType);
         if (found.Count == 0)
-            yield return "   (none nominated — see NOTES in README if this is empty)";
+            yield return "   (none — no type's complexity stands that far above its peers)";
 
         var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
 
@@ -54,8 +54,8 @@ internal static class FindingSections
                 : $"({Sentences.Number(times)}x the peer median; cc ";
 
             yield return $"   {type.Name}.{member?.Name} — {opening}"
-                         + $"{Sentences.TopPercent(percentile)} of internal complexity among your "
-                         + $"{type.CohortSize} {ShortCohort(type.Cohort.Key)}. "
+                         + $"{Sentences.TopPercent(percentile)} of internal complexity among "
+                         + $"{Sentences.PeerGroup(type.Cohort, type.CohortSize)}. "
                          + basis
                          + $"{type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
                          + $"fan-in {type.FanIn}, fan-out {type.FanOut})";
@@ -71,6 +71,9 @@ internal static class FindingSections
         yield return "-- CONCEALED DECISION, METHOD LEVEL ----------------------------";
 
         var found = findings.OfKind(FindingKind.ConcealedDecisionMethod);
+        if (found.Count == 0)
+            yield return "   (none — no method's complexity stands that far above its peers)";
+
         var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
 
         foreach (var finding in shown)
@@ -101,8 +104,11 @@ internal static class FindingSections
         yield return "-- BUG BLAST RADIUS --------------------------------------------";
         yield return "   (widely depended on AND internally complex)";
 
-        var (shown, disclosure) = Sentences.Cap(
-            findings.OfKind(FindingKind.BugBlastRadius), model.Policy.Top, "nomination");
+        var found = findings.OfKind(FindingKind.BugBlastRadius);
+        if (found.Count == 0)
+            yield return "   (none — nothing is both widely depended on and internally complex)";
+
+        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
 
         foreach (var finding in shown)
         {
@@ -124,8 +130,11 @@ internal static class FindingSections
         yield return "-- CHANGE COST -------------------------------------------------";
         yield return "   (many internal callers on a contract-shaped type)";
 
-        var (shown, disclosure) = Sentences.Cap(
-            findings.OfKind(FindingKind.ChangeCost), model.Policy.Top, "nomination");
+        var found = findings.OfKind(FindingKind.ChangeCost);
+        if (found.Count == 0)
+            yield return "   (none — no contract carries enough of the solution's callers)";
+
+        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
 
         foreach (var finding in shown)
         {
@@ -404,19 +413,6 @@ internal static class FindingSections
             .Select(t => t!.Classification.Kind)
             .Distinct(StringComparer.Ordinal)
             .OrderBy(k => k, StringComparer.Ordinal));
-
-    /// <summary>
-    /// <c>base:global::App.ControllerBase</c> becomes <c>ControllerBase</c>.
-    /// </summary>
-    private static string ShortCohort(string cohort)
-    {
-        var afterPrefix = cohort.IndexOf(':', StringComparison.Ordinal) is var colon and >= 0
-            ? cohort[(colon + 1)..]
-            : cohort;
-
-        var lastDot = afterPrefix.LastIndexOf('.');
-        return lastDot >= 0 ? afterPrefix[(lastDot + 1)..] : afterPrefix;
-    }
 
     /// <summary>Resolves a member subject back to its declaring type and the member itself.</summary>
     private static (TypeNode? Type, Member? Member) Member(SolutionModel model, SubjectRef subject)

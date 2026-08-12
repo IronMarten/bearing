@@ -22,13 +22,48 @@ internal static class StructureSections
     /// <summary>The same, for the type graph, where names are shorter.</summary>
     private const int TypesPerTangle = 8;
 
+    /// <summary>
+    /// The types at this solution's edge — and, when there are none, why that is worth doubting.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The zero case is not a smaller version of the non-zero case.</b> This section used to
+    /// print <c>"0 external contact point(s): 0 inbound API, 0 outbound"</c> four lines above an
+    /// integration map naming six external systems, under a heading reading HERE BE DRAGONS. Both
+    /// numbers were right and they measure different things — a contact point is a type in <i>this
+    /// solution</i> that the classifier put at the edge, and the map counts external namespaces
+    /// this solution <i>references</i> — but nothing said so, and adjacent lines saying "0" and
+    /// "six" read as the tool contradicting itself.
+    /// </para>
+    /// <para>
+    /// <b>It is also the most likely place for <c>docs/DEFECTS.md</c> §5 to show up.</b> The
+    /// classifier recognises an external call by a hardcoded list of namespace prefixes —
+    /// <c>System.Net.Http</c>, <c>Azure.</c>, <c>Stripe</c> and a handful more. Run Bearing on
+    /// itself and it reports zero outbound contact points while listing Roslyn and MSBuild in the
+    /// map, because a compiler API is not on that list. Rather than print a confident zero, the
+    /// zero case names the two explanations and lets the reader pick, which is what invariant 8
+    /// asks of any absence this tool cannot distinguish from ignorance.
+    /// </para>
+    /// </remarks>
     internal static IEnumerable<string> ContactPoints(SolutionModel model)
     {
         var contact = model.ContactPoints;
 
         yield return "";
         yield return "-- BOUNDARY: HERE BE DRAGONS -----------------------------------";
-        yield return $"   {contact.Count} external contact point(s): "
+
+        if (contact.Count == 0)
+        {
+            yield return "   No type in this solution was classified as an API boundary or an";
+            yield return "   external call. Either this codebase has no edge of its own — a";
+            yield return "   library called only by its own tests would look like this — or the";
+            yield return "   frameworks it uses are not ones this tool recognises. The";
+            yield return "   integration map below is the check: entries there with nothing here";
+            yield return "   means the second.";
+            yield break;
+        }
+
+        yield return $"   {Sentences.Plural(contact.Count, "external contact point")}: "
                      + $"{contact.Inbound.Count} inbound API, "
                      + $"{contact.Outbound.Count} outbound. Consumer impact of";
         yield return "   changes at ANY of these is outside what static analysis can see.";
@@ -39,7 +74,12 @@ internal static class StructureSections
         var map = model.Integrations;
 
         yield return "";
-        yield return "   INTEGRATION MAP — external systems, by how many types touch them:";
+
+        // Named as a different measurement from the contact points above, because it is one:
+        // these are namespaces this solution references, not types in it. Printed adjacently and
+        // undistinguished, the two counts read as a contradiction whenever they disagree.
+        yield return "   INTEGRATION MAP — external systems this solution calls into,";
+        yield return "   by how many of its types touch them:";
 
         if (map.Systems.Count == 0)
             yield return "     (none detected outside language/framework plumbing)";

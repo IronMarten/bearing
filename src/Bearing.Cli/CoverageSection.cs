@@ -63,9 +63,13 @@ internal static class CoverageSection
         yield return "";
         yield return "   All types with no usable peer group, by fan-in:";
 
+        // Peers, not cohort size — one fewer, and it is the number this section is about. A type
+        // alone in its group has none, and saying "the 1 type classified as ApiBoundary" about
+        // that type reads as though it had one.
         foreach (var type in listed)
             yield return $"     {type!.Name} — fan-in {type.FanIn}, cc {type.Cyclomatic}, "
-                         + $"cohort '{ShortCohort(type.Cohort.Key)}' (size {type.CohortSize})";
+                         + $"{Sentences.Plural(type.CohortSize - 1, "peer")} "
+                         + $"({Sentences.PeerGroupNoun(type.Cohort)})";
 
         foreach (var line in listDisclosure) yield return line;
 
@@ -134,13 +138,4 @@ internal static class CoverageSection
         }
     }
 
-    private static string ShortCohort(string cohort)
-    {
-        var afterPrefix = cohort.IndexOf(':', StringComparison.Ordinal) is var colon and >= 0
-            ? cohort[(colon + 1)..]
-            : cohort;
-
-        var lastDot = afterPrefix.LastIndexOf('.');
-        return lastDot >= 0 ? afterPrefix[(lastDot + 1)..] : afterPrefix;
-    }
 }

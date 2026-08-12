@@ -39,6 +39,108 @@ internal static class Sentences
         $"{Math.Max(1, Math.Round(100 - percentile)):0}%";
 
     /// <summary>
+    /// A peer group, named the way the reader would name it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The template this replaces had grammar for one basis out of five.</b> It read
+    /// <c>"among your {size} {last segment of the cohort key}"</c>, which was written against
+    /// <c>suffix:Normalizer</c> and a solution with 56 of them. Every other basis produced
+    /// nonsense: a namespace cohort rendered as <i>"among your 63 Bearing"</i> and <i>"your 17
+    /// ArchProbe"</i>, a base-type cohort as <i>"your 8 ControllerBase"</i>, an architectural-kind
+    /// cohort as <i>"your 1 ApiBoundary"</i>. <c>PRD-free-tier.md</c> §4 names this sentence as the
+    /// one thing to get right, and on any solution that is not organised by name suffix it was the
+    /// first thing a reader saw.
+    /// </para>
+    /// <para>
+    /// <b>Each basis gets its own phrase rather than a plural rule</b>, because the bases are not
+    /// grammatically alike: a suffix is a pattern, a namespace is a place, a base type and an
+    /// interface are relationships, and a kind is a classification this tool assigned rather than
+    /// something the code says about itself. The last of those is worth wording carefully — a
+    /// reader who sees "the 5 types we classified as DataAccess" can tell the classifier was
+    /// involved, and <c>docs/DEFECTS.md</c> §5 is the reason that matters.
+    /// </para>
+    /// <para>
+    /// The <c>Basis</c> strings come from <see cref="CohortBasis"/> by way of
+    /// <c>CohortCandidates</c>; an unrecognised one falls back to naming the key, which is
+    /// wrong-but-honest rather than silently ungrammatical.
+    /// </para>
+    /// </remarks>
+    internal static string PeerGroup(Cohort cohort, int size)
+    {
+        ArgumentNullException.ThrowIfNull(cohort);
+
+        var name = ShortName(cohort.Key);
+
+        return cohort.Basis switch
+        {
+            "name suffix" => $"the {Plural(size, "type")} whose name ends in {name}",
+            "namespace" => $"the {Plural(size, "type")} in {FullName(cohort.Key)}",
+            "base type" => $"the {Plural(size, "type")} deriving from {name}",
+            "interface" => size == 1
+                ? $"the 1 implementation of {name}"
+                : $"the {Whole(size)} implementations of {name}",
+            "architectural kind" => $"the {Plural(size, "type")} classified as {name}",
+            _ => $"the {Plural(size, "type")} in {name}",
+        };
+    }
+
+    /// <summary>
+    /// The same group, described without counting it — <c>types whose name ends in Depot</c>.
+    /// </summary>
+    /// <remarks>
+    /// A second switch rather than <see cref="PeerGroup"/> with the count removed, because the two
+    /// forms are wanted in sentences that count different things. A finding says <i>"among the 8
+    /// types deriving from ControllerBase"</i>, counting the subject itself, which is right when
+    /// the claim is about where it sits in that population. The coverage list says how many
+    /// <i>peers</i> a type has, which is one fewer, and is the number that section exists to
+    /// report — <c>"the 1 type classified as ApiBoundary"</c> is a true sentence about a type that
+    /// has no peers at all, and reads as though it had one.
+    /// </remarks>
+    internal static string PeerGroupNoun(Cohort cohort)
+    {
+        ArgumentNullException.ThrowIfNull(cohort);
+
+        var name = ShortName(cohort.Key);
+
+        return cohort.Basis switch
+        {
+            "name suffix" => $"types whose name ends in {name}",
+            "namespace" => $"types in {FullName(cohort.Key)}",
+            "base type" => $"types deriving from {name}",
+            "interface" => $"implementations of {name}",
+            "architectural kind" => $"types classified as {name}",
+            _ => $"types in {name}",
+        };
+    }
+
+    /// <summary><c>base:global::App.ControllerBase</c> becomes <c>ControllerBase</c>.</summary>
+    internal static string ShortName(string cohortKey)
+    {
+        var afterPrefix = FullName(cohortKey);
+
+        var lastDot = afterPrefix.LastIndexOf('.');
+        return lastDot >= 0 ? afterPrefix[(lastDot + 1)..] : afterPrefix;
+    }
+
+    /// <summary>
+    /// The cohort key with its basis prefix and <c>global::</c> removed, but nothing else — a
+    /// namespace is only itself when it is complete.
+    /// </summary>
+    internal static string FullName(string cohortKey)
+    {
+        ArgumentNullException.ThrowIfNull(cohortKey);
+
+        var afterPrefix = cohortKey.IndexOf(':', StringComparison.Ordinal) is var colon and >= 0
+            ? cohortKey[(colon + 1)..]
+            : cohortKey;
+
+        return afterPrefix.StartsWith("global::", StringComparison.Ordinal)
+            ? afterPrefix["global::".Length..]
+            : afterPrefix;
+    }
+
+    /// <summary>
     /// What a list dropped, said out loud.
     /// </summary>
     /// <remarks>

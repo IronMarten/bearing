@@ -39,10 +39,31 @@ internal static partial class VerifyConfiguration
                 builder.ToString(),
                 m => "TestBed/" + m.Groups[1].Value.Replace('\\', '/'));
 
+            // The report header names the build that produced it, which is the one genuinely
+            // volatile thing in it: every release moves it, and re-accepting a snapshot for a
+            // version bump is how a real change rides along unread. Scrubbed here rather than
+            // omitted from the report, because a user quoting a version in a bug report is the
+            // whole reason it is printed. ReportTests asserts the real value separately.
+            scrubbed = ToolVersion().Replace(scrubbed, "BEARING {version}");
+
             builder.Clear();
             builder.Append(scrubbed);
         });
     }
+
+    /// <summary>
+    /// Matches the version in the report header, and only there.
+    /// </summary>
+    /// <remarks>
+    /// Anchored to the start of a line. The first version of this was <c>BEARING \S+</c>, which
+    /// also matched inside the section heading <c>-- LOAD-BEARING AND INTRICATE</c> and rewrote it
+    /// to <c>-- LOAD-BEARING {version} INTRICATE</c> in the snapshot — a scrubber quietly editing
+    /// real content, which is the exact failure this file's own header warns about.
+    /// </remarks>
+    [GeneratedRegex(
+        pattern: """^BEARING \S+""",
+        options: RegexOptions.CultureInvariant | RegexOptions.Multiline)]
+    private static partial Regex ToolVersion();
 
     /// <summary>
     /// Matches an absolute path into the fixture and captures the part below <c>TestBed</c>.

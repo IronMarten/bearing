@@ -57,6 +57,60 @@ public sealed class ReportTests(CoreWalkFixture core)
         Assert.Equal(expected, Lines.Where(l => l.StartsWith("-- ", StringComparison.Ordinal)));
     }
 
+    // -------------------------------------------------------------------- the header ----
+
+    /// <summary>
+    /// The header names the build and the solution, and no longer tells the reader the sentences
+    /// are drafts.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It read <i>"NOMINATED INSTANCES / Draft sentences. Receipts in parentheses. Rewrite before
+    /// the session."</i> until <c>TASKS.md</c> A0 — probe-era scaffolding addressed to whoever was
+    /// about to present the output, printed to every user of the shipped tool. Asserted as an
+    /// absence as well as a presence, because the string is the kind of thing that comes back by
+    /// being copied from an old snapshot.
+    /// </para>
+    /// <para>
+    /// <b>The version is asserted here because the snapshot cannot.</b> It is scrubbed to
+    /// <c>{version}</c> in <c>VerifyConfiguration</c> so a release does not move the snapshot and
+    /// invite a blind re-accept — which means this is the only place that knows the printed
+    /// version is the tool's own.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_header_names_the_build_and_the_solution()
+    {
+        Assert.DoesNotContain("Draft sentences", Text, StringComparison.Ordinal);
+        Assert.DoesNotContain("Rewrite before the session", Text, StringComparison.Ordinal);
+
+        // The Cli's version, not Bearing.Core's — <Version> is set on the Cli project, and the
+        // model's own ToolVersion property reads Core and reports 1.0.0.
+        var version = ToolInfo.ReadVersion(typeof(Report).Assembly);
+        Assert.Equal($"BEARING {version} — TestBed.sln", Lines[2]);
+
+        // 145, which is Core's count — the probe reports 144, because it merges the two
+        // PayloadTag declarations. docs/DEFECTS.md §1, and the header renders from the model.
+        Assert.Contains("145 types in 3 projects", Text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// <c>SolutionModel.ToolVersion</c> is not the tool's version, and the header does not use it.
+    /// </summary>
+    /// <remarks>
+    /// Found by rendering it. <c>&lt;Version&gt;</c> lives on <c>Bearing.Cli</c>; the property
+    /// reads <c>typeof(SolutionModel).Assembly</c>, which is <c>Bearing.Core</c>, which sets none
+    /// and so reports the SDK default. Nothing rendered it before A0, so nothing caught it. Pinned
+    /// as a defect rather than quietly worked around, because it is still the value that will
+    /// reach the JSON writer at A4 and become a field somebody parses.
+    /// </remarks>
+    [Fact]
+    public void The_models_tool_version_reports_the_wrong_assembly()
+    {
+        Assert.NotEqual(ToolInfo.ReadVersion(typeof(Report).Assembly), core.Model.ToolVersion);
+        Assert.DoesNotContain($"BEARING {core.Model.ToolVersion}", Text, StringComparison.Ordinal);
+    }
+
     // ------------------------------------------------------------------ defect 16 ----
 
     /// <summary>
