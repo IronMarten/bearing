@@ -83,6 +83,17 @@ static class Graphs
             }
         }
 
+        // Canonical form, because a strongly-connected component is a set and Tarjan hands
+        // it back as a stack-pop sequence. Both the membership order within a component and
+        // the order components are discovered in are artefacts of which root the outer loop
+        // reached first — that is, of dictionary enumeration order, which is insertion
+        // order, which is project load order. The PARTITION is a property of the graph; none
+        // of the ordering around it is. Sorting here means callers cannot accidentally
+        // inherit a visit-order dependence, and the components are disjoint so first-element
+        // ordering is total.
+        foreach (var scc in result) scc.Sort(StringComparer.Ordinal);
+        result.Sort((a, b) => StringComparer.Ordinal.Compare(a[0], b[0]));
+
         return result;
     }
 

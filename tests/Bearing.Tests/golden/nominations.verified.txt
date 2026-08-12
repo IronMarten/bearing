@@ -20,10 +20,10 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    ReconciliationController.Reconcile — 11x the median complexity of its 7 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:291
    ThroughputGauge.Sample — 8x the median complexity of its 5 peers (cc 8, dsm 0, nesting 1, 15 lines) — Gauges.cs:55
    AuthenticationMiddleware.Authenticate — 5x the median complexity of its 7 peers (cc 5, dsm 2, nesting 1, 12 lines) — AuthenticationMiddleware.cs:13
-   RateReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:120
    MethodReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:188
-   TariffReconciler.Reconcile — 3.67x the median complexity of its 9 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:89
+   RateReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:120
    AuditReconciler.Reconcile — 3.67x the median complexity of its 9 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:154
+   TariffReconciler.Reconcile — 3.67x the median complexity of its 9 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:89
    GuaranteedServiceNormalizer.Normalize — 3.5x the median complexity of its 8 peers (cc 21, dsm 15, nesting 4, 57 lines) — GuaranteedServiceNormalizer.cs:6
 
 -- BUG BLAST RADIUS --------------------------------------------
@@ -78,7 +78,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    (dependencies reaching across 3+ architectural kinds — cross-cutting
     work, whatever the component is named)
    6 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern rather than an
-     anomaly. Examples: QuoteController, AuthenticationMiddleware, PolicyBridge, RateController, ...
+     anomaly. Examples: QuoteController, AuthenticationMiddleware, DocumentController, PolicyBridge, ...
 
 -- CIRCULAR REFERENCES -----------------------------------------
    NAMESPACE CYCLES — mutually dependent namespaces cannot be layered,
@@ -121,17 +121,17 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      RoutingDepot [Internal] — top 8% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
-     RoutingDepot — fan-in 1, cc 12, cohort 'Depot' (size 3)
      LabelDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
      ManifestDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
+     RoutingDepot — fan-in 1, cc 12, cohort 'Depot' (size 3)
      SurchargeTable — fan-in 1, cc 4, cohort 'Table' (size 1)
      PricingVault — fan-in 1, cc 8, cohort 'Vault' (size 3)
-     TokenVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
      SessionVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
-     PayloadAuditor — fan-in 0, cc 4, cohort 'Auditor' (size 1)
-     PayloadTag — fan-in 0, cc 16, cohort 'Tag' (size 1)
+     TokenVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
      OrderRepository — fan-in 0, cc 19, cohort 'Repository' (size 2)
      RateRepository — fan-in 0, cc 2, cohort 'Repository' (size 2)
+     PayloadTag — fan-in 0, cc 16, cohort 'Tag' (size 1)
+     PayloadAuditor — fan-in 0, cc 4, cohort 'Auditor' (size 1)
 
    NOTE: a type with no peers still has its own METHODS as a cohort —
    check methods.csv for it. And its real comparison is its own history,

@@ -136,8 +136,12 @@ static class Report
             "GlobalFanInPctl", "GlobalMaxCcPctl",
             "MemberCount", "Loc", "File", "Line", "Id"));
 
+        // Id breaks the tie. See the note on WriteEdgesCsv — 89 of these 108 rows share a
+        // (Cohort, MaxMemberCyclomaticXMedian) with at least one other, so without a total
+        // key most of this file is ordered by whatever Roslyn happened to enumerate first.
         foreach (var t in types.OrderBy(t => t.Cohort, StringComparer.Ordinal)
-                               .ThenByDescending(t => t.MaxMemberCyclomaticXMedian))
+                               .ThenByDescending(t => t.MaxMemberCyclomaticXMedian)
+                               .ThenBy(t => t.Id, StringComparer.Ordinal))
         {
             w.WriteLine(string.Join(",",
                 Esc(t.Name), Esc(t.Namespace), Esc(t.Project), Esc(t.Kind), Esc(t.KindSpan),
@@ -167,7 +171,18 @@ static class Report
             "Dsm", "DsmPctl", "DsmXMedian", "Transform", "StaticMutations",
             "ParamCount", "MaxNesting", "Loc", "File", "Line"));
 
-        foreach (var m in methods.OrderByDescending(m => m.CyclomaticXMedian).ThenByDescending(m => m.Cyclomatic))
+        // The tiebreak is (DeclaringTypeId, Id, File, Line) and NOT Id alone, because
+        // MethodMetrics.Id is not an identifier: SymbolDisplayFormat.FullyQualifiedFormat
+        // qualifies TYPE symbols but leaves member symbols bare, so Id here is "Reconcile",
+        // "Apply", "Post". TestBed alone has 17 colliding groups, one of them 12 members
+        // wide. Nothing read the field before this sort, which is why it went unnoticed —
+        // and it is a live problem for member-level SubjectRef, not just for ordering.
+        foreach (var m in methods.OrderByDescending(m => m.CyclomaticXMedian)
+                                 .ThenByDescending(m => m.Cyclomatic)
+                                 .ThenBy(m => m.DeclaringTypeId, StringComparer.Ordinal)
+                                 .ThenBy(m => m.Id, StringComparer.Ordinal)
+                                 .ThenBy(m => m.File, StringComparer.Ordinal)
+                                 .ThenBy(m => m.Line))
         {
             w.WriteLine(string.Join(",",
                 Esc(m.Name), Esc(m.DeclaringType), Esc(m.Project), Esc(m.Cohort), m.CohortSize, Esc(m.Accessibility),
@@ -189,18 +204,41 @@ static class Report
 
         foreach (var t in types.Where(t => t.CohortSize >= opt.MinCohort)
                                .OrderBy(t => t.Cohort, StringComparer.Ordinal)
-                               .ThenBy(t => t.Name, StringComparer.Ordinal))
+                               .ThenBy(t => t.Name, StringComparer.Ordinal)
+                               .ThenBy(t => t.Id, StringComparer.Ordinal))
         {
             w.WriteLine(string.Join(",",
                 Esc(ShortCohort(t.Cohort)), Esc(t.Name), Esc(t.Namespace), Esc(t.Project), "", "", ""));
         }
     }
 
+    /// <summary>
+    /// Edges, heaviest first — then by endpoint, which is the part that matters.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Weight alone is not a total order and is nowhere near one: 261 edges spread over 10
+    /// distinct weights, so 257 of them tie, 134 at weight 2 alone. <c>OrderBy</c> is stable,
+    /// so every one of those ties was previously settled by the enumeration order of the
+    /// <c>edgeWeights</c> dictionary — which is insertion order, which is project load order
+    /// times Roslyn's symbol order.
+    /// </para>
+    /// <para>
+    /// That reproduced perfectly run to run and was still wrong to rely on. Reversing the
+    /// project declaration order in <c>TestBed.sln</c> — an edit with no semantic content —
+    /// reordered this file while leaving the set of rows identical. The goldens are the
+    /// contract phase 1 is extracted against, and a reimplementation in <c>Bearing.Core</c>
+    /// will not reproduce this probe's incidental insertion order no matter how correct its
+    /// numbers are. Ordering noise would have swamped the diff on day one.
+    /// </para>
+    /// </remarks>
     public static void WriteEdgesCsv(string path, IEnumerable<(string From, string To, int Weight)> edges)
     {
         using var w = new StreamWriter(path, false, new UTF8Encoding(false));
         w.WriteLine("From,To,Weight");
-        foreach (var e in edges.OrderByDescending(e => e.Weight))
+        foreach (var e in edges.OrderByDescending(e => e.Weight)
+                               .ThenBy(e => e.From, StringComparer.Ordinal)
+                               .ThenBy(e => e.To, StringComparer.Ordinal))
             w.WriteLine($"{Esc(e.From)},{Esc(e.To)},{e.Weight}");
     }
 
@@ -260,6 +298,7 @@ static class Report
             // percentile while being, in substance, identical.
             .Where(t => t.FanInXMedian <= 2.0 && t.FanOutXMedian <= 2.0)
             .OrderByDescending(t => t.MaxMemberCyclomaticXMedian)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
         foreach (var t in concealed)
@@ -288,6 +327,12 @@ static class Report
             .Where(m => m.Cyclomatic >= opt.MinDecisionCc)
             .Where(m => m.CyclomaticXMedian >= opt.OutlierFactor)
             .OrderByDescending(m => m.CyclomaticXMedian)
+            // NOT m.Id — it is the bare method name ("Reconcile", "Apply"), so it ties across
+            // every type declaring that name and breaks nothing. See the note in
+            // WriteMethodsCsv; DeclaringTypeId is what makes this total.
+            .ThenBy(m => m.DeclaringTypeId, StringComparer.Ordinal)
+            .ThenBy(m => m.Id, StringComparer.Ordinal)
+            .ThenBy(m => m.Line)
             .Take(opt.Top);
         foreach (var m in concealedMethods)
             w.WriteLine($"   {m.DeclaringType}.{m.Name} — " +
@@ -309,6 +354,7 @@ static class Report
             .Where(t => t.FanInXMedian >= 2.0)
             .Where(t => t.FanInPctl >= 95 && t.CyclomaticPctl >= 70)
             .OrderByDescending(t => t.FanIn)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top);
         foreach (var t in blast)
             w.WriteLine($"   {t.Name} — {Plural(t.FanIn, "distinct caller")} ({N(t.FanInXMedian)}x its peer median) and " +
@@ -323,6 +369,7 @@ static class Report
             .Where(t => t.Kind is "Contract" or "ApiBoundary")
             .Where(t => t.FanIn >= opt.MinCohort)
             .OrderByDescending(t => t.FanIn)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top);
         foreach (var t in changeCost)
             w.WriteLine($"   {t.Name} — {Plural(t.FanIn, "internal caller")} depend on this contract " +
@@ -341,6 +388,7 @@ static class Report
             .Where(t => t.FanIn >= opt.MinFanIn)                 // ratio hides magnitude
             .Where(t => t.MaxMemberCyclomatic >= opt.HighCc)
             .OrderBy(t => t.Instability).ThenByDescending(t => t.FanIn)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
         foreach (var t in loadBearing)
@@ -378,6 +426,7 @@ static class Report
             .Where(t => !double.IsNaN(t.Instability) && t.Instability >= 0.8)
             .Where(t => t.MaxMemberCyclomatic >= opt.HighCc)
             .OrderByDescending(t => t.MaxMemberCyclomatic)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
         foreach (var t in breaksAlone)
@@ -394,6 +443,7 @@ static class Report
         var hubs = result.Types
             .Where(t => Math.Min(t.FanIn, t.FanOut) >= opt.HubMin)
             .OrderByDescending(t => Math.Min(t.FanIn, t.FanOut))
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
         foreach (var t in hubs)
@@ -429,6 +479,7 @@ static class Report
         var staticMutators = result.Types
             .Where(t => t.StaticMutations > 0)
             .OrderByDescending(t => t.StaticMutations)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
         foreach (var t in staticMutators)
@@ -463,6 +514,7 @@ static class Report
                 .Select(t => (Type: t, Claims: GlobalClaims(t, opt)))
                 .Where(x => x.Claims.Count > 0)
                 .OrderByDescending(x => Math.Max(x.Type.GlobalFanInPctl, x.Type.GlobalMaxCcPctl))
+                .ThenBy(x => x.Type.Id, StringComparer.Ordinal)
                 .Take(opt.Top)
                 .ToList();
 
@@ -478,7 +530,9 @@ static class Report
 
             w.WriteLine();
             w.WriteLine("   All types with no usable peer group, by fan-in:");
-            foreach (var t in orphans.OrderByDescending(t => t.FanIn).Take(opt.Top))
+            foreach (var t in orphans.OrderByDescending(t => t.FanIn)
+                                     .ThenBy(t => t.Id, StringComparer.Ordinal)
+                                     .Take(opt.Top))
                 w.WriteLine($"     {t.Name} — fan-in {t.FanIn}, cc {t.Cyclomatic}, " +
                             $"cohort '{ShortCohort(t.Cohort)}' (size {t.CohortSize})");
 
@@ -606,9 +660,15 @@ static class Report
         // PATTERN and belongs in one line; rare, it is an anomaly and deserves the detail.
         foreach (var group in spanning
                      .GroupBy(x => string.Join("+", x.Kinds), StringComparer.Ordinal)
-                     .OrderBy(g => g.Count()))
+                     .OrderBy(g => g.Count()).ThenBy(g => g.Key, StringComparer.Ordinal))
         {
-            var members = group.OrderByDescending(x => x.Type.FanIn).ToList();
+            // Id breaks the fan-in tie. This makes the Take(4) below deterministic; it does
+            // NOT make it right. Five of six members tie at fan-in 0 here, so which four
+            // names survive is still arbitrary — just arbitrary in a reproducible way now.
+            // That is defect 11, and it needs a requirement, not a tiebreak.
+            var members = group.OrderByDescending(x => x.Type.FanIn)
+                               .ThenBy(x => x.Type.Id, StringComparer.Ordinal)
+                               .ToList();
 
             if (members.Count > opt.Top / 3)
             {
@@ -688,6 +748,7 @@ static class Report
         var withLogic = boundaries
             .Where(t => t.MaxMemberCyclomatic >= opt.HighCc)
             .OrderByDescending(t => t.MaxMemberCyclomatic)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
 
@@ -705,6 +766,7 @@ static class Report
         var bigSurface = boundaries
             .Where(t => t.DataShape >= Math.Max(surfaceMedian * 1.5, 1))
             .OrderByDescending(t => t.DataShape)
+            .ThenBy(t => t.Id, StringComparer.Ordinal)
             .Take(5)
             .ToList();
 
@@ -769,6 +831,7 @@ static class Report
             .Where(x => x.Now.GlobalFanInPctl - x.Was.GlobalFanInPctl >= 20
                         || x.Now.FanIn >= x.Was.FanIn * 2)
             .OrderByDescending(x => x.Now.FanIn - x.Was.FanIn)
+            .ThenBy(x => x.Now.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
 
@@ -787,6 +850,7 @@ static class Report
             .Select(x => (x.Now, x.Was, New: KindsAdded(x.Was.KindSpan, x.Now.KindSpan)))
             .Where(x => x.New.Count > 0)
             .OrderByDescending(x => x.Now.FanIn)
+            .ThenBy(x => x.Now.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
 
@@ -800,7 +864,7 @@ static class Report
         // across a layer, not six findings. Same collapse as everywhere else.
         foreach (var group in reached
                      .GroupBy(x => string.Join("+", x.New), StringComparer.Ordinal)
-                     .OrderBy(g => g.Count()))
+                     .OrderBy(g => g.Count()).ThenBy(g => g.Key, StringComparer.Ordinal))
         {
             var members = group.ToList();
             if (members.Count > 2)
@@ -824,6 +888,7 @@ static class Report
             .Where(x => x.Now.MaxMemberCyclomatic >= opt.HighCc)
             .Where(x => x.Now.MaxMemberCyclomatic - x.Was.MaxMemberCyclomatic >= opt.MinDriftDelta)
             .OrderByDescending(x => x.Now.MaxMemberCyclomatic - x.Was.MaxMemberCyclomatic)
+            .ThenBy(x => x.Now.Id, StringComparer.Ordinal)
             .Take(opt.Top)
             .ToList();
 
@@ -838,9 +903,11 @@ static class Report
         // A lower bar than drift: appearing and vanishing are rare and consequential, so
         // anything that had or has a caller at all is worth a line.
         var appearedShown = appeared.Where(t => t.FanIn >= 1)
-                                    .OrderByDescending(t => t.FanIn).Take(opt.Top).ToList();
+                                    .OrderByDescending(t => t.FanIn)
+                                    .ThenBy(t => t.Id, StringComparer.Ordinal).Take(opt.Top).ToList();
         var goneShown = disappeared.Where(b => b.FanIn >= 1)
-                                   .OrderByDescending(b => b.FanIn).Take(opt.Top).ToList();
+                                   .OrderByDescending(b => b.FanIn)
+                                   .ThenBy(b => b.Id, StringComparer.Ordinal).Take(opt.Top).ToList();
 
         if (appearedShown.Count > 0 || goneShown.Count > 0)
         {
@@ -896,7 +963,8 @@ static class Report
         w.WriteLine("   understood, or extracted independently:");
         if (nsCycles.Count == 0)
             w.WriteLine("     (none)");
-        foreach (var cycle in nsCycles.OrderByDescending(c => c.Count).Take(opt.Top))
+        foreach (var cycle in nsCycles.OrderByDescending(c => c.Count)
+                                      .ThenBy(c => c[0], StringComparer.Ordinal).Take(opt.Top))
             w.WriteLine($"     {cycle.Count} namespaces: " +
                         string.Join(" <-> ", cycle.OrderBy(n => n, StringComparer.Ordinal).Take(6)) +
                         (cycle.Count > 6 ? ", ..." : ""));
@@ -914,7 +982,8 @@ static class Report
         w.WriteLine("   them can be tested or changed in isolation:");
         if (tangles.Count == 0)
             w.WriteLine($"     (none — mutual pairs and triples are ordinary and not reported)");
-        foreach (var tangle in tangles.OrderByDescending(t => t.Count).Take(opt.Top))
+        foreach (var tangle in tangles.OrderByDescending(t => t.Count)
+                                      .ThenBy(t => t[0], StringComparer.Ordinal).Take(opt.Top))
         {
             var names = tangle.Select(id => byId[id].Name).OrderBy(n => n, StringComparer.Ordinal).ToList();
             w.WriteLine($"     {names.Count} types: {string.Join(", ", names.Take(8))}" +
