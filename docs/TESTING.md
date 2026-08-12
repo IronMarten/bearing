@@ -113,6 +113,11 @@ it. Extraction then cannot carry it forward silently, and cannot fix it silently
 day Core does the right thing the test fails, and deleting it is a deliberate act rather than
 a diff nobody reads.
 
+Each pinned test has an entry in [`DEFECTS.md`](DEFECTS.md), which carries the evidence and the
+remedy; the test names the requirement and asserts the behaviour. Add to both or neither — a
+pinned test with no entry is a defect nobody can act on, and an entry with no test is one that
+can be carried forward silently.
+
 `Change_cost_is_gated_by_min_cohort_where_it_means_min_fan_in` is the first. It is also the
 one place the suite reads report text rather than the model, because the threshold is a
 literal inside `PrintNominations` and there is no model surface to assert against. That
@@ -292,12 +297,22 @@ Invariant 6 is currently enforced in the wrong place — see
 Each is a recurring defect class from the probe build, turned into a question:
 
 - Does this normalized measure have an absolute floor beside it? *(failed 5 ways)*
-- Can this fire on 100% of a category? *(failed 4 times)*
+- Can this fire on 100% of a category? *(failed 4 times — and now measured at 6.9%)*
+- **Can this fire at all?** *(the highest-yield question here — three findings failed it: blast
+  radius below a cohort of ten, widest contract surface at any size, and the layer-span examples
+  list. Two of the three were unreachable by arithmetic rather than by tuning, which no amount of
+  running the tool would have revealed)*
+- **Is this gate measured against something its own filter already bounds?** *(a proportional
+  suppression on top of a proportional filter can only ever land on its own threshold —
+  `DEFECTS.md` §12)*
 - Can two findings contradict each other about one component?
-- **Can this fire at all?** *(new — `FanInPctl >= 95` is unsatisfiable below a cohort of ten,
-  and nothing noticed for the life of the finding)*
 - Does this claim something the tool cannot see?
 - Is a statistic being printed where none exists? *(`999x`, median-of-one)*
+- **Does this number travel to a second codebase?** *(four of seven did not: percentile gates
+  travel, absolute ones do not)*
+- **Is this output ordered by something total, or is the tail of the sort decided by whatever
+  order the data arrived in?** *(a stable sort on a non-total key looks deterministic on one
+  machine and is not a property of the tool — §5, `DEFECTS.md` §6)*
 
 ## 9. A gate that cannot fail is worse than no gate
 

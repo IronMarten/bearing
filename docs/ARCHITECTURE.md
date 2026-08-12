@@ -337,16 +337,34 @@ decision from whether it is versioned.
 | A type is identified by `(assembly, FQN)`, never by name alone | §4, `SubjectRef` — .NET permits one FQN in two assemblies and plugin architectures use it deliberately; keying on the name merges the rows and sums their metrics |
 | The SDK is pinned | `global.json` — an unpinned toolchain picks the newest SDK on the machine, which made CI build a net8.0 project with .NET 10 and fail on rules no developer machine had |
 | Both graph artifacts are static | neither view that proved legible on a real solution needs a layout engine, so elkjs / cytoscape / d3-force come off the critical path. The only view that did need one should not ship: a two-hop ego view pulls in 24–41% of the codebase from an ordinary seed |
+| A method-level concealed decision suppresses breaks-alone on its declaring type | the reason the suppression exists is behavioural, and behaviour lives in methods — so the level that *nominated* it is not what decides. `SubjectRef` walks member → declaring type to express it. Not yet implemented: `DEFECTS.md` §15 |
+| Every emitted artifact is ordered by a total key | a stable sort on a non-total key reproduces on one machine without being a property of the tool, and Core is a reimplementation that will not inherit the probe's enumeration order. `TESTING.md` §5, `DEFECTS.md` §6 |
 
 ## 11. Decisions still open
 
 These are live, and each one changes code that has not been written yet. Full context in
 the private `TECHREQ-job-a.md` §10.
 
+Distinct from [`DEFECTS.md`](DEFECTS.md): that is behaviour known to be wrong, with a remedy
+already understood. These are questions with no answer yet.
+
 - **Edge kind taxonomy.** §4 commits to collecting one. *Which* set — inheritance,
   implementation, field, parameter, call, generic argument, attribute — and whether it is
   fixed or extensible, is undecided. Decide before the walkers move; §4 says why deciding
-  after them is expensive.
+  after them is expensive. The filter is worth building either way: abstraction and contract
+  edges are 39–50% of all out-edges.
+- **How `WIDEST CONTRACT SURFACE` should be gated at all.** `DEFECTS.md` §12 is the one row
+  that cannot be fixed by moving a constant, so extraction cannot simply port it. An absolute
+  surface floor and a dispersion test — is the top of the distribution actually separated from
+  the middle — are the two candidates. Decide before the suppression matrix is implemented, or
+  it gets reimplemented unreachable.
+- **Whether `SignificantKinds` stays at three.** There are exactly three and `--min-kind-span`
+  is 3, so every spanning type necessarily carries the same signature: the `GroupBy` in
+  `PrintLayerSpan` is written for a generality that cannot occur. Ties into the edge-kind
+  taxonomy, and into `DEFECTS.md` §11 — a richer taxonomy would separate the anomaly from the
+  boilerplate that currently hides it.
+- **Thresholds global, or calibrated per codebase.** `DEFECTS.md` §2 narrows it: percentile
+  gates travel between codebases, absolute ones do not.
 - **Dead code at member level or types only.** Far more useful, far more false-positive
   prone.
 - **Is the JSON schema a public contract from v0.1**, or versioned-but-unstable?

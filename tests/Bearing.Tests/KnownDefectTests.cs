@@ -21,6 +21,21 @@ namespace Bearing.Tests;
 /// <para>
 /// Every entry names the requirement that supersedes it.
 /// </para>
+/// <para>
+/// Each also has an entry in <c>docs/DEFECTS.md</c>, which carries the evidence and the remedy
+/// while the test carries the behaviour. Add to both or neither: a pinned test with no entry is
+/// a defect nobody can act on, and an entry with no test is one that can be carried forward
+/// silently. The mapping:
+/// </para>
+/// <list type="bullet">
+///   <item><description>§1 — <c>Two_types_sharing_a_name_across_assemblies_merge_into_one_row</c></description></item>
+///   <item><description>§9 — <c>Change_cost_is_gated_by_min_cohort_where_it_means_min_fan_in</c></description></item>
+///   <item><description>§10 — <c>The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone</c></description></item>
+///   <item><description>§11 — <c>The_layer_span_collapse_hides_the_anomaly_it_shares_a_signature_with</c></description></item>
+///   <item><description>§12 — <c>Widest_contract_surface_can_never_be_suppressed</c></description></item>
+///   <item><description>§14 — <c>Blast_radius_is_unreachable_in_a_cohort_below_ten</c></description></item>
+///   <item><description>§15 — <c>A_method_level_concealed_decision_does_not_suppress_breaks_alone</c></description></item>
+/// </list>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
 public sealed class KnownDefectTests(FixtureRun run)
