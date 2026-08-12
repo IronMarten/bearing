@@ -207,10 +207,27 @@ nothing rather than an arbitrary five of the qualifying boundaries, which is `DE
 this section.
 
 **It is reachable but not yet observable.** The qualifying set is bounded by `floor(n/2)`, so
-firing needs at least twelve boundaries with six of them qualifying; TestBed has eight, and a
-maximum of four can qualify. The gate is reachable in principle at every solution large enough,
+firing needs at least twelve boundaries with six of them qualifying; TestBed has **ten**, and a
+maximum of five can qualify. The gate is reachable in principle at every solution large enough,
 which the current one is not at any size — but the fixture needs boundaries planted before the
 suppression has a behavioural test, and until it does this stays a suppression that cannot fail.
+
+**This entry was read backwards for several sessions, and it cost three plants.** "Can never be
+suppressed at any boundary count" was turned into a *constraint on the fixture* — no new
+`ApiBoundary` or `ExternalCall` type — recorded in `Bridges.cs`, `Dispatch.cs`, `TASKS.md` X1 and
+`docs/TESTING.md`, with two mutually contradictory justifications: that a tenth boundary makes the
+suppression reachable, and that a tenth boundary stops it being reachable. Both are wrong and this
+section says so. The pin is a synthetic proof over the distributions that *maximise* the
+qualifying set; the fixture appears in it only as a count. Going to ten moved that literal and
+nothing else. Withdrawn as decision X1, which is what unblocked the change-cost plant, P4 and F9.
+
+**A correction to the reasoning above, found while checking it.** *"Qualifying boundaries always
+come from the upper half"* holds only while the median is above `2/3`. Below that the
+`max(…, 1)` floor takes over, the gate stops being proportional, and more than half can qualify —
+`[0,0,0,0,0,1,1,1,1,1,1,1]` puts seven of twelve over the line. The conclusion survives because
+the `Take(5)` cap catches it, so the claim *"removing it changes nothing"* is the part that is
+wrong rather than the verdict. Worth keeping: the decided replacement is an absolute count, and
+this is the second way the proportional form misbehaves.
 
 Pinned: `Widest_contract_surface_can_never_be_suppressed`.
 

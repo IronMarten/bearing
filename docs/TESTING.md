@@ -208,10 +208,16 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **89 type rows** from **90 declarations**, 88 methods, 202 edges, 13 cohorts, 2 excluded,
+- **127 type rows** from **128 declarations**, 133 methods, 290 edges, 21 cohorts, 2 excluded,
   **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
   planted identity collision below, and it is the expected answer until Core keys types on
   `(assembly, FQN)`.
+
+  > These four numbers were **89 / 90 / 88 / 202** in this file until they were checked against
+  > the goldens, having drifted through every plant since they were written. Nothing asserted
+  > them, so nothing failed. `StructureTests.Fixture_shape_is_stable` pins the counts and this
+  > line now quotes it — a known answer that no test holds is a comment, and it rots at exactly
+  > the rate the fixture grows.
 - namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
 - breaks alone: `TariffReconciler` fires; `MethodReconciler` also fires and **should not** — see
@@ -237,7 +243,14 @@ Tidying it up changes the expected answers.
 - `TenantPolicySink` is the **contrast**: registered by `AddSingleton<T>()`, fan-in **1**. A
   generic type argument is a compile-time reference, so the DI case §5.6 names as needing
   detection already works. The case that does not is convention registration
-- boundary: 8 contact points, 6 inbound, 2 outbound
+- boundary: **10** contact points, 8 inbound, 2 outbound. Shapes
+  `2,3,4,6,7,8,8,8,8,12`, median 7.5, so `WIDEST CONTRACT SURFACE` threshold 11.25 and
+  `ShipmentController` at 12 is the sole qualifier — one against a ceiling of five, which is
+  `docs/DEFECTS.md` §12 and why row 5 still cannot fire
+- change cost: 5 nominations. Four contracts — `NormalizationContext` 20, `RawResponse` 19,
+  `NormalizedResponse` 15, `ModelDescription` 5 — and `DispatchCallbackController` at 5, the only
+  `ApiBoundary` ever to clear the floor and therefore the whole of what makes the `or ApiBoundary`
+  arm a gate
 - `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
 - **layer span: 6 nominations**, and every one of them sits exactly on `minKindSpan`. Three
   significant kinds and a floor of three make "spans the minimum" and "spans everything" the same
@@ -520,6 +533,67 @@ three survivors belong to §3.1.
 > **The inventory is now the cheapest step in a port, and it keeps paying.** Two of the three
 > survivors above are §3.1's, and the port took an afternoon because §3.8's and §3.9's cases were
 > planted before anyone wrote a detector. `TECHREQ-job-b.md` §10 puts B0 before B2 and it means it.
+
+### The complete inventory, measured in one pass
+
+Everything above was found one port at a time, which made a fixed backlog read as fresh decay
+every session. This is the whole of it, measured rather than reasoned, by two sweeps over the
+**23 named policy values** and every guard in every Core detector. Re-run both when a plant lands.
+
+**Method.** *Leave-one-out*: delete each `if (…) continue;` in turn and run the suite — this asks
+whether the **condition** discriminates. *Nudge*: move each policy value one notch each way and
+compare the finding set including qualifiers — this asks whether the **constant** does. They are
+different questions and a gate can pass one and fail the other, which is why both are here.
+`MinKindSpan` is the case that shows it: deleting the condition admits every type in the solution,
+so it looks observed, while moving the floor from 3 to 2 changes nothing at all.
+
+**Conditions that discriminate: 20 of 22.** The two that do not are blast radius' absolute fan-in
+floor and its multiple-of-median, both already recorded above.
+
+**Constants the fixture cannot see — the real list.** Of 23 values, a one-notch move changes
+nothing for these:
+
+| Value | Read by | Why nothing moves |
+|---|---|---|
+| `OutlierFactor` 3.0 | §3.2, §3.3 | nominations sit at 3.5×–22×; nothing is near the bar |
+| `HighCc` 10 | §3.6, §3.7, §3.8, §3.10 | complexity is bimodal — cc 1 or cc 11+ |
+| `GodObjectMembers` 20 | §3.8 | `DispatchRegistry` at 23 is the only case; observable at ±4, not ±1 |
+| `StableThreshold` 0.2 | §3.6 | nominees at instability 0 and 0.125 |
+| `ConcealedFanInCeiling` 2.0 | §3.2 | every nominee is at 0 or infinity, never between |
+| `BlastFanInMultiple` 2.0 | §3.4 | the one nominee is at 11× |
+| `BlastComplexityPercentile` 70 | §3.4 | the one nominee is at 95.8 |
+| `Top` 15 | §3.1 via `RollCallThreshold` | Core does not truncate, and 14/3 and 16/3 both floor to the same threshold |
+| `SurfaceOutlierMultiple`, `SurfaceOutlierFloor`, `SurfaceDiscriminationDivisor` | §3.10 | **not ported yet** — Core reads none of them |
+| `GlobalFanInPercentile`, `GlobalComplexityPercentile`, `GlobalComplexityFloor` | §3.11 | **not ported yet**, and two are dead on the fixture besides — see below |
+| `MinTangle` 4 | graphs | not ported yet |
+
+**The three findings still in the probe, inventoried ahead of their ports.** This is the part that
+was never done before, and it is the cheap half:
+
+- **§3.5 change cost.** `or ApiBoundary` was dead and is now the `DispatchCallbackController`
+  plant. `FanIn >= minCohort` is defect 9 and needs decision X2, not a plant.
+- **§3.10 boundary marking.** *Boundaries carrying real logic* discriminates — two of ten qualify
+  (`ShipmentController` cc 12, `ReconciliationController` cc 11) and eight do not. *Widest contract
+  surface* discriminates — one of ten. Its **suppression cannot fire at any size**, which is
+  defect 12 and needs P4's twelve boundaries, now unblocked.
+- **§3.11 coverage.** Thirteen types sit below the floor. `GlobalComplexityPercentile` discriminates
+  — three of the thirteen clear it (`OrderRepository` 98, `PayloadTag` 95.2, `RoutingDepot` 91.7).
+  **`GlobalFanInPercentile` is dead: not one below-floor type reaches the 90th percentile by
+  fan-in solution-wide**, which is close to structural — a type with no peers usually has few
+  callers. **`GlobalComplexityFloor` is dead too**: no orphan clears the percentile while failing
+  the floor, so the absolute floor beside it never decides. Both need plants before F10 ports, and
+  F10 is the finding whose whole job is to say what the tool stayed silent about.
+
+> **The one structural finding, and it explains the rest.** Loosening a threshold by one notch
+> moves output for **3 of 23** values. Nearly every gate has slack on both sides: types clear a
+> gate comfortably or fail it comfortably, and almost nothing sits just outside one. That is what
+> a fixture built by planting *positive* cases looks like — every plant so far has answered "does
+> this finding fire?" and none has answered "is this the number at which it stops firing?"
+>
+> It is also why gates keep reading as dead, and why the remedy is one plant rather than eleven. A
+> deliberate **near-miss band** — cc 9 against a floor of 10, fan-in 4 against 5, instability 0.78
+> against 0.8, member count 19 against 20 — would make most of the table above observable at once.
+> `TASKS.md` P7.
 
 ## 7. The invariants are acceptance criteria
 

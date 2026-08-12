@@ -71,12 +71,17 @@ public sealed class KnownDefectTests(FixtureRun run)
         Assert.DoesNotContain("NormalizedResponse", byCohort);   // fan-in 15, dropped by a cohort threshold
         Assert.DoesNotContain("ModelDescription", byCohort);     // fan-in 5
 
-        // And the right knob has none: a fan-in floor of 18 should leave two contracts
-        // standing. All four survive.
+        // And the right knob has none: a fan-in floor of 18 should leave two subjects standing.
+        // All five survive — the fifth being the ApiBoundary the arm was planted for, which makes
+        // the defect visible on both halves of the kind gate rather than only on contracts.
         var byFanIn = ChangeCostSubjects(new Options { MinFanIn = 18 });
 
         Assert.Equal(
-            new[] { "ModelDescription", "NormalizationContext", "NormalizedResponse", "RawResponse" },
+            new[]
+            {
+                "DispatchCallbackController", "ModelDescription", "NormalizationContext",
+                "NormalizedResponse", "RawResponse",
+            },
             byFanIn.Order(StringComparer.Ordinal).ToArray());
     }
 
@@ -285,13 +290,19 @@ public sealed class KnownDefectTests(FixtureRun run)
             return qualifying > 0 && qualifying > Math.Max(1, shapes.Length / 2);
         }
 
-        // The fixture's own nine boundaries: one qualifies against a ceiling of four.
+        // The fixture's own ten boundaries: one qualifies against a ceiling of five.
+        //
+        // This count is bookkeeping and nothing rests on it. Three separate records once claimed
+        // a tenth boundary would change whether this suppression is reachable — in opposite
+        // directions — and all three were wrong: the proof below is over arbitrary distributions
+        // and does not mention the fixture. Planting DispatchCallbackController moved the literal
+        // from 9 to 10 and moved nothing else, which is decision X1's evidence.
         var fixtureShapes = run.Result.Types
             .Where(t => t.Kind is "ApiBoundary" or "ExternalCall")
             .Select(t => (double)t.DataShape)
             .ToArray();
 
-        Assert.Equal(9, fixtureShapes.Length);
+        Assert.Equal(10, fixtureShapes.Length);
         Assert.False(Suppressed(fixtureShapes));
 
         // And the distributions that MAXIMISE the qualifying set — half the boundaries at zero,

@@ -20,9 +20,11 @@
 //
 // WHAT THIS PLANT MUST NOT DO — the constraints Bridges.cs records, and they still bind:
 //
-//   * No new ApiBoundary or ExternalCall types. PrintBoundaries counts them, and row 5's
-//     suppression stops being reachable at ten. The fixture sits at nine. Every type here is
-//     Internal, and each lane carries one trivial method for that reason: a type with no
+//   * ~~No new ApiBoundary or ExternalCall types, because row 5's suppression stops being
+//     reachable at ten.~~ WITHDRAWN — see Callback.cs and decision X1. Row 5 is unreachable at
+//     every boundary count, so nine was not a cliff edge and this constraint never protected
+//     anything. What is still true and still load-bearing: every type in THIS file is Internal
+//     deliberately, and each lane carries one trivial method for that reason — a type with no
 //     executable member is classified Contract ("shape:no executable members"), which would
 //     have quietly changed what the boundary and change-cost sections see.
 //   * No new fan-in on anything that already exists. Every reference below points inside this
@@ -143,7 +145,8 @@ public class AirDispatcher
 {
     private readonly DispatchRegistry _registry = new();
     private readonly DispatchCounter _counter = new();
-    public int Handle() => _registry.Registered() + _counter.Seen();
+    private readonly DispatchCallbackController _callback = new();
+    public int Handle() => _callback.Accept(_registry.Registered() + _counter.Seen());
 }
 
 /// <inheritdoc cref="AirDispatcher"/>
@@ -151,7 +154,8 @@ public class RailDispatcher
 {
     private readonly DispatchRegistry _registry = new();
     private readonly DispatchCounter _counter = new();
-    public int Handle() => _registry.Registered() + _counter.Seen();
+    private readonly DispatchCallbackController _callback = new();
+    public int Handle() => _callback.Accept(_registry.Registered() + _counter.Seen());
 }
 
 /// <inheritdoc cref="AirDispatcher"/>
@@ -159,7 +163,8 @@ public class RoadDispatcher
 {
     private readonly DispatchRegistry _registry = new();
     private readonly DispatchCounter _counter = new();
-    public int Handle() => _registry.Registered() + _counter.Seen();
+    private readonly DispatchCallbackController _callback = new();
+    public int Handle() => _callback.Accept(_registry.Registered() + _counter.Seen());
 }
 
 /// <inheritdoc cref="AirDispatcher"/>
@@ -167,7 +172,8 @@ public class SeaDispatcher
 {
     private readonly DispatchRegistry _registry = new();
     private readonly DispatchCounter _counter = new();
-    public int Handle() => _registry.Registered() + _counter.Seen();
+    private readonly DispatchCallbackController _callback = new();
+    public int Handle() => _callback.Accept(_registry.Registered() + _counter.Seen());
 }
 
 /// <inheritdoc cref="AirDispatcher"/>
@@ -175,5 +181,6 @@ public class BulkDispatcher
 {
     private readonly DispatchRegistry _registry = new();
     private readonly DispatchCounter _counter = new();
-    public int Handle() => _registry.Registered() + _counter.Seen();
+    private readonly DispatchCallbackController _callback = new();
+    public int Handle() => _callback.Accept(_registry.Registered() + _counter.Seen());
 }

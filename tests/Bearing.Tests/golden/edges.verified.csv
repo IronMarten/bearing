@@ -62,14 +62,19 @@ global::TestBed.Core.ConcreteConsumer,global::TestBed.Core.SystemClock,2
 global::TestBed.Core.ConsumerFacade,global::TestBed.Core.AbstractConsumer,2
 global::TestBed.Core.ConsumerFacade,global::TestBed.Core.ConcreteConsumer,2
 global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.NormalizeStep,2
+global::TestBed.Core.Dispatch.AirDispatcher,global::TestBed.Core.Dispatch.DispatchCallbackController,2
 global::TestBed.Core.Dispatch.AirDispatcher,global::TestBed.Core.Dispatch.DispatchCounter,2
 global::TestBed.Core.Dispatch.AirDispatcher,global::TestBed.Core.Dispatch.DispatchRegistry,2
+global::TestBed.Core.Dispatch.BulkDispatcher,global::TestBed.Core.Dispatch.DispatchCallbackController,2
 global::TestBed.Core.Dispatch.BulkDispatcher,global::TestBed.Core.Dispatch.DispatchCounter,2
 global::TestBed.Core.Dispatch.BulkDispatcher,global::TestBed.Core.Dispatch.DispatchRegistry,2
+global::TestBed.Core.Dispatch.RailDispatcher,global::TestBed.Core.Dispatch.DispatchCallbackController,2
 global::TestBed.Core.Dispatch.RailDispatcher,global::TestBed.Core.Dispatch.DispatchCounter,2
 global::TestBed.Core.Dispatch.RailDispatcher,global::TestBed.Core.Dispatch.DispatchRegistry,2
+global::TestBed.Core.Dispatch.RoadDispatcher,global::TestBed.Core.Dispatch.DispatchCallbackController,2
 global::TestBed.Core.Dispatch.RoadDispatcher,global::TestBed.Core.Dispatch.DispatchCounter,2
 global::TestBed.Core.Dispatch.RoadDispatcher,global::TestBed.Core.Dispatch.DispatchRegistry,2
+global::TestBed.Core.Dispatch.SeaDispatcher,global::TestBed.Core.Dispatch.DispatchCallbackController,2
 global::TestBed.Core.Dispatch.SeaDispatcher,global::TestBed.Core.Dispatch.DispatchCounter,2
 global::TestBed.Core.Dispatch.SeaDispatcher,global::TestBed.Core.Dispatch.DispatchRegistry,2
 global::TestBed.Core.DocumentController,global::TestBed.Core.NormalizationContext,2
@@ -206,6 +211,7 @@ global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.EnrichStep,1
 global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.PriceStep,1
 global::TestBed.Core.Depots.RoutingDepot,global::TestBed.Core.ValidateStep,1
 global::TestBed.Core.DepthGauge,global::TestBed.Core.NormalizeStep,1
+global::TestBed.Core.Dispatch.DispatchCallbackController,global::TestBed.Core.ControllerBase,1
 global::TestBed.Core.Dispatch.DispatchRegistry,global::TestBed.Core.Dispatch.AirLane,1
 global::TestBed.Core.Dispatch.DispatchRegistry,global::TestBed.Core.Dispatch.BulkLane,1
 global::TestBed.Core.Dispatch.DispatchRegistry,global::TestBed.Core.Dispatch.RailLane,1

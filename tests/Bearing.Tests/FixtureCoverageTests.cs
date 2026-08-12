@@ -410,6 +410,62 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// Change cost's <c>or ApiBoundary</c> arm decides something now, and it is the only subject
+    /// that can make it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// §3.5 gates on <c>Kind is Contract or ApiBoundary</c>. Every nomination on this fixture was
+    /// <c>Contract</c>, so the second half of the disjunction could be deleted with no output
+    /// moving — and that was not an accident of the fixture. Almost nothing in real code
+    /// references a controller, which is why every boundary here sat at fan-in 0 or 1, and why the
+    /// arm needed a case built rather than found.
+    /// </para>
+    /// <para>
+    /// <c>DispatchCallbackController</c> is a return address: five dispatchers name it because
+    /// they hand it to a carrier, so the dependency runs inward, from internal components to the
+    /// edge. It is asserted as the <b>only</b> ApiBoundary that clears the floor, which is what
+    /// makes deleting the arm observable — with a second one, removing the arm would still leave
+    /// output and this would still pass.
+    /// </para>
+    /// <para>
+    /// Invariant 4 is the reason this subject matters more than the gate does. The sentence says
+    /// external consumers are not visible, and on a contract that is a caveat; on a callback
+    /// endpoint the invisible consumers are the entire point of the type.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_change_cost_plant_observes_the_ApiBoundary_arm()
+    {
+        var callback = run.Type("DispatchCallbackController");
+
+        Assert.Equal("ApiBoundary", callback.Kind);
+        Assert.True(callback.FanIn >= run.Options.MinCohort);
+
+        // The only one, so the arm is deletable exactly when this type is absent.
+        Assert.Equal(
+            ["DispatchCallbackController"],
+            run.Result.Types
+                .Where(t => t.Kind == "ApiBoundary" && t.FanIn >= run.Options.MinCohort)
+                .Select(t => t.Name));
+
+        // And it is inert everywhere else, so the plant adds one claim rather than a cluster of
+        // them. Each of these is a gate it deliberately fails.
+        Assert.True(callback.MaxMemberCyclomatic < run.Options.HighCc);        // not load-bearing,
+                                                                              // not a boundary
+                                                                              // carrying logic
+        Assert.True(Math.Min(callback.FanIn, callback.FanOut) < run.Options.HubMin);  // not a hub
+        Assert.Equal("ApiBoundary", callback.KindSpan);                        // one kind, not three
+
+        var text = NominationText.Render(run.Result, run.Options);
+        Assert.Contains(
+            "DispatchCallbackController — 5 internal callers", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("DispatchCallbackController —", text.Replace(
+            "DispatchCallbackController — 5 internal callers", "", StringComparison.Ordinal),
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// <c>++</c> is the only static write on one type, so dropping support for it empties a
     /// finding.
     /// </summary>

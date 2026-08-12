@@ -33,17 +33,17 @@ public sealed class StructureTests(FixtureRun run)
     [Fact]
     public void Fixture_shape_is_stable()
     {
-        // 126 rows, not 127: the two TestBed.Shared.PayloadTag declarations are one row, because
+        // 127 rows, not 128: the two TestBed.Shared.PayloadTag declarations are one row, because
         // type identity is keyed on name alone. That is the planted defect, pinned in
-        // KnownDefectTests. When Core keys on (assembly, FQN) this becomes 127.
+        // KnownDefectTests. When Core keys on (assembly, FQN) this becomes 128.
         //
         // NormalizerScenarios is absent, and correctly so — it lives in Core.Tests, which is
         // skipped.
-        Assert.Equal(126, run.Result.Types.Count);
-        Assert.Equal(284, run.Result.Edges.Count);
+        Assert.Equal(127, run.Result.Types.Count);
+        Assert.Equal(290, run.Result.Edges.Count);
         // Methods are counted per declaration, so unlike Types this is not distorted by the
         // planted collision: Describe, Score and Weight are all three present.
-        Assert.Equal(132, run.Result.Methods.Count);
+        Assert.Equal(133, run.Result.Methods.Count);
     }
 
     // ---- Generated code exclusion -------------------------------------------------

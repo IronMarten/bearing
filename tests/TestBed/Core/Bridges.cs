@@ -21,9 +21,12 @@
 //
 // WHAT THIS PLANT MUST NOT DO, and the reason it is built from existing types:
 //
-//   * No new ApiBoundary or ExternalCall types. Those are what PrintBoundaries counts, and row
-//     5's suppression stops being reachable at ten boundaries — see KnownDefectTests. The
-//     fixture sits at nine, and adding a boundary here would silently disarm the next row.
+//   * ~~No new ApiBoundary or ExternalCall types, because row 5's suppression stops being
+//     reachable at ten boundaries.~~ WITHDRAWN — the claim was false, and it was stated in three
+//     places with two different and mutually contradictory justifications. DEFECTS.md §12 proves
+//     row 5 is unreachable AT EVERY boundary count, and KnownDefectTests proves it over arbitrary
+//     distributions rather than over this fixture, so nine was never a cliff edge. Callback.cs
+//     takes the count to ten and nothing about the suppression moved. Decision X1.
 //   * No new fan-in on ShipmentController or AuthenticationMiddleware. Both are nominated as
 //     concealed decisions with fan-in 0, and the cohort's fan-in median is 0, so any inbound
 //     edge sends FanInXMedian to infinity and drops them out of the finding. PolicyBridge
