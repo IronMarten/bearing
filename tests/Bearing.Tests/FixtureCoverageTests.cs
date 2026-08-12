@@ -224,6 +224,92 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// Breaks alone's own gates are masked by its suppressions — including the one that carries
+    /// half its claim.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Nine more mutations when §3.7 and three of §4's rows moved into Core. Seven failed. Two
+    /// did not, and the second is the one that matters.
+    /// </para>
+    /// <para>
+    /// <b>1. Row 3, <c>breaks-alone-is-unreferenced</c>, silences nothing.</b> Two types reach
+    /// the finding with no callers: <c>ShipmentController</c>, which row 1 takes as a boundary,
+    /// and <c>AuditReconciler</c>, which row 2 takes as a concealed decision. The row needs a
+    /// plant of its own — unreferenced, not a boundary, not a concealed decision.
+    /// </para>
+    /// <para>
+    /// <b>2. The instability gate can be deleted and no output moves.</b> This is not a spare
+    /// threshold: <c>Instability &gt;= 0.8</c> is the <i>isolated</i> in "complex inside but
+    /// isolated", and without it the finding claims nothing more than "complex". Four types are
+    /// complex enough to qualify and are held back only by it — and <b>all four are also
+    /// concealed decisions</b>, so row 2 removes every one of them before the difference can
+    /// show. The gate is masked, not redundant.
+    /// </para>
+    /// <para>
+    /// <b>What that would say if the mask ever lifted.</b> <c>ShipmentLedger</c> has fan-in 11,
+    /// the most depended-on type in the fixture, and is already nominated as both a bug blast
+    /// radius and load-bearing-and-intricate. Delete the instability gate and the same run also
+    /// tells the reader that if it breaks, it breaks alone. That is invariant 3's exact failure,
+    /// and on this fixture the only thing preventing it is an unrelated suppression row.
+    /// </para>
+    /// <para>
+    /// The plant both gaps need is the same shape: <b>a complex, well-connected type that is not
+    /// a concealed decision</b>. Every complex type on TestBed is one, which is why neither gate
+    /// has anything to bite on. Add, do not reshape.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Breaks_alone_has_gates_its_own_suppressions_hide()
+    {
+        var policy = core.Model.Policy;
+        var detected = Analysis.Detected(core.Model);
+
+        bool IsConcealed(TypeNode t) =>
+            detected.ContainsAbout(FindingKind.ConcealedDecisionType, t.Subject) ||
+            detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, t.Subject);
+
+        // Everything the instability gate holds back, and the fact that makes it invisible.
+        var heldBack = core.Model.Types
+            .Where(t => t.Instability is { } i && i < policy.IsolatedThreshold)
+            .Where(t => t.MaxMemberCyclomatic >= policy.HighCc)
+            .ToList();
+
+        Assert.Equal(
+            ["GuaranteedServiceNormalizer", "ShipmentCoordinator", "ShipmentLedger", "TariffCalculator"],
+            heldBack.Select(t => t.Name).Order(StringComparer.Ordinal));
+
+        // Every one of them. A single counter-example here un-masks the gate, and this test is
+        // what says so.
+        Assert.All(heldBack, t => Assert.True(IsConcealed(t), $"{t.Name} would un-mask the gate"));
+
+        // And the worst case is concrete rather than hypothetical: the type that would be told
+        // it breaks alone is the one two other findings call heavily depended on.
+        var ledger = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
+        var about = Analysis.FindingsFor(core.Model).About(ledger.Subject).Select(f => f.Kind).ToList();
+        Assert.Contains(FindingKind.BugBlastRadius, about);
+        Assert.Contains(FindingKind.LoadBearingAndIntricate, about);
+        Assert.DoesNotContain(FindingKind.BreaksAlone, about);
+
+        // Row 3's candidates are both taken by an earlier row. Read off the detected set rather
+        // than re-derived from the model: OrderRepository and PayloadTag are unreferenced and
+        // complex but depend on nothing either, so their instability is undefined and they never
+        // reach the finding at all. A gap record that re-states the detector's conditions gets
+        // that wrong, and did.
+        var unreferenced = detected.OfKind(FindingKind.BreaksAlone)
+            .Select(f => core.Model.Find(f.Subject)!)
+            .Where(t => t.FanIn < policy.BreaksAloneMinFanIn)
+            .ToList();
+
+        Assert.Equal(
+            ["AuditReconciler", "ShipmentController"],
+            unreferenced.Select(t => t.Name).Order(StringComparer.Ordinal));
+        Assert.All(unreferenced, t => Assert.True(
+            IsConcealed(t) || t.Classification.Kind is "ApiBoundary" or "ExternalCall" or "Contract",
+            $"{t.Name} would give row 3 a case of its own"));
+    }
+
+    /// <summary>
     /// The three dead-code traps are planted, and nothing can currently tell them apart from
     /// code that really is unreferenced.
     /// </summary>

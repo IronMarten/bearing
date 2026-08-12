@@ -352,6 +352,36 @@ today with the suite green. In `FixtureCoverageTests.The_new_findings_have_gates
 > Core's nomination set. **Extraction silently halves the protection on every gate it copies**,
 > and it will keep doing so until Cli renders from the model.
 
+**For breaks alone, once it moved into Core.** Nine more mutations; seven failed, two did not,
+and the second is the more serious of any found this far.
+
+- **Row 3, `breaks-alone-is-unreferenced`, silences nothing.** Both types that reach the finding
+  with no callers are taken by an earlier row — `ShipmentController` as a boundary,
+  `AuditReconciler` as a concealed decision.
+- **The instability gate can be deleted and no output moves.** `Instability >= 0.8` is the
+  *isolated* in "complex inside but isolated"; without it the finding claims nothing more than
+  "complex". Four types are held back by it alone, and **all four are also concealed decisions**,
+  so row 2 removes each one before the difference can show.
+
+> **What the second one would say if the mask lifted.** `ShipmentLedger` has fan-in 11 — the most
+> depended-on type in the fixture — and is already nominated as both a bug blast radius and
+> load-bearing-and-intricate. Delete the instability gate and the same run also tells the reader
+> that if it breaks, it breaks alone. That is invariant 3's exact failure, and the only thing
+> preventing it here is an unrelated suppression row.
+>
+> **A suppression masking a detector's gate is a new failure mode**, and it is not the one §4
+> warns about. §4's concern is a suppression that stops working and produces more output. This is
+> the reverse: a suppression working so broadly that the detector beneath it stops being tested,
+> and the finding would keep passing every test with half its meaning removed. Both gaps need one
+> plant — a complex, well-connected type that is *not* a concealed decision. Every complex type
+> on TestBed is one.
+
+> **Re-deriving a detector's population in a gap record gets it wrong.** The first version of this
+> test looked for unreferenced complex types in the model rather than in the detected set, and
+> caught `OrderRepository` and `PayloadTag` — both unreferenced, both complex, and both depending
+> on nothing either, so their instability is undefined and they never reach the finding. Read the
+> finding set; do not restate the conditions that built it.
+
 **~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
 and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:
 when Core keys on `(assembly, FQN)` the row count goes 52 → 53 and `KnownDefectTests` fails,
