@@ -189,8 +189,12 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         var expected = ProbeNominations("   All types with no usable peer group, by fan-in:", stopAt: "NOTE:");
         var actual = CoreTypeNominations(FindingKind.Coverage);
 
-        Assert.Equal(13, expected.Count);
-        Assert.Equal(14, actual.Count);
+        // Seventeen and eighteen since P6, which added four peerless types: its three shared
+        // dependency targets, each the only member of the cohort it lands in, and RouteAttribute.
+        // The eight *Conduit types are not among them — they are a name-suffix cohort of eight,
+        // which is what keeps the plant out of every existing peer group.
+        Assert.Equal(17, expected.Count);
+        Assert.Equal(18, actual.Count);
 
         // Same components, and the extra entry is the second declaration rather than a new subject.
         Assert.Equal(expected, actual.Distinct(StringComparer.Ordinal).ToList());
@@ -207,7 +211,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     }
 
     /// <summary>
-    /// The weaker global claim is made about exactly three types, and all three are complexity.
+    /// The weaker global claim is made about six types — three by complexity, three by fan-in.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -217,13 +221,22 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// peer-relative sentence.
     /// </para>
     /// <para>
-    /// <b>Not one of the thirteen clears the fan-in percentile</b>, which is asserted here rather
-    /// than left implicit — it is a dead gate and close to a structural one, since a type with no
-    /// peers usually has few callers. <c>FixtureCoverageTests</c> carries the record.
+    /// <b>The fan-in half was a dead gate until P6, and P6 closed it as a side effect.</b> It was
+    /// recorded as close to structural — a type with no peers usually has few callers — and as
+    /// needing a deliberate plant: <i>a lone component much of the system depends on</i>. P6's
+    /// shared dependency set is exactly that shape without having set out to be. Eight conduits
+    /// reach three targets, so each target has fan-in 8 against a solution where most types have
+    /// none, and none of the three has a peer group. The claim is now made in both flavours, and
+    /// the gate is observable upward as well as downward for the first time.
+    /// </para>
+    /// <para>
+    /// It is asserted by name rather than by count, because the case is incidental to the plant
+    /// that produced it: reshape P6 and the gate goes quiet again, and this is where that has to
+    /// be noticed.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_weaker_global_claim_is_complexity_and_names_three()
+    public void The_weaker_global_claim_is_made_in_both_flavours()
     {
         var coverage = Analysis.FindingsFor(core.Model).OfKind(FindingKind.Coverage);
 
@@ -234,7 +247,12 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
                 .Select(f => core.Model.Find(f.Subject)!.Name)
                 .Order(StringComparer.Ordinal));
 
-        Assert.DoesNotContain(coverage, f => f.Holds(Qualifiers.GloballyExtremeFanIn));
+        Assert.Equal(
+            ["LayeringArchive", "LayeringBeacon", "LayeringEndpoint"],
+            coverage
+                .Where(f => f.Holds(Qualifiers.GloballyExtremeFanIn))
+                .Select(f => core.Model.Find(f.Subject)!.Name)
+                .Order(StringComparer.Ordinal));
 
         // And it is the floor, not the percentile, that would let a cc-1 type in — so the floor is
         // asserted as applied even though nothing on this fixture depends on it.
@@ -340,11 +358,18 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// </para>
     /// <para>
     /// <c>ModelDescription</c> and <c>DispatchCallbackController</c> are the two that go, both at
-    /// fan-in 5, both at solution rank 20.5 of 128 types. Five callers clears an absolute floor
-    /// and is nowhere near the most-depended-on part of the application, which is the whole of
-    /// what the conversion is for. The divergence is asserted as a set rather than as Core's
-    /// output alone: a regression that emptied the finding would satisfy "Core says three" just as
-    /// well.
+    /// fan-in 5, both at solution rank 20.5. Five callers clears an absolute floor and is nowhere
+    /// near the most-depended-on part of the application, which is the whole of what the
+    /// conversion is for. The divergence is asserted as a set rather than as Core's output alone:
+    /// a regression that emptied the finding would satisfy "Core says three" just as well.
+    /// </para>
+    /// <para>
+    /// <b><c>LayeringEndpoint</c> is P6's, and it is a third divergence of the same kind.</b> Eight
+    /// conduits reach it, so it clears the probe's absolute floor of five comfortably — and at
+    /// solution midrank 9 of 144, in a tie of five types at fan-in 8, it is still outside Core's
+    /// top slice of 7.2 at the default fraction. So the plant widened the probe's set and left
+    /// Core's alone, which is the conversion doing exactly what it was converted for, on a type
+    /// built for an unrelated reason.
     /// </para>
     /// </remarks>
     [Fact]
@@ -355,15 +380,15 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
 
         Assert.Equal(
             [
-                "DispatchCallbackController", "ModelDescription", "NormalizationContext",
-                "NormalizedResponse", "RawResponse",
+                "DispatchCallbackController", "LayeringEndpoint", "ModelDescription",
+                "NormalizationContext", "NormalizedResponse", "RawResponse",
             ],
             probeSaid);
         Assert.Equal(["NormalizationContext", "NormalizedResponse", "RawResponse"], coreSays);
 
         // In one direction only. A gate may narrow a finding, never widen it.
         Assert.Equal(
-            ["DispatchCallbackController", "ModelDescription"],
+            ["DispatchCallbackController", "LayeringEndpoint", "ModelDescription"],
             probeSaid.Except(coreSays, StringComparer.Ordinal).Order(StringComparer.Ordinal));
         Assert.Empty(coreSays.Except(probeSaid, StringComparer.Ordinal));
     }
@@ -396,31 +421,48 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     }
 
     /// <summary>
-    /// The share is the gate; its exact value is not what decides the fixture's answer.
+    /// The share decides, in both directions — and P6 is what made that true.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// A constant nobody can check is a constant taken on faith, and this one is a share of the
-    /// whole solution rather than a number calibrated against a codebase. What makes it defensible
-    /// is not the value but its <i>insensitivity</i>: the nominated set is identical across a
-    /// threefold range, because the fixture's fan-in population has a gap between 15 and 5 and the
-    /// gate falls inside it.
+    /// <b>This test used to assert the opposite, and the change is worth reading rather than
+    /// re-accepting.</b> Its claim was that the constant is defensible because it is
+    /// <i>insensitive</i>: the nominated set was identical across 0.05, 0.10 and 0.15, because the
+    /// fixture's fan-in population had a gap between 15 and 5 and the gate fell inside it. That
+    /// reassurance was an artifact of the gap. P6's three shared dependency targets sit at fan-in
+    /// 8 and fill it, so the same threefold range now moves the finding.
     /// </para>
     /// <para>
-    /// Asserted rather than claimed, so that a fixture change which makes the constant
-    /// load-bearing shows up here as a failure instead of as a silent dependency on 0.05.
+    /// <b>Losing it is a gain by the inventory's own standard and a loss by X2's.</b>
+    /// <c>docs/TESTING.md</c> §6 counts a constant as unobserved when a one-notch move changes
+    /// nothing, and by that measure <c>ChangeCostTopFraction</c> has just stopped being one of
+    /// them — this is the first fixture state in which the number decides anything. What is gone
+    /// is the separate argument that the exact value does not matter, which is what X2 leaned on
+    /// when it chose a share of the whole solution over a percentile. The value is now a real
+    /// choice, and 0.05 is the one the default makes.
+    /// </para>
+    /// <para>
+    /// Nothing was tuned to produce this. The default's answer is the same three types it was
+    /// before the plant; what moved is the answer one notch out.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_change_cost_share_is_not_load_bearing_at_its_default()
+    public void The_change_cost_share_decides_in_both_directions()
     {
-        var atDefaults = CoreTypeNominations(FindingKind.ChangeCost);
+        // Unchanged by P6: the default still nominates the three contracts, and LayeringEndpoint
+        // is outside the slice at solution midrank 9 against a limit of 7.2.
+        Assert.Equal(
+            ["NormalizationContext", "NormalizedResponse", "RawResponse"],
+            CoreTypeNominations(FindingKind.ChangeCost));
 
-        foreach (var fraction in (double[])[0.05, 0.10, 0.15])
-            Assert.Equal(atDefaults, ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = fraction }));
+        // Loosening it admits the boundary the probe's absolute floor always accepted, which is
+        // the arm §3.5 has and Core has never exercised at its default.
+        foreach (var fraction in (double[])[0.10, 0.15])
+            Assert.Equal(
+                ["LayeringEndpoint", "NormalizationContext", "NormalizedResponse", "RawResponse"],
+                ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = fraction }));
 
-        // And it is a gate rather than a decoration: tighten it past the third survivor and the
-        // finding narrows.
+        // And tightening it past the third survivor narrows the finding.
         Assert.Equal(
             ["NormalizationContext", "RawResponse"],
             ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = 0.02 }));
@@ -637,10 +679,13 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         NominationText.Render(probe.Result, Uncapped);
         var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
 
-        // What the probe groups on: one signature, six members, and X4 is open on the fact that
+        // What the probe groups on: one signature, every member, and X4 is open on the fact that
         // three significant kinds and a span floor of three leave no other signature possible.
+        // P6 took this from six to fourteen and the probe still sees one group, which is the
+        // clearest statement of §11 the fixture has — the plant deliberately contains two
+        // different phenomena and the kind signature cannot tell them apart.
         Assert.Equal(
-            6,
+            14,
             probe.Result.Types.Count(t => t.KindSpan == "ApiBoundary+DataAccess+ExternalCall"));
 
         // What Core groups on. The anomaly and the bridge stand alone; the boilerplate is one fact.
@@ -651,6 +696,11 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Equal(1, PatternSize("AuthenticationMiddleware"));
         Assert.Equal(1, PatternSize("PolicyBridge"));
 
+        // And P6's two: six conduits that are one fact, and the ApiBoundary pair that is not part
+        // of it. Same three dependencies, different role, different group.
+        Assert.Equal(6, PatternSize("IntakeConduit"));
+        Assert.Equal(2, PatternSize("PublicIntakeConduit"));
+
         // And the dependencies are why, which is the half a count cannot see: the middleware
         // shares the store with the controllers and reaches out somewhere else entirely.
         Assert.Equal(["CarrierGateway", "TenantStore"], ParticipantNames("QuoteController"));
@@ -659,7 +709,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         // The claim survives for every one of them. A collapse withdraws detail, never a finding —
         // the probe keeps collapsed types named in its examples line, which is the evidence for
         // reading row 4 as a sentence suppression rather than a finding suppression.
-        Assert.Equal(6, findings.Count);
+        Assert.Equal(14, findings.Count);
     }
 
     // ----------------------------------------------------- breaks alone, and §4's rows ----

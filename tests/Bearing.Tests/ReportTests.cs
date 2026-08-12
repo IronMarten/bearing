@@ -131,9 +131,9 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// Every capped list says what it dropped.
     /// </summary>
     /// <remarks>
-    /// Rendered at a deliberately low <c>--top</c> so the caps bite. At the default of 15 nothing
-    /// in the fixture is truncated, which is exactly how this defect survived: the probe's
-    /// <c>Take</c> was invisible on every input anyone looked at.
+    /// Rendered at a deliberately low <c>--top</c> so several caps bite at once. Until P6 the
+    /// default of 15 truncated nothing at all, which is exactly how this defect survived: the
+    /// probe's <c>Take</c> was invisible on every input anyone looked at.
     /// </remarks>
     [Fact]
     public void A_shortened_list_says_that_it_was_shortened()
@@ -147,14 +147,35 @@ public sealed class ReportTests(CoreWalkFixture core)
         Assert.Contains("raise --top", text, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The disclosure appears where a cap bit, and nowhere else.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The control for the disclosure: it has to appear exactly when it is true, or it becomes
+    /// noise people learn to skip — which is how the roll-call problem started.
+    /// </para>
+    /// <para>
+    /// <b>P6 is what made this control do any work.</b> It used to assert that the string was
+    /// absent from the whole report, because nothing in the fixture reached the default
+    /// <c>--top</c> of 15 — a control that deleting the disclosure would have satisfied just as
+    /// well. Coverage now carries 18 peerless subjects, four of them P6's, so at defaults exactly
+    /// one section is capped and exactly one line is entitled to say so. Asserting the count is
+    /// what makes both failure directions visible: a disclosure that stops appearing, and one
+    /// that starts appearing where nothing was dropped.
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void Nothing_claims_to_be_shortened_when_it_is_not()
+    public void The_disclosure_appears_where_a_cap_bit_and_nowhere_else()
     {
-        // The control for the disclosure: it has to appear exactly when it is true, or it becomes
-        // noise people learn to skip — which is how the roll-call problem started. No second walk
-        // needed, because nothing in the fixture reaches the default --top of 15.
-        Assert.DoesNotContain("not shown of", Text, StringComparison.Ordinal);
-        Assert.DoesNotContain("shown", Text, StringComparison.Ordinal);
+        var disclosures = Text
+            .Split('\n')
+            .Where(line => line.Contains("not shown of", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.Single(disclosures);
+        Assert.Contains("3 types not shown of 18", disclosures[0], StringComparison.Ordinal);
+        Assert.Contains("raise --top", disclosures[0], StringComparison.Ordinal);
     }
 
     // ------------------------------------------------------------------ the snapshot ----

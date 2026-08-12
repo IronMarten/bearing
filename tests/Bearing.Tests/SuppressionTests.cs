@@ -103,8 +103,12 @@ public sealed class SuppressionTests(FixtureRun run)
     {
         var text = Render();
 
+        // Fourteen since P6, and all fourteen in one group: the probe keys a pattern on the kind
+        // signature alone, so its count is every spanning type in the solution. Core partitions
+        // the same fourteen into 6 + 4 + 2 + 1 + 1 — DEFECTS.md §11 — which is why the collapse is
+        // a qualifier there and a Count() here.
         Assert.Contains(
-            "6 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern",
+            "14 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern",
             text, StringComparison.Ordinal);
 
         // And the per-type detail is genuinely gone, rather than the summary being printed
@@ -115,18 +119,21 @@ public sealed class SuppressionTests(FixtureRun run)
     }
 
     /// <summary>
-    /// Row 4's control. The floor is <c>--top / 3</c>, so lifting <c>--top</c> to 18 puts it at
-    /// exactly 6 and the six-member group stops exceeding it.
+    /// Row 4's control. The floor is <c>--top / 3</c>, so lifting <c>--top</c> to 42 puts it at
+    /// exactly 14 and the fourteen-member group stops exceeding it.
     /// </summary>
     /// <remarks>
-    /// The control has to move a threshold rather than build a second group: there are exactly
-    /// three <c>SignificantKinds</c> and <c>--min-kind-span</c> is 3, so every spanning type
-    /// necessarily carries the same signature and a second group cannot exist at defaults.
+    /// The control has to move a threshold rather than build a second group, and that is a
+    /// statement about <b>the probe</b> rather than about the finding: it keys a pattern on the
+    /// kind signature, and with exactly three <c>SignificantKinds</c> and <c>--min-kind-span</c>
+    /// at 3 every spanning type necessarily carries the same one. Core can do better and does —
+    /// P6's plant produces five groups there, and <c>FixtureCoverageTests</c> moves the divisor
+    /// rather than <c>--top</c> because a second group is something Core can actually have.
     /// </remarks>
     [Fact]
     public void Raising_top_restores_the_per_type_layer_span_detail()
     {
-        var text = Render(new Options { Top = 18 });
+        var text = Render(new Options { Top = 42 });
 
         Assert.Contains(
             "AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds",

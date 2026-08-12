@@ -216,7 +216,7 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
         Assert.Equal(6, analysed.AbstractTypes);
-        Assert.Equal(128, analysed.TotalTypes);
+        Assert.Equal(140, analysed.TotalTypes);          // 128 before P6's twelve
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
@@ -420,9 +420,13 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
     {
         var contact = core.Model.ContactPoints;
 
-        Assert.Equal(13, contact.Inbound.Count);
-        Assert.Equal(2, contact.Outbound.Count);
-        Assert.Equal(15, contact.Count);
+        // P6 took these from 13 / 2 / 15. Three of its types are boundaries: LayeringEndpoint,
+        // which the eight conduits reach, and the ApiBoundary pair that is the plant's control.
+        // LayeringBeacon is the outbound one. The surfaces were chosen to leave the boundary
+        // median where it was — see KnownDefectTests and the plant's own header.
+        Assert.Equal(16, contact.Inbound.Count);
+        Assert.Equal(3, contact.Outbound.Count);
+        Assert.Equal(19, contact.Count);
 
         // Same population BoundaryMarking judges, counted a different way. The two halves of the
         // section have to be talking about the same set or the renderer joins two answers to
@@ -437,11 +441,14 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
     {
         var map = core.Model.Integrations;
 
+        // One more type touches each: P6's LayeringArchive is DataAccess by System.Data and its
+        // LayeringBeacon is ExternalCall by System.Net.Http, which is how the plant reaches two of
+        // the three significant kinds without giving an existing type new fan-in.
         Assert.Equal(
-            [("System.Data", 2), ("System.Net.Http", 2)],
+            [("System.Data", 3), ("System.Net.Http", 3)],
             map.Systems.Select(d => (d.Namespace, d.TypesTouching)));
 
-        Assert.Equal(21, map.PlumbingReferences);
+        Assert.Equal(22, map.PlumbingReferences);
     }
 
     /// <summary>

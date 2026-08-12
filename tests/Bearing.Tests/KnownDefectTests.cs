@@ -84,15 +84,17 @@ public sealed class KnownDefectTests(FixtureRun run)
         Assert.DoesNotContain("ModelDescription", byCohort);     // fan-in 5
 
         // And the right knob has none: a fan-in floor of 18 should leave two subjects standing.
-        // All five survive — the fifth being the ApiBoundary the arm was planted for, which makes
-        // the defect visible on both halves of the kind gate rather than only on contracts.
+        // All six survive — two of them ApiBoundary, which makes the defect visible on both halves
+        // of the kind gate rather than only on contracts. LayeringEndpoint is P6's and reaches the
+        // list at fan-in 8 without having been built for this; DispatchCallbackController is the
+        // one the arm was planted for.
         var byFanIn = ChangeCostSubjects(new Options { MinFanIn = 18 });
 
         Assert.Equal(
             new[]
             {
-                "DispatchCallbackController", "ModelDescription", "NormalizationContext",
-                "NormalizedResponse", "RawResponse",
+                "DispatchCallbackController", "LayeringEndpoint", "ModelDescription",
+                "NormalizationContext", "NormalizedResponse", "RawResponse",
             },
             byFanIn.Order(StringComparer.Ordinal).ToArray());
     }
@@ -324,7 +326,11 @@ public sealed class KnownDefectTests(FixtureRun run)
             .Select(t => (double)t.DataShape)
             .ToArray();
 
-        Assert.Equal(15, fixtureShapes.Length);
+        // Nineteen since P6, whose four new boundaries were given surfaces of 4, 4, 5 and 5 so
+        // that the median stays where it was — the plant needed the boundary population to grow
+        // without the qualifying set moving, or it would have disarmed P4 as a side effect. The
+        // count is still bookkeeping; the two assertions below are the claim.
+        Assert.Equal(19, fixtureShapes.Length);
 
         // Seven qualify, five are named, and none of it reaches the ceiling.
         var median = Median(fixtureShapes);
@@ -460,17 +466,21 @@ public sealed class KnownDefectTests(FixtureRun run)
         var middleware = run.Result.Types.Single(t => t.Name == "AuthenticationMiddleware");
         Assert.Equal("ApiBoundary+DataAccess+ExternalCall", middleware.KindSpan);
 
-        // The ordering that picks which four to name is by fan-in, and five of the six tie at
-        // zero — so membership of the examples list is decided by enumeration order. The anomaly
-        // appears in it by position rather than on merit, and one more boilerplate controller
-        // would evict it without any threshold changing.
+        // The ordering that picks which four to name is by fan-in, and thirteen of the fourteen
+        // tie at zero — so membership of the examples list is decided by enumeration order. The
+        // anomaly appears in it by position rather than on merit, and boilerplate arriving in the
+        // group evicts by position too, without any threshold changing.
+        //
+        // P6 demonstrated it rather than leaving it hypothetical: eight conduits joined the group
+        // and PolicyBridge fell out of the examples line, which is visible in the golden diff and
+        // was decided by nothing but where the types were enumerated.
         var group = run.Result.Types
             .Where(t => t.KindSpan == "ApiBoundary+DataAccess+ExternalCall")
             .ToList();
 
-        Assert.Equal(6, group.Count);
+        Assert.Equal(14, group.Count);
         Assert.Equal(0, middleware.FanIn);
-        Assert.Equal(5, group.Count(t => t.FanIn == 0));
+        Assert.Equal(13, group.Count(t => t.FanIn == 0));
     }
 
     /// <summary>

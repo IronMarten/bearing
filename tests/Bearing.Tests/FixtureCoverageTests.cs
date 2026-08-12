@@ -466,12 +466,17 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
             Analysis.FindingsFor(core.Model).OfKind(FindingKind.ChangeCost),
             f => Assert.Equal("Contract", core.Model.Find(f.Subject)!.Classification.Kind));
 
-        // The only one, so the arm is deletable exactly when this type is absent.
+        // Two of them since P6, whose LayeringEndpoint is reached by eight conduits and clears the
+        // probe's absolute floor without having been built to. It does not rescue the arm in Core
+        // — at solution midrank 9 against a limit of 7.2 it is outside the slice, which is the
+        // assertion above stated for a second type — but it does mean the probe's half of the arm
+        // no longer rests on a single plant.
         Assert.Equal(
-            ["DispatchCallbackController"],
+            ["DispatchCallbackController", "LayeringEndpoint"],
             run.Result.Types
                 .Where(t => t.Kind == "ApiBoundary" && t.FanIn >= run.Options.MinCohort)
-                .Select(t => t.Name));
+                .Select(t => t.Name)
+                .Order(StringComparer.Ordinal));
 
         // And it is inert everywhere else, so the plant adds one claim rather than a cluster of
         // them. Each of these is a gate it deliberately fails.
@@ -579,66 +584,147 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
-    /// The roll-call collapse has no case, and closing <c>DEFECTS.md</c> §11 is what took it away.
+    /// The roll-call collapse fires, and it fires for the pattern rather than for the pair.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>A trade, made deliberately and recorded rather than discovered.</b> Under the probe's
-    /// kind-signature grouping all six spanning types were one pattern, so the collapse branch was
-    /// the only one the fixture exercised and the per-type detail branch had none — the opposite
-    /// of what <c>TECHREQ-job-b.md</c> §3.1 and §5 both claim, and the golden settles it. Core
-    /// groups on the named dependencies instead, which is §11's repair, and the largest group
-    /// falls to four against a threshold of five. Now the detail branch is covered and the
-    /// collapse is not.
+    /// <b>This branch was owed from the moment <c>DEFECTS.md</c> §11 closed.</b> Under the probe's
+    /// kind-signature grouping all six spanning types were one pattern, so the collapsed line was
+    /// the only branch the fixture exercised and the per-type detail branch had none — the opposite
+    /// of what <c>TECHREQ-job-b.md</c> §3.1 and §5 both claimed, and the golden settled it. Core
+    /// groups on the named dependencies instead, the largest group fell to four against a
+    /// threshold of five, and the branches traded places. R1 then rendered the collapse from the
+    /// qualifier, so it was written, unreachable and held by nothing until <c>TASKS.md</c> P6.
     /// </para>
     /// <para>
-    /// <b>The collapse is the better branch to owe.</b> It removes detail from a finding whose
-    /// detail §3.1 calls the finding, so an uncovered collapse risks output that says too much,
-    /// while an uncovered detail branch risked the headline finding rendering as one sentence
-    /// about controllers — which is what it did.
+    /// <b>The plant is <c>TestBed.Core.Layering</c>, and it is one construction answering two
+    /// questions.</b> Eight types reach the identical three components — one per significant kind,
+    /// all three new, because eight shared dependents would otherwise be eight new inbound edges
+    /// on types that already exist. Six of them are <c>Internal</c> and are the group of six the
+    /// threshold needs. The other two are <c>ApiBoundary</c> and differ from the six in nothing
+    /// else, which is what makes the type's own role the whole of the difference between a
+    /// partition of 6 + 2 and one group of 8.
     /// </para>
     /// <para>
-    /// The plant is two types with identical dependency sets and different architectural roles for
-    /// the key, and six sharing one dependency set for the threshold. <c>TASKS.md</c> P6 owes
-    /// both. Until then <c>Qualifiers.PartOfALayeringPattern</c> can be pinned to
-    /// <see langword="false"/>, and the pattern key can ignore a type's own role, with the whole
-    /// suite green.
+    /// The two halves interlock: with the role in the key the six collapse and the pair keeps its
+    /// detail; without it all eight collapse and the pair loses detail it is entitled to. That is
+    /// §11's failure one level down — a collapse absorbing something that is not an instance of
+    /// the pattern — which is why the pair is the control rather than a second plant.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_roll_call_collapse_has_no_case_under_the_named_dependency_grouping()
+    public void The_roll_call_collapse_fires_for_the_pattern_and_spares_the_pair()
     {
         var policy = core.Model.Policy;
         var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
 
-        // Nothing collapses, so the qualifier is a constant on this fixture.
-        Assert.All(findings, f => Assert.False(f.Holds(Qualifiers.PartOfALayeringPattern)));
+        string Name(Finding finding) => core.Model.Find(finding.Subject)!.Name;
 
-        // And it is not close: the largest pattern is one short of the threshold, so the plant
-        // needs two more members rather than a tuning change.
-        var largest = findings.Max(f => f.ValueOf("PatternGroupSize")!.Value);
-        Assert.Equal(4, largest);
-        Assert.True(largest <= policy.RollCallThreshold);
+        // The six that are a pattern, named rather than counted: a count would still pass if the
+        // collapse started taking the wrong six.
+        Assert.Equal(
+            ["EgressConduit", "IntakeConduit", "MirrorConduit", "RelayConduit", "ReplayConduit", "SyncConduit"],
+            findings
+                .Where(f => f.Holds(Qualifiers.PartOfALayeringPattern))
+                .Select(Name)
+                .Order(StringComparer.Ordinal));
 
-        // The other half the fixture cannot see: no two subjects share a dependency set while
-        // differing in their own role, so whether the role belongs in the pattern key is
-        // undecidable here. Grouping on dependencies alone gives the identical partition.
-        var withRole = findings
-            .GroupBy(f => string.Join(
-                "|",
-                new[] { core.Model.Find(f.Subject)!.Classification.Kind }
-                    .Concat(f.Participants.Select(p => p.Canonical))),
-                StringComparer.Ordinal)
-            .Count();
-        var withoutRole = findings
-            .GroupBy(f => string.Join("|", f.Participants.Select(p => p.Canonical)), StringComparer.Ordinal)
-            .Count();
+        // The pair reaches the same three components and keeps its detail, because its group has
+        // two members. Both halves asserted — that they are in a group of two, and that the group
+        // being small is what spares them.
+        var pair = findings.Where(f => Name(f).StartsWith("Public", StringComparison.Ordinal)).ToList();
+        Assert.Equal(2, pair.Count);
+        Assert.All(pair, f => Assert.False(f.Holds(Qualifiers.PartOfALayeringPattern)));
+        Assert.All(pair, f => Assert.Equal(2, f.ValueOf("PatternGroupSize")));
 
-        Assert.Equal(withRole, withoutRole);
+        // Six against a threshold of five, which is the smallest group that fires it.
+        Assert.Equal(6, findings.Max(f => f.ValueOf("PatternGroupSize")!.Value));
+        Assert.Equal(5, policy.RollCallThreshold);
     }
 
     /// <summary>
-    /// Coverage's two global gates: one is half-observed, the other is dead.
+    /// The collapse threshold now decides in both directions, which is what a nudge asks.
+    /// </summary>
+    /// <remarks>
+    /// The leave-one-out question — does the condition discriminate — was already answered, since
+    /// deleting the qualifier changes every spanning type's rendering. The nudge is the other
+    /// question, and before P6 it had no answer at all: with nothing collapsing, the threshold
+    /// could be moved anywhere without moving output. It is asserted here from both sides,
+    /// because a gate observable in one direction only is half a gate — <c>docs/TESTING.md</c> §6
+    /// carries two of those and they are the reason this suite distinguishes them.
+    /// </remarks>
+    [Fact]
+    public void The_roll_call_threshold_decides_in_both_directions()
+    {
+        // Loosening it: a divisor of 2 puts the threshold at 7, above the group of six, and the
+        // pattern stops collapsing.
+        Assert.Empty(CollapsedUnder(core.Model.Policy with { RollCallDivisor = 2 }));
+
+        // Tightening it: a divisor of 4 puts the threshold at 3, and the four boilerplate
+        // controllers — a pattern of four that keeps its detail today — collapse as well.
+        Assert.Equal(
+            ["DocumentController", "EgressConduit", "IntakeConduit", "MirrorConduit", "QuoteController",
+             "RateController", "RelayConduit", "ReplayConduit", "SyncConduit", "TrackingController"],
+            CollapsedUnder(core.Model.Policy with { RollCallDivisor = 4 }));
+    }
+
+    /// <summary>
+    /// A type's own architectural role is part of what makes two spanning types one finding.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Recorded as undecidable until P6: no two spanning subjects shared a dependency set while
+    /// differing in their role, so grouping on dependencies alone gave the identical partition and
+    /// the role could be dropped from the key with the suite green. It cannot now.
+    /// </para>
+    /// <para>
+    /// The consequence is named rather than counted, because a partition count moving is not the
+    /// point. Dropping the role merges the <c>ApiBoundary</c> pair into the group of six, taking
+    /// it to eight — so two components that receive calls from outside the solution would be
+    /// reported as two more instances of an internal relay pattern, and lose the per-kind detail
+    /// §3.1 calls the finding.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_types_own_role_is_part_of_the_pattern_key()
+    {
+        var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
+
+        IEnumerable<IGrouping<string, Finding>> GroupBy(Func<Finding, IEnumerable<string>> key) =>
+            findings.GroupBy(f => string.Join("|", key(f)), StringComparer.Ordinal);
+
+        var dependencies = GroupBy(f => f.Participants.Select(p => p.Canonical)).ToList();
+        var withRole = GroupBy(f => new[] { core.Model.Find(f.Subject)!.Classification.Kind }
+            .Concat(f.Participants.Select(p => p.Canonical))).ToList();
+
+        // The partitions differ, which is the whole of what was undecidable before.
+        Assert.NotEqual(dependencies.Count, withRole.Count);
+
+        // And this is the group that differs: on dependencies alone the pair joins the six.
+        var merged = dependencies.Single(g => g.Count() == 8);
+        Assert.Equal(2, merged.Count(f => core.Model.Find(f.Subject)!.Classification.Kind == TypeKinds.ApiBoundary));
+
+        // Eight is past the threshold, so the pair would not merely be regrouped — it would be
+        // collapsed, which is the detail loss the key exists to prevent.
+        Assert.True(merged.Count() > core.Model.Policy.RollCallThreshold);
+    }
+
+    /// <summary>The subjects whose layer-span detail collapses under a given policy.</summary>
+    private static List<string> CollapsedUnder(AnalysisPolicy policy)
+    {
+        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        return Analysis.FindingsFor(model)
+            .OfKind(FindingKind.SpansArchitecturalLayers)
+            .Where(f => f.Holds(Qualifiers.PartOfALayeringPattern))
+            .Select(f => model.Find(f.Subject)!.Name)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Coverage's two global gates: one is observed since P6, the other is still dead.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -647,26 +733,34 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     /// little branching (<c>SESSION-NOTES.md</c> #8), and on this fixture no below-floor type
     /// clears the percentile while failing the floor — so removing it changes no output. The plant
     /// it needs is a peerless type with cc 1 sitting high on the solution-wide complexity
-    /// percentile, which takes a codebase flatter than this one.
+    /// percentile, which takes a codebase flatter than this one. Still owed.
     /// </para>
     /// <para>
-    /// <b><c>GlobalFanInPercentile</c> is observable in one direction only.</b> Not one of the
-    /// thirteen reaches the 90th percentile by fan-in solution-wide, so raising it changes
-    /// nothing; the assertion below is what stops it being <i>lowered</i> silently, which is worth
-    /// having but is half a gate. This is close to structural rather than accidental — a type with
-    /// no peer group usually has few callers — so the plant has to be deliberate: a lone component
-    /// that much of the system depends on, which is exactly the case §3.11 exists for and the one
-    /// the fixture has never had.
+    /// <b><c>GlobalFanInPercentile</c> was observable in one direction only, and P6 closed it.</b>
+    /// The record said the plant would have to be deliberate — <i>a lone component that much of
+    /// the system depends on</i>, close to structural because a type with no peer group usually
+    /// has few callers — and predicted it would never arrive by accident. It arrived by accident.
+    /// P6's three shared dependency targets each carry fan-in 8 and each land in a cohort too
+    /// small to compare against, which is that description exactly.
+    /// </para>
+    /// <para>
+    /// <b>Worth being uneasy about, and recorded rather than celebrated.</b> The case is a
+    /// by-product of a plant built for layer span, so nothing about it is load-bearing for P6 and
+    /// a future reshape of the conduits would retire it without anything saying so. That is why
+    /// <c>FindingEquivalenceTests</c> names the three types rather than counting them.
     /// </para>
     /// </remarks>
     [Fact]
-    public void Coverages_global_gates_are_one_dead_and_one_half_observed()
+    public void Coverages_global_gates_are_one_observed_and_one_dead()
     {
         var policy = core.Model.Policy;
         var coverage = Analysis.FindingsFor(core.Model).OfKind(FindingKind.Coverage);
 
-        // Nothing is near the fan-in bar, so only the loosening direction can be caught.
-        Assert.DoesNotContain(coverage, f => f.ValueOf("GlobalFanInPctl") >= policy.GlobalFanInPercentile);
+        // P6 closed the fan-in half. Three of its types clear the percentile, so raising the bar
+        // now moves output as well as lowering it — see the remarks.
+        Assert.Equal(
+            3,
+            coverage.Count(f => f.ValueOf("GlobalFanInPctl") >= policy.GlobalFanInPercentile));
 
         // And nothing clears the complexity percentile while failing the floor, which is the only
         // configuration in which the floor decides anything.

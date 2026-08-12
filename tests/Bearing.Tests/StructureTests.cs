@@ -33,18 +33,22 @@ public sealed class StructureTests(FixtureRun run)
     [Fact]
     public void Fixture_shape_is_stable()
     {
-        // 132 rows, not 133: the two TestBed.Shared.PayloadTag declarations are one row, because
+        // 144 rows, not 145: the two TestBed.Shared.PayloadTag declarations are one row, because
         // the probe keys type identity on name alone. That is the planted defect, pinned in
-        // KnownDefectTests. This count is the probe's and stays 132 — Core already keys on
-        // (assembly, FQN) and reports 133; WalkerEquivalenceTests asserts the difference.
+        // KnownDefectTests. This count is the probe's and stays one behind Core — Core already
+        // keys on (assembly, FQN) and reports 145; WalkerEquivalenceTests asserts the difference.
         //
         // NormalizerScenarios is absent, and correctly so — it lives in Core.Tests, which is
         // skipped.
-        Assert.Equal(132, run.Result.Types.Count);
-        Assert.Equal(290, run.Result.Edges.Count);
+        //
+        // P6 moved all three: twelve types (the eight *Conduit types, their three shared
+        // dependency targets and RouteAttribute) and twenty-seven edges — 8 × 3 dependency
+        // fields, plus the three [Route] usages, which are references like any other.
+        Assert.Equal(144, run.Result.Types.Count);
+        Assert.Equal(317, run.Result.Edges.Count);
         // Methods are counted per declaration, so unlike Types this is not distorted by the
         // planted collision: Describe, Score and Weight are all three present.
-        Assert.Equal(138, run.Result.Methods.Count);
+        Assert.Equal(149, run.Result.Methods.Count);
     }
 
     // ---- Generated code exclusion -------------------------------------------------

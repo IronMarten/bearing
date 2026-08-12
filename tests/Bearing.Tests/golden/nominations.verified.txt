@@ -35,17 +35,18 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    NormalizationContext — 20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
    RawResponse — 19 internal callers depend on this contract (3 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
    NormalizedResponse — 15 internal callers depend on this contract (5 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
+   LayeringEndpoint — 8 internal callers depend on this contract (5 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (ApiBoundary)
    DispatchCallbackController — 5 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (ApiBoundary)
    ModelDescription — 5 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this probe. (Contract)
 
 -- BOUNDARY: HERE BE DRAGONS -----------------------------------
-   15 external contact point(s): 13 inbound API, 2 outbound. Consumer impact of
+   19 external contact point(s): 16 inbound API, 3 outbound. Consumer impact of
    changes at ANY of these is outside what static analysis can see.
 
    INTEGRATION MAP — external systems, by how many types touch them:
-     System.Data                                2 types
-     System.Net.Http                            2 types
-     (21 language/runtime references omitted as plumbing)
+     System.Data                                3 types
+     System.Net.Http                            3 types
+     (22 language/runtime references omitted as plumbing)
 
    BOUNDARIES CARRYING REAL LOGIC — decisions made at the edge:
      ShipmentController — Post is cc 12. Business decisions at an external edge are the hardest kind to change later.
@@ -84,8 +85,8 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
 -- SPANS ARCHITECTURAL LAYERS (no cohort required) -------------
    (dependencies reaching across 3+ architectural kinds — cross-cutting
     work, whatever the component is named)
-   6 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern rather than an
-     anomaly. Examples: QuoteController, AuthenticationMiddleware, DocumentController, PolicyBridge, ...
+   14 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern rather than an
+     anomaly. Examples: QuoteController, AuthenticationMiddleware, DocumentController, EgressConduit, ...
 
 -- CIRCULAR REFERENCES -----------------------------------------
    NAMESPACE CYCLES — mutually dependent namespaces cannot be layered,
@@ -105,7 +106,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.05, D 0.95  (Ca 2 depend on it, Ce 0 reach out, 6/128 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.04, D 0.96  (Ca 2 depend on it, Ce 0 reach out, 6/140 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -117,7 +118,7 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      appears here. Verify before deleting.
 
 -- NO PEER GROUP -----------------------------------------------
-   13 of 132 types (9.8%) sit in cohorts below --min-cohort (5).
+   17 of 144 types (11.8%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these. They are absent from the
    nominations above and from prediction-sheet.csv, and their Pctl/XMedian
    columns are blank where a cohort of one made them meaningless.
@@ -125,12 +126,19 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    Extreme against the WHOLE SOLUTION despite having no peer group.
    Weaker evidence — this compares unlike things — but not nothing:
      OrderRepository [DataAccess] — top 2% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
-     PayloadTag [Internal] — top 5% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
-     RoutingDepot [Internal] — top 8% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
+     PayloadTag [Internal] — top 4% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
+     LayeringArchive [DataAccess] — top 6% by fan-in (8 callers), solution-wide. (no cohort to compare against)
+     LayeringBeacon [ExternalCall] — top 6% by fan-in (8 callers), solution-wide. (no cohort to compare against)
+     LayeringEndpoint [ApiBoundary] — top 6% by fan-in (8 callers), solution-wide. (no cohort to compare against)
+     RoutingDepot [Internal] — top 7% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
+     LayeringArchive — fan-in 8, cc 2, cohort 'Layering' (size 3)
+     LayeringBeacon — fan-in 8, cc 2, cohort 'Layering' (size 3)
+     LayeringEndpoint — fan-in 8, cc 1, cohort 'ApiBoundary' (size 1)
      DispatchCounter — fan-in 5, cc 2, cohort 'Dispatch' (size 2)
      DispatchRegistry — fan-in 5, cc 1, cohort 'Dispatch' (size 2)
+     RouteAttribute — fan-in 3, cc 0, cohort 'Layering' (size 3)
      LabelDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
      ManifestDepot — fan-in 1, cc 1, cohort 'Depot' (size 3)
      RoutingDepot — fan-in 1, cc 12, cohort 'Depot' (size 3)
@@ -138,10 +146,8 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      PricingVault — fan-in 1, cc 8, cohort 'Vault' (size 3)
      SessionVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
      TokenVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
-     OrderRepository — fan-in 0, cc 19, cohort 'Repository' (size 2)
-     RateRepository — fan-in 0, cc 2, cohort 'Repository' (size 2)
-     PayloadTag — fan-in 0, cc 16, cohort 'Tag' (size 1)
-     PayloadAuditor — fan-in 0, cc 4, cohort 'Auditor' (size 1)
+     OrderRepository — fan-in 0, cc 19, cohort 'DataAccess' (size 1)
+     RateRepository — fan-in 0, cc 2, cohort 'Repository' (size 1)
 
    NOTE: a type with no peers still has its own METHODS as a cohort —
    check methods.csv for it. And its real comparison is its own history,
