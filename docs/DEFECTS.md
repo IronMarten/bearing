@@ -202,26 +202,46 @@ cohort of 5–9**, whatever its members look like, while `--min-cohort` admits 5
 Arithmetic, not tuning. Needs its own answer rather than falling out of defect 2's
 absolute-to-percentile conversion, because that conversion runs *toward* this hazard.
 
-**Decided (Aug 2026): a proportional rank test replaces the percentile gate**, as blast radius
-ports into Core. `rank <= max(1, ceil(blastTopFraction × cohortSize))` by fan-in, descending,
-with `blastTopFraction` defaulting to 0.05 — one of the thirteen previously unnamed gates, now
-a policy value.
+**Fixed in Core (Aug 2026): a midrank *position* replaces the percentile threshold.** Blast
+radius gates on `rank <= max(1, blastTopFraction × n + 0.5)`, `blastTopFraction` defaulting to
+0.05 — `Distribution.RankOf` and `Distribution.TopRankLimit`. The probe is unchanged and still
+carries the defect; it is the oracle, not the product.
 
-Two things this gets right that the obvious alternatives do not. **It keeps the proportion.**
-`FanInPctl >= 95` is structurally the top 5% of each cohort, and that self-limiting property is
-why blast radius held at 1.0% and 0.9% of types across two unrelated real solutions where the
-absolute-gated findings did not — a flat `rank <= 1` is satisfiable everywhere and discards the
-one behaviour worth keeping. **And `max(1, …)` is what actually closes this defect:** at n=9,
-`ceil(0.05 × 9) = 1`, so the cohort maximum qualifies where the percentile gate admitted nobody.
+**This is the same gate, not a retune.** Midrank position and midrank percentile are one
+statistic — `rank = n(100 − pctl)/100 + 0.5` identically, for every value and every tie
+configuration — so substituting it into `pctl >= 95` gives `rank <= 0.05n + 0.5` exactly. The
+`+ 0.5` is the midrank offset, not a fudge factor. **Core therefore admits precisely what the
+probe admits in every cohort of ten or more**, which is why no golden moved and why
+`FindingEquivalenceTests` agrees on the fixture.
+
+`Math.Max(1, …)` is the entire repair. Below n = 10 the percentile form yields a limit under 1,
+which no rank can satisfy; flooring it at 1 admits the cohort maximum and nothing else. A
+two-way tie for that maximum ranks 1.5 and is still refused — the top of a small group is one
+type or it is nobody.
+
+**Why not a fixed rank.** `rank <= 1` is reachable everywhere and would have been simpler, and
+it discards the property worth keeping: a percentile-within-cohort gate self-limits by
+construction, which is why blast radius held at 1.0% and 0.9% of types across two unrelated real
+solutions while the absolute-gated findings ran to 4–7%. Midrank also matters for the same
+reason — under competition ranking (`1 + strictly-greater`) forty types tied at the cohort
+maximum all rank 1 and clear any top fraction, which is defect 3's eight normalizers arriving by
+a different door. Pinned: `A_mass_tie_at_the_maximum_is_not_the_top_of_anything`.
 
 The absolute floor `FanIn >= minFanIn` is unchanged and is what stops a rank test crowning the
-tallest member of a cohort where nothing is tall — defect 3, and invariant 1's canonical case.
+tallest member of a cohort where nothing is tall — invariant 1's canonical case.
 
-Pinned: `Blast_radius_is_unreachable_in_a_cohort_below_ten`. **The pin inverts when the port
-lands** — it currently asserts the defect, and must become an assertion that a cohort of nine
-*can* nominate. Changing it is a golden-affecting change under `CONTRIBUTING.md`; the fixture
-plant that makes it observable is owed either way, since blast radius nominates nothing on
-TestBed today.
+Pinned: `Blast_radius_is_unreachable_in_a_cohort_below_ten` **stays as written** — it is a
+statement about the oracle, which still has the defect. Core's side is
+`The_top_rank_limit_never_drops_below_one`,
+`A_cohort_of_nine_can_reach_the_top_rank_but_a_tie_for_it_cannot` and
+`Rank_is_the_percentile_from_the_other_end`.
+
+**The fix is not observed on the fixture, and that is recorded rather than assumed.** TestBed's
+stranded cohorts contain types that now clear the rank gate — `NormalizationContext` at rank 1
+of eight, `RawResponse` at rank 2 — and every one of them fails blast radius on complexity
+instead. So `Math.Max` can be deleted with the fixture green; only the `Distribution` tests catch
+it. A plant is owed, alongside four other blast-radius and load-bearing gates in the same
+position: `FixtureCoverageTests.The_new_findings_have_gates_the_fixture_cannot_observe`.
 
 ### 15. Breaks-alone's concealed-decision suppression is type-level only
 

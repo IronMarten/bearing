@@ -120,15 +120,28 @@ public sealed record AnalysisPolicy
     public double BlastFanInMultiple { get; init; } = 2.0;
 
     /// <summary>
-    /// Fan-in percentile within the cohort for blast radius.
+    /// The share of a cohort, by fan-in, that counts as "the top" for blast radius.
     /// </summary>
     /// <remarks>
-    /// Midrank percentiles cap a unique maximum at <c>(n-0.5)/n·100</c>, so this value is
-    /// <b>unsatisfiable in any cohort smaller than ten</b> while <see cref="MinCohort"/> admits
-    /// five. See <c>docs/DEFECTS.md</c> §14 — the gate is unreachable by arithmetic rather than
-    /// by tuning, and lowering it is not obviously the right fix.
+    /// <para>
+    /// Replaces the probe's <c>FanInPctl &gt;= 95</c>, which was <b>unsatisfiable in any cohort
+    /// smaller than ten</b> while <see cref="MinCohort"/> admitted five — a gate unreachable by
+    /// arithmetic rather than by tuning. <c>docs/DEFECTS.md</c> §14.
+    /// </para>
+    /// <para>
+    /// <b>It stays a fraction rather than becoming a count</b>, and that is the part worth
+    /// defending. A percentile-within-cohort gate self-limits by construction: blast radius
+    /// nominated 1.0% and 0.9% of types on two unrelated real solutions, holding steady where
+    /// the absolute-gated findings ran to 4–7% of everything. That stability is the finding's
+    /// best evidence. A fixed "top N per cohort" would be reachable at every size and would
+    /// throw it away — starving on large cohorts and saturating on small ones.
+    /// </para>
+    /// <para>
+    /// Read through <see cref="Distribution.TopRankLimit"/>, which is where the floor of 1 that
+    /// actually repairs the defect lives.
+    /// </para>
     /// </remarks>
-    public double BlastFanInPercentile { get; init; } = 95;
+    public double BlastTopFraction { get; init; } = 0.05;
 
     /// <summary>Complexity percentile within the cohort for blast radius.</summary>
     public double BlastComplexityPercentile { get; init; } = 70;
@@ -225,7 +238,7 @@ public sealed record AnalysisPolicy
         (nameof(ConcealedFanInCeiling), ConcealedFanInCeiling),
         (nameof(ConcealedFanOutCeiling), ConcealedFanOutCeiling),
         (nameof(BlastFanInMultiple), BlastFanInMultiple),
-        (nameof(BlastFanInPercentile), BlastFanInPercentile),
+        (nameof(BlastTopFraction), BlastTopFraction),
         (nameof(BlastComplexityPercentile), BlastComplexityPercentile),
         (nameof(RollCallDivisor), RollCallDivisor),
         (nameof(SurfaceOutlierMultiple), SurfaceOutlierMultiple),
@@ -276,7 +289,6 @@ public sealed record AnalysisPolicy
 
         foreach (var (name, value) in new (string, double)[]
                  {
-                     (nameof(BlastFanInPercentile), BlastFanInPercentile),
                      (nameof(BlastComplexityPercentile), BlastComplexityPercentile),
                      (nameof(GlobalFanInPercentile), GlobalFanInPercentile),
                      (nameof(GlobalComplexityPercentile), GlobalComplexityPercentile),
@@ -285,6 +297,13 @@ public sealed record AnalysisPolicy
             if (value > 100)
                 throw new ArgumentOutOfRangeException(name, value, $"{name} is a percentile and must be within 0..100.");
         }
+
+        // A share of a cohort, so 1.0 means "all of it" and anything above is not a share. The
+        // upper bound matters more than it looks: this gate is the only thing keeping blast
+        // radius self-limiting, and a fraction of 2 would silently turn it into a roll-call of
+        // every type clearing the other three conditions.
+        if (BlastTopFraction > 1)
+            throw new ArgumentOutOfRangeException(nameof(BlastTopFraction), BlastTopFraction, "BlastTopFraction is a share of a cohort and must be within 0..1.");
 
         if (RollCallDivisor < 1)
             throw new ArgumentOutOfRangeException(nameof(RollCallDivisor), RollCallDivisor, "RollCallDivisor must be at least 1.");

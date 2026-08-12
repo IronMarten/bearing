@@ -117,4 +117,98 @@ public sealed class DistributionTests
         Assert.Equal(100.0, d.PercentileOf(99));
         Assert.Equal(0.0, d.PercentileOf(-1));
     }
+
+    // ------------------------------------------------------------ rank, and defect 14 ----
+
+    /// <summary>
+    /// Rank and percentile are one statistic, so a gate on either admits the same set.
+    /// </summary>
+    /// <remarks>
+    /// <c>rank = n·(100 − pctl)/100 + 0.5</c> is an identity, not an approximation, and it is
+    /// what lets <c>docs/DEFECTS.md</c> §14 be repaired without moving a golden: at
+    /// <c>fraction = 0.05</c> the rank gate admits exactly what <c>FanInPctl &gt;= 95</c>
+    /// admitted, in every cohort where that gate was satisfiable at all. If this ever fails, the
+    /// repair has quietly become a retune.
+    /// </remarks>
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(5)]
+    [InlineData(9)]
+    [InlineData(10)]
+    [InlineData(28)]
+    [InlineData(100)]
+    public void Rank_is_the_percentile_from_the_other_end(int count)
+    {
+        // Heavy ties on purpose: the identity has to hold for fractional ranks, which is where
+        // an off-by-a-half in either direction would otherwise hide.
+        var values = Enumerable.Range(0, count).Select(i => (double)(i % 3)).ToArray();
+        var d = Distribution.Of(values);
+
+        foreach (var v in values.Distinct())
+            Assert.Equal(
+                (count * (100 - d.PercentileOf(v)) / 100) + 0.5,
+                d.RankOf(v),
+                precision: 9);
+    }
+
+    /// <summary>
+    /// The floor of 1 is the whole of the defect 14 repair, and only cohorts below ten feel it.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is where the fix is observed.</b> Nothing on TestBed exercises it — the cohorts of
+    /// five to nine that the percentile gate stranded all fail blast radius on complexity or on
+    /// the fan-in multiple instead, so <c>Math.Max</c> could be deleted and the fixture would
+    /// stay green. Recorded in <c>FixtureCoverageTests</c> as a plant still owed.
+    /// </remarks>
+    [Theory]
+    [InlineData(5, 1.0)]     // percentile form gives 0.75 — no rank can satisfy it
+    [InlineData(9, 1.0)]     // 0.95, the last stranded size
+    [InlineData(10, 1.0)]    // 1.0 exactly: the first size that never needed the floor
+    [InlineData(28, 1.9)]
+    [InlineData(100, 5.5)]
+    public void The_top_rank_limit_never_drops_below_one(int count, double expected)
+    {
+        var d = Distribution.Of(Enumerable.Range(1, count).Select(i => (double)i));
+
+        Assert.Equal(expected, d.TopRankLimit(0.05), precision: 9);
+    }
+
+    /// <summary>
+    /// A cohort of nine can now nominate its maximum, and a tie for that maximum still cannot.
+    /// </summary>
+    /// <remarks>
+    /// The defect stated as behaviour rather than as arithmetic. The second half matters as much
+    /// as the first: the repair was not meant to make the gate generous, only reachable, and "the
+    /// top" of a small group is one type or it is nobody.
+    /// </remarks>
+    [Fact]
+    public void A_cohort_of_nine_can_reach_the_top_rank_but_a_tie_for_it_cannot()
+    {
+        var unique = Distribution.Of([1, 1, 1, 1, 1, 1, 1, 1, 9]);
+        Assert.True(unique.RankOf(9) <= unique.TopRankLimit(0.05));
+        Assert.True(unique.PercentileOf(9) < 95, "the gate this replaced admitted nobody here");
+
+        var tied = Distribution.Of([1, 1, 1, 1, 1, 1, 1, 9, 9]);
+        Assert.False(tied.RankOf(9) <= tied.TopRankLimit(0.05));
+    }
+
+    /// <summary>
+    /// Ties keep a rank gate from becoming the roll-call a naive "top N" would be.
+    /// </summary>
+    /// <remarks>
+    /// Invariant 2, and the reason <see cref="Reading.Rank"/> is midrank rather than competition
+    /// ranking. Forty types tied at the cohort maximum are one fact about the codebase, not forty
+    /// findings — and under <c>1 + strictly-greater</c> all forty would rank 1 and clear any top
+    /// fraction. This is defect 3's eight normalizers arriving by a different door.
+    /// </remarks>
+    [Fact]
+    public void A_mass_tie_at_the_maximum_is_not_the_top_of_anything()
+    {
+        var d = Distribution.Of(
+            Enumerable.Repeat(1.0, 60).Concat(Enumerable.Repeat(50.0, 40)).ToArray());
+
+        Assert.Equal(20.5, d.RankOf(50));
+        Assert.True(d.RankOf(50) > d.TopRankLimit(0.05));
+    }
 }

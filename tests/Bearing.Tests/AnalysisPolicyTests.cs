@@ -25,7 +25,10 @@ public sealed class AnalysisPolicyTests
         "ConcealedFanInCeiling",
         "ConcealedFanOutCeiling",
         "BlastFanInMultiple",
-        "BlastFanInPercentile",
+        // Named as BlastFanInPercentile when the thirteen were catalogued; renamed when
+        // docs/DEFECTS.md §14 was decided, because the gate it names is no longer a percentile.
+        // The literal it replaced is still one of the thirteen.
+        "BlastTopFraction",
         "BlastComplexityPercentile",
         "IsolatedThreshold",
         "BreaksAloneMinFanIn",
@@ -77,7 +80,7 @@ public sealed class AnalysisPolicyTests
         Assert.Equal(2.0, p.ConcealedFanInCeiling);              // FanInXMedian <= 2.0
         Assert.Equal(2.0, p.ConcealedFanOutCeiling);             // FanOutXMedian <= 2.0
         Assert.Equal(2.0, p.BlastFanInMultiple);                 // FanInXMedian >= 2.0
-        Assert.Equal(95, p.BlastFanInPercentile);                // FanInPctl >= 95
+        Assert.Equal(0.05, p.BlastTopFraction);                  // was FanInPctl >= 95; §14
         Assert.Equal(70, p.BlastComplexityPercentile);           // CyclomaticPctl >= 70
         Assert.Equal(0.8, p.IsolatedThreshold);                  // Instability >= 0.8
         Assert.Equal(1, p.BreaksAloneMinFanIn);                  // FanIn >= 1
@@ -148,7 +151,10 @@ public sealed class AnalysisPolicyTests
 
     public static TheoryData<AnalysisPolicy> InvalidPolicies =>
     [
-        AnalysisPolicy.Default with { BlastFanInPercentile = 101 },
+        AnalysisPolicy.Default with { BlastComplexityPercentile = 101 },
+        // A share of a cohort, so above 1 is not a share. It is also the value that keeps blast
+        // radius self-limiting, and 2 would quietly make it a roll-call.
+        AnalysisPolicy.Default with { BlastTopFraction = 1.5 },
         AnalysisPolicy.Default with { GlobalComplexityPercentile = -1 },
         AnalysisPolicy.Default with { RollCallDivisor = 0 },
         AnalysisPolicy.Default with { SurfaceDiscriminationDivisor = 0 },

@@ -13,16 +13,36 @@ namespace IronMarten.Bearing;
 /// </remarks>
 public readonly record struct Reading
 {
-    internal Reading(double percentile, double timesMedian)
+    internal Reading(double percentile, double timesMedian, double rank)
     {
         Percentile = percentile;
         TimesMedian = timesMedian;
+        Rank = rank;
     }
 
     /// <summary>
     /// Midrank percentile: strictly-below plus half the ties, in 0..100.
     /// </summary>
     public double Percentile { get; }
+
+    /// <summary>
+    /// Midrank position counting from the top: 1 for a unique maximum, and fractional when
+    /// values tie.
+    /// </summary>
+    /// <remarks>
+    /// <b>The same statistic as <see cref="Percentile"/>, expressed from the other end</b> —
+    /// <c>rank = count·(100 − percentile)/100 + 0.5</c> exactly, for every tie configuration.
+    /// It exists because a threshold on it can be made reachable and a threshold on the
+    /// percentile cannot: see <see cref="Distribution.TopRankLimit"/> and
+    /// <c>docs/DEFECTS.md</c> §14.
+    /// <para>
+    /// Fractional ranks are the tie behaviour, not a rounding artefact, and they are what stops
+    /// a rank gate degenerating into a roll-call. Forty types tied at the cohort maximum sit at
+    /// rank 20.5, not rank 1 — so "top 5%" excludes them, which is the same protection midrank
+    /// percentile gives and the reason defect 3's eight normalizers are not eight findings.
+    /// </para>
+    /// </remarks>
+    public double Rank { get; }
 
     /// <summary>
     /// The value as a multiple of the peer median.
@@ -101,7 +121,55 @@ public sealed class Distribution
     /// archived group.
     /// </remarks>
     public Reading? Read(double value) =>
-        IsComparable ? new Reading(PercentileOf(value), TimesMedianOf(value)) : null;
+        IsComparable
+            ? new Reading(PercentileOf(value), TimesMedianOf(value), RankOf(value))
+            : null;
+
+    /// <summary>
+    /// Midrank position from the top: strictly-above, plus half the ties, plus a half.
+    /// </summary>
+    /// <remarks>
+    /// The half at the end is what makes a unique maximum rank 1 rather than 0, and it is the
+    /// same offset midrank percentile carries at the other end. See <see cref="Reading.Rank"/>
+    /// for the identity between the two.
+    /// </remarks>
+    public double RankOf(double value)
+    {
+        if (_sorted.Length == 0) return 0;
+
+        var above = 0;
+        var equal = 0;
+        foreach (var x in _sorted)
+        {
+            if (x > value) above++;
+            else if (x == value) equal++;
+        }
+
+        return above + (0.5 * equal) + 0.5;
+    }
+
+    /// <summary>
+    /// The largest <see cref="Reading.Rank"/> still inside the top <paramref name="fraction"/> of
+    /// this group — <b>never smaller than 1</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>fraction·n + 0.5</c> is not an approximation of a percentile threshold, it is one.
+    /// Substituting <c>rank = n − n·pctl/100 + 0.5</c> into <c>pctl ≥ p</c> gives
+    /// <c>rank ≤ n(100−p)/100 + 0.5</c> identically, for every value and every tie
+    /// configuration. So at <c>fraction = 0.05</c> this admits exactly what
+    /// <c>FanInPctl &gt;= 95</c> admits — and the probe's goldens cannot move because of it.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Math.Max(double,double)"/> against 1 is the whole of the defect 14 fix.</b>
+    /// Below <c>n = 10</c> the percentile form yields a limit under 1, which no rank can satisfy
+    /// — the gate is unreachable by arithmetic rather than by tuning, whatever the cohort looks
+    /// like. Flooring it at 1 admits the cohort maximum and nothing else, and a two-way tie for
+    /// the maximum ranks 1.5 and is still correctly refused: "the top" of a small group is one
+    /// type or it is nobody.
+    /// </para>
+    /// </remarks>
+    public double TopRankLimit(double fraction) => Math.Max(1, (fraction * _sorted.Length) + 0.5);
 
     /// <summary>
     /// Midrank percentile: strictly-below plus half the ties.
@@ -115,7 +183,8 @@ public sealed class Distribution
     /// The consequence is worth knowing before gating on this: a unique maximum tops out at
     /// <c>(n-0.5)/n·100</c>, so a threshold of 95 is unsatisfiable for any group smaller than
     /// ten. See <c>docs/DEFECTS.md</c> §14 — a percentile floor can be unreachable by
-    /// arithmetic rather than by tuning.
+    /// arithmetic rather than by tuning. <b>Gate on <see cref="TopRankLimit"/> instead</b>, which
+    /// says the same thing in a form where the floor is visible and can be raised to 1.
     /// </para>
     /// </remarks>
     public double PercentileOf(double value)
