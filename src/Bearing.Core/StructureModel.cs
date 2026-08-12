@@ -192,6 +192,12 @@ public sealed class TypeNode
     /// <summary>Architectural role, with the evidence that decided it.</summary>
     public TypeClassification Classification { get; internal set; } = TypeClassification.Internal;
 
+    /// <summary>The peer group this type is judged against.</summary>
+    public Cohort Cohort { get; internal set; }
+
+    /// <summary>How many types are in that peer group, this one included.</summary>
+    public int CohortSize { get; internal set; }
+
     /// <summary>Its members.</summary>
     public List<Member> Members { get; } = [];
 

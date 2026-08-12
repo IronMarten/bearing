@@ -226,49 +226,91 @@ public sealed class CohortTests
 }
 
 /// <summary>
-/// Core's candidate derivation against the fixture's actual assignments.
+/// Core's cohort assignment against the probe's, over the whole fixture.
 /// </summary>
 /// <remarks>
-/// Partial equivalence, and deliberately labelled as such. The probe does not expose the
-/// candidates it derived — they are a local in <c>SolutionAnalyzer</c> — so Core's
-/// <see cref="CohortSet"/> cannot yet be fed the same input and compared outcome-for-outcome.
-/// What can be checked now is that Core's derivation reproduces the keys the probe actually
-/// assigned, for every fixture type whose cohort came from a name suffix or a namespace. Full
-/// equivalence lands with Core's walker, which is where the candidates start existing in Core.
+/// <para>
+/// This was partial until Core had a walk of its own — the probe keeps its derived candidates
+/// in a local, so there was no way to feed both halves the same input. Now each side derives
+/// its own candidates from the same solution and the outcome is compared type for type, which
+/// covers the derivation and the assignment together.
+/// </para>
+/// <para>
+/// Cohort assignment is population-sensitive: every type's group depends on how many other
+/// types could join it. So this is a stronger check than it looks — Core assigning one type
+/// differently would usually move several.
+/// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class CohortDerivationEquivalenceTests(FixtureRun run)
+public sealed class CohortEquivalenceTests(CoreWalkFixture core, FixtureRun probe)
 {
+    /// <summary>The planted collision, which Core keeps as two types and the probe merges.</summary>
+    private const string CollidingName = "global::TestBed.Shared.PayloadTag";
+
     [Fact]
-    public void Suffix_cohorts_in_the_fixture_are_reproduced_by_Core()
+    public void Every_type_lands_in_the_same_cohort_as_the_probe_put_it_in()
     {
-        var checked_ = 0;
+        var byName = core.Model.Types
+            .Where(t => t.FullyQualifiedName != CollidingName)
+            .ToDictionary(t => t.FullyQualifiedName, StringComparer.Ordinal);
 
-        foreach (var t in run.Result.Types.Where(t => t.CohortBasis == "name suffix"))
+        var compared = 0;
+        foreach (var p in probe.Result.Types.Where(t => t.Id != CollidingName))
         {
-            var suffix = CohortCandidates.TrailingWord(t.Name, t.TypeKeyword == "Interface");
-
-            Assert.Equal(t.Cohort, "suffix:" + suffix);
-            checked_++;
+            Assert.Equal(p.Cohort, byName[p.Id].Cohort.Key);
+            Assert.Equal(p.CohortBasis, byName[p.Id].Cohort.Basis);
+            compared++;
         }
 
-        Assert.True(checked_ > 0, "the fixture has no suffix-based cohort to check against");
+        Assert.Equal(probe.Result.Types.Count - 1, compared);
     }
 
     [Fact]
-    public void Namespace_cohorts_in_the_fixture_are_reproduced_by_Core()
+    public void Cohort_sizes_match_except_where_the_collision_changes_the_population()
     {
-        var checked_ = 0;
+        var probeSizes = probe.Result.Types
+            .GroupBy(t => t.Cohort, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
 
-        foreach (var t in run.Result.Types.Where(t => t.CohortBasis == "namespace"))
+        var collidedCohorts = core.Model.Types
+            .Where(t => t.FullyQualifiedName == CollidingName)
+            .Select(t => t.Cohort.Key)
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (var type in core.Model.Types.Where(t => !collidedCohorts.Contains(t.Cohort.Key)))
+            Assert.Equal(probeSizes[type.Cohort.Key], type.CohortSize);
+
+        // Where the collision lands, Core has one more member than the probe — it is counting
+        // two declarations the probe folded into one. That is DEFECTS.md §1 reaching the
+        // population every percentile in that cohort is taken against.
+        Assert.NotEmpty(collidedCohorts);
+        foreach (var cohort in collidedCohorts)
+            Assert.Equal(probeSizes[cohort] + 1, core.Model.Types.Count(t => t.Cohort.Key == cohort));
+    }
+
+    [Fact]
+    public void Every_type_has_a_cohort()
+    {
+        Assert.All(core.Model.Types, t =>
         {
-            var candidates = CohortCandidates.For(
-                new TypeShape(t.Name, t.Namespace, t.TypeKeyword == "Interface", [], null));
+            Assert.False(string.IsNullOrEmpty(t.Cohort.Key));
+            Assert.False(string.IsNullOrEmpty(t.Cohort.Basis));
+            Assert.True(t.CohortSize >= 1);
+        });
 
-            Assert.Equal(t.Cohort, candidates[^1].Key);
-            checked_++;
-        }
+        Assert.Equal(core.Model.Types.Count, core.Model.Types.Sum(t => 1));
+    }
 
-        Assert.True(checked_ > 0, "the fixture has no namespace-based cohort to check against");
+    [Fact]
+    public void The_bases_the_fixture_exercises_are_all_reached()
+    {
+        // A basis nothing exercises is a branch no test covers. The fixture was built to reach
+        // all of them; this asserts it still does rather than assuming.
+        var bases = core.Model.Types.Select(t => t.Cohort.Basis).ToHashSet(StringComparer.Ordinal);
+
+        Assert.Contains("interface", bases);
+        Assert.Contains("name suffix", bases);
+        Assert.Contains("namespace", bases);
+        Assert.Contains("architectural kind", bases);
     }
 }

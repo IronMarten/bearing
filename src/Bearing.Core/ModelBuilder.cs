@@ -243,6 +243,13 @@ internal sealed class ModelBuilder
             if (CohortCandidates.ForArchitecturalKind(type.Classification.Kind) is { } kind)
                 _candidates[type.Subject.Canonical].Add(kind);
 
+        var cohorts = CohortSet.Assign(CohortSubjects(), _options.Policy.MinCohort);
+        foreach (var type in _types.Values)
+        {
+            type.Cohort = cohorts[type.Subject.Canonical];
+            type.CohortSize = cohorts.SizeOf(type.Subject.Canonical);
+        }
+
         var edges = _references
             .Select(kv => new Edge(_subjects[kv.Key.From], _subjects[kv.Key.To], kv.Value))
             .OrderBy(e => e.From.Canonical, StringComparer.Ordinal)
@@ -256,8 +263,7 @@ internal sealed class ModelBuilder
         return new SolutionModel(solutionPath, _options.Policy, projects, types, edges, coverage);
     }
 
-    /// <summary>The cohort candidates for every analysed type, for <see cref="CohortSet"/>.</summary>
-    internal IEnumerable<CohortSubject> CohortSubjects() =>
+    private IEnumerable<CohortSubject> CohortSubjects() =>
         _candidates.Select(kv => new CohortSubject(kv.Key, kv.Value));
 
     private IEnumerable<CohortCandidate> CandidatesFor(INamedTypeSymbol type)

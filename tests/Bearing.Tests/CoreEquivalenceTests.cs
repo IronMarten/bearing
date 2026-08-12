@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Text.RegularExpressions;
 using ArchProbe;
 using IronMarten.Bearing;
 
@@ -23,13 +21,13 @@ namespace Bearing.Tests;
 /// the rule living in a renderer — where every other renderer misses it.
 /// </para>
 /// <para>
-/// As Core grows a walker and a model of its own, the adapters at the bottom of this file
-/// shrink and eventually go. Until then they are how Core is fed the probe's analysis without
-/// Core depending on the probe.
+/// The adapters at the bottom are how the probe's flat accumulators are read on Core's terms.
+/// They shrink as more of the report moves, and the prose parser that used to sit beside them
+/// is already gone — see the note on project coupling.
 /// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class CoreEquivalenceTests(FixtureRun run)
+public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
 {
     // ------------------------------------------------------------ type cohorts ----
 
@@ -187,32 +185,70 @@ public sealed class CoreEquivalenceTests(FixtureRun run)
 
     // --------------------------------------------------------- project coupling ----
 
+    /// <summary>
+    /// Project coupling over the fixture, with the answers written down.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This used to read the probe's own sentence and parse the numbers back out of it, because
+    /// there was no model surface to compare against and that absence was the defect. There is
+    /// one now, on both sides: Core walks the solution itself, and <c>WalkerEquivalenceTests</c>
+    /// already establishes that its types and edges are the probe's. Coupling is a pure function
+    /// of those two and the function has its own tests, so re-deriving the probe's numbers from
+    /// prose proves nothing composition does not — while keeping a regex over report text alive
+    /// in the suite.
+    /// </para>
+    /// <para>
+    /// What replaces it is the fixture's known answers, stated rather than parsed. These are
+    /// checked figures rather than a snapshot: <c>Core</c> is stable and concrete because
+    /// everything depends on it and it depends on nothing, and the two leaf projects each reach
+    /// into it while nothing reaches into them.
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void Project_coupling_matches_the_probe()
+    public void Project_coupling_over_the_fixture_is_what_it_should_be()
     {
-        var core = ProjectCoupling.ForSolution(
-            run.Result.Types.Select(t => (t.Id, t.Project, t.IsAbstract || t.TypeKeyword == "Interface")),
-            run.Result.Edges.Select(e => (e.From, e.To)));
+        var coupling = CoreProjectCoupling().ToDictionary(c => c.Project, StringComparer.Ordinal);
 
-        var probe = ProbeProjectLines();
-        Assert.NotEmpty(probe);
-        Assert.Equal(probe.Keys.Order(StringComparer.Ordinal), core.Select(c => c.Project));
+        Assert.Equal(["Core", "Data", "Tools"], coupling.Keys.Order(StringComparer.Ordinal));
 
-        foreach (var c in core)
+        var analysed = coupling["Core"];
+        Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
+        Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
+        Assert.Equal(6, analysed.AbstractTypes);
+        Assert.Equal(104, analysed.TotalTypes);
+        Assert.Equal(0, analysed.Instability);                   // maximally stable
+        Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
+
+        foreach (var leaf in new[] { coupling["Data"], coupling["Tools"] })
         {
-            var expected = probe[c.Project];
-
-            Assert.Equal(expected.Ca, c.TypesElsewhereReachingIn);
-            Assert.Equal(expected.Ce, c.TypesHereReachingOut);
-            Assert.Equal(expected.AbstractTypes, c.AbstractTypes);
-            Assert.Equal(expected.TotalTypes, c.TotalTypes);
-
-            // The derived values, compared at the precision the probe prints them to.
-            Assert.Equal(expected.A, Math.Round(c.Abstractness, 2));
-            Assert.Equal(expected.I, c.Instability is { } i ? Math.Round(i, 2) : null);
-            Assert.Equal(expected.D, c.DistanceFromMainSequence is { } d ? Math.Round(d, 2) : null);
+            Assert.Equal(0, leaf.TypesElsewhereReachingIn);
+            Assert.Equal(1, leaf.TypesHereReachingOut);
+            Assert.Equal(0, leaf.AbstractTypes);
+            Assert.Equal(1, leaf.Instability);                   // maximally unstable
+            Assert.Equal(MainSequenceZone.NearMainSequence, leaf.Zone);
         }
     }
+
+    [Fact]
+    public void The_collision_fix_reaches_the_project_totals()
+    {
+        // The probe credits both halves of the planted cross-project collision to whichever
+        // project loaded first, so it sees two types in Data and two in Tools. Core attributes
+        // each declaration to the project that declares it, which is one more type in Data —
+        // and abstractness is a share of that total, so the fix does not stop at the type row.
+        // docs/DEFECTS.md §1.
+        var coupling = CoreProjectCoupling().ToDictionary(c => c.Project, StringComparer.Ordinal);
+
+        Assert.Equal(3, coupling["Data"].TotalTypes);
+        Assert.Equal(2, coupling["Tools"].TotalTypes);
+        Assert.Equal(run.Result.Types.Count(t => t.Project == "Data") + 1, coupling["Data"].TotalTypes);
+    }
+
+    private IReadOnlyList<ProjectCoupling> CoreProjectCoupling() =>
+        ProjectCoupling.ForSolution(
+            core.Model.Types.Select(t => (t.Subject.Canonical, t.Project, t.IsAbstract || t.TypeKeyword == "Interface")),
+            core.Model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
     [Fact]
     public void A_project_with_no_cross_project_coupling_has_no_instability()
@@ -264,63 +300,4 @@ public sealed class CoreEquivalenceTests(FixtureRun run)
         _ => throw new ArgumentOutOfRangeException(nameof(dimension), dimension, null),
     };
 
-    private sealed record ProjectLine(int Ca, int Ce, int AbstractTypes, int TotalTypes, double A, double? I, double? D);
-
-    /// <summary>
-    /// Reads the probe's project metrics back out of the sentence it writes them into.
-    /// </summary>
-    /// <remarks>
-    /// Asserting against prose, which the rest of the suite avoids. It is legitimate here for
-    /// the same reason it is in <c>KnownDefectTests</c>: there is no model surface to assert
-    /// against, and <b>that absence is precisely the defect being fixed</b>. The moment the
-    /// renderer reads <see cref="ProjectCoupling"/>, this parser is deleted.
-    /// </remarks>
-    private Dictionary<string, ProjectLine> ProbeProjectLines()
-    {
-        using var writer = new StringWriter();
-        Report.PrintNominations(run.Result, run.Options, writer);
-
-        var coupled = new Regex(
-            @"^\s{5}(?<p>\S+) — I (?<i>[\d.]+), A (?<a>[\d.]+), D (?<d>[\d.]+)\s+\(Ca (?<ca>\d+) depend on it, Ce (?<ce>\d+) reach out, (?<abs>\d+)/(?<tot>\d+) abstract\)",
-            RegexOptions.ExplicitCapture);
-
-        var isolated = new Regex(
-            @"^\s{5}(?<p>\S+) — no cross-project coupling; A (?<a>[\d.]+)$",
-            RegexOptions.ExplicitCapture);
-
-        var lines = new Dictionary<string, ProjectLine>(StringComparer.Ordinal);
-        foreach (var line in writer.ToString().Split('\n').Select(l => l.TrimEnd('\r')))
-        {
-            var m = coupled.Match(line);
-            if (m.Success)
-            {
-                lines[m.Groups["p"].Value] = new ProjectLine(
-                    int.Parse(m.Groups["ca"].Value, CultureInfo.InvariantCulture),
-                    int.Parse(m.Groups["ce"].Value, CultureInfo.InvariantCulture),
-                    int.Parse(m.Groups["abs"].Value, CultureInfo.InvariantCulture),
-                    int.Parse(m.Groups["tot"].Value, CultureInfo.InvariantCulture),
-                    double.Parse(m.Groups["a"].Value, CultureInfo.InvariantCulture),
-                    double.Parse(m.Groups["i"].Value, CultureInfo.InvariantCulture),
-                    double.Parse(m.Groups["d"].Value, CultureInfo.InvariantCulture));
-                continue;
-            }
-
-            m = isolated.Match(line);
-            if (m.Success)
-            {
-                var project = m.Groups["p"].Value;
-                var types = run.Result.Types.Count(t => string.Equals(t.Project, project, StringComparison.Ordinal));
-                var abs = run.Result.Types.Count(t =>
-                    string.Equals(t.Project, project, StringComparison.Ordinal)
-                    && (t.IsAbstract || t.TypeKeyword == "Interface"));
-
-                lines[project] = new ProjectLine(
-                    0, 0, abs, types,
-                    double.Parse(m.Groups["a"].Value, CultureInfo.InvariantCulture),
-                    null, null);
-            }
-        }
-
-        return lines;
-    }
 }
