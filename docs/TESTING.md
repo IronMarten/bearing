@@ -102,6 +102,8 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `OrderingTests` | that every artifact is a function of the analysis and not of its enumeration order — see below |
 | `DistributionTests` | the comparative substrate — midrank, medians, and when a reading is refused — without Roslyn |
 | `CoreEquivalenceTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
+| `AnalysisPolicyTests` | that every threshold is named and reviewable, including the thirteen that were literals |
+| `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |

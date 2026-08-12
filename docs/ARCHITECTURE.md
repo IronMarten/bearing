@@ -174,6 +174,13 @@ holding them to the probe's numbers on the fixture. The probe still computes its
 it is the oracle, and it stays verbatim — so this is the reimplementation existing and agreeing,
 not the probe delegating.
 
+Cohort assignment followed, as `CohortSet` and `CohortCandidates`. It is the substrate beneath
+the substrate: `Distribution` is computed *over* a peer group, so an error here changes what
+every finding compares against without breaking a single condition. Split so that deriving
+candidates — which needs to know what a type is — is separate from choosing between them, which
+does not. The choosing half is pure, which is what makes stranding and starvation testable
+directly rather than through a solution that happens to exhibit them.
+
 The corollary in §3 is discharged along with it. `Distribution.Read` returns nothing for a group
 of fewer than two rather than the arithmetically-correct-and-meaningless 50, and
 `ProjectCoupling.Instability` is null where there is no cross-project coupling. Invariant 6 now
@@ -347,6 +354,8 @@ decision from whether it is versioned.
 | A type is identified by `(assembly, FQN)`, never by name alone | §4, `SubjectRef` — .NET permits one FQN in two assemblies and plugin architectures use it deliberately; keying on the name merges the rows and sums their metrics |
 | The SDK is pinned | `global.json` — an unpinned toolchain picks the newest SDK on the machine, which made CI build a net8.0 project with .NET 10 and fail on rules no developer machine had |
 | Both graph artifacts are static | neither view that proved legible on a real solution needs a layout engine, so elkjs / cytoscape / d3-force come off the critical path. The only view that did need one should not ship: a two-hop ego view pulls in 24–41% of the codebase from an ordinary seed |
+| Every threshold is a named value on `AnalysisPolicy`, including the thirteen that were literals | a policy carrying ten of twenty-three misrepresents which policy produced a finding, which is the failure it exists to prevent |
+| `StableThreshold` and `IsolatedThreshold` are independent | the defaults are 0.2 and 0.8 and the symmetry is coincidence, not maintained. They gate different findings over different populations; deriving one from the other would make one flag move two findings |
 | A method-level concealed decision suppresses breaks-alone on its declaring type | the reason the suppression exists is behavioural, and behaviour lives in methods — so the level that *nominated* it is not what decides. `SubjectRef` walks member → declaring type to express it. Not yet implemented: `DEFECTS.md` §15 |
 | Every emitted artifact is ordered by a total key | a stable sort on a non-total key reproduces on one machine without being a property of the tool, and Core is a reimplementation that will not inherit the probe's enumeration order. `TESTING.md` §5, `DEFECTS.md` §6 |
 
