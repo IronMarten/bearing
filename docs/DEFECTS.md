@@ -202,7 +202,26 @@ cohort of 5–9**, whatever its members look like, while `--min-cohort` admits 5
 Arithmetic, not tuning. Needs its own answer rather than falling out of defect 2's
 absolute-to-percentile conversion, because that conversion runs *toward* this hazard.
 
-Pinned: `Blast_radius_is_unreachable_in_a_cohort_below_ten`.
+**Decided (Aug 2026): a proportional rank test replaces the percentile gate**, as blast radius
+ports into Core. `rank <= max(1, ceil(blastTopFraction × cohortSize))` by fan-in, descending,
+with `blastTopFraction` defaulting to 0.05 — one of the thirteen previously unnamed gates, now
+a policy value.
+
+Two things this gets right that the obvious alternatives do not. **It keeps the proportion.**
+`FanInPctl >= 95` is structurally the top 5% of each cohort, and that self-limiting property is
+why blast radius held at 1.0% and 0.9% of types across two unrelated real solutions where the
+absolute-gated findings did not — a flat `rank <= 1` is satisfiable everywhere and discards the
+one behaviour worth keeping. **And `max(1, …)` is what actually closes this defect:** at n=9,
+`ceil(0.05 × 9) = 1`, so the cohort maximum qualifies where the percentile gate admitted nobody.
+
+The absolute floor `FanIn >= minFanIn` is unchanged and is what stops a rank test crowning the
+tallest member of a cohort where nothing is tall — defect 3, and invariant 1's canonical case.
+
+Pinned: `Blast_radius_is_unreachable_in_a_cohort_below_ten`. **The pin inverts when the port
+lands** — it currently asserts the defect, and must become an assertion that a cohort of nine
+*can* nominate. Changing it is a golden-affecting change under `CONTRIBUTING.md`; the fixture
+plant that makes it observable is owed either way, since blast radius nominates nothing on
+TestBed today.
 
 ### 15. Breaks-alone's concealed-decision suppression is type-level only
 
