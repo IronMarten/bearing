@@ -54,8 +54,28 @@ public static class Report
 
         foreach (var line in CoverageSection.NoPeerGroup(model, findings)) yield return line;
 
+        // Last, and the placement is argued in the section itself: it qualifies everything above
+        // it, which is a reason to lead with it, and on a clean run it is bookkeeping, which is a
+        // reason not to.
+        foreach (var line in StructureSections.NotAnalysed(model.Coverage)) yield return line;
+
         yield return "";
     }
+
+    /// <summary>
+    /// The coverage section, rendered from <see cref="Coverage"/> alone.
+    /// </summary>
+    /// <remarks>
+    /// <b>Public where no other section is, and the reason is a distinction rather than a
+    /// concession to testing.</b> Every other section reads a <see cref="SolutionModel"/>, whose
+    /// constructor is internal — a model can only be produced by a walk — so those can only be
+    /// exercised through a real solution. This one is a pure function of a public type, and the
+    /// branch that matters most in it is the one no solution in this repository can produce: every
+    /// solution here loads cleanly, so a load diagnostic would otherwise be the loudest thing the
+    /// report can say with nothing exercising it.
+    /// </remarks>
+    public static IEnumerable<string> NotAnalysed(Coverage coverage) =>
+        StructureSections.NotAnalysed(coverage);
 
     /// <summary>
     /// What was analysed, and how to read what follows.

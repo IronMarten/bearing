@@ -185,3 +185,10 @@ Every claim shows the numbers behind it.
    NOTE: a type with no peers still has its own METHODS as a cohort.
    And its real comparison is its own history, which is the temporal
    signal a single snapshot cannot give you.
+
+-- WHAT WAS NOT ANALYSED ---------------------------------------
+   Every number above is relative to what was read. This is the rest.
+
+   Skipped as test projects: Core.Tests
+   Excluded by path: 2 types, under 16 patterns (--exclude-path, --no-default-excludes)
+   Load diagnostics: none

@@ -30,14 +30,22 @@ public sealed class ReportTests(CoreWalkFixture core)
 
     /// <summary>Every section the probe printed still appears, in the same order.</summary>
     /// <remarks>
+    /// <para>
     /// The fidelity decision, asserted rather than trusted. Criticality drift is absent and that
     /// is the one section deliberately not carried — it is <c>TASKS.md</c> X7, undecided, and
     /// Core has no baseline to render from.
+    /// </para>
+    /// <para>
+    /// <b>Additions are listed separately rather than appended to the expected list</b>, so that
+    /// adding a section is a deliberate edit to the second array and never an accident of
+    /// regenerating the first. The probe's sections are the contract; what Bearing prints beyond
+    /// them is a product decision, and the two should not be able to blur into each other.
+    /// </para>
     /// </remarks>
     [Fact]
     public void The_sections_are_the_probes_sections_in_the_probes_order()
     {
-        string[] expected =
+        string[] probes =
         [
             "-- CONCEALED DECISION ------------------------------------------",
             "-- CONCEALED DECISION, METHOD LEVEL ----------------------------",
@@ -54,7 +62,17 @@ public sealed class ReportTests(CoreWalkFixture core)
             "-- NO PEER GROUP -----------------------------------------------",
         ];
 
-        Assert.Equal(expected, Lines.Where(l => l.StartsWith("-- ", StringComparison.Ordinal)));
+        // Bearing's own, in the order they are rendered after the probe's.
+        string[] additions =
+        [
+            // A1. Last on purpose, and the argument against that placement is recorded where the
+            // section is written: it qualifies everything above it.
+            "-- WHAT WAS NOT ANALYSED ---------------------------------------",
+        ];
+
+        Assert.Equal(
+            [.. probes, .. additions],
+            Lines.Where(l => l.StartsWith("-- ", StringComparison.Ordinal)));
     }
 
     // -------------------------------------------------------------------- the header ----
@@ -109,6 +127,95 @@ public sealed class ReportTests(CoreWalkFixture core)
     {
         Assert.NotEqual(ToolInfo.ReadVersion(typeof(Report).Assembly), core.Model.ToolVersion);
         Assert.DoesNotContain($"BEARING {core.Model.ToolVersion}", Text, StringComparison.Ordinal);
+    }
+
+    // ----------------------------------------------------------------- coverage (A1) ----
+
+    /// <summary>
+    /// What was not analysed is now in the report, and it says the routine things routinely.
+    /// </summary>
+    /// <remarks>
+    /// The model carried <c>ExclusionsApplied</c>, <c>ExcludedTypes</c> and <c>LoadDiagnostics</c>
+    /// from the first walk and no line of the renderer read any of them. Invariant 8 is the whole
+    /// of why that mattered: a tool disciplined about not making claims it cannot support was
+    /// dropping the record of what it could not see.
+    /// </remarks>
+    [Fact]
+    public void The_report_says_what_it_did_not_analyse()
+    {
+        Assert.Contains("-- WHAT WAS NOT ANALYSED", Text, StringComparison.Ordinal);
+        Assert.Contains("Skipped as test projects: Core.Tests", Text, StringComparison.Ordinal);
+
+        // Two types, and the pattern count rather than the patterns — sixteen defaults on one
+        // line is what this replaced.
+        Assert.Contains("Excluded by path: 2 types, under 16 patterns", Text, StringComparison.Ordinal);
+        Assert.Contains("Load diagnostics: none", Text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A load diagnostic is reported as a reason to distrust the numbers, not as a failure.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Tested against a fabricated <see cref="Coverage"/> because no fixture can produce one.</b>
+    /// Every solution in this repository loads cleanly, and a deliberately broken one is a fixture
+    /// whose only purpose is this path — so the section takes <c>Coverage</c> rather than the
+    /// model, and the branch is reachable from a test without one. The alternative was shipping
+    /// the loudest thing the report can say with nothing exercising it.
+    /// </para>
+    /// <para>
+    /// The wording is the assertion. <c>docs/DEFECTS.md</c> §4 is load success judged by
+    /// diagnostic rather than by outcome — six spurious failures on nopCommerce — so the section
+    /// may not call a diagnostic a failure. What it may say is what is certain: a project that did
+    /// not load understates fan-in everywhere it is referenced.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_load_diagnostic_is_reported_as_a_reason_to_distrust_the_numbers()
+    {
+        var lines = Report.NotAnalysed(new Coverage
+        {
+            ExclusionsApplied = ["/obj/"],
+            SkippedProjects = [],
+            LoadDiagnostics = ["Project 'A.csproj' failed to restore.", "SDK 'X' not found."],
+            ExcludedTypes = 0,
+        }).ToList();
+
+        var text = string.Join(Environment.NewLine, lines);
+
+        Assert.Contains("2 diagnostics while loading", text, StringComparison.Ordinal);
+        Assert.Contains("not necessarily", text, StringComparison.Ordinal);
+        Assert.Contains("understates fan-in EVERYWHERE", text, StringComparison.Ordinal);
+        Assert.Contains("Project 'A.csproj' failed to restore.", text, StringComparison.Ordinal);
+
+        // And the clean-run line is not also printed, which would contradict the block above it.
+        Assert.DoesNotContain("Load diagnostics: none", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The diagnostics list discloses what it dropped, and its cap is not <c>--top</c>.
+    /// </summary>
+    /// <remarks>
+    /// Lowering <c>--top</c> is how a reader focuses a report, and it must not also hide the
+    /// reasons that report might be wrong. Asserted because the obvious implementation reuses the
+    /// policy value every other capped list uses.
+    /// </remarks>
+    [Fact]
+    public void The_diagnostics_list_discloses_what_it_dropped()
+    {
+        var many = Enumerable.Range(1, 14).Select(i => $"diagnostic {i}").ToList();
+
+        var text = string.Join(Environment.NewLine, Report.NotAnalysed(new Coverage
+        {
+            ExclusionsApplied = [],
+            SkippedProjects = [],
+            LoadDiagnostics = many,
+            ExcludedTypes = 0,
+        }));
+
+        Assert.Contains("diagnostic 10", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("diagnostic 11", text, StringComparison.Ordinal);
+        Assert.Contains("4 diagnostics not shown of 14", text, StringComparison.Ordinal);
     }
 
     // ------------------------------------------------------------------ defect 16 ----

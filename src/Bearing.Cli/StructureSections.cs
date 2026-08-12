@@ -231,4 +231,93 @@ internal static class StructureSections
         if (model.Coverage.SkippedProjects.Count > 0)
             yield return $"     Skipped this run: {string.Join(", ", model.Coverage.SkippedProjects)}.";
     }
+
+    /// <summary>
+    /// What the analysis did not see — invariant 8, and the section every number above depends on.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The model has carried this since the walk and nothing rendered it.</b> <c>Coverage</c>
+    /// holds <c>ExclusionsApplied</c>, <c>ExcludedTypes</c> and <c>LoadDiagnostics</c>, and until
+    /// <c>TASKS.md</c> A1 no line of <c>Bearing.Cli</c> read any of the three — only
+    /// <c>SkippedProjects</c>, and only inside the unreferenced-projects caveat. A tool whose
+    /// entire discipline is not making claims it cannot support was silently dropping the record
+    /// of what it could not see.
+    /// </para>
+    /// <para>
+    /// <b>Load diagnostics come first inside the section and are worded as diagnostics.</b>
+    /// <c>Coverage</c> says in as many words that they are not necessarily failures, and
+    /// <c>docs/DEFECTS.md</c> §4 is the reason to take that seriously — load success is judged by
+    /// diagnostic rather than by outcome, which produced six spurious failures on nopCommerce. So
+    /// the wording says what is certain (a project that did not load understates fan-in everywhere
+    /// it is referenced) without asserting that any particular diagnostic means that happened.
+    /// </para>
+    /// <para>
+    /// <b>Placement is provisional and the argument against it should be recorded.</b> A failed
+    /// load makes every number above it wrong, which argues for the top of the report rather than
+    /// the end. It is here because on a clean run this section is routine bookkeeping — two
+    /// exclusions and a skipped test project — and leading with that pushes the findings down for
+    /// nothing. The case for promoting it needs a run where a load actually fails, which is
+    /// <c>TASKS.md</c> A2 and does not exist yet.
+    /// </para>
+    /// <para>
+    /// Takes <see cref="Coverage"/> rather than the model, so the diagnostics path can be tested
+    /// without a deliberately broken solution to walk.
+    /// </para>
+    /// </remarks>
+    internal static IEnumerable<string> NotAnalysed(Coverage coverage)
+    {
+        ArgumentNullException.ThrowIfNull(coverage);
+
+        yield return "";
+        yield return "-- WHAT WAS NOT ANALYSED ---------------------------------------";
+        yield return "   Every number above is relative to what was read. This is the rest.";
+
+        if (coverage.LoadDiagnostics.Count > 0)
+        {
+            yield return "";
+            yield return $"   {Sentences.Plural(coverage.LoadDiagnostics.Count, "diagnostic")} while loading. "
+                         + "These are not necessarily";
+            yield return "   failures — but a project that did not load understates fan-in EVERYWHERE";
+            yield return "   it is referenced, so read the numbers above as lower bounds until you";
+            yield return "   have ruled these out:";
+
+            var (shown, disclosure) = Sentences.Cap(
+                coverage.LoadDiagnostics, DiagnosticsShown, "diagnostic", "     ");
+
+            foreach (var diagnostic in shown) yield return $"     {diagnostic}";
+            foreach (var line in disclosure) yield return line;
+        }
+
+        yield return "";
+
+        yield return coverage.SkippedProjects.Count > 0
+            ? $"   Skipped as test projects: {string.Join(", ", coverage.SkippedProjects)}"
+            : "   Skipped as test projects: none";
+
+        // The count of types, and the number of patterns in force — not the patterns themselves.
+        // ExclusionsApplied is the set that was ACTIVE rather than the set that matched anything,
+        // so listing it printed sixteen defaults on one unreadable line and did it identically on
+        // a run where nothing was excluded at all. The patterns are the user's own input, on
+        // --help and on their command line; the count is the part the report knows and they do not.
+        yield return coverage.ExcludedTypes > 0
+            ? $"   Excluded by path: {Sentences.Plural(coverage.ExcludedTypes, "type")}, under "
+              + $"{Sentences.Plural(coverage.ExclusionsApplied.Count, "pattern")} "
+              + "(--exclude-path, --no-default-excludes)"
+            : $"   Excluded by path: none matched, under "
+              + $"{Sentences.Plural(coverage.ExclusionsApplied.Count, "pattern")}";
+
+        if (coverage.LoadDiagnostics.Count == 0)
+            yield return "   Load diagnostics: none";
+    }
+
+    /// <summary>
+    /// A display cap for diagnostics, deliberately not <c>--top</c>.
+    /// </summary>
+    /// <remarks>
+    /// <c>--top</c> is how many <i>findings</i> a reader wants to see, and lowering it to focus a
+    /// report should not also hide the reasons that report might be wrong. Fixed, and it discloses
+    /// what it dropped like every other capped list — <c>docs/DEFECTS.md</c> §3.
+    /// </remarks>
+    private const int DiagnosticsShown = 10;
 }
