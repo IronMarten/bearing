@@ -143,7 +143,7 @@ Pinned: `The_surviving_control_survives_because_of_a_different_live_defect`.
 
 Pinned: `The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone`.
 
-### 11. The layer-span collapse hides the anomaly it shares a signature with
+### 11. The layer-span collapse hides the anomaly it shares a signature with — **fixed in Core**
 
 The collapse assumes a shared kind signature means a shared phenomenon. Four boilerplate
 controllers and one genuine anomaly carry the identical signature, and the collapse absorbs the
@@ -154,7 +154,33 @@ names survive was settled by enumeration order. Defect 6's fix made that *reprod
 changed which name survives, once, as a direct result. It did not make it *right*: a tiebreak is
 not a requirement.
 
-Pinned: `The_layer_span_collapse_hides_the_anomaly_it_shares_a_signature_with`.
+**The requirement it was missing was in §3.1 the whole time.** *"The named dependencies per kind
+are the finding, not the count."* If the names are the finding, the names are what makes two
+findings the same finding — so grouping on the count discards the thing the section calls the
+point, and that is exactly what lets a middleware reaching `TenantStore` and `AuditClient` be
+counted as another controller wired to `TenantStore` and `CarrierGateway`. `SpansArchitecturalLayers`
+groups on the type's own architectural role plus its named dependencies. On the fixture the four
+controllers stay one pattern and both anomalies keep their detail.
+
+**The second deliberate divergence from the oracle, and unlike the first it withdraws nothing.**
+The nomination set is identical to the probe's — `Layer_span_nominations_are_the_probes` — and what
+moves is which subjects may have their detail collapsed. That is also why the collapse is a
+qualifier rather than a suppression row: the probe keeps every collapsed type named in its examples
+line, so the claim survives and only the detail is dropped, which is row 6's shape rather than row
+1's.
+
+The ordering half is fixed with it. Rarest pattern first, then fan-in, then identity — a total
+order, held by `Layer_span_emits_the_rarest_pattern_first`, which fails if the rank is dropped.
+
+Still pinned against the probe: `The_layer_span_collapse_hides_the_anomaly_it_shares_a_signature_with`.
+The probe is unchanged and the golden still carries the collapsed line; the pin retires with the
+oracle at `TASKS.md` R2.
+
+**What the fix cost.** The collapse branch now has no fixture case — the largest pattern falls from
+six to four against a threshold of five — where before the fix it was the *only* branch the fixture
+exercised and the per-type detail had none. Recorded in
+`FixtureCoverageTests.The_roll_call_collapse_has_no_case_under_the_named_dependency_grouping`, with
+the plant it needs.
 
 ### 12. `WIDEST CONTRACT SURFACE` can never be suppressed, at any boundary count
 
@@ -283,7 +309,7 @@ A suppression may silence, never nominate. `Breaks_alone_diverges_from_the_probe
 The probe keeps the defect and its pin, `A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
 It is the oracle, not the product.
 
-### 16. A god object by size is told it carries real logic
+### 16. A god object by size is told it carries real logic — **fixed in Core**
 
 `HUBS AND GOD OBJECTS` splits on `MaxMemberCyclomatic >= highCc` **or** `MemberCount >=
 godObjectMembers`, and both branches print the same sentence: *"Architectural bottleneck: it
@@ -304,15 +330,20 @@ Not caught earlier because the size arm had never decided anything: `ShipmentCoo
 only other bottleneck and reaches the branch on complexity, where the sentence is true. This is
 the *second* thing the same plant found — the first was that the arm was untested at all.
 
-**Fix it in Core when §3.8 ports**, as two sentences rather than one. The size arm should say
-what it actually means: coupled both ways and large enough that no one holds it in their head,
-with nothing complex inside. That is a different danger from a bottleneck carrying logic, and
-§3.8's whole design is that the split names two different dangers — the wording currently
-collapses them back together.
+~~**Fix it in Core when §3.8 ports**~~ — done. `HubOrGodObject` carries the two arms as
+independent qualifiers, `carries-real-logic` and `too-large-to-hold`, so a renderer says what each
+arm actually means and cannot say the wrong one by accident. The size arm means coupled both ways
+and large enough that no one holds it in their head, with nothing complex inside — a different
+danger from a bottleneck carrying logic, which is §3.8's whole design and what one sentence
+collapsed back together.
 
-Not pinned: the sentence is wording, and `docs/TESTING.md` §5 is explicit that this suite
-asserts against the model rather than against report prose. The golden holds the exact string,
-so the change will be visible there.
+The disjunction is still derivable — a bottleneck is either arm holding — so nothing is lost by
+splitting it. `The_hub_disjunction_has_two_arms_that_say_different_things` holds one fixture type
+per combination: complexity alone, size alone, and neither.
+
+Not pinned, and it stays that way: the sentence is wording, and `docs/TESTING.md` §5 is explicit
+that this suite asserts against the model rather than against report prose. The golden holds the
+probe's exact string and the probe is unchanged, so the wording moves at R1 and is visible there.
 
 ## How these were found
 

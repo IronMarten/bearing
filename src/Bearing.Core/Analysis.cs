@@ -18,13 +18,13 @@ namespace IronMarten.Bearing;
 /// 1,066-line method, which means reordering it breaks invariant 3 without failing anything.
 /// </para>
 /// <para>
-/// Seven of §3's findings are wired up — both concealed-decision nominations, blast radius,
-/// load-bearing, breaks alone, hubs and shared mutable state — and four of §4's seven rows: breaks
-/// alone's three as suppressions, and row 6 as a qualifier, because it silences a <i>sentence</i>
-/// rather than a claim. The rest arrive the same way and neither changes this shape. Note that
-/// blast radius and load-bearing overlap on "widely depended on and complex" and are still two
-/// findings, both allowed to fire on one type; that is a <c>PRD-free-tier.md</c> §7.2 decision, not
-/// an oversight here.
+/// Eight of §3's findings are wired up — layer span, both concealed-decision nominations, blast
+/// radius, load-bearing, breaks alone, hubs and shared mutable state — and five of §4's seven
+/// rows: breaks alone's three as suppressions, and rows 4 and 6 as qualifiers, because each of
+/// those silences a <i>sentence</i> rather than a claim. The rest arrive the same way and neither
+/// changes this shape. Note that blast radius and load-bearing overlap on "widely depended on and
+/// complex" and are still two findings, both allowed to fire on one type; that is a
+/// <c>PRD-free-tier.md</c> §7.2 decision, not an oversight here.
 /// </para>
 /// </remarks>
 public static class Analysis
@@ -39,6 +39,7 @@ public static class Analysis
     /// </remarks>
     private static readonly Func<SolutionModel, IEnumerable<Finding>>[] Detectors =
     [
+        SpansArchitecturalLayers.Detect,
         ConcealedDecision.AtMethodLevel,
         ConcealedDecision.AtTypeLevel,
         BlastRadius.Detect,

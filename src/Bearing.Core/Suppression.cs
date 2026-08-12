@@ -64,9 +64,11 @@ public sealed record SuppressionRule(
 /// invariant 3 — and breaking it produces <i>more</i> output, which reads as a working tool.
 /// </para>
 /// <para>
-/// <b>Only breaks alone's three rows are here so far.</b> The other four belong to findings that
-/// have not moved, except row 6, which is not a finding suppression at all — it silences a
-/// <i>sentence</i> and is carried as a <see cref="Qualifier"/> on the finding instead.
+/// <b>Only breaks alone's three rows are here, and two more will never be.</b> Rows 4 and 6 are
+/// not finding suppressions at all: each silences a <i>sentence</i>, and both are carried as a
+/// <see cref="Qualifier"/> on the finding instead. Row 4's evidence for that is the probe's own
+/// output — a collapsed type keeps its place in the examples line, so the claim survives and only
+/// its detail is dropped. Rows 5 and 7 belong to findings that have not moved.
 /// </para>
 /// </remarks>
 public static class Suppression

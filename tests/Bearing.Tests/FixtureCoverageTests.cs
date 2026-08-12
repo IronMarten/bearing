@@ -442,6 +442,122 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// Layer span's own floor is <b>vacuous</b>, not merely unobserved — no fixture can fix it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Twelve mutations over §3.1, §3.8 and §3.9 as they moved into Core. Eight failed a test.
+    /// This is the first of the three that did not, and it is the only one in the whole register
+    /// that a plant cannot close.
+    /// </para>
+    /// <para>
+    /// <b>Three significant kinds and a <c>MinKindSpan</c> of three make "spans the minimum" and
+    /// "spans everything" one condition.</b> The gate cannot discriminate at any solution size,
+    /// because there is no fourth kind to fall short of. Setting it to 2 changes nothing here and
+    /// setting it to 4 empties the finding everywhere, forever. That is <c>TASKS.md</c> X4, and it
+    /// is a design question rather than a missing case — recorded here so it is visible from the
+    /// suite rather than only from the board.
+    /// </para>
+    /// <para>
+    /// The fixture half is asserted too: nothing sits at span 2, so even a fourth kind would need
+    /// a plant to make the floor decide. That plant collides with both constraints binding every
+    /// plant — reaching a second significant kind means a new <c>ApiBoundary</c>/<c>ExternalCall</c>
+    /// type or new fan-in on an existing one — which is why it is recorded rather than owed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_layer_span_floor_cannot_discriminate_at_three_significant_kinds()
+    {
+        var policy = core.Model.Policy;
+        var spans = Analysis.FindingsFor(core.Model)
+            .OfKind(FindingKind.SpansArchitecturalLayers)
+            .Select(f => f.ValueOf("KindSpan")!.Value)
+            .ToList();
+
+        // Every nomination sits exactly on the floor, and the floor is also the ceiling. No
+        // finding can be further above it than any other, so the gate admits all or none.
+        Assert.NotEmpty(spans);
+        Assert.All(spans, span => Assert.Equal(policy.MinKindSpan, span));
+
+        // And nothing sits one below it, so lowering the floor admits nobody either. Read off the
+        // model rather than re-derived from the detector's conditions: a gap record that restates
+        // them gets them subtly wrong, and did.
+        var significant = new[] { "ApiBoundary", "DataAccess", "ExternalCall" };
+        var reach = core.Model.Types.Select(type =>
+        {
+            var kinds = new SortedSet<string>(StringComparer.Ordinal);
+            if (significant.Contains(type.Classification.Kind, StringComparer.Ordinal))
+                kinds.Add(type.Classification.Kind);
+            foreach (var outbound in type.Outbound)
+                if (core.Model.Find(outbound) is { } dependency &&
+                    significant.Contains(dependency.Classification.Kind, StringComparer.Ordinal))
+                    kinds.Add(dependency.Classification.Kind);
+            return kinds.Count;
+        }).ToList();
+
+        Assert.DoesNotContain(reach, count => count == policy.MinKindSpan - 1);
+    }
+
+    /// <summary>
+    /// The roll-call collapse has no case, and closing <c>DEFECTS.md</c> §11 is what took it away.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A trade, made deliberately and recorded rather than discovered.</b> Under the probe's
+    /// kind-signature grouping all six spanning types were one pattern, so the collapse branch was
+    /// the only one the fixture exercised and the per-type detail branch had none — the opposite
+    /// of what <c>TECHREQ-job-b.md</c> §3.1 and §5 both claim, and the golden settles it. Core
+    /// groups on the named dependencies instead, which is §11's repair, and the largest group
+    /// falls to four against a threshold of five. Now the detail branch is covered and the
+    /// collapse is not.
+    /// </para>
+    /// <para>
+    /// <b>The collapse is the better branch to owe.</b> It removes detail from a finding whose
+    /// detail §3.1 calls the finding, so an uncovered collapse risks output that says too much,
+    /// while an uncovered detail branch risked the headline finding rendering as one sentence
+    /// about controllers — which is what it did.
+    /// </para>
+    /// <para>
+    /// The plant is two types with identical dependency sets and different architectural roles for
+    /// the key, and six sharing one dependency set for the threshold. <c>TASKS.md</c> P6 owes
+    /// both. Until then <c>Qualifiers.PartOfALayeringPattern</c> can be pinned to
+    /// <see langword="false"/>, and the pattern key can ignore a type's own role, with the whole
+    /// suite green.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_roll_call_collapse_has_no_case_under_the_named_dependency_grouping()
+    {
+        var policy = core.Model.Policy;
+        var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
+
+        // Nothing collapses, so the qualifier is a constant on this fixture.
+        Assert.All(findings, f => Assert.False(f.Holds(Qualifiers.PartOfALayeringPattern)));
+
+        // And it is not close: the largest pattern is one short of the threshold, so the plant
+        // needs two more members rather than a tuning change.
+        var largest = findings.Max(f => f.ValueOf("PatternGroupSize")!.Value);
+        Assert.Equal(4, largest);
+        Assert.True(largest <= policy.RollCallThreshold);
+
+        // The other half the fixture cannot see: no two subjects share a dependency set while
+        // differing in their own role, so whether the role belongs in the pattern key is
+        // undecidable here. Grouping on dependencies alone gives the identical partition.
+        var withRole = findings
+            .GroupBy(f => string.Join(
+                "|",
+                new[] { core.Model.Find(f.Subject)!.Classification.Kind }
+                    .Concat(f.Participants.Select(p => p.Canonical))),
+                StringComparer.Ordinal)
+            .Count();
+        var withoutRole = findings
+            .GroupBy(f => string.Join("|", f.Participants.Select(p => p.Canonical)), StringComparer.Ordinal)
+            .Count();
+
+        Assert.Equal(withRole, withoutRole);
+    }
+
+    /// <summary>
     /// The three dead-code traps are planted, and nothing can currently tell them apart from
     /// code that really is unreferenced.
     /// </summary>

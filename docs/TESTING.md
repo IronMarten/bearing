@@ -239,6 +239,30 @@ Tidying it up changes the expected answers.
   detection already works. The case that does not is convention registration
 - boundary: 8 contact points, 6 inbound, 2 outbound
 - `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
+- **layer span: 6 nominations**, and every one of them sits exactly on `minKindSpan`. Three
+  significant kinds and a floor of three make "spans the minimum" and "spans everything" the same
+  condition, so the floor cannot discriminate at any solution size — `TASKS.md` X4. Nothing on the
+  fixture reaches exactly two, either, so lowering it admits nobody
+- **layering patterns: three of them**, grouped on the type's own role plus its named dependencies
+  rather than on the kind signature (`docs/DEFECTS.md` §11). `QuoteController`,
+  `DocumentController`, `RateController` and `TrackingController` are one pattern of four —
+  `ApiBoundary`, reaching `TenantStore` and `CarrierGateway`. `AuthenticationMiddleware`
+  (`TenantStore`, `AuditClient`) and `PolicyBridge` (`Internal`, reaching `QuoteController`,
+  `TenantStore` and `CarrierGateway`) are patterns of one. Four is below the roll-call threshold of
+  five, so **nothing collapses** and every nomination keeps its detail. Under the probe's
+  kind-signature grouping all six were one pattern and the whole section collapsed to a line
+- five of the six need their own architectural role to reach the span — the four controllers and
+  the middleware, all at two kinds through dependencies. `PolicyBridge` is the control: three
+  through dependencies alone
+- **hubs: 3 nominations**, one per combination of §3.8's disjunction. `ShipmentCoordinator` (7/7,
+  16 members, cc 13) on complexity alone; `DispatchRegistry` (5/5, 23 members, cc 1) on size
+  alone; `Router` (5/11, 2 members, cc 2) on neither, which is the wiring hub. `IResponseNormalizer`
+  (8/3) and `CarrierGateway` (6/2) are the contrasts that make the gate a minimum rather than a
+  maximum
+- **shared mutable state: 2 nominations.** `DispatchCounter` — one static field, one write, an
+  increment, fan-in 5 — is the case that protects `++` counting at all: stop counting increments
+  and its count is zero. `QuoteAssembler` has two writes across `Build` and `Reset`, one of them a
+  plain assignment, which is why it could not do that job
 - project Martin metrics: `Core` I 0 A 0.1 D 0.9 (zone of pain); `Data` and `Tools` I 1 A 0 D 0
 - **identity collision:** `TestBed.Shared.PayloadTag` is declared `partial` in both `Data` and
   `Tools`, which do not reference each other. The probe reports **one** row: `Project=Tools`,
@@ -459,6 +483,43 @@ which is the event worth seeing (`TECHREQ-job-b.md` §8, criterion 8).
 >    type shifted `GlobalFanInPctl` and `GlobalMaxCcPctl` on all 51 existing rows. That is
 >    arithmetic, not behaviour — but it means the diff is never purely additive, and skimming
 >    it for "only new rows" will mislead you.
+
+**For layer span, hubs and shared mutable state, once they moved into Core.** All three agree with
+the probe on the fixture. Twelve mutations: **nine failed a test, three did not.** Both of §3.8's
+arms and §3.9's single gate are observed — that is what the `Dispatch.cs` plant bought — and all
+three survivors belong to §3.1.
+
+- **`MinKindSpan` is vacuous, and no plant can fix it.** Three significant kinds and a floor of
+  three make *spans the minimum* and *spans everything* one condition: setting it to 2 changes
+  nothing on the fixture and setting it to 4 empties the finding on every solution, forever. This
+  is the only entry in this section that is not a missing case — it is `TASKS.md` X4, and it needs
+  a decision rather than a type. Recorded in
+  `FixtureCoverageTests.The_layer_span_floor_cannot_discriminate_at_three_significant_kinds`, which
+  also asserts the fixture half: nothing reaches exactly two, so even a fourth kind would need a
+  plant before the floor decided anything.
+- **The roll-call collapse has no case**, and closing `DEFECTS.md` §11 is what took it away. The
+  largest pattern fell from six to four against a threshold of five. Before the fix the collapse
+  was the *only* branch the fixture exercised and the per-type detail had none, so this is a trade
+  rather than a loss — and the better half to owe, because the collapse removes detail that §3.1
+  calls the finding.
+- **Whether a type's own role belongs in the pattern key is undecidable here.** No two spanning
+  subjects share a dependency set while differing in their role, so grouping on dependencies alone
+  gives the identical partition and dropping the role from the key moves nothing.
+
+  Both need one plant: six types sharing a dependency set for the threshold, two of them differing
+  in their own role for the key. `TASKS.md` P6.
+
+> **A stale claim in the requirement, settled by the golden.** `TECHREQ-job-b.md` §3.1 and §5 both
+> say the fixture *"exercises only the detail branch"* of the roll-call collapse. It was the exact
+> opposite — one group of six against a threshold of five, so only the collapsed line ever
+> rendered, and `golden/nominations.verified.txt` has carried nothing else. The requirement is
+> corrected at source. Worth noting how it survived: the claim cited `SESSION-NOTES.md` #30, which
+> recorded both branches as verified *at the time*, and nobody re-read the golden when the fixture
+> moved underneath it.
+
+> **The inventory is now the cheapest step in a port, and it keeps paying.** Two of the three
+> survivors above are §3.1's, and the port took an afternoon because §3.8's and §3.9's cases were
+> planted before anyone wrote a detector. `TECHREQ-job-b.md` §10 puts B0 before B2 and it means it.
 
 ## 7. The invariants are acceptance criteria
 

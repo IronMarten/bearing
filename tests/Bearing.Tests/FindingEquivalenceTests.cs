@@ -160,7 +160,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Null(bearing.ValueOf("CohortSize"));
     }
 
-    // ------------------------------------------------ hubs and static state ------------
+    // ------------------------------------------------ hubs, static state, layer span ----
 
     /// <summary>
     /// Hubs agree with the probe. The <b>disjunction</b> is what changes, not the population.
@@ -272,6 +272,129 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Equal(["Build", "Reset"], MemberNames(assembler));
     }
 
+    /// <summary>
+    /// Layer span nominates exactly what the probe nominates, read off the probe's own model.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The one finding whose subjects cannot be read from the report.</b> Its section prints a
+    /// collapsed pattern line rather than a list — <c>6 types span … Examples: …</c> — so there is
+    /// no per-subject line to parse, and only four of the six are named at all. The probe's
+    /// <c>KindSpan</c> column is the model surface that survives that: computed by
+    /// <c>ComputeKindSpans</c>, frozen in <c>golden/types.verified.csv</c>, and therefore held by
+    /// a golden rather than by this test.
+    /// </para>
+    /// <para>
+    /// It is rendered first because the column is populated by <c>PrintNominations</c>. Reading it
+    /// without that is an ordering dependence between tests, which is the shape of the defect this
+    /// suite exists to catch.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Layer_span_nominations_are_the_probes()
+    {
+        NominationText.Render(probe.Result, Uncapped);
+
+        var expected = probe.Result.Types
+            .Where(t => t.KindSpan.Length > 0)
+            .Where(t => t.KindSpan.Split('+').Length >= Uncapped.MinKindSpan)
+            .Select(t => t.Name)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+        var actual = CoreTypeNominations(FindingKind.SpansArchitecturalLayers);
+
+        Assert.Equal(expected, actual);
+        Assert.NotEmpty(actual);
+    }
+
+    /// <summary>
+    /// A type's own architectural role counts toward its span, and five of six nominations need it.
+    /// </summary>
+    /// <remarks>
+    /// §3.1: a boundary component that also does data access spans layers even if that is its only
+    /// significant dependency. Drop the rule and the finding loses every controller and the
+    /// middleware, keeping only <c>PolicyBridge</c> — which reaches all three kinds through
+    /// dependencies alone and is the control that makes the deletion visible as a change in the
+    /// population rather than as an empty section.
+    /// </remarks>
+    [Fact]
+    public void A_types_own_role_counts_toward_its_span()
+    {
+        var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
+
+        var needTheirOwnRole = findings
+            .Where(f => f.ValueOf("KindsThroughDependencies") < f.ValueOf("KindSpan"))
+            .Select(f => core.Model.Find(f.Subject)!.Name)
+            .Order(StringComparer.Ordinal);
+
+        Assert.Equal(
+            [
+                "AuthenticationMiddleware", "DocumentController", "QuoteController", "RateController",
+                "TrackingController",
+            ],
+            needTheirOwnRole);
+
+        var bridge = Assert.Single(findings, f => core.Model.Find(f.Subject)!.Name == "PolicyBridge");
+        Assert.Equal(bridge.ValueOf("KindSpan"), bridge.ValueOf("KindsThroughDependencies"));
+    }
+
+    /// <summary>
+    /// <b>Defect 11, fixed.</b> A layering pattern is a shared set of dependencies, not a shared
+    /// count of kinds.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The second deliberate divergence from the oracle</b>, and unlike the first it removes no
+    /// claim: the nomination set is identical to the probe's — asserted above — and what changes is
+    /// which subjects may have their detail collapsed. That is why the collapse is a qualifier
+    /// rather than a suppression row.
+    /// </para>
+    /// <para>
+    /// The probe groups on the kind signature, which assumes a shared signature means a shared
+    /// phenomenon. All six fixture types carry <c>ApiBoundary+DataAccess+ExternalCall</c>, so all
+    /// six are one group and the whole section collapses to a single line — including
+    /// <c>AuthenticationMiddleware</c>, which is §3.1's own worked example of a component whose
+    /// name has stopped describing it. The finding's entire output is a sentence about controllers
+    /// being wired to a store.
+    /// </para>
+    /// <para>
+    /// The repair comes from §3.1 rather than from taste: <i>the named dependencies per kind are
+    /// the finding, not the count</i>. If the names are the finding, the names are what makes two
+    /// findings the same finding. Four controllers reaching <c>TenantStore</c> and
+    /// <c>CarrierGateway</c> genuinely are one fact; a middleware reaching <c>TenantStore</c> and
+    /// <c>AuditClient</c> is a different one, and it keeps its detail.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_layering_pattern_is_a_shared_dependency_set_not_a_shared_kind_count()
+    {
+        NominationText.Render(probe.Result, Uncapped);
+        var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
+
+        // What the probe groups on: one signature, six members, and X4 is open on the fact that
+        // three significant kinds and a span floor of three leave no other signature possible.
+        Assert.Equal(
+            6,
+            probe.Result.Types.Count(t => t.KindSpan == "ApiBoundary+DataAccess+ExternalCall"));
+
+        // What Core groups on. The anomaly and the bridge stand alone; the boilerplate is one fact.
+        Assert.Equal(4, PatternSize("QuoteController"));
+        Assert.Equal(4, PatternSize("DocumentController"));
+        Assert.Equal(4, PatternSize("RateController"));
+        Assert.Equal(4, PatternSize("TrackingController"));
+        Assert.Equal(1, PatternSize("AuthenticationMiddleware"));
+        Assert.Equal(1, PatternSize("PolicyBridge"));
+
+        // And the dependencies are why, which is the half a count cannot see: the middleware
+        // shares the store with the controllers and reaches out somewhere else entirely.
+        Assert.Equal(["CarrierGateway", "TenantStore"], ParticipantNames("QuoteController"));
+        Assert.Equal(["AuditClient", "TenantStore"], ParticipantNames("AuthenticationMiddleware"));
+
+        // The claim survives for every one of them. A collapse withdraws detail, never a finding —
+        // the probe keeps collapsed types named in its examples line, which is the evidence for
+        // reading row 4 as a sentence suppression rather than a finding suppression.
+        Assert.Equal(6, findings.Count);
+    }
 
     // ----------------------------------------------------- breaks alone, and §4's rows ----
 
@@ -566,6 +689,52 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         }
     }
 
+    /// <summary>
+    /// Layer span emits rarest pattern first, which is the opposite direction from every other
+    /// finding.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// §3.1: <i>"rarer signatures sort first and get full detail."</i> Every other detector ranks
+    /// by strength of evidence descending; here the rank is how few others share the pattern, so
+    /// ascending is correct and the shared <c>Findings_are_emitted_in_a_total_order</c> theory
+    /// cannot cover it — it asserts the descending shape.
+    /// </para>
+    /// <para>
+    /// Without this the ordering could be deleted outright with the suite green, which was
+    /// confirmed by deleting it. The discipline it encodes is the one <c>DEFECTS.md</c> §11 is
+    /// about: an ordering that puts the boilerplate first is the inverse of interestingness.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Layer_span_emits_the_rarest_pattern_first()
+    {
+        var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
+        Assert.True(findings.Count > 1, "a single finding cannot exercise an ordering");
+
+        // Ranks differ, so the sort is doing work rather than being satisfied by a constant.
+        Assert.True(findings.Select(f => f.ValueOf("PatternGroupSize")).Distinct().Count() > 1);
+
+        for (var i = 1; i < findings.Count; i++)
+        {
+            var (previous, current) = (findings[i - 1], findings[i]);
+            var (before, after) = (previous.ValueOf("PatternGroupSize")!.Value, current.ValueOf("PatternGroupSize")!.Value);
+
+            Assert.True(before <= after, $"{previous} sits in a commoner pattern than {current} and ranks above it");
+            if (before != after) continue;
+
+            // Within one pattern the members are equivalent by construction, so the order is a
+            // tiebreak between things the finding does not distinguish — but it still has to be
+            // total, or it is walk order wearing a sort.
+            var (inbound, outbound) = (previous.ValueOf("FanIn")!.Value, current.ValueOf("FanIn")!.Value);
+            Assert.True(inbound >= outbound, $"{previous} ranks below {current} on fan-in");
+            if (inbound != outbound) continue;
+
+            Assert.True(
+                string.CompareOrdinal(previous.Subject.Canonical, current.Subject.Canonical) < 0,
+                $"{previous} and {current} tie completely and are not in identity order");
+        }
+    }
 
     /// <summary>
     /// The fixture ties, so the tiebreak above is exercised rather than merely present.
@@ -615,6 +784,20 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
             .ToList();
     }
 
+    /// <summary>How many subjects share this one's layering pattern, itself included.</summary>
+    private double? PatternSize(string typeName) => Spanning(typeName).ValueOf("PatternGroupSize");
+
+    /// <summary>The named dependencies a spanning finding rests on.</summary>
+    private List<string> ParticipantNames(string typeName) =>
+        Spanning(typeName).Participants
+            .Select(p => core.Model.Find(p)!.Name)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+    private Finding Spanning(string typeName) =>
+        Assert.Single(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers),
+            f => core.Model.Find(f.Subject)!.Name == typeName);
 
     private Finding Hub(string typeName) =>
         Assert.Single(

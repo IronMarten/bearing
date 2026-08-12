@@ -91,6 +91,20 @@ public static class Qualifiers
     /// hub — neither, which is what makes it wiring.
     /// </remarks>
     public const string TooLargeToHold = "too-large-to-hold";
+
+    /// <summary>
+    /// Enough other components do the same thing, in the same way, that the subject is an instance
+    /// of a pattern rather than an anomaly — so its detail may be collapsed into one line.
+    /// </summary>
+    /// <remarks>
+    /// Row 4 of the suppression matrix, carried as a qualifier for the same reason as row 6: it
+    /// silences <i>detail</i> and not the claim. The probe keeps every collapsed type named in its
+    /// examples list, which is the proof that the finding is not withdrawn — what it loses is the
+    /// per-kind breakdown, and §3.1 says that breakdown is the finding. See
+    /// <see cref="SpansArchitecturalLayers"/> for what makes two subjects the same instance, which
+    /// is <c>docs/DEFECTS.md</c> §11.
+    /// </remarks>
+    public const string PartOfALayeringPattern = "part-of-a-layering-pattern";
 }
 
 /// <summary>
