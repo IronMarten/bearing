@@ -15,6 +15,15 @@
     <ProjectReference Include="..\Bearing.Core\Bearing.Core.csproj" />
   </ItemGroup>
 
+  <!--
+    Registering the MSBuild SDK is the host's job, so the locator belongs here and not in
+    Bearing.Core: a library that registers a process-wide singleton on load cannot be composed.
+    Core's csproj carries the other half of that decision.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
+  </ItemGroup>
+
   <!-- dotnet tool packaging -->
   <PropertyGroup>
     <PackAsTool>true</PackAsTool>

@@ -35,14 +35,18 @@
   </ItemGroup>
 
   <!--
-    SeamTests reads Bearing.Cli's compiled metadata to prove the dependency direction, so it
-    needs the assembly on disk without taking a compile-time reference on it — a reference
-    would create the very Core -> Cli edge the test exists to forbid.
-    ReferenceOutputAssembly=false builds it and stops there.
+    A real reference, as of R1. It used to be ReferenceOutputAssembly=false, on the grounds that
+    referencing Cli "would create the very Core -> Cli edge the test exists to forbid" — which is
+    not what it creates. Every seam assertion reads Bearing.Core's csproj and Bearing.Core.dll;
+    what this project references appears in neither, and SeamTests stays exactly as strong.
+
+    What the old arrangement did cost was the renderer: with no compile-time reference nothing
+    here could name a type in Cli, and R1 moves the report — and with it defects 3, 16 and 17 —
+    into that assembly. A rendering layer carrying three defect fixes cannot be the one part of
+    the tool no test can see.
   -->
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Bearing.Cli\Bearing.Cli.csproj"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\Bearing.Cli\Bearing.Cli.csproj" />
   </ItemGroup>
 
 </Project>

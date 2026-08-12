@@ -1,39 +1,118 @@
 using System.Reflection;
+using Microsoft.Build.Locator;
 
 namespace IronMarten.Bearing.Cli;
 
 /// <summary>
-/// Placeholder entry point for the 0.0.1-preview package.
-///
-/// This build performs no analysis. It exists so that <c>IronMarten.Bearing</c> is
-/// published with complete, consistent metadata ahead of the NuGet ID-prefix
-/// reservation request for <c>IronMarten.*</c>. Analysis lands in 0.1.
-///
-/// Note what this class does and does not do: it reads arguments and writes to the
-/// console, and nothing else. Deciding what the version string should say is
-/// <see cref="ToolInfo"/>'s job, in Bearing.Core. That split is the whole architecture
-/// (<c>docs/ARCHITECTURE.md</c>), and it is worth holding even here, where the logic is
-/// four lines long.
+/// The host: reads arguments, registers MSBuild, runs the walk, and prints what came back.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Nothing here decides what anything means. Argument text is <see cref="CommandLine"/>'s,
+/// the analysis is Core's, and the words are <see cref="Report"/>'s — this method's whole job is
+/// to sequence them and to turn a failure into an exit code. That is the split
+/// <c>docs/ARCHITECTURE.md</c> is about, and it is worth holding here more than anywhere, because
+/// the probe's equivalent grew into 997 lines of formatting with the interpretation baked in.
+/// </para>
+/// <para>
+/// <b>MSBuild is registered before any Roslyn type is touched.</b> <c>MSBuildLocator</c> rewrites
+/// how MSBuild assemblies resolve for the life of the process, so it has to run before the
+/// workspace types load — which is why the walk is behind a separate non-inlined method rather
+/// than in <c>Main</c>. A library that registered a process-wide singleton on load could not be
+/// composed, so Core does not do it and says so in its csproj.
+/// </para>
+/// </remarks>
 internal static class Program
 {
-    private static int Main(string[] args)
+    private static async Task<int> Main(string[] args)
     {
         var version = ToolInfo.ReadVersion(Assembly.GetExecutingAssembly());
 
-        if (Array.Exists(args, a => string.Equals(a, "--version", StringComparison.Ordinal)))
+        Invocation invocation;
+        try
+        {
+            invocation = CommandLine.Parse(args);
+        }
+        catch (CommandLineException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            Console.Error.WriteLine("Run 'bearing --help' for usage.");
+            return 2;
+        }
+
+        if (invocation.ShowVersion)
         {
             Console.WriteLine(version);
             return 0;
         }
 
-        Console.WriteLine($"bearing {version} - Iron Marten");
-        Console.WriteLine();
-        Console.WriteLine("This is a placeholder release. It reserves the package identity and");
-        Console.WriteLine("performs no analysis yet.");
-        Console.WriteLine();
-        Console.WriteLine("  https://github.com/ironmarten/bearing");
+        if (invocation.ShowHelp || invocation.Options is null)
+        {
+            foreach (var line in CommandLine.Usage(version)) Console.WriteLine(line);
+            return invocation.ShowHelp ? 0 : 2;
+        }
+
+        var options = invocation.Options;
+
+        if (!File.Exists(options.SolutionPath))
+        {
+            Console.Error.WriteLine($"Solution not found: {options.SolutionPath}");
+            return 2;
+        }
+
+        if (!RegisterMSBuild()) return 3;
+
+        try
+        {
+            return await AnalyseAsync(options).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            Console.Error.WriteLine($"Analysis failed: {ex.Message}");
+            return 1;
+        }
+    }
+
+    /// <summary>
+    /// Runs the walk and prints the report.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <see cref="Main"/> and never inlined, so that no Roslyn or MSBuild type is
+    /// resolved before <see cref="RegisterMSBuild"/> has run. Inlining this is not a style
+    /// question — it reintroduces the load-order bug.
+    /// </remarks>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static async Task<int> AnalyseAsync(WalkOptions options)
+    {
+        var model = await new SolutionWalker(options).WalkAsync().ConfigureAwait(false);
+        var findings = Analysis.FindingsFor(model);
+
+        foreach (var line in Report.For(model, findings)) Console.WriteLine(line);
 
         return 0;
+    }
+
+    private static bool RegisterMSBuild()
+    {
+        if (MSBuildLocator.IsRegistered) return true;
+
+        try
+        {
+            var instance = MSBuildLocator.QueryVisualStudioInstances().OrderByDescending(i => i.Version).FirstOrDefault();
+            if (instance is null)
+            {
+                Console.Error.WriteLine(
+                    "No MSBuild instance found. Install the .NET SDK — 'dotnet --version' should work.");
+                return false;
+            }
+
+            MSBuildLocator.RegisterInstance(instance);
+            return true;
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.Error.WriteLine($"MSBuild could not be registered: {ex.Message}");
+            return false;
+        }
     }
 }

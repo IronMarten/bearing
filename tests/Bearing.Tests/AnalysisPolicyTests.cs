@@ -1,5 +1,6 @@
 using ArchProbe;
 using IronMarten.Bearing;
+using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
 
@@ -56,6 +57,53 @@ public sealed class AnalysisPolicyTests
     [Fact]
     public void The_policy_carries_the_number_of_values_the_inventory_was_run_over() =>
         Assert.Equal(26, AnalysisPolicy.Default.Values.Count);
+
+    /// <summary>
+    /// Every named threshold can be moved from the command line.
+    /// </summary>
+    /// <remarks>
+    /// The policy exists so a reader can see which thresholds produced a finding. A value that is
+    /// cited in the output but cannot be changed without a rebuild is only half-exposed, and the
+    /// gap would be invisible — nothing fails, the flag simply is not there. Adding a policy value
+    /// and forgetting its flag fails here instead.
+    /// </remarks>
+    [Fact]
+    public void Every_policy_value_has_a_command_line_flag()
+    {
+        var flagged = CommandLine.PolicyFlagNames.ToHashSet(StringComparer.Ordinal);
+
+        Assert.All(
+            AnalysisPolicy.Default.Values,
+            value => Assert.Contains(CommandLine.FlagFor(value.Name), flagged, StringComparer.Ordinal));
+
+        // And nothing the other way: a flag for a value the policy does not carry would set
+        // something the report never cites.
+        Assert.Equal(AnalysisPolicy.Default.Values.Count, CommandLine.PolicyFlagNames.Count);
+    }
+
+    [Theory]
+    [InlineData("MinCohort", "--min-cohort")]
+    [InlineData("HighCc", "--high-cc")]
+    [InlineData("MinFanIn", "--min-fan-in")]
+    [InlineData("GodObjectMembers", "--god-object-members")]
+    [InlineData("SurfaceOutlierMultiple", "--surface-outlier-multiple")]
+    public void Flag_names_are_derived_from_the_property_and_match_the_probes(string property, string flag)
+    {
+        // The derivation is the point: the flag cannot drift from the property because it is not
+        // written down twice. These cases pin the rule against the spellings users already know.
+        Assert.Equal(flag, CommandLine.FlagFor(property));
+    }
+
+    [Fact]
+    public void A_policy_flag_actually_moves_the_policy()
+    {
+        // Otherwise the table above could be complete and inert.
+        var invocation = CommandLine.Parse(["TestBed.sln", "--min-cohort", "9", "--outlier-factor", "2.5"]);
+
+        Assert.NotNull(invocation.Options);
+        Assert.Equal(9, invocation.Options.Policy.MinCohort);
+        Assert.Equal(2.5, invocation.Options.Policy.OutlierFactor);
+    }
 
     [Fact]
     public void Every_gate_that_had_no_name_now_has_one()

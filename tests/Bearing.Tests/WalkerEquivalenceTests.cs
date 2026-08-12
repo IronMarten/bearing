@@ -8,14 +8,40 @@ namespace Bearing.Tests;
 /// </summary>
 public sealed class CoreWalkFixture
 {
+    private readonly Dictionary<string, SolutionModel> _byPolicy = new(StringComparer.Ordinal);
+
     public CoreWalkFixture()
     {
-        Model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution })
-            .WalkAsync(CancellationToken.None)
-            .GetAwaiter().GetResult();
+        Model = Walk(AnalysisPolicy.Default);
     }
 
     public SolutionModel Model { get; }
+
+    /// <summary>
+    /// The same fixture under a different policy, walked once per distinct policy.
+    /// </summary>
+    /// <remarks>
+    /// The workspace load is the suite's cost centre, which is why everything shares one model.
+    /// Some questions cannot be asked of that model: the policy is fixed at construction because
+    /// a finding has to be able to name the policy that produced it, so a test about what happens
+    /// at a different threshold needs a real second walk. Memoised so that asking twice is free,
+    /// and used sparingly — at the time of writing, only by the truncation tests, which need a
+    /// --top low enough to bite.
+    /// </remarks>
+    public SolutionModel WalkWith(AnalysisPolicy policy)
+    {
+        ArgumentNullException.ThrowIfNull(policy);
+
+        var key = string.Join(";", policy.Values.Select(v => $"{v.Name}={v.Value}"));
+        if (_byPolicy.TryGetValue(key, out var cached)) return cached;
+
+        return _byPolicy[key] = Walk(policy);
+    }
+
+    private static SolutionModel Walk(AnalysisPolicy policy) =>
+        new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None)
+            .GetAwaiter().GetResult();
 }
 
 /// <summary>
