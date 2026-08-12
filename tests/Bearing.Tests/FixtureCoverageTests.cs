@@ -695,9 +695,13 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     /// without its category named, and that criterion is now testable the day the feature lands.
     /// </para>
     /// <para>
-    /// This test fails then, and narrowing it is the event worth seeing. Invariant 4: a tool that
-    /// says "safe to remove" about something six customers depend on has caused the burn it claimed
-    /// to prevent.
+    /// <b>It will not be this test that announces the feature, though.</b> The assertion below
+    /// renders the <i>probe</i>, which is frozen, so type-level dead code landing in Core leaves
+    /// it green — the same trap <c>docs/DEFECTS.md</c> §1 fell into, where a pin on the oracle was
+    /// mistaken for a guard on the reimplementation. When the feature is built, the assertion that
+    /// matters is over Core's finding set and belongs beside it. Invariant 4 is what it has to
+    /// satisfy: a tool that says "safe to remove" about something six customers depend on has
+    /// caused the burn it claimed to prevent.
     /// </para>
     /// </remarks>
     [Theory]

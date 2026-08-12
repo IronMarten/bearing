@@ -43,6 +43,20 @@ public sealed class AnalysisPolicyTests
         "GlobalComplexityFloor",
     ];
 
+    /// <summary>
+    /// How many values the whole-policy sweep has to cover.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/TESTING.md</c> §6 quotes this number, and its inventory is only complete against
+    /// the policy it was run over. It has already gone stale twice — the section swept 23 while
+    /// the policy had grown to 26, so three values had never been nudged and nothing said so.
+    /// This is the test that was missing: adding a gate now fails here, and the fix is to sweep
+    /// the new value and update §6 rather than to change the number.
+    /// </remarks>
+    [Fact]
+    public void The_policy_carries_the_number_of_values_the_inventory_was_run_over() =>
+        Assert.Equal(26, AnalysisPolicy.Default.Values.Count);
+
     [Fact]
     public void Every_gate_that_had_no_name_now_has_one()
     {

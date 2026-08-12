@@ -4,8 +4,13 @@
 dotnet test Bearing.sln
 ```
 
-43 assertions, about 3 seconds. The workspace load is the cost centre, not the analysis, so
+281 tests, about 10 seconds. The workspace load is the cost centre, not the analysis, so
 the whole suite shares one analyzed fixture.
+
+> This figure and the one in `CONTRIBUTING.md` have each been wrong by a wide margin at different
+> times — 43 here against 202 there, when the truth was neither. Nothing holds either of them.
+> Treat both as an order of magnitude, and see §6 for what happens to a number in this repository
+> that no test holds.
 
 ---
 
@@ -116,9 +121,17 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 
 The oracle is frozen, so a defect found after the freeze cannot be fixed where it lives. It
 gets a test asserting the **wrong** behaviour instead, naming the requirement that supersedes
-it. Extraction then cannot carry it forward silently, and cannot fix it silently either — the
-day Core does the right thing the test fails, and deleting it is a deliberate act rather than
-a diff nobody reads.
+it. Extraction then cannot carry it forward silently, because the requirement is written down
+beside the behaviour.
+
+> **It does not stop extraction fixing one silently, and this section claimed for months that it
+> did.** Every assertion in `KnownDefectTests` runs against the probe's run, and the probe cannot
+> change — so no pin there can fail on the day Core does the right thing. Defect 1 is the proof:
+> Core has keyed type identity on `(assembly, FQN)` since `ModelBuilder` adopted `SubjectRef`, and
+> the pin is still green. Pins record the oracle's behaviour and retire with it at R2. What
+> catches a silent fix is the equivalence suite below, which runs both implementations and
+> compares them — a defect Core is expected to fix needs an intended-divergence assertion there
+> as well as a pin here.
 
 Each pinned test has an entry in [`DEFECTS.md`](DEFECTS.md), which carries the evidence and the
 remedy; the test names the requirement and asserts the behaviour. Add to both or neither — a
@@ -208,17 +221,26 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **127 type rows** from **128 declarations**, 133 methods, 290 edges, 21 cohorts, 2 excluded,
+- **132 type rows** from **133 declarations**, 138 methods, 290 edges, 22 cohorts, 2 excluded,
   **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
-  planted identity collision below, and it is the expected answer until Core keys types on
-  `(assembly, FQN)`.
+  planted identity collision below. **It is the probe's answer and it is now permanent** — Core
+  keys types on `(assembly, FQN)` and reports 133, which is the one divergence extraction is
+  allowed; the probe is frozen, so this gap closes when the probe retires and not before.
 
   > These four numbers were **89 / 90 / 88 / 202** in this file until they were checked against
   > the goldens, having drifted through every plant since they were written. Nothing asserted
   > them, so nothing failed. `StructureTests.Fixture_shape_is_stable` pins the counts and this
   > line now quotes it — a known answer that no test holds is a comment, and it rots at exactly
   > the rate the fixture grows.
-- namespace cycle: `TestBed.Core` ↔ `TestBed.Core.Pricing`
+  >
+  > **And then it drifted again**, to 127 / 128 / 133 / 21, through P0, P0b and P4 — caught at
+  > S1–S5. Quoting a pinned number is not the same as being held by it, which is the whole of why
+  > it happened twice: three of these five are pinned in `StructureTests` and nobody re-read this
+  > line, and the other two (declarations, cohorts) are pinned nowhere at all. Treat every figure
+  > in this section as a comment until you have found the test that holds it.
+- namespace cycle: 4 namespaces — `TestBed.Core` ↔ `.Depots` ↔ `.Pricing` ↔ `.Vaults`
+  (was two here for several sessions; pinned now in
+  `CoreEquivalenceTests.Namespace_cycles_over_the_fixture_are_what_they_should_be`)
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
 - breaks alone: `TariffReconciler` fires; `MethodReconciler` also fires and **should not** — see
   the note below. Cohort `suffix:Reconciler` (9 members), medians fan-out 2, fan-in 1,
@@ -470,9 +492,14 @@ Two were dead and are now planted in `Core/Dispatch/Dispatch.cs`:
 > `DEFECTS.md` §16. The receipts in the same sentence refute it. Nothing could have seen that
 > while the arm was unreachable.
 
-> **Two constraints on any further plant, both still binding.** `Bridges.cs` records them: no new
-> `ApiBoundary` or `ExternalCall` type, because the fixture sits at nine boundaries and row 5's
-> suppression stops being reachable at ten; and no new fan-in on anything that already exists.
+> **~~Two constraints on any further plant, both still binding.~~ One, now.** The first was
+> withdrawn as decision X1 and its premise was false: *no new `ApiBoundary` or `ExternalCall`
+> type, because the fixture sits at nine boundaries and row 5's suppression stops being reachable
+> at ten*. Row 5 was unreachable at **every** count — `DEFECTS.md` §12 — so a boundary count
+> could not have protected it, and the same constraint had been recorded elsewhere with the
+> opposite justification. P4 has since taken the fixture from nine boundaries to fifteen with
+> nothing disarmed, and F9 made the ceiling observable from both sides for the first time. What
+> still binds is the second: no new fan-in on anything that already exists.
 > The second is easy to violate by accident — naming the new types `*Handler` pulled
 > `SchemaMigrationHandler` into the new suffix cohort and shrank an unrelated peer population
 > from 33 to 32. Caught in the golden diff, not by reasoning. Renamed to `*Dispatcher`.
@@ -548,7 +575,7 @@ three survivors belong to §3.1.
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
 every session. This is the whole of it, measured rather than reasoned, by two sweeps over the
-**23 named policy values** and every guard in every Core detector. Re-run both when a plant lands.
+**26 named policy values** (`AnalysisPolicy.Values`, pinned in `AnalysisPolicyTests`) and every guard in every Core detector. Re-run both when a plant lands.
 
 **Method.** *Leave-one-out*: delete each `if (…) continue;` in turn and run the suite — this asks
 whether the **condition** discriminates. *Nudge*: move each policy value one notch each way and
@@ -560,8 +587,9 @@ so it looks observed, while moving the floor from 3 to 2 changes nothing at all.
 **Conditions that discriminate: 20 of 22.** The two that do not are blast radius' absolute fan-in
 floor and its multiple-of-median, both already recorded above.
 
-**Constants the fixture cannot see — the real list.** Of 23 values, a one-notch move changes
-nothing for these:
+**Constants the fixture cannot see — the real list.** Of the **23 values swept**, a one-notch move
+changes nothing for these. The policy now carries **26**: the sweep predates three of them, and
+re-running it over the current list is owed. `AnalysisPolicyTests` fails if the count moves again.
 
 | Value | Read by | Why nothing moves |
 |---|---|---|
@@ -632,7 +660,7 @@ model.
   which is the case §3.11 exists for and the fixture has never had.
 
 > **The one structural finding, and it explains the rest.** Loosening a threshold by one notch
-> moves output for **3 of 23** values. Nearly every gate has slack on both sides: types clear a
+> moves output for **3 of the 23 swept** values. Nearly every gate has slack on both sides: types clear a
 > gate comfortably or fail it comfortably, and almost nothing sits just outside one. That is what
 > a fixture built by planting *positive* cases looks like — every plant so far has answered "does
 > this finding fire?" and none has answered "is this the number at which it stops firing?"

@@ -27,14 +27,27 @@ be tested against that bar; it is the only entry here that was fixed in place.
 move, each naming the requirement that supersedes it. The regime is "frozen except for a
 registered list of intended changes" — not "frozen".
 
-**The probe is still the only implementation**, so the tool carries these defects until
-extraction lands. That is an argument for extraction being the only thing on the agenda, not for
-unfreezing.
+**The probe is still the only implementation that *renders*.** Core computes every finding and
+every structure section, and several of these defects are fixed there — but nothing a user runs
+reads Core yet, so the shipped tool carries the register until `TASKS.md` R1. That is an argument
+for R1 being the only thing on the agenda, not for unfreezing.
+
+**Read each entry's own status line, not this one.** "Fixed in Core" and "fixed" are different
+claims here: the first means the defect is gone from the model and still present in anything the
+probe renders.
 
 ## The register
 
-Roughly severity-ordered. "Pinned" means `KnownDefectTests` asserts the wrong behaviour as
-current, and will fail the day Core does the right thing.
+Roughly severity-ordered. **"Pinned" means `KnownDefectTests` asserts the wrong behaviour as
+current — the *probe's* behaviour, and nothing more.** Every assertion in that class runs against
+the probe's run, and the probe is frozen, so a pin cannot fail when Core starts doing the right
+thing and cannot be relied on to announce it. Defect 1 is the proof: Core has keyed type identity
+on `(assembly, FQN)` since `ModelBuilder` adopted `SubjectRef`, and the pin is still green. Pins
+retire with the oracle at `TASKS.md` R2.
+
+What catches a fix — or a fix that quietly does the wrong thing — is the equivalence suite, which
+runs both implementations and compares them. A defect Core is expected to fix needs an entry
+there, stated as an intended divergence, as well as a pin here.
 
 ### 1. Type identity is keyed on fully-qualified name alone
 
@@ -257,11 +270,12 @@ It also stops the `Take(5)` being a silent truncation. Past the ceiling the sect
 nothing rather than an arbitrary five of the qualifying boundaries, which is `DEFECTS.md` §3 for
 this section.
 
-**It is reachable but not yet observable.** The qualifying set is bounded by `floor(n/2)`, so
-firing needs at least twelve boundaries with six of them qualifying; TestBed has **ten**, and a
-maximum of five can qualify. The gate is reachable in principle at every solution large enough,
-which the current one is not at any size — but the fixture needs boundaries planted before the
-suppression has a behavioural test, and until it does this stays a suppression that cannot fail.
+**~~It is reachable but not yet observable.~~ Superseded — read the "built, and observable from
+both sides" paragraph below instead.** The reasoning is kept because it is what the decision was
+taken against: the qualifying set is bounded by `floor(n/2)`, so firing would need at least twelve
+boundaries with six qualifying, and TestBed had **ten** with a maximum of five able to qualify.
+P4 has since taken the fixture to **fifteen**, and the ceiling is an absolute count rather than
+`floor(n/2)`, so both halves of that arithmetic are now historical.
 
 **This entry was read backwards for several sessions, and it cost three plants.** "Can never be
 suppressed at any boundary count" was turned into a *constraint on the fixture* — no new
