@@ -4,8 +4,11 @@ Behaviour that is wrong today, recorded rather than fixed. Every entry names wha
 it, and most are pinned as tests in `KnownDefectTests` so that neither carrying one forward nor
 fixing one can happen quietly.
 
-This is also the work order for extraction. Each of these has to be fixed in `Bearing.Core`;
-none is a patch to `oracle/ArchProbe`.
+This is also the work order for extraction. None is a patch to `oracle/ArchProbe`. Most are fixed
+in `Bearing.Core` — **18, 19 and 20 are fixed in `Bearing.Cli`**, and they are a different class:
+not defects carried through the port, but ones the port made visible by producing a report a user
+could read. All three were found by running the shipped binary on a real solution, and none of
+them can be caught by the suite. See *How these were found*.
 
 ## Why a defect gets recorded instead of fixed
 
@@ -473,6 +476,98 @@ so the renderer can ask rather than assert.
 
 Pinned: `The_coverage_section_claims_an_absence_that_is_not_true`.
 
+### 18. The report header is working notes, addressed to the people who built it
+
+Every run, first four lines, in `Report.Header`:
+
+```
+================================================================
+NOMINATED INSTANCES
+Draft sentences. Receipts in parentheses. Rewrite before the session.
+================================================================
+```
+
+*"Rewrite before the session"* is an instruction to the authors about a validation session that
+happened months ago. It shipped through extraction untouched — `golden/nominations.verified.txt`
+carries the same three lines, so this is the probe's text inherited rather than R1's mistake, and
+the only thing R1 changed was dropping the `(cohorts of >= 5 members)` parenthetical.
+
+It survived because **nothing asserts that output is addressed to a user.** The snapshot suite
+holds the header exactly, which pins it as *current* and reads as *intended*; the equivalence
+suite compares Core to the probe, and both say it. A line that both implementations agree on is
+invisible to every check the repo has.
+
+Fix in `Bearing.Cli`. Not pinned — a pin asserts the probe's behaviour, and the probe is not what
+ships. `ReportTests.The_report_renders` moves on the accept workflow; `golden/` does not, because
+it is the probe's frozen baseline and the probe is unchanged.
+
+### 19. The cohort sentence discards the field that would make it true
+
+`PRD-free-tier.md` §4 gives the canonical output as *"top 2% of your 56 normalizers"*, and §5
+rests the whole anomaly claim on it: the reader cannot say *"normalizers are just complex"* — the
+other 55 are not. **The tool has never produced that sentence.** What it renders, from the frozen
+golden:
+
+```
+... top 6% of internal complexity among your 8 ControllerBase.
+... top 10% of internal complexity among your 5 Gauge.
+... top 7% of internal complexity among your 7 IResponseNormalizer.
+```
+
+A base type, a singular noun, and **an interface name with the `I` prefix intact** — that last one
+in the very case the PRD's example was written from. Against a real solution the namespace
+fallback is worse, because there is no noun in it at all: running Bearing on its own solution
+gives *"among your 63 Bearing."* and *"among your 17 ArchProbe"*.
+
+The mechanism is one method. `FindingSections.ShortCohort` takes the cohort key, strips everything
+up to the first `:` — which is `impl:`, `base:`, `suffix:`, `kind:` or `ns:`, **the token that says
+what kind of group this is** — and then takes the last dotted segment. `Cohort` carries `Basis`
+beside `Key` for exactly this, documented as *"how the group was arrived at, for the report to
+explain itself"*, and **no file in `Bearing.Cli` reads it.** The renderer throws away the word that
+would make the sentence grammatical, then hides the loss by stripping the prefix that encoded it.
+
+The fix is not pluralisation. Each basis needs its own phrasing — *"the 7 types implementing
+`IResponseNormalizer`"*, *"the 8 types deriving from `ControllerBase`"*, *"the 5 types whose names
+end in `Gauge`"*, *"the 63 types in `IronMarten.Bearing`"* — because a reader who cannot tell
+*which* population the claim is against cannot check it, and checkability is the entire argument
+for cohort-relative findings over scores.
+
+Invisible to the equivalence suite by construction: `TESTING.md` §5 asserts against the model
+rather than report prose, and both implementations render the same wrong sentence from the same
+right model. Fix in `Bearing.Cli`; `ReportTests` re-accepts, `golden/` stays as the probe's record.
+
+### 20. `0 external contact point(s)` prints directly above six external systems
+
+The boundary section opens with a count of types classified `ApiBoundary` or `ExternalCall`, then
+warns that *"changes at ANY of these is outside what static analysis can see"*, and then the
+integration map lists every external system by how many types touch it. On Bearing's own solution
+that reads:
+
+```
+   0 external contact point(s): 0 inbound API, 0 outbound. Consumer impact of
+   changes at ANY of these is outside what static analysis can see.
+
+   INTEGRATION MAP — external systems, by how many types touch them:
+     System.IO                                  9 types
+     Microsoft.CodeAnalysis                     8 types
+     ...
+```
+
+Both numbers are right and they measure different things — a contact point is a *type* at the
+edge, an integration is a *namespace* reached across it. The defect is that the section states an
+absence and then enumerates a presence, four lines apart, with nothing saying they are different
+questions. Invariant 4 is about never implying safety at a boundary; a zero that a reader takes
+for "no external surface here" is that failure arriving through arithmetic that is individually
+correct.
+
+**The fixture cannot show this.** TestBed has 19 contact points, so the disagreeing case is the
+zero case, and the zero case is unexercised — which is why it took a run against a solution that
+is a library and a CLI and nothing else to surface it. `TESTING.md` §6 should carry the gap.
+
+Related but not the same: whether `Microsoft.CodeAnalysis` should be called an *external system*
+alongside Stripe and Azure at all is defect 5's classification question, and fixing the wording
+here does not answer it.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.
@@ -493,3 +588,14 @@ this class of problem, which had passed over it because nothing read it.
 **Suppressions interact through the population, not just through the code.** One suppression's
 test plant had to be built from existing boundary types, because adding a new one would have
 moved `boundaries.Count` and disarmed defect 12's row before it could be examined.
+
+**Running the tool on a solution that is not the fixture found three defects in one pass.**
+Defects 18, 19 and 20 all came from `bearing ./Bearing.sln` — 89 types, 4.5s — and none of them
+could have come from the suite. Two were agreed on by both implementations, which makes them
+invisible to the equivalence check, and pinned by a snapshot, which records them as intended. The
+third needs a population the fixture does not have: TestBed has 19 contact points, so the case
+where the count is zero and the integration map is not has never rendered. **A fixture answers
+the questions it was built to answer.** The complement — *is this output addressed to a user, and
+does it read as one thing* — has no test and probably cannot have one, which is an argument for
+running the shipped binary on real solutions as a scheduled activity rather than as a
+demonstration.
