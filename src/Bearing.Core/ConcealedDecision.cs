@@ -154,26 +154,7 @@ public static class ConcealedDecision
         return Ranked(found);
     }
 
-    /// <summary>
-    /// Strongest evidence first, broken by identity.
-    /// </summary>
-    /// <remarks>
-    /// The tiebreak is what makes the order total. Ranking alone reproduces on one machine
-    /// without being a property of the tool: outlier factors tie constantly, and a stable sort
-    /// over a tied group just preserves whatever order the walk happened to arrive in.
-    /// <c>docs/TESTING.md</c> §5.
-    /// <para>
-    /// No <c>Take</c>. <see cref="AnalysisPolicy.Top"/> is a display cap, and a model that
-    /// truncates leaves every renderer unable to say how much it is not showing — which is
-    /// <c>docs/DEFECTS.md</c> §3. It also silently weakens suppression: in the probe, a type
-    /// nominated below the cap does not suppress anything, because the set the suppression tests
-    /// membership against was truncated first.
-    /// </para>
-    /// </remarks>
+    /// <summary>Strongest outlier first. See <see cref="Nomination"/> for the tiebreak.</summary>
     private static List<Finding> Ranked(IEnumerable<(double Rank, Finding Finding)> found) =>
-        found
-            .OrderByDescending(f => f.Rank)
-            .ThenBy(f => f.Finding.Subject.Canonical, StringComparer.Ordinal)
-            .Select(f => f.Finding)
-            .ToList();
+        Nomination.Ranked(found.OrderByDescending(f => f.Rank), f => f.Finding);
 }

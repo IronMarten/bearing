@@ -80,6 +80,86 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Equal(7, byMethod.Except(byType, StringComparer.Ordinal).Count());
     }
 
+    /// <summary>
+    /// Blast radius agrees with the probe, <b>including where the gate was replaced</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Core does not implement the probe's <c>FanInPctl &gt;= 95</c>. It gates on rank within the
+    /// cohort instead, because the percentile form is unsatisfiable below a cohort of ten
+    /// (<c>docs/DEFECTS.md</c> §14). Agreement here is therefore a result about the replacement:
+    /// <c>rank ≤ 0.05n + 0.5</c> and <c>pctl ≥ 95</c> are the same condition wherever the latter
+    /// could be met, so the only cohorts where the two can disagree are the ones the probe could
+    /// never nominate from.
+    /// </para>
+    /// <para>
+    /// <b>And on this fixture they do not disagree at all</b> — which is worth stating plainly,
+    /// because it means the repair is not observed here. The stranded cohorts contain types that
+    /// now clear the rank gate (<c>NormalizationContext</c> at rank 1 of eight, <c>RawResponse</c>
+    /// at rank 2) and every one of them fails blast radius on complexity instead. See
+    /// <c>FixtureCoverageTests</c>: the plant that would observe it is still owed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Blast_radius_nominations_are_the_probes()
+    {
+        var expected = ProbeNominations("-- BUG BLAST RADIUS");
+        var actual = CoreTypeNominations(FindingKind.BugBlastRadius);
+
+        Assert.Equal(expected, actual);
+        Assert.NotEmpty(actual);
+    }
+
+    [Fact]
+    public void Load_bearing_nominations_are_the_probes()
+    {
+        var expected = ProbeNominations("-- LOAD-BEARING AND INTRICATE");
+        var actual = CoreTypeNominations(FindingKind.LoadBearingAndIntricate);
+
+        Assert.Equal(expected, actual);
+        Assert.NotEmpty(actual);
+    }
+
+    /// <summary>
+    /// One type is nominated as both, and that is the design rather than a double-count.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>PRD-free-tier.md</c> §7.2 settles that blast radius and load-bearing-and-intricate are
+    /// two findings rather than one, against the alternative reading that the probe had split a
+    /// single message in two. They overlap on <i>"widely depended on and complex"</i> and diverge
+    /// on what they claim: how far a defect propagates, judged against peers, versus how
+    /// insulated a type is, judged in absolute terms with no cohort at all.
+    /// </para>
+    /// <para>
+    /// <c>ShipmentLedger</c> is where the decision becomes observable. Unlike breaks-alone and
+    /// concealed decision — which contradict each other, and where saying both discredits both —
+    /// nothing suppresses this pair, so a suppression pass that ever removed one of these two
+    /// would be enforcing a merge nobody agreed to. The assertion is what makes that loud.
+    /// </para>
+    /// <para>
+    /// The two receipts below are the divergence itself: the cohort-relative reading exists only
+    /// on one of them, and the instability that carries the whole of the other's claim exists
+    /// only on the other.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Both_findings_may_be_made_about_one_type()
+    {
+        var ledger = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
+        var about = Analysis.FindingsFor(core.Model).About(ledger.Subject).ToList();
+
+        var blast = Assert.Single(about, f => f.Kind == FindingKind.BugBlastRadius);
+        var bearing = Assert.Single(about, f => f.Kind == FindingKind.LoadBearingAndIntricate);
+
+        Assert.NotNull(blast.ValueOf("FanInRank"));
+        Assert.Null(blast.ValueOf("Instability"));
+
+        Assert.NotNull(bearing.ValueOf("Instability"));
+        Assert.Null(bearing.ValueOf("FanInRank"));
+        Assert.Null(bearing.ValueOf("CohortSize"));
+    }
+
     // ------------------------------------------------------- the rules, on the model ----
 
     /// <summary>
@@ -242,6 +322,21 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// </remarks>
     private List<string> ProbeNominations(string header) =>
         NominationText.SubjectsUnder(NominationText.Render(probe.Result, Uncapped), header)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+    /// <summary>
+    /// Type-subject findings, named the way the probe names them — the type alone.
+    /// </summary>
+    /// <remarks>
+    /// Distinct from <see cref="Label"/>, which appends the member a concealed-decision sentence
+    /// is about. Blast radius and load-bearing claim something about the type itself, so the
+    /// member is a participant rather than part of the subject.
+    /// </remarks>
+    private List<string> CoreTypeNominations(FindingKind kind) =>
+        Analysis.FindingsFor(core.Model)
+            .OfKind(kind)
+            .Select(f => core.Model.Find(f.Subject)!.Name)
             .Order(StringComparer.Ordinal)
             .ToList();
 

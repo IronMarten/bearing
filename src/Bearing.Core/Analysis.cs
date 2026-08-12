@@ -18,9 +18,11 @@ namespace IronMarten.Bearing;
 /// 1,066-line method, which means reordering it breaks invariant 3 without failing anything.
 /// </para>
 /// <para>
-/// Only the two concealed-decision nominations are wired up so far. The rest of
-/// <c>TECHREQ-job-b.md</c> §3 arrives as detectors, and §4's suppressions as a pass over the set
-/// — neither of which changes this shape.
+/// Four of §3's findings are wired up: both concealed-decision nominations, blast radius and
+/// load-bearing. The rest arrive as detectors, and §4's suppressions as a pass over the set —
+/// neither of which changes this shape. Note that blast radius and load-bearing overlap on
+/// "widely depended on and complex" and are still two findings, both allowed to fire on one
+/// type; that is a <c>PRD-free-tier.md</c> §7.2 decision, not an oversight here.
 /// </para>
 /// </remarks>
 public static class Analysis
@@ -37,6 +39,8 @@ public static class Analysis
     [
         ConcealedDecision.AtMethodLevel,
         ConcealedDecision.AtTypeLevel,
+        BlastRadius.Detect,
+        LoadBearing.Detect,
     ];
 
     /// <summary>Runs every detector over the model and indexes the result.</summary>
