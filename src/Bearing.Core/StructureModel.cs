@@ -461,6 +461,53 @@ public sealed class SolutionModel
             Types.Select(t => (t.Subject.Canonical, t.Project, t.IsAbstractOrInterface)),
             Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
+    /// <summary>Mutually dependent namespaces, largest cycle first.</summary>
+    public IReadOnlyList<Cycle> NamespaceCycles => Cycles.AmongNamespaces(this);
+
+    /// <summary>
+    /// Groups of types that all reach each other, largest first. Gated at
+    /// <see cref="AnalysisPolicy.MinTangle"/>.
+    /// </summary>
+    public IReadOnlyList<Cycle> TypeTangles => Cycles.AmongTypes(this);
+
+    /// <summary>
+    /// Projects no other project depends on, ordered by name.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A root is not dead.</b> Something has to be depended on by nothing, or the solution
+    /// does not run — so an entry point, an executable and a project holding an API boundary are
+    /// all excluded. What is left is a library nothing reaches, which is the case worth raising.
+    /// </para>
+    /// <para>
+    /// <b>It cannot see test projects, and that changes what the answer means.</b> They are
+    /// skipped by default, so a library used only by tests has no visible consumer and appears
+    /// here. The claim this list supports is "nothing in the analysed solution depends on these",
+    /// which is not the same as "these are unused" — a renderer that shortens it to the second is
+    /// telling a reader it is safe to delete working code. <c>Coverage.SkippedProjects</c> is
+    /// what makes the difference statable.
+    /// </para>
+    /// <para>
+    /// Only projects that declare an analysed type are candidates, since Ca is counted over
+    /// types — see <see cref="ProjectCouplings"/>.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<ProjectNode> UnreferencedProjects
+    {
+        get
+        {
+            var unreferenced = ProjectReachability.Unreferenced(
+                Projects.Select(p => (p.Name, p.HasEntryPoint, p.IsLibrary)),
+                ProjectCouplings,
+                Types
+                    .Where(t => string.Equals(t.Classification.Kind, "ApiBoundary", StringComparison.Ordinal))
+                    .Select(t => t.Project));
+
+            var byName = Projects.ToDictionary(p => p.Name, StringComparer.Ordinal);
+            return unreferenced.Select(name => byName[name]).ToList();
+        }
+    }
+
     /// <summary>Every namespace outside the solution that analysed types touch.</summary>
     public IReadOnlyList<ExternalDependency> ExternalDependencies =>
         Types

@@ -293,6 +293,126 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
             Shape(ProjectCoupling.ForSolution(types.Reverse(), edges.Reverse())));
     }
 
+    // ------------------------------------------------------- circular references ----
+
+    /// <summary>
+    /// The fixture's one namespace cycle, stated rather than parsed.
+    /// </summary>
+    /// <remarks>
+    /// The golden pins the probe's rendering of the same four namespaces, so agreement here is
+    /// agreement with the probe. <c>GraphTests</c> is where the algorithms are compared directly.
+    /// </remarks>
+    [Fact]
+    public void Namespace_cycles_over_the_fixture_are_what_they_should_be()
+    {
+        var cycle = Assert.Single(core.Model.NamespaceCycles);
+
+        Assert.Equal(
+            [
+                SubjectRef.ForNamespace("TestBed.Core"),
+                SubjectRef.ForNamespace("TestBed.Core.Depots"),
+                SubjectRef.ForNamespace("TestBed.Core.Pricing"),
+                SubjectRef.ForNamespace("TestBed.Core.Vaults"),
+            ],
+            cycle.Members);
+    }
+
+    [Fact]
+    public void Type_tangles_over_the_fixture_are_what_they_should_be()
+    {
+        var tangle = Assert.Single(core.Model.TypeTangles);
+
+        var names = tangle.Members
+            .Select(m => core.Model.Find(m)!.Name)
+            .Order(StringComparer.Ordinal);
+
+        Assert.Equal(
+            [
+                "AccessorialNormalizer", "AddressNormalizer", "RateNormalizer", "ReferenceNormalizer",
+                "Router", "ShipmentCoordinator", "TrackingNormalizer", "TransitNormalizer",
+            ],
+            names);
+    }
+
+    /// <summary>
+    /// The collision fix does not reach the cycles, and cannot on this fixture.
+    /// </summary>
+    /// <remarks>
+    /// Asserted so that the gap is a statement rather than an omission. Core keeps two
+    /// <c>PayloadTag</c> rows where the probe merges them, and both have fan-in 0 — a node with
+    /// no inbound edges is in no strongly-connected component, so merged and split give the same
+    /// partition. S2 therefore agrees with the probe for a reason that has nothing to do with S2
+    /// being right. <c>docs/DEFECTS.md</c> §1, <c>TASKS.md</c> P8.
+    /// </remarks>
+    [Fact]
+    public void The_collision_is_invisible_to_the_cycles_and_that_is_why_P8_exists()
+    {
+        var collided = core.Model.Types
+            .Where(t => t.FullyQualifiedName == "global::TestBed.Shared.PayloadTag")
+            .ToList();
+
+        Assert.Equal(2, collided.Count);
+        Assert.All(collided, t => Assert.Equal(0, t.FanIn));
+
+        var entangled = core.Model.TypeTangles.SelectMany(c => c.Members).ToHashSet();
+        Assert.All(collided, t => Assert.DoesNotContain(t.Subject, entangled));
+    }
+
+    // ------------------------------------------------------- unreferenced projects ----
+
+    [Fact]
+    public void Unreferenced_projects_over_the_fixture_are_what_they_should_be()
+    {
+        // Data and Tools each reach into Core and nothing reaches into either. Core itself is
+        // depended on by both, so it is not a candidate whatever else is true of it.
+        Assert.Equal(
+            ["Data", "Tools"],
+            core.Model.UnreferencedProjects.Select(p => p.Name).Order(StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// A root is not dead, and each exclusion carries its own case.
+    /// </summary>
+    /// <remarks>
+    /// The fixture cannot show this. Its two unreferenced projects are plain libraries with no
+    /// entry point and no boundary, so all three exclusions are dead against it and deleting any
+    /// of them leaves the section unchanged — TESTING.md §9. The control is the last row: the same
+    /// project with none of the three applying, which has to appear or the theory above would pass
+    /// on a function that returned nothing.
+    /// </remarks>
+    [Theory]
+    [InlineData("has a Main", true, true, false, false)]
+    [InlineData("is an executable", false, false, false, false)]
+    [InlineData("hosts an API", false, true, true, false)]
+    [InlineData("is none of those", false, true, false, true)]
+    public void A_root_is_not_dead(string _, bool hasEntryPoint, bool isLibrary, bool hostsAnApi, bool expected)
+    {
+        var coupling = ProjectCoupling.ForSolution(
+            [("Leaf.T", "Leaf", false), ("App.T", "App", false)],
+            [("Leaf.T", "App.T")]);   // Leaf reaches out; nothing reaches into Leaf
+
+        var unreferenced = ProjectReachability.Unreferenced(
+            [("Leaf", hasEntryPoint, isLibrary), ("App", false, true)],
+            coupling,
+            hostsAnApi ? ["Leaf"] : []);
+
+        Assert.Equal(expected, unreferenced.Contains("Leaf"));
+    }
+
+    [Fact]
+    public void A_project_with_no_analysed_types_is_not_reported_as_unreferenced()
+    {
+        // Ca is counted over types, so a project with none has no Ca to be zero. It is unmeasured
+        // rather than unreferenced, and the two are different claims — the same distinction
+        // Instability draws by returning null.
+        var unreferenced = ProjectReachability.Unreferenced(
+            [("Empty", false, true)],
+            ProjectCoupling.ForSolution([("A.T", "A", false)], []),
+            []);
+
+        Assert.Empty(unreferenced);
+    }
+
     // ------------------------------------------------------------------ adapters ----
 
     private static double ValueOf(TypeMetrics t, string dimension) => dimension switch

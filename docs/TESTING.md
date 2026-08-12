@@ -575,7 +575,15 @@ nothing for these:
 | `Top` 15 | §3.1 via `RollCallThreshold` | Core does not truncate, and 14/3 and 16/3 both floor to the same threshold |
 | `SurfaceOutlierMultiple`, `SurfaceOutlierFloor`, `SurfaceDiscriminationDivisor` | §3.10 | **not ported yet** — Core reads none of them |
 | `GlobalFanInPercentile`, `GlobalComplexityPercentile`, `GlobalComplexityFloor` | §3.11 | **not ported yet**, and two are dead on the fixture besides — see below |
-| `MinTangle` 4 | graphs | not ported yet |
+| `MinTangle` 4 | graphs | **ported at S2, and measured dead**: the fixture holds one tangle of 8 and *no* mutual pairs or triples, so 3 and 5 both change nothing — 2 does not either |
+
+**The circular-reference section has one of everything, which is one short of a test.** S2 landed
+with a single namespace cycle and a single type tangle, and three things follow from that number
+rather than from anything being wrong: `MinTangle` cannot discriminate (above), the model's
+"largest cycle first" ordering has nothing to sort, and neither can the renderer's eventual
+truncation be exercised. `GraphTests` covers the algorithm's own canonical ordering on synthetic
+graphs, so what is unobserved is the *section's* ordering rather than Tarjan's. **A second tangle
+fixes all three at once**, and P8 needs a cycle built anyway — one plant, four gates.
 
 **One divergence the fixture cannot see, and it is not a constant.** Core keys type identity on
 `(assembly, FQN)` and the probe keys on the FQN alone — `DEFECTS.md` §1, the one carve-out from
