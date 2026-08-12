@@ -221,13 +221,19 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// peer-relative sentence.
     /// </para>
     /// <para>
-    /// <b>The fan-in half was a dead gate until P6, and P6 closed it as a side effect.</b> It was
-    /// recorded as close to structural — a type with no peers usually has few callers — and as
+    /// <b>The fan-in half had never fired, and P6 gave it its first case as a side effect.</b> It
+    /// was recorded as close to structural — a type with no peers usually has few callers — and as
     /// needing a deliberate plant: <i>a lone component much of the system depends on</i>. P6's
     /// shared dependency set is exactly that shape without having set out to be. Eight conduits
     /// reach three targets, so each target has fan-in 8 against a solution where most types have
-    /// none, and none of the three has a peer group. The claim is now made in both flavours, and
-    /// the gate is observable upward as well as downward for the first time.
+    /// none, and none of the three has a peer group. The claim is now made in both flavours.
+    /// </para>
+    /// <para>
+    /// <b>That is the condition, not the constant, and the two are not the same win.</b> The three
+    /// sit at <c>GlobalFanInPctl</c> 94.1 against a bar of 90, so 89 and 91 both leave the finding
+    /// alone and it takes 95 to move — <c>GlobalFanInPercentile</c> is still in the
+    /// constants-the-fixture-cannot-see table. <c>docs/TESTING.md</c> §6 opens by insisting those
+    /// are different questions, and the first version of this remark ran them together.
     /// </para>
     /// <para>
     /// It is asserted by name rather than by count, because the case is incidental to the plant

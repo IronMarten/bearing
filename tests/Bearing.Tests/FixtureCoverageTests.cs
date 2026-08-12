@@ -724,7 +724,7 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
-    /// Coverage's two global gates: one is observed since P6, the other is still dead.
+    /// Coverage's two global gates: one condition is live since P6, and both constants are dead.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -736,12 +736,20 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     /// percentile, which takes a codebase flatter than this one. Still owed.
     /// </para>
     /// <para>
-    /// <b><c>GlobalFanInPercentile</c> was observable in one direction only, and P6 closed it.</b>
+    /// <b><c>GlobalFanInPercentile</c>'s condition had never fired, and P6 gave it a case.</b>
     /// The record said the plant would have to be deliberate — <i>a lone component that much of
     /// the system depends on</i>, close to structural because a type with no peer group usually
     /// has few callers — and predicted it would never arrive by accident. It arrived by accident.
     /// P6's three shared dependency targets each carry fan-in 8 and each land in a cohort too
     /// small to compare against, which is that description exactly.
+    /// </para>
+    /// <para>
+    /// <b>The constant is still dead, and conflating the two is what the sweep caught.</b> The
+    /// three sit at <c>GlobalFanInPctl</c> 94.1 against a bar of 90, so a one-notch move in either
+    /// direction changes nothing and it takes 95 to empty the claim —
+    /// <c>PolicySweepTests</c> reports it unmoved both ways. What P6 closed is the condition: the
+    /// gate now has something to admit, so deleting it would be noticed. Before, it admitted
+    /// nothing and its removal was free.
     /// </para>
     /// <para>
     /// <b>Worth being uneasy about, and recorded rather than celebrated.</b> The case is a

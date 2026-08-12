@@ -619,39 +619,53 @@ different questions and a gate can pass one and fail the other, which is why bot
 so it looks observed, while moving the floor from 3 to 2 changes nothing at all.
 
 **Conditions that discriminate: 20 of 22.** The two that do not are blast radius' absolute fan-in
-floor and its multiple-of-median, both already recorded above.
+floor and its multiple-of-median, both already recorded above. This half is still run by hand — it
+needs source edits — and it has not been re-run since P6.
 
-**Constants the fixture cannot see — the real list.** Of the **23 values swept**, a one-notch move
-changes nothing for these. The policy now carries **26**: the sweep predates three of them, and
-re-running it over the current list is owed. `AnalysisPolicyTests` fails if the count moves again.
+**Constants the fixture cannot see — and the table is no longer written here.**
+`PolicySweepTests.The_whole_policy_swept_one_notch_each_way.verified.txt` **is** the table: every
+value in `AnalysisPolicy.Values`, moved one notch each way, with the finding set compared at each.
+Read it there.
 
-> **This table is one plant out of date, and the sweep is the next thing owed.** P6 moved three
-> values without having been run over the whole policy: `GlobalFanInPercentile` is observed,
-> `RollCallDivisor` is observed in both directions, and `ChangeCostTopFraction` has stopped being
-> insensitive. `Top` is unchanged — 14/3 and 16/3 still floor to the same threshold.
+> **Why it moved out of this document.** The hand-run version went stale twice and nothing said so.
+> It was measured once over 23 values while the policy had grown to 26, and **which three were
+> missing was recorded nowhere** — "23" counted what was nudged rather than the policy at the time,
+> so it is not recoverable from history. Two of its rows were also simply out of date: it called
+> `SurfaceOutlierMultiple` *observable upward only* on a boundary population of two qualifiers,
+> which P4 took to seven, and it had no row for `RollCallDivisor` at all — a value that could not
+> have been observable before P6, since nothing collapsed. Re-running over all 26 dissolves the
+> question of which three were skipped, and pinning the result as a snapshot means the next drift
+> is a diff to accept rather than a claim that quietly stops being true.
 >
-> **Which three values the sweep has never seen is recorded nowhere.** The "23" is a count of what
-> was nudged rather than a snapshot of the policy, and diffing `AnalysisPolicy.Values` back through
-> the ports does not recover it — the policy has carried 26 since before the commit that wrote this
-> section down. So the three can only come out of the re-run. Do that next, over all 26, before
-> building P7 against a table this stale.
+> **The cost is real**: 52 walks, and the suite goes from about 12 seconds to about 56. That is the
+> workspace load, which is the suite's cost centre, and it is the price of the table being measured
+> instead of remembered.
 
-| Value | Read by | Why nothing moves |
+**11 of 26 decide something at one notch; 15 do not.** The rows worth a sentence beyond the
+snapshot:
+
+| Value | Read by | Note |
 |---|---|---|
 | `OutlierFactor` 3.0 | §3.2, §3.3 | nominations sit at 3.5×–22×; nothing is near the bar |
 | `HighCc` 10 | §3.6, §3.7, §3.8, §3.10 | complexity is bimodal — cc 1 or cc 11+ |
 | `GodObjectMembers` 20 | §3.8 | `DispatchRegistry` at 23 is the only case; observable at ±4, not ±1 |
-| `StableThreshold` 0.2 | §3.6 | nominees at instability 0 and 0.125 |
 | `ConcealedFanInCeiling` 2.0 | §3.2 | every nominee is at 0 or infinity, never between |
 | `BlastFanInMultiple` 2.0 | §3.4 | the one nominee is at 11× |
 | `BlastComplexityPercentile` 70 | §3.4 | the one nominee is at 95.8 |
-| `Top` 15 | §3.1 via `RollCallThreshold` | Core does not truncate, and 14/3 and 16/3 both floor to the same threshold |
+| `Top` 15 | §3.1 via `RollCallThreshold` | 14/3 and 16/3 both floor to the same threshold. Unchanged by P6 |
 | `SurfaceDiscriminationDivisor` | §3.10 | **retired, not unported** — D12 replaced the proportional ceiling with `MaxNamedSurfaces`, and Core has no such value to read |
-| `SurfaceOutlierFloor` 1 | §3.10 | `median × 1.5` clears it on every boundary distribution the fixture produces, so the floor never binds — 0 and 2 both change nothing |
-| `SurfaceOutlierMultiple` 1.5 | §3.10 | **observable upward only**: 1.6 moves the finding set, 1.4 does not. The qualifying surfaces sit at 8 and 12 against a bar of 6, so there is room below the gate and none above it |
-| `GlobalComplexityFloor` | §3.11 | dead on the fixture: no below-floor type clears the percentile while failing the floor, so the floor never decides — see below |
-| ~~`GlobalFanInPercentile` 90~~ | §3.11 | **closed by P6, and by accident** — its three shared dependency targets each carry fan-in 8 with no peer group, which is the deliberate plant this row said would never arrive on its own. See below |
+| `SurfaceOutlierFloor` 1, `SurfaceOutlierMultiple` 1.5, `MaxNamedSurfaces` 5 | §3.10 | **all three are masked by their own suppression.** Seven surfaces qualify against a ceiling of five, so the section is suppressed and every nudge that leaves it suppressed produces the same empty output. `MaxNamedSurfaces` is observable at +2 and the multiple at +0.5, both of which unsuppress it. This is §4's inverse — a suppression working so broadly that the gates underneath stop being tested — and it is why the old *observable upward only* row for the multiple was true when written and false by P4 |
+| `GlobalComplexityFloor` 1 | §3.11 | dead: no below-floor type clears the percentile while failing the floor, so the floor never decides |
+| `GlobalFanInPercentile` 90 | §3.11 | **the condition is live since P6; the constant is not.** P6's three dependency targets sit at `GlobalFanInPctl` 94.1, so §3.11's fan-in claim has its first case ever — but 89 and 91 both leave it alone and it takes 95 to move. Same shape as `GodObjectMembers`, and see the correction below |
 | `MinTangle` 4 | graphs | **ported at S2, and measured dead**: the fixture holds one tangle of 8 and *no* mutual pairs or triples, so 3 and 5 both change nothing — 2 does not either |
+
+> **A correction, and it is the exact mistake this section exists to prevent.** P6's own commit and
+> the first version of this row said `GlobalFanInPercentile` was *closed*. It is not. What P6 closed
+> is the **condition** — three types now satisfy a gate nothing had ever satisfied, so the finding
+> makes its fan-in claim for the first time and a leave-one-out would notice its removal. The
+> **constant** is still invisible at one notch. Those are the two questions this section opens by
+> insisting are different, conflated in the same document that insists on it. The sweep is what
+> caught it, four commits after the claim was written.
 
 **The circular-reference section has one of everything, which is one short of a test.** S2 landed
 with a single namespace cycle and a single type tangle, and three things follow from that number
@@ -701,16 +715,21 @@ model.
   `GlobalComplexityPercentile` discriminates: three of the thirteen clear it (`OrderRepository` 98,
   `PayloadTag` 95.2, `RoutingDepot` 91.7). **`GlobalComplexityFloor` is dead** — no below-floor type
   clears the percentile while failing the floor, so the absolute floor never decides.
-  ~~**`GlobalFanInPercentile` is observable downward only**~~ — **closed at P6, which was not
-  trying to.** The record said the plant would have to be deliberate, *a lone component much of the
-  system depends on*, and called it close to structural because a type with no peers usually has
-  few callers. P6's shared dependency set is that description without having meant to be: eight
+  **`GlobalFanInPercentile`'s condition fired for the first time at P6, which was not trying to.**
+  The record said the plant would have to be deliberate, *a lone component much of the system
+  depends on*, and called it close to structural because a type with no peers usually has few
+  callers. P6's shared dependency set is that description without having meant to be: eight
   conduits reach three targets, each target lands in a cohort too small to compare against, and
   each carries fan-in 8 against a solution where most types have none. The finding now makes the
   weaker global claim in both flavours.
 
+  **The constant is still dead, and the distinction matters here more than anywhere.** The three
+  sit at `GlobalFanInPctl` 94.1 against a bar of 90, so one notch either way moves nothing and it
+  takes 95 — the gate has a case, not a calibration. The sweep says so; the first draft of this
+  paragraph said "closed" and was wrong.
+
   **Recorded rather than celebrated.** Nothing about it is load-bearing for P6, so reshaping the
-  conduits would retire the gate again with nothing saying so — which is why
+  conduits would retire the case again with nothing saying so — which is why
   `FindingEquivalenceTests.The_weaker_global_claim_is_made_in_both_flavours` names the three types
   instead of counting them. **Two of the fixture's gate closures now rest on plants built for
   something else**, this one and change cost's, and that is a pattern worth watching rather than

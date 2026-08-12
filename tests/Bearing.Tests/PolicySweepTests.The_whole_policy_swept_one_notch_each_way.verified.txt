@@ -1,0 +1,31 @@
+﻿Each value moved one notch each way, against the finding set at defaults.
+'moves' = the finding set differs.  'rejected' = the policy refuses the value.
+
+value                          default   notch   down       up
+------------------------------------------------------------------------
+MinCohort                            5       1   moves      moves
+OutlierFactor                        3     0.1   -          -
+MinFanIn                             5       1   -          moves
+Top                                 15       1   -          -
+HighCc                              10       1   -          -
+MinDecisionCc                        5       1   -          moves
+HubMin                               5       1   -          moves
+GodObjectMembers                    20       1   -          -
+MinKindSpan                          3       1   -          moves
+StableThreshold                    0.2     0.1   moves      moves
+IsolatedThreshold                  0.8     0.1   -          moves
+BreaksAloneMinFanIn                  1       1   moves      moves
+ConcealedFanInCeiling                2     0.1   -          -
+ConcealedFanOutCeiling               2     0.1   moves      -
+BlastFanInMultiple                   2     0.1   -          -
+BlastTopFraction                  0.05    0.01   -          -
+BlastComplexityPercentile           70       1   -          -
+ChangeCostTopFraction             0.05    0.01   -          moves
+RollCallDivisor                      3       1   moves      moves
+SurfaceOutlierMultiple             1.5     0.1   -          -
+SurfaceOutlierFloor                  1       1   -          -
+MaxNamedSurfaces                     5       1   -          -
+GlobalFanInPercentile               90       1   -          -
+GlobalComplexityPercentile          90       1   -          -
+GlobalComplexityFloor                1       1   -          -
+MinTangle                            4       1   -          -
