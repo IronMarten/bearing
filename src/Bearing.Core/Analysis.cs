@@ -18,11 +18,12 @@ namespace IronMarten.Bearing;
 /// 1,066-line method, which means reordering it breaks invariant 3 without failing anything.
 /// </para>
 /// <para>
-/// Four of §3's findings are wired up: both concealed-decision nominations, blast radius and
-/// load-bearing. The rest arrive as detectors, and §4's suppressions as a pass over the set —
-/// neither of which changes this shape. Note that blast radius and load-bearing overlap on
-/// "widely depended on and complex" and are still two findings, both allowed to fire on one
-/// type; that is a <c>PRD-free-tier.md</c> §7.2 decision, not an oversight here.
+/// Five of §3's findings are wired up — both concealed-decision nominations, blast radius,
+/// load-bearing and breaks alone — and three of §4's seven suppression rows, all of them breaks
+/// alone's. The rest arrive the same way and neither changes this shape. Note that blast radius
+/// and load-bearing overlap on "widely depended on and complex" and are still two findings, both
+/// allowed to fire on one type; that is a <c>PRD-free-tier.md</c> §7.2 decision, not an oversight
+/// here.
 /// </para>
 /// </remarks>
 public static class Analysis
@@ -41,10 +42,35 @@ public static class Analysis
         ConcealedDecision.AtTypeLevel,
         BlastRadius.Detect,
         LoadBearing.Detect,
+        BreaksAlone.Detect,
     ];
 
-    /// <summary>Runs every detector over the model and indexes the result.</summary>
+    /// <summary>The claims this model supports, with the suppression matrix applied.</summary>
     public static FindingSet FindingsFor(SolutionModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        var detected = Detected(model);
+
+        return FindingSet.Of(
+            detected.All.Where(finding => Suppression.Silencing(finding, detected, model) is null));
+    }
+
+    /// <summary>
+    /// Every claim the detectors made, <b>before</b> suppression.
+    /// </summary>
+    /// <remarks>
+    /// Exposed because the two sets have to be comparable. A suppression that stops working
+    /// produces more output, which reads as a working tool, so the only way to assert a row is
+    /// doing anything is to show a finding present here and absent from
+    /// <see cref="FindingsFor"/>. <c>TECHREQ-job-b.md</c> §4: "a suppression that cannot fail is
+    /// worse than no suppression."
+    /// <para>
+    /// It is not what a renderer should read. No renderer may emit a finding in isolation, and
+    /// every finding in this set is one that has not yet been checked against the others.
+    /// </para>
+    /// </remarks>
+    public static FindingSet Detected(SolutionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
 

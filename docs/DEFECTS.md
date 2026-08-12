@@ -127,6 +127,18 @@ breaks alone at cc 12 purely because it has three peers instead of five, and *lo
 
 Violates invariant 3 — two findings contradicting each other about one component.
 
+**Core inherits it, and that is not an oversight.** Making suppression a declared rule (defect 15)
+does not help: the rule searches for a concealed-decision nomination that the cohort floor stops
+anyone from making. Fixing it means deciding what a below-floor type may be nominated *as*, which
+is `ARCHITECTURE.md` §11's thresholds-global-vs-calibrated question, not a local repair.
+
+**Fixing it costs defect 15's control, so the two have to move together.** `RoutingDepot` is the
+type that survives breaks alone in Core, and it survives precisely because its cohort of three
+strips its concealed-decision nomination. The day a below-floor type can be nominated, it leaves
+breaks alone, the finding empties on this fixture, and the §15 divergence test starts asserting
+an absence rather than a difference. A replacement control has to be planted in the same change.
+Pinned: `The_surviving_control_survives_because_of_a_different_live_defect`.
+
 Pinned: `The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone`.
 
 ### 11. The layer-span collapse hides the anomaly it shares a signature with
@@ -254,14 +266,20 @@ The decision is closed — a method-level concealed decision *does* suppress bre
 declaring type, and `SubjectRef` walks member → declaring type to express it. What remains is
 the fix in Core.
 
-**The mechanism is in place; the finding that consumes it is not.** `FindingSet.ContainsAbout`
-is the query, tested on synthetic input, and both concealed-decision nominations now produce
-findings for it to search. Breaks-alone has not moved, so nothing asks yet. When it does, the
-fixture will show the fix: `MethodReconciler` and `TariffReconciler` are both nominated at
-method level and both currently told they break alone, and `RoutingDepot` — nominated at
-neither level — is the third, which survives as the control.
+**Fixed in Core (Aug 2026).** Breaks-alone moved, and row 2 of the suppression matrix is now a
+declared rule asking `ContainsAbout` at *both* levels — `Suppression.Rules`,
+`breaks-alone-decides-something`. The fixture shows the fix exactly as predicted:
+`MethodReconciler` and `TariffReconciler` are nominated at method level, neither at type level,
+both told they break alone by the probe and neither by Core. `RoutingDepot` survives in both as
+the control.
 
-Pinned: `A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
+**This is the findings layer's first deliberate divergence from the oracle.** Every other
+finding that has moved agrees with the probe byte-for-byte on the fixture; this one must not, and
+the difference is asserted as a set in both directions — Core removes two claims and adds none.
+A suppression may silence, never nominate. `Breaks_alone_diverges_from_the_probe_by_exactly_the_defect_fifteen_fix`.
+
+The probe keeps the defect and its pin, `A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
+It is the oracle, not the product.
 
 ## How these were found
 

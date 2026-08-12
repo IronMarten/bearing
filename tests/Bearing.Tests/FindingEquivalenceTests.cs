@@ -160,6 +160,168 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Null(bearing.ValueOf("CohortSize"));
     }
 
+    // ----------------------------------------------------- breaks alone, and §4's rows ----
+
+    /// <summary>
+    /// Breaks alone disagrees with the probe, by exactly the two types <c>DEFECTS.md</c> §15 named.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The first deliberate behaviour change in the findings layer.</b> Every other finding
+    /// that has moved agrees with the probe byte-for-byte on the fixture; this one must not. §15:
+    /// the probe's concealed-decision exclusion reads a set of <b>type-level</b> nominations, and
+    /// §3.3 — the primary of the two, the one that found the right thing on real code — is
+    /// invisible to it. So the report says <i>"this method is making business judgements"</i> and
+    /// <i>"if it breaks, it breaks alone"</i> about one component.
+    /// </para>
+    /// <para>
+    /// <c>MethodReconciler</c> and <c>TariffReconciler</c> are both nominated at method level and
+    /// neither at type level, so both are told they break alone by the probe and neither is by
+    /// Core. <c>RoutingDepot</c> is the control: nominated at neither level, and it survives in
+    /// both. Asserting the difference as a set rather than asserting Core's output alone is what
+    /// makes this a statement about the fix — an unrelated regression that emptied the finding
+    /// would satisfy "Core says only RoutingDepot" just as well.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Breaks_alone_diverges_from_the_probe_by_exactly_the_defect_fifteen_fix()
+    {
+        var probeSaid = ProbeNominations("-- BREAKS ALONE");
+        var coreSays = CoreTypeNominations(FindingKind.BreaksAlone);
+
+        Assert.Equal(["MethodReconciler", "RoutingDepot", "TariffReconciler"], probeSaid);
+        Assert.Equal(["RoutingDepot"], coreSays);
+
+        // The difference is entirely the fix, in one direction only: Core removes two claims and
+        // adds none. A suppression is allowed to silence, never to nominate.
+        Assert.Equal(
+            ["MethodReconciler", "TariffReconciler"],
+            probeSaid.Except(coreSays, StringComparer.Ordinal).Order(StringComparer.Ordinal));
+        Assert.Empty(coreSays.Except(probeSaid, StringComparer.Ordinal));
+
+        // And it is the method-level nomination doing it, which is the whole of §15. Neither is
+        // nominated at type level, so the probe's query could not have found them however it was
+        // ordered.
+        var detected = Analysis.Detected(core.Model);
+        foreach (var name in (string[])["MethodReconciler", "TariffReconciler"])
+        {
+            var subject = core.Model.Types.Single(t => t.Name == name).Subject;
+
+            Assert.True(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, subject));
+            Assert.False(detected.Contains(FindingKind.ConcealedDecisionType, subject));
+        }
+    }
+
+    /// <summary>
+    /// Two of breaks alone's three rows silence something. <b>The third is unreachable here.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>TECHREQ-job-b.md</c> §4's second structural requirement: a suppression that stops
+    /// working produces <i>more</i> output, which reads as a working tool, so a row that silences
+    /// nothing is a row nothing can fail on. Writing this is what surfaced that
+    /// <c>breaks-alone-is-unreferenced</c> is exactly that on this fixture.
+    /// </para>
+    /// <para>
+    /// <b>It is masked rather than wrong.</b> Two types reach breaks alone with no callers at
+    /// all. <c>ShipmentController</c> is an <c>ApiBoundary</c>, so row 1 takes it; and
+    /// <c>AuditReconciler</c> is nominated as a concealed decision, so row 2 takes it. Both would
+    /// be silenced by row 3 too — deleting it changes no output, which is why it needs a plant of
+    /// its own: an unreferenced type that is neither a boundary nor a concealed decision. In
+    /// <c>FixtureCoverageTests</c>.
+    /// </para>
+    /// <para>
+    /// The matrix order decides which reason gets reported when rows overlap, and it is §4's
+    /// order rather than a convenience. Reordering to make this test greener would be choosing
+    /// the attribution to suit the suite.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Two_of_the_three_suppression_rows_are_observable()
+    {
+        var detected = Analysis.Detected(core.Model);
+
+        var silenced = detected.All
+            .Select(f => Suppression.Silencing(f, detected, core.Model))
+            .Where(rule => rule is not null)
+            .Select(rule => rule!.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        Assert.Equal(
+            ["breaks-alone-at-a-boundary", "breaks-alone-decides-something"],
+            silenced.Order(StringComparer.Ordinal));
+
+        // Stated positively so that filling the gap fails here rather than quietly closing it.
+        Assert.DoesNotContain("breaks-alone-is-unreferenced", silenced);
+
+        // Detection and suppression are separate passes, so every silenced finding was really
+        // made and then withdrawn. If a detector ever absorbs one of these rules the two sets
+        // become equal and this fails.
+        Assert.True(detected.Count > Analysis.FindingsFor(core.Model).Count);
+    }
+
+    /// <summary>
+    /// Row 1 does not depend on fan-in, and row 3 does not depend on the architectural role.
+    /// </summary>
+    /// <remarks>
+    /// The two rows overlap on <c>ShipmentController</c> — a boundary that is also unreferenced —
+    /// and an overlap is where a redundant rule hides. Each therefore needs a case only it
+    /// catches: <c>ReconciliationController</c> is a boundary with a caller, and
+    /// <c>AuditReconciler</c> is unreferenced and not a boundary. Without these two, either row
+    /// could be deleted and the surviving set would not move.
+    /// </remarks>
+    [Fact]
+    public void The_boundary_and_unreferenced_rows_are_not_the_same_rule()
+    {
+        var boundaryWithCallers = core.Model.Types.Single(t => t.Name == "ReconciliationController");
+        Assert.Equal("ApiBoundary", boundaryWithCallers.Classification.Kind);
+        Assert.True(boundaryWithCallers.FanIn >= core.Model.Policy.BreaksAloneMinFanIn);
+        Assert.Equal("breaks-alone-at-a-boundary", SilencingRuleFor(boundaryWithCallers.Name));
+
+        // And the case row 3 would catch alone does not exist: AuditReconciler is unreferenced
+        // and not a boundary, but it is a concealed decision, so row 2 reaches it first.
+        var unreferencedNonBoundary = core.Model.Types.Single(t => t.Name == "AuditReconciler");
+        Assert.NotEqual("ApiBoundary", unreferencedNonBoundary.Classification.Kind);
+        Assert.Equal(0, unreferencedNonBoundary.FanIn);
+        Assert.Equal("breaks-alone-decides-something", SilencingRuleFor(unreferencedNonBoundary.Name));
+    }
+
+    /// <summary>
+    /// The control for §15 exists only because <c>DEFECTS.md</c> §10 is still live.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>RoutingDepot</c> is the type that survives breaks alone, and it survives because its
+    /// cohort is three. §10: breaks alone runs over all types while its concealed-decision
+    /// exclusion reads a cohort-gated population, so a small peer group drops a type out of
+    /// concealed decision and straight into breaks alone. Core inherits that — the exclusion is a
+    /// suppression row now, but the nomination it searches for is still never made.
+    /// </para>
+    /// <para>
+    /// <b>This is worth pinning because fixing §10 costs the §15 control.</b> The day a
+    /// below-floor type can be nominated as a concealed decision, <c>RoutingDepot</c> leaves
+    /// breaks alone, the finding empties on this fixture, and the divergence test above starts
+    /// asserting an absence rather than a difference. A replacement control has to be planted in
+    /// the same change, not discovered afterwards.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_surviving_control_survives_because_of_a_different_live_defect()
+    {
+        var depot = core.Model.Types.Single(t => t.Name == "RoutingDepot");
+        var policy = core.Model.Policy;
+
+        Assert.True(depot.CohortSize < policy.MinCohort);
+        Assert.True(depot.MaxMemberCyclomatic >= policy.MinDecisionCc);
+
+        // Every condition for a concealed decision except a viable peer group, so the suppression
+        // finds nothing to suppress with.
+        var detected = Analysis.Detected(core.Model);
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionType, depot.Subject));
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, depot.Subject));
+        Assert.Null(SilencingRuleFor("RoutingDepot"));
+    }
+
     // ------------------------------------------------------- the rules, on the model ----
 
     /// <summary>
@@ -362,6 +524,18 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
 
         var type = core.Model.Find(finding.Subject)!;
         return $"{type.Name}.{type.MostComplexMember!.Name}";
+    }
+
+    /// <summary>
+    /// The row that silenced this type's breaks-alone claim, or null if the claim stands.
+    /// </summary>
+    private string? SilencingRuleFor(string typeName)
+    {
+        var detected = Analysis.Detected(core.Model);
+        var subject = core.Model.Types.Single(t => t.Name == typeName).Subject;
+        var finding = Assert.Single(detected.About(subject), f => f.Kind == FindingKind.BreaksAlone);
+
+        return Suppression.Silencing(finding, detected, core.Model)?.Name;
     }
 
     private Finding TypeLevel(string typeName)
