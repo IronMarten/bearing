@@ -150,9 +150,27 @@ requires it to *exceed*. It lands on the threshold at every n and never crosses.
 cap is a second ceiling above ten boundaries but is not the cause; removing it changes nothing.
 
 The only entry here that cannot be fixed by moving a constant: **a proportional gate cannot sit
-on a filter proportional to the same distribution.** Needs an absolute floor or a dispersion
-test, and that has to be decided before the suppression matrix is implemented in Core or it gets
-reimplemented unreachable.
+on a filter proportional to the same distribution.**
+
+**Decided: an absolute count ceiling.** `bigSurface.Count <= MaxNamedSurfaces`, replacing
+`Math.Max(1, boundaries.Count / 2)`, with the default at the five the `Take` already imposes.
+
+The trap ruled out two of the three candidates. Any gate phrased as "the qualifying set is too
+large a *share*" tests a set the filter has already bounded by that share, so a dispersion test
+on the same statistic inherits the defect — "is the top separated from the middle" is what
+`1.5 × median` already asks, and it is non-empty exactly when the filter is. What goes wrong in
+#28 is not a proportion at all: the section promises to name what stands out and instead reads a
+list, and a count is what bounds a list.
+
+It also stops the `Take(5)` being a silent truncation. Past the ceiling the section prints
+nothing rather than an arbitrary five of the qualifying boundaries, which is `DEFECTS.md` §3 for
+this section.
+
+**It is reachable but not yet observable.** The qualifying set is bounded by `floor(n/2)`, so
+firing needs at least twelve boundaries with six of them qualifying; TestBed has eight, and a
+maximum of four can qualify. The gate is reachable in principle at every solution large enough,
+which the current one is not at any size — but the fixture needs boundaries planted before the
+suppression has a behavioural test, and until it does this stays a suppression that cannot fail.
 
 Pinned: `Widest_contract_surface_can_never_be_suppressed`.
 

@@ -396,6 +396,7 @@ decision from whether it is versioned.
 | Detection and suppression are separate passes over the whole finding set | §4 — a detector that can only be correct if it runs after another one is the probe's ordering dependence with different syntax |
 | Core emits every finding; `Top` is applied by the renderer | §4 — a truncating model cannot disclose what it dropped, and in the probe truncation silently weakens suppression |
 | A member's kind is model data | §4 — the findings do not all read the same population, and "has an executable body" is a different set from "is a method or constructor" |
+| `WIDEST CONTRACT SURFACE` is gated by an absolute count ceiling, not a proportion | `DEFECTS.md` §12 — a gate phrased as "too large a share" tests a set the median-relative filter has already bounded by that share, so a dispersion test on the same statistic inherits the defect. The section promises to name what stands out, and a count is what bounds a list. It also turns the `Take(5)` from a silent truncation into the gate itself |
 
 ## 11. Decisions still open
 
@@ -405,11 +406,6 @@ the private `TECHREQ-job-a.md` §10.
 Distinct from [`DEFECTS.md`](DEFECTS.md): that is behaviour known to be wrong, with a remedy
 already understood. These are questions with no answer yet.
 
-- **How `WIDEST CONTRACT SURFACE` should be gated at all.** `DEFECTS.md` §12 is the one row
-  that cannot be fixed by moving a constant, so extraction cannot simply port it. An absolute
-  surface floor and a dispersion test — is the top of the distribution actually separated from
-  the middle — are the two candidates. Decide before the suppression matrix is implemented, or
-  it gets reimplemented unreachable.
 - **Whether `SignificantKinds` stays at three.** There are exactly three and `--min-kind-span`
   is 3, so every spanning type necessarily carries the same signature: the `GroupBy` in
   `PrintLayerSpan` is written for a generality that cannot occur. Ties into the edge-kind
