@@ -189,8 +189,10 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         var probeSaid = ProbeNominations("-- BREAKS ALONE");
         var coreSays = CoreTypeNominations(FindingKind.BreaksAlone);
 
-        Assert.Equal(["MethodReconciler", "RoutingDepot", "TariffReconciler"], probeSaid);
-        Assert.Equal(["RoutingDepot"], coreSays);
+        Assert.Equal(
+            ["MethodReconciler", "RoutingDepot", "SurchargeEvaluator", "TariffReconciler"],
+            probeSaid);
+        Assert.Equal(["RoutingDepot", "SurchargeEvaluator"], coreSays);
 
         // The difference is entirely the fix, in one direction only: Core removes two claims and
         // adds none. A suppression is allowed to silence, never to nominate.
@@ -213,31 +215,30 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     }
 
     /// <summary>
-    /// Two of breaks alone's three rows silence something. <b>The third is unreachable here.</b>
+    /// Every implemented suppression row silences something, and each one has a case of its own.
     /// </summary>
     /// <remarks>
     /// <para>
     /// <c>TECHREQ-job-b.md</c> §4's second structural requirement: a suppression that stops
     /// working produces <i>more</i> output, which reads as a working tool, so a row that silences
-    /// nothing is a row nothing can fail on. Writing this is what surfaced that
-    /// <c>breaks-alone-is-unreferenced</c> is exactly that on this fixture.
+    /// nothing is a row nothing can fail on.
     /// </para>
     /// <para>
-    /// <b>It is masked rather than wrong.</b> Two types reach breaks alone with no callers at
-    /// all. <c>ShipmentController</c> is an <c>ApiBoundary</c>, so row 1 takes it; and
-    /// <c>AuditReconciler</c> is nominated as a concealed decision, so row 2 takes it. Both would
-    /// be silenced by row 3 too — deleting it changes no output, which is why it needs a plant of
-    /// its own: an unreferenced type that is neither a boundary nor a concealed decision. In
-    /// <c>FixtureCoverageTests</c>.
+    /// <b>Row 3 was exactly that until the Evaluator cohort was planted.</b> Both types that
+    /// reached breaks alone with no callers were taken first — <c>ShipmentController</c> by the
+    /// boundary row, <c>AuditReconciler</c> by the concealed-decision row — so
+    /// <c>breaks-alone-is-unreferenced</c> could be deleted outright with the suite green.
+    /// <c>DetentionEvaluator</c> is unreferenced, is not a boundary, and is not a concealed
+    /// decision, so it is the first type only row 3 can reach.
     /// </para>
     /// <para>
-    /// The matrix order decides which reason gets reported when rows overlap, and it is §4's
-    /// order rather than a convenience. Reordering to make this test greener would be choosing
-    /// the attribution to suit the suite.
+    /// The matrix order decides which reason is reported when rows overlap, and it is §4's order
+    /// rather than a convenience. Reordering to change an attribution would be choosing the
+    /// answer to suit the suite.
     /// </para>
     /// </remarks>
     [Fact]
-    public void Two_of_the_three_suppression_rows_are_observable()
+    public void Every_suppression_row_silences_something()
     {
         var detected = Analysis.Detected(core.Model);
 
@@ -248,11 +249,12 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
             .ToHashSet(StringComparer.Ordinal);
 
         Assert.Equal(
-            ["breaks-alone-at-a-boundary", "breaks-alone-decides-something"],
-            silenced.Order(StringComparer.Ordinal));
+            Suppression.Rules.Select(r => r.Name).ToHashSet(StringComparer.Ordinal),
+            silenced);
 
-        // Stated positively so that filling the gap fails here rather than quietly closing it.
-        Assert.DoesNotContain("breaks-alone-is-unreferenced", silenced);
+        // And row 3 has a case no earlier row would have taken, which is what makes it a gate
+        // rather than a comment. Without this the set above is satisfied by overlap alone.
+        Assert.Equal("breaks-alone-is-unreferenced", SilencingRuleFor("DetentionEvaluator"));
 
         // Detection and suppression are separate passes, so every silenced finding was really
         // made and then withdrawn. If a detector ever absorbs one of these rules the two sets

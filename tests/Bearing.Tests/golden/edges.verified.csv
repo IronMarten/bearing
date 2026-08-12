@@ -109,6 +109,14 @@ global::TestBed.Core.RateNormalizer,global::TestBed.Core.NormalizationContext,2
 global::TestBed.Core.RateNormalizer,global::TestBed.Core.ShipmentCoordinator,2
 global::TestBed.Core.RateNormalizer,global::TestBed.Core.TariffCalculator,2
 global::TestBed.Core.RateReconciler,global::TestBed.Core.NormalizeStep,2
+global::TestBed.Core.Rating.DetentionEvaluator,global::TestBed.Core.Rating.LaneEvaluator,2
+global::TestBed.Core.Rating.DetentionEvaluator,global::TestBed.Core.Rating.SurchargeEvaluator,2
+global::TestBed.Core.Rating.LaneEvaluator,global::TestBed.Core.Rating.FuelEvaluator,2
+global::TestBed.Core.Rating.LaneEvaluator,global::TestBed.Core.Rating.TransitEvaluator,2
+global::TestBed.Core.Rating.SurchargeEvaluator,global::TestBed.Core.Rating.FuelEvaluator,2
+global::TestBed.Core.Rating.SurchargeEvaluator,global::TestBed.Core.Rating.LaneEvaluator,2
+global::TestBed.Core.Rating.SurchargeEvaluator,global::TestBed.Core.Rating.PolicyEvaluator,2
+global::TestBed.Core.Rating.SurchargeEvaluator,global::TestBed.Core.Rating.TransitEvaluator,2
 global::TestBed.Core.ReconciliationCatalog,global::TestBed.Core.DocumentReconciler,2
 global::TestBed.Core.ReconciliationCatalog,global::TestBed.Core.MethodReconciler,2
 global::TestBed.Core.ReconciliationCatalog,global::TestBed.Core.QuoteReconciler,2

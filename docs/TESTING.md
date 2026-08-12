@@ -352,16 +352,38 @@ today with the suite green. In `FixtureCoverageTests.The_new_findings_have_gates
 > Core's nomination set. **Extraction silently halves the protection on every gate it copies**,
 > and it will keep doing so until Cli renders from the model.
 
-**For breaks alone, once it moved into Core.** Nine more mutations; seven failed, two did not,
-and the second is the more serious of any found this far.
+**~~For breaks alone, once it moved into Core.~~ Filled — one plant closed both.** Nine mutations
+found two dead gates; seven types in `Core/Rating/Evaluators.cs` now make both fail.
 
-- **Row 3, `breaks-alone-is-unreferenced`, silences nothing.** Both types that reach the finding
-  with no callers are taken by an earlier row — `ShipmentController` as a boundary,
-  `AuditReconciler` as a concealed decision.
-- **The instability gate can be deleted and no output moves.** `Instability >= 0.8` is the
+- ~~**Row 3, `breaks-alone-is-unreferenced`, silences nothing.**~~ Both types that reached the
+  finding with no callers were taken by an earlier row — `ShipmentController` as a boundary,
+  `AuditReconciler` as a concealed decision. `DetentionEvaluator` is neither.
+- ~~**The instability gate can be deleted and no output moves.**~~ `Instability >= 0.8` is the
   *isolated* in "complex inside but isolated"; without it the finding claims nothing more than
-  "complex". Four types are held back by it alone, and **all four are also concealed decisions**,
-  so row 2 removes each one before the difference can show.
+  "complex". Every type it held back was **also a concealed decision**, so row 2 removed each one
+  before the difference could show. `LaneEvaluator` is complex, referenced, not a boundary and
+  not a concealed decision, so the gate is now the only thing keeping it silent.
+
+> **What the plant had to supply, and why nothing in the fixture already did.** Concealed
+> decision fires on `CyclomaticXMedian >= 3.0` against the peer group's *method* population, so
+> any type whose complexity stands out against its peers is one — and every complex type in
+> TestBed concentrates its complexity in a single method. The plant is a cohort of six evaluators
+> of **comparable** complexity, which puts twelve similar values in that population and leaves no
+> member three times the median. It is not a dodge: a uniform family of rule evaluators is what
+> genuinely-complex-but-not-anomalous code looks like, and the tool staying quiet about it is
+> correct.
+>
+> **A suppression can mask the detector beneath it, and that is a failure mode §4 does not
+> warn about.** §4's concern is a suppression that stops working and produces more output. This
+> is the reverse: a suppression working so broadly that the gate underneath stops being tested,
+> and the finding keeps passing every test with half its meaning removed. Look for it wherever
+> two rules remove the same population.
+
+> **The same plant replaced a control that rested on a defect.** `SurchargeEvaluator` survives
+> breaks alone with a peer group of six. `RoutingDepot` survives only because defect 10 strips
+> its concealed-decision nomination, so before this the §15 divergence test would have emptied
+> the moment defect 10 was fixed. Both are asserted now; the fix can proceed without taking the
+> control with it.
 
 > **What the second one would say if the mask lifted.** `ShipmentLedger` has fan-in 11 — the most
 > depended-on type in the fixture — and is already nominated as both a bug blast radius and
@@ -381,6 +403,13 @@ and the second is the more serious of any found this far.
 > caught `OrderRepository` and `PayloadTag` — both unreferenced, both complex, and both depending
 > on nothing either, so their instability is undefined and they never reach the finding. Read the
 > finding set; do not restate the conditions that built it.
+
+**Still open, and not closed by that plant.** Three gates from §3.4 and §3.6 remain unobserved —
+blast radius' absolute fan-in floor and its multiple-of-median, and load-bearing's use of
+effective rather than raw fan-out. The evaluator cohort does not reach them: blast radius needs a
+type that clears the rank and complexity gates while failing one of those two, and the fan-out
+exclusion needs a type depending on *abstractions* rather than concrete ones. Confirmed by
+re-running those three mutations after the plant — all three still pass.
 
 **~~For type identity.~~ Filled.** `TestBed.Shared.PayloadTag` is now declared in both `Data`
 and `Tools`. The goldens record the merged row, so the defect *and* its fix are both visible:

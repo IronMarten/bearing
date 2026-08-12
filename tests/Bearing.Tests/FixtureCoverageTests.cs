@@ -224,8 +224,66 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
-    /// Breaks alone's own gates are masked by its suppressions — including the one that carries
-    /// half its claim.
+    /// ~~Breaks alone's own gates are masked by its suppressions.~~ <b>Filled — the instability
+    /// gate is observable now.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>Instability &gt;= 0.8</c> is the <i>isolated</i> in "complex inside but isolated";
+    /// without it the finding claims nothing more than "complex". It could be deleted with the
+    /// whole suite green, because every type it held back was <i>also</i> a concealed decision
+    /// and suppression row 2 removed each one before the difference could show. A suppression was
+    /// masking the detector beneath it.
+    /// </para>
+    /// <para>
+    /// <c>LaneEvaluator</c> ends that: complex, referenced, not a boundary, and not a concealed
+    /// decision, so the instability gate is the only thing between it and a nomination. Remove
+    /// the gate and the tool says a type with two callers breaks alone. The assertions below are
+    /// each of the other conditions, so an unrelated change that stopped it qualifying cannot
+    /// leave this passing.
+    /// </para>
+    /// <para>
+    /// <b>The failure it now prevents is concrete.</b> <c>ShipmentLedger</c> has fan-in 11, the
+    /// most depended-on type in the fixture, and is nominated as both a bug blast radius and
+    /// load-bearing-and-intricate. Without the gate the same run also tells the reader that if it
+    /// breaks, it breaks alone — invariant 3's exact failure. That is asserted here too, because
+    /// it is the reason the gate is worth a plant rather than a comment.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_instability_gate_is_the_only_thing_holding_back_a_connected_type()
+    {
+        var policy = core.Model.Policy;
+        var detected = Analysis.Detected(core.Model);
+        var lane = core.Model.Types.Single(t => t.Name == "LaneEvaluator");
+
+        // Every condition for breaks alone except the one being protected.
+        Assert.True(lane.MaxMemberCyclomatic >= policy.HighCc);
+        Assert.True(lane.FanIn >= policy.BreaksAloneMinFanIn);
+        Assert.Equal("Internal", lane.Classification.Kind);
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionType, lane.Subject));
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, lane.Subject));
+
+        // And the gate itself, which is therefore the whole of why it is silent.
+        Assert.True(lane.Instability < policy.IsolatedThreshold);
+        Assert.False(detected.Contains(FindingKind.BreaksAlone, lane.Subject));
+
+        // Its peer group is what makes it unremarkable: six evaluators of comparable complexity,
+        // so no member is an outlier against the others. That is the property the plant supplies
+        // and the reason no such case existed before.
+        Assert.True(lane.CohortSize >= policy.MinCohort);
+
+        // The contradiction the gate prevents, stated on the type it would be worst about.
+        var ledger = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
+        var about = Analysis.FindingsFor(core.Model).About(ledger.Subject).Select(f => f.Kind).ToList();
+        Assert.Contains(FindingKind.BugBlastRadius, about);
+        Assert.Contains(FindingKind.LoadBearingAndIntricate, about);
+        Assert.DoesNotContain(FindingKind.BreaksAlone, about);
+    }
+
+    /// <summary>
+    /// ~~Breaks alone's own gates are masked by its suppressions.~~ Superseded — kept for the
+    /// four types the instability gate holds back, which is still worth pinning.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -276,22 +334,19 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
             .ToList();
 
         Assert.Equal(
-            ["GuaranteedServiceNormalizer", "ShipmentCoordinator", "ShipmentLedger", "TariffCalculator"],
+            [
+                "FuelEvaluator", "GuaranteedServiceNormalizer", "LaneEvaluator", "PolicyEvaluator",
+                "ShipmentCoordinator", "ShipmentLedger", "TariffCalculator", "TransitEvaluator",
+            ],
             heldBack.Select(t => t.Name).Order(StringComparer.Ordinal));
 
-        // Every one of them. A single counter-example here un-masks the gate, and this test is
-        // what says so.
-        Assert.All(heldBack, t => Assert.True(IsConcealed(t), $"{t.Name} would un-mask the gate"));
+        // Four of the eight are the planted evaluators, and none of those is a concealed
+        // decision — which is what un-masked the gate. Before the plant every type on this list
+        // was one, so row 2 removed each of them and the gate could be deleted with no output
+        // moving. The count is asserted so that losing the plant is loud.
+        Assert.Equal(4, heldBack.Count(t => !IsConcealed(t)));
 
-        // And the worst case is concrete rather than hypothetical: the type that would be told
-        // it breaks alone is the one two other findings call heavily depended on.
-        var ledger = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
-        var about = Analysis.FindingsFor(core.Model).About(ledger.Subject).Select(f => f.Kind).ToList();
-        Assert.Contains(FindingKind.BugBlastRadius, about);
-        Assert.Contains(FindingKind.LoadBearingAndIntricate, about);
-        Assert.DoesNotContain(FindingKind.BreaksAlone, about);
-
-        // Row 3's candidates are both taken by an earlier row. Read off the detected set rather
+        // Row 3's candidates were both taken by an earlier row. Read off the detected set rather
         // than re-derived from the model: OrderRepository and PayloadTag are unreferenced and
         // complex but depend on nothing either, so their instability is undefined and they never
         // reach the finding at all. A gap record that re-states the detector's conditions gets
@@ -302,11 +357,16 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
             .ToList();
 
         Assert.Equal(
-            ["AuditReconciler", "ShipmentController"],
+            ["AuditReconciler", "DetentionEvaluator", "ShipmentController"],
             unreferenced.Select(t => t.Name).Order(StringComparer.Ordinal));
-        Assert.All(unreferenced, t => Assert.True(
-            IsConcealed(t) || t.Classification.Kind is "ApiBoundary" or "ExternalCall" or "Contract",
-            $"{t.Name} would give row 3 a case of its own"));
+
+        // DetentionEvaluator is the one that is neither, so row 3 is the only rule that reaches
+        // it. The other two are still taken first, which is why the row was dead before.
+        Assert.Equal(
+            ["DetentionEvaluator"],
+            unreferenced
+                .Where(t => !IsConcealed(t) && t.Classification.Kind is not ("ApiBoundary" or "ExternalCall" or "Contract"))
+                .Select(t => t.Name));
     }
 
     /// <summary>

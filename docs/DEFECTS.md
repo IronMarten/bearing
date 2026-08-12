@@ -132,11 +132,13 @@ does not help: the rule searches for a concealed-decision nomination that the co
 anyone from making. Fixing it means deciding what a below-floor type may be nominated *as*, which
 is `ARCHITECTURE.md` §11's thresholds-global-vs-calibrated question, not a local repair.
 
-**Fixing it costs defect 15's control, so the two have to move together.** `RoutingDepot` is the
-type that survives breaks alone in Core, and it survives precisely because its cohort of three
-strips its concealed-decision nomination. The day a below-floor type can be nominated, it leaves
-breaks alone, the finding empties on this fixture, and the §15 divergence test starts asserting
-an absence rather than a difference. A replacement control has to be planted in the same change.
+~~**Fixing it costs defect 15's control.**~~ **It did, and no longer does.** `RoutingDepot`
+survives breaks alone precisely because its cohort of three strips its concealed-decision
+nomination, so the day a below-floor type can be nominated it leaves the finding — and until
+`Core/Rating/Evaluators.cs` was planted it was the *only* survivor, which would have left §15's
+divergence test asserting an absence rather than a difference. `SurchargeEvaluator` is the
+replacement: it survives on a peer group of six, so its survival does not depend on this defect.
+Both are pinned, and fixing this one can now proceed on its own.
 Pinned: `The_surviving_control_survives_because_of_a_different_live_defect`.
 
 Pinned: `The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone`.
