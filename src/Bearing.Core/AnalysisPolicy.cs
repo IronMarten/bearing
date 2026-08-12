@@ -146,6 +146,45 @@ public sealed record AnalysisPolicy
     /// <summary>Complexity percentile within the cohort for blast radius.</summary>
     public double BlastComplexityPercentile { get; init; } = 70;
 
+    // ------------------------------------------------------------- change cost ----
+
+    /// <summary>
+    /// The share of the <b>whole solution</b>, by fan-in, that counts as "the top" for change
+    /// cost.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Solution-wide, where <see cref="BlastTopFraction"/> is per-cohort</b>, and the
+    /// difference is the question each finding asks. Blast radius asks how far a defect
+    /// propagates compared with a type's peers. This asks which part of the <i>application</i> is
+    /// most expensive to change, which is not a question about peers — and §3.5 is explicit that
+    /// the finding runs over all types with no cohort gate, so a lone contract with thirty callers
+    /// is not silenced for having none.
+    /// </para>
+    /// <para>
+    /// <b>Where 0.05 comes from, since it should not be taken on faith.</b> It is not tuned to the
+    /// fixture. The two measured solutions put the eligible population — <c>Contract</c> plus
+    /// <c>ApiBoundary</c> — at 13–30% of all types, and blast radius demonstrates that a
+    /// proportional gate at 0.05 lands a finding near 1% of a codebase, which is the rate that
+    /// held still across both. A share of the solution rather than of the eligible set is what
+    /// keeps that true when one codebase is 20.3% controllers and another 8.5%.
+    /// </para>
+    /// <para>
+    /// <b>And it is deliberately not load-bearing, which is checkable rather than hoped.</b> On
+    /// the fixture the nominated set is <i>identical</i> at 0.05, 0.10 and 0.15 — a threefold
+    /// range — because the population has a gap between fan-in 15 and fan-in 5 and the gate falls
+    /// in it. Only below 0.02 does it move. A constant whose output is stable across the range it
+    /// would plausibly be tuned within is a constant that is not deciding much, and
+    /// <c>FindingEquivalenceTests</c> asserts that rather than leaving it as a claim.
+    /// </para>
+    /// <para>
+    /// <b>Unvalidated on real code, and recorded as such.</b> The two-solution run measured the
+    /// old absolute gate, not this one, and re-running solutions is out of scope
+    /// (<c>NEXT-SESSION.md</c>). What this value is owed is the backtest — <c>TASKS.md</c> Z3.
+    /// </para>
+    /// </remarks>
+    public double ChangeCostTopFraction { get; init; } = 0.05;
+
     // ---------------------------------------------------------- roll-call cap ----
 
     /// <summary>
@@ -240,6 +279,7 @@ public sealed record AnalysisPolicy
         (nameof(BlastFanInMultiple), BlastFanInMultiple),
         (nameof(BlastTopFraction), BlastTopFraction),
         (nameof(BlastComplexityPercentile), BlastComplexityPercentile),
+        (nameof(ChangeCostTopFraction), ChangeCostTopFraction),
         (nameof(RollCallDivisor), RollCallDivisor),
         (nameof(SurfaceOutlierMultiple), SurfaceOutlierMultiple),
         (nameof(SurfaceOutlierFloor), SurfaceOutlierFloor),
@@ -304,6 +344,11 @@ public sealed record AnalysisPolicy
         // every type clearing the other three conditions.
         if (BlastTopFraction > 1)
             throw new ArgumentOutOfRangeException(nameof(BlastTopFraction), BlastTopFraction, "BlastTopFraction is a share of a cohort and must be within 0..1.");
+
+        // Same reasoning one level up: a share of the solution above 1 turns the only
+        // self-limiting gate change cost has back into the roll-call it was converted away from.
+        if (ChangeCostTopFraction > 1)
+            throw new ArgumentOutOfRangeException(nameof(ChangeCostTopFraction), ChangeCostTopFraction, "ChangeCostTopFraction is a share of the solution and must be within 0..1.");
 
         if (RollCallDivisor < 1)
             throw new ArgumentOutOfRangeException(nameof(RollCallDivisor), RollCallDivisor, "RollCallDivisor must be at least 1.");

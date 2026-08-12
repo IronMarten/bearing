@@ -55,12 +55,33 @@ is live until extraction adopts it.
 
 Pinned: `Two_types_sharing_a_name_across_assemblies_merge_into_one_row`.
 
-### 2. Absolute gates saturate; percentile gates do not
+### 2. Absolute gates saturate; percentile gates do not — **one of three converted**
 
 Change cost fires on 7.9% of nopCommerce, hubs on 6.9% of Jellyfin, both truncated to 15 by
 `--top`. Blast radius — the only percentile-gated finding — held at 1.0% and 0.9% across both.
 
 Convert, do not retune. But see defect 14: converting runs *toward* a different hazard.
+
+**Change cost is converted**, being the worst of them: `ChangeCostTopFraction`, a share of the
+**whole solution** by fan-in, beside the absolute floor rather than instead of it — §3.4 keeps its
+floor for invariant 1's reason, and a share alone crowns the top of a population where nothing is
+tall.
+
+**Solution-wide, not per-cohort, and that is a choice of reader rather than of arithmetic.**
+Within-cohort answers *"which controller is riskiest to change"* — a maintainer's question, for
+someone who already knows the codebase. Solution-wide answers *"which part of this application is
+riskiest to change"*, which is what someone arriving at an unfamiliar codebase is asking, and it
+is what §3.5 was written for: not cohort-gated, running over all types, so a lone contract with
+thirty callers is not silenced for having no peers. Both are real findings and the maintainer's
+view is a second nomination set, not a wording change — `TASKS.md` X8.
+
+It is also the more defensible of the two against a codebase nobody has seen. The spike found
+cohort **basis** to be the measure that swung hardest between the two solutions — name suffix
+55.4% → 33.9%, base type 14.3% → 44.8% — so a within-cohort gate inherits that instability, while
+a share of the solution is that share at any size.
+
+**Hubs (6.9%) and breaks alone (2.8%) are not converted**, and neither should be until there is a
+fixture case that can observe the difference: `TASKS.md` P7.
 
 ### 3. Truncation is never disclosed
 
@@ -109,13 +130,23 @@ Including Roslyn anonymous types, which should never be graph nodes.
 
 Orchard Core could not be analysed. Cannot block extraction — TestBed is a `.sln`.
 
-### 9. Change cost gates on `minCohort` where it means a fan-in floor
+### 9. Change cost gates on `minCohort` where it means a fan-in floor — **fixed in Core**
 
 Both default to 5, so the two are indistinguishable at defaults and the defect is invisible in
 the goldens. It appears only when either is tuned — which is exactly when someone is relying on
 the threshold to mean what it says. Superseded by defect 2: the answer is a percentile.
 
-Pinned: `Change_cost_is_gated_by_min_cohort_where_it_means_min_fan_in`.
+`ChangeCost` reads `MinFanIn`, and the two are pinned apart by
+`Change_cost_reads_the_fan_in_floor_and_not_the_cohort_floor` — moving `MinCohort` to 16 must not
+move the finding, and moving `MinFanIn` to 16 must. Reverting the floor to `MinCohort` fails a
+test, which it could not do while both read 5.
+
+**Defect 2 is only half-closed by the same change, and the half that is closed is this finding.**
+The share gate below makes change cost self-limiting; hubs at 6.9% and breaks alone at 2.8% are
+untouched and still absolute.
+
+Still pinned against the probe: `Change_cost_is_gated_by_min_cohort_where_it_means_min_fan_in`.
+The probe is unchanged and retires at `TASKS.md` R2.
 
 ### 10. The cohort floor strips a suppression it was never meant to touch
 

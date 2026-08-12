@@ -410,8 +410,8 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
-    /// Change cost's <c>or ApiBoundary</c> arm decides something now, and it is the only subject
-    /// that can make it.
+    /// Change cost's <c>or ApiBoundary</c> arm is gated <b>in the probe</b> and dead in Core, and
+    /// the difference is the saturation conversion rather than a regression.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -419,28 +419,52 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     /// <c>Contract</c>, so the second half of the disjunction could be deleted with no output
     /// moving — and that was not an accident of the fixture. Almost nothing in real code
     /// references a controller, which is why every boundary here sat at fan-in 0 or 1, and why the
-    /// arm needed a case built rather than found.
+    /// arm needed a case built rather than found. <c>DispatchCallbackController</c> is that case:
+    /// a return address five dispatchers name because they hand it to a carrier, so the
+    /// dependency runs inward, from internal components to the edge.
     /// </para>
     /// <para>
-    /// <c>DispatchCallbackController</c> is a return address: five dispatchers name it because
-    /// they hand it to a carrier, so the dependency runs inward, from internal components to the
-    /// edge. It is asserted as the <b>only</b> ApiBoundary that clears the floor, which is what
-    /// makes deleting the arm observable — with a second one, removing the arm would still leave
-    /// output and this would still pass.
+    /// <b>It closes the gap in the probe and not in Core, which is the "extraction halves the
+    /// protection" lesson arriving in a new form.</b> The probe gates on the kind filter plus an
+    /// absolute floor, and the plant clears both — dropping <c>or "ApiBoundary"</c> from
+    /// <c>PrintNominations</c> moves the golden and fails three tests. Core adds a
+    /// share-of-the-solution gate, and five callers is rank 20.5 of 128: nowhere near the
+    /// most-depended-on part of the application, which is the whole of what the conversion is
+    /// for. So the same deletion in <c>ChangeCost</c> passes the suite.
     /// </para>
     /// <para>
-    /// Invariant 4 is the reason this subject matters more than the gate does. The sentence says
-    /// external consumers are not visible, and on a contract that is a caveat; on a callback
-    /// endpoint the invisible consumers are the entire point of the type.
+    /// <b>Recorded rather than forced, deliberately.</b> Making Core's arm observable needs a
+    /// boundary in the solution's top 5% by fan-in. The realistic shape is a base controller —
+    /// real codebases' carry enormous fan-in and are unambiguously boundaries — and this fixture
+    /// has one, <c>ControllerBase</c> at fan-in 8, which the classifier misses only because the
+    /// name lacks the suffix. Reaching the limit of 6.9 needs fan-in 11, so three more
+    /// controllers. Choosing 0.10 instead, which <c>ControllerBase</c> would clear at rank 7.5, is
+    /// picking the constant to admit our own plant. Neither is worth doing to close a gap that
+    /// only exists at this fixture's size. <c>TASKS.md</c> P7.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_change_cost_plant_observes_the_ApiBoundary_arm()
+    public void The_change_cost_plant_observes_the_ApiBoundary_arm_in_the_probe_only()
     {
         var callback = run.Type("DispatchCallbackController");
 
         Assert.Equal("ApiBoundary", callback.Kind);
         Assert.True(callback.FanIn >= run.Options.MinCohort);
+
+        // Core does not nominate it, and the reason is the share gate rather than the kind or the
+        // floor — both of which it still clears. Asserted so that the day a plant reaches the
+        // solution's top slice, this fails and the arm is recorded as observed on both sides.
+        var subject = core.Model.Types.Single(t => t.Name == "DispatchCallbackController");
+        Assert.True(subject.FanIn >= core.Model.Policy.MinFanIn);
+        Assert.DoesNotContain(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.ChangeCost),
+            f => f.Subject == subject.Subject);
+
+        // And every subject Core does nominate is a Contract, which is what makes the arm
+        // deletable there.
+        Assert.All(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.ChangeCost),
+            f => Assert.Equal("Contract", core.Model.Find(f.Subject)!.Classification.Kind));
 
         // The only one, so the arm is deletable exactly when this type is absent.
         Assert.Equal(

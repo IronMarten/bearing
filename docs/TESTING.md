@@ -247,10 +247,13 @@ Tidying it up changes the expected answers.
   `2,3,4,6,7,8,8,8,8,12`, median 7.5, so `WIDEST CONTRACT SURFACE` threshold 11.25 and
   `ShipmentController` at 12 is the sole qualifier — one against a ceiling of five, which is
   `docs/DEFECTS.md` §12 and why row 5 still cannot fire
-- change cost: 5 nominations. Four contracts — `NormalizationContext` 20, `RawResponse` 19,
-  `NormalizedResponse` 15, `ModelDescription` 5 — and `DispatchCallbackController` at 5, the only
-  `ApiBoundary` ever to clear the floor and therefore the whole of what makes the `or ApiBoundary`
-  arm a gate
+- change cost: **the probe says 5, Core says 3**, and the difference is the saturation conversion.
+  The probe's five are four contracts — `NormalizationContext` 20, `RawResponse` 19,
+  `NormalizedResponse` 15, `ModelDescription` 5 — plus `DispatchCallbackController` at 5, the only
+  `ApiBoundary` ever to clear the absolute floor. Core drops the two at fan-in 5: both sit at
+  solution rank 20.5 of 128, which is not the most-depended-on part of the application. Core's
+  three are identical at `ChangeCostTopFraction` 0.05, 0.10 and 0.15 — the population has a gap
+  between fan-in 15 and 5 and the gate falls in it — and narrow to two at 0.02
 - `AuthenticationMiddleware [ApiBoundary]` spans 3 kinds via `TenantStore` and `AuditClient`
 - **layer span: 6 nominations**, and every one of them sits exactly on `minKindSpan`. Three
   significant kinds and a floor of three make "spans the minimum" and "spans everything" the same
@@ -570,8 +573,17 @@ nothing for these:
 **The three findings still in the probe, inventoried ahead of their ports.** This is the part that
 was never done before, and it is the cheap half:
 
-- **§3.5 change cost.** `or ApiBoundary` was dead and is now the `DispatchCallbackController`
-  plant. `FanIn >= minCohort` is defect 9 and needs decision X2, not a plant.
+- **§3.5 change cost — ported, and the arm went dead again for a better reason.** `or ApiBoundary`
+  was dead under the absolute gate and the `DispatchCallbackController` plant closed it *in the
+  probe*, where dropping the arm now fails three tests. Core's converted gate is a share of the
+  whole solution, and five callers is rank 20.5 of 128, so the arm is deletable there with the
+  suite green. **This is "extraction halves the protection" in a new form**: previously Core's
+  copy of a gate was unprotected because nothing rendered it; here it is unprotected because Core
+  and the probe no longer gate the same way, and the plant was built for the probe's. Closing it
+  needs a boundary in the solution's top slice — realistically a base controller, which this
+  fixture has at `ControllerBase` fan-in 8 but classifies `Internal` for want of the name suffix.
+  Reaching a limit of 6.9 takes fan-in 11. Recorded rather than forced, because the alternative is
+  picking `ChangeCostTopFraction` to admit our own plant.
 - **§3.10 boundary marking.** *Boundaries carrying real logic* discriminates — two of ten qualify
   (`ShipmentController` cc 12, `ReconciliationController` cc 11) and eight do not. *Widest contract
   surface* discriminates — one of ten. Its **suppression cannot fire at any size**, which is

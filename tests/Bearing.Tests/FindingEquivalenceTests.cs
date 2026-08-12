@@ -160,6 +160,108 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Null(bearing.ValueOf("CohortSize"));
     }
 
+    // ------------------------------------------------------------------ change cost ----
+
+    /// <summary>
+    /// Change cost diverges from the probe by removing the two the saturation evidence says do
+    /// not belong.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The third deliberate divergence, and the largest.</b> The probe gates on a kind filter
+    /// plus an absolute fan-in floor, which on two real solutions ran to 4.5% and 7.9% of every
+    /// type — 252 candidates on the larger, the worst saturation measured, and moving the wrong
+    /// way as the codebase grew. Core adds a share-of-the-solution gate, so the finding is bounded
+    /// by construction at any size rather than by a constant somebody hopes still holds.
+    /// </para>
+    /// <para>
+    /// <c>ModelDescription</c> and <c>DispatchCallbackController</c> are the two that go, both at
+    /// fan-in 5, both at solution rank 20.5 of 128 types. Five callers clears an absolute floor
+    /// and is nowhere near the most-depended-on part of the application, which is the whole of
+    /// what the conversion is for. The divergence is asserted as a set rather than as Core's
+    /// output alone: a regression that emptied the finding would satisfy "Core says three" just as
+    /// well.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Change_cost_diverges_from_the_probe_by_the_saturation_conversion()
+    {
+        var probeSaid = ProbeNominations("-- CHANGE COST");
+        var coreSays = CoreTypeNominations(FindingKind.ChangeCost);
+
+        Assert.Equal(
+            [
+                "DispatchCallbackController", "ModelDescription", "NormalizationContext",
+                "NormalizedResponse", "RawResponse",
+            ],
+            probeSaid);
+        Assert.Equal(["NormalizationContext", "NormalizedResponse", "RawResponse"], coreSays);
+
+        // In one direction only. A gate may narrow a finding, never widen it.
+        Assert.Equal(
+            ["DispatchCallbackController", "ModelDescription"],
+            probeSaid.Except(coreSays, StringComparer.Ordinal).Order(StringComparer.Ordinal));
+        Assert.Empty(coreSays.Except(probeSaid, StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// The floor is the fan-in floor, and it is no longer the cohort floor. <c>DEFECTS.md</c> §9.
+    /// </summary>
+    /// <remarks>
+    /// Both default to 5, which is what hid this for the whole probe build, so the two are pinned
+    /// apart here: moving <c>MinCohort</c> must not move this finding, and moving <c>MinFanIn</c>
+    /// must. <c>KnownDefectTests</c> holds the probe's half — the wrong knob works and the right
+    /// one does nothing — and this is the same experiment against the fix.
+    /// <para>
+    /// Both walks are needed because cohort assignment reads <c>MinCohort</c> during the walk, so
+    /// a different floor is a different set of peer groups rather than a different render.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Change_cost_reads_the_fan_in_floor_and_not_the_cohort_floor()
+    {
+        var atDefaults = CoreTypeNominations(FindingKind.ChangeCost);
+
+        // The cohort floor is nothing to this finding now: it has no cohort in it.
+        Assert.Equal(atDefaults, ChangeCostUnder(core.Model.Policy with { MinCohort = 16 }));
+
+        // The fan-in floor is. Raising it past the smallest survivor drops it.
+        Assert.Equal(
+            ["NormalizationContext", "RawResponse"],
+            ChangeCostUnder(core.Model.Policy with { MinFanIn = 16 }));
+    }
+
+    /// <summary>
+    /// The share is the gate; its exact value is not what decides the fixture's answer.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A constant nobody can check is a constant taken on faith, and this one is a share of the
+    /// whole solution rather than a number calibrated against a codebase. What makes it defensible
+    /// is not the value but its <i>insensitivity</i>: the nominated set is identical across a
+    /// threefold range, because the fixture's fan-in population has a gap between 15 and 5 and the
+    /// gate falls inside it.
+    /// </para>
+    /// <para>
+    /// Asserted rather than claimed, so that a fixture change which makes the constant
+    /// load-bearing shows up here as a failure instead of as a silent dependency on 0.05.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_change_cost_share_is_not_load_bearing_at_its_default()
+    {
+        var atDefaults = CoreTypeNominations(FindingKind.ChangeCost);
+
+        foreach (var fraction in (double[])[0.05, 0.10, 0.15])
+            Assert.Equal(atDefaults, ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = fraction }));
+
+        // And it is a gate rather than a decoration: tighten it past the third survivor and the
+        // finding narrows.
+        Assert.Equal(
+            ["NormalizationContext", "RawResponse"],
+            ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = 0.02 }));
+    }
+
     // ------------------------------------------------ hubs, static state, layer span ----
 
     /// <summary>
@@ -780,6 +882,26 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         return (stopAt is null
                 ? subjects
                 : subjects.TakeWhile(s => !string.Equals(s, stopAt, StringComparison.Ordinal)))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Change cost's subjects under a different policy, from a second walk.
+    /// </summary>
+    /// <remarks>
+    /// A walk rather than a re-render because cohort assignment reads <c>MinCohort</c>, so a
+    /// policy that moves it is a different set of peer groups. Change cost has no cohort in it,
+    /// which is the point being tested — but the comparison has to be honest about the walk.
+    /// </remarks>
+    private static List<string> ChangeCostUnder(AnalysisPolicy policy)
+    {
+        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        return Analysis.FindingsFor(model)
+            .OfKind(FindingKind.ChangeCost)
+            .Select(f => model.Find(f.Subject)!.Name)
             .Order(StringComparer.Ordinal)
             .ToList();
     }
