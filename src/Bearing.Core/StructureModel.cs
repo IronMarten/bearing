@@ -227,6 +227,17 @@ public sealed class TypeNode
     /// <summary>Whether the type is abstract.</summary>
     public bool IsAbstract { get; }
 
+    /// <summary>
+    /// Whether this type counts toward its project's abstractness: abstract, or an interface.
+    /// </summary>
+    /// <remarks>
+    /// The second arm is redundant against Roslyn, which reports every interface as abstract, and
+    /// it is kept because the metric's definition is "abstract classes and interfaces" and a
+    /// reader checking the code against Martin should find both halves of it written down.
+    /// </remarks>
+    public bool IsAbstractOrInterface =>
+        IsAbstract || string.Equals(TypeKeyword, "Interface", StringComparison.Ordinal);
+
     /// <summary>Where it is declared. For a partial type, the first declaration found.</summary>
     public SourceLocation Location { get; }
 
@@ -424,6 +435,31 @@ public sealed class SolutionModel
 
     /// <summary>What was not seen.</summary>
     public Coverage Coverage { get; }
+
+    /// <summary>
+    /// Martin's coupling metrics for every project that declares an analysed type, ordered by
+    /// project name.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The model's own reading of <see cref="ProjectCoupling"/>. The class could always compute
+    /// this; until now nothing but a test could call it, because feeding it meant knowing that
+    /// the ids it wants are <see cref="SubjectRef.Canonical"/> on both the types and the edge
+    /// endpoints. A renderer should not have to know that, and two renderers deriving it
+    /// separately is <c>docs/ARCHITECTURE.md</c> §3 in miniature.
+    /// </para>
+    /// <para>
+    /// <b>A project that declares no analysed type does not appear here</b>, which is the probe's
+    /// behaviour too — every project it lists comes from the type table. It is not the same list
+    /// as <see cref="Projects"/>: a project excluded down to nothing, or one that is only a host,
+    /// has no abstractness to report and no edges to read an instability from. A renderer that
+    /// wants to say a project was analysed and found empty should ask <see cref="Projects"/>.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<ProjectCoupling> ProjectCouplings =>
+        ProjectCoupling.ForSolution(
+            Types.Select(t => (t.Subject.Canonical, t.Project, t.IsAbstractOrInterface)),
+            Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
     /// <summary>Every namespace outside the solution that analysed types touch.</summary>
     public IReadOnlyList<ExternalDependency> ExternalDependencies =>

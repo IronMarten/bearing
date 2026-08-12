@@ -245,10 +245,11 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         Assert.Equal(run.Result.Types.Count(t => t.Project == "Data") + 1, coupling["Data"].TotalTypes);
     }
 
-    private IReadOnlyList<ProjectCoupling> CoreProjectCoupling() =>
-        ProjectCoupling.ForSolution(
-            core.Model.Types.Select(t => (t.Subject.Canonical, t.Project, t.IsAbstract || t.TypeKeyword == "Interface")),
-            core.Model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
+    // Read from the model rather than assembled here. When the test built the tuples itself it
+    // was asserting that ProjectCoupling computes correctly from ids the test chose, which is a
+    // weaker claim than the section needs: the renderer will read SolutionModel, so that is the
+    // path the fixture's known answers have to hold on.
+    private IReadOnlyList<ProjectCoupling> CoreProjectCoupling() => core.Model.ProjectCouplings;
 
     [Fact]
     public void A_project_with_no_cross_project_coupling_has_no_instability()
@@ -264,6 +265,32 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         Assert.Null(isolated.DistanceFromMainSequence);
         Assert.Equal(MainSequenceZone.None, isolated.Zone);
         Assert.Equal(0.5, isolated.Abstractness);   // still measurable, and still reported
+    }
+
+    /// <summary>
+    /// The section is a function of the analysis and not of the order it arrived in.
+    /// </summary>
+    /// <remarks>
+    /// <c>OrderingTests</c> makes this argument for the probe's artifacts and it applies here for
+    /// the same reason: the counts accumulate into dictionaries keyed by project, so nothing but
+    /// the final <c>OrderBy</c> stops the rows being positioned by insertion order. Asserted on a
+    /// synthetic solution rather than the fixture, because three projects in name order would
+    /// still pass if the sort were removed.
+    /// </remarks>
+    [Fact]
+    public void Project_coupling_does_not_depend_on_enumeration_order()
+    {
+        (string, string, bool)[] types =
+            [("Z.T1", "Z", false), ("A.T1", "A", true), ("Z.T2", "Z", true), ("M.T1", "M", false)];
+        (string, string)[] edges = [("Z.T1", "A.T1"), ("A.T1", "M.T1"), ("Z.T2", "M.T1")];
+
+        static IEnumerable<(string, int, int, int, int)> Shape(IEnumerable<ProjectCoupling> couplings) =>
+            couplings.Select(c =>
+                (c.Project, c.TypesElsewhereReachingIn, c.TypesHereReachingOut, c.AbstractTypes, c.TotalTypes));
+
+        Assert.Equal(
+            Shape(ProjectCoupling.ForSolution(types, edges)),
+            Shape(ProjectCoupling.ForSolution(types.Reverse(), edges.Reverse())));
     }
 
     // ------------------------------------------------------------------ adapters ----
