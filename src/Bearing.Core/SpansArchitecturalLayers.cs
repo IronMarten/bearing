@@ -60,7 +60,7 @@ public static class SpansArchitecturalLayers
     /// undecided — §5 names twenty-three values and this is not among them, and adding a knob to a
     /// list whose membership is the open question would settle it by accident.
     /// </remarks>
-    private static readonly string[] SignificantKinds = ["ApiBoundary", "DataAccess", "ExternalCall"];
+    private static readonly string[] SignificantKinds = [TypeKinds.ApiBoundary, TypeKinds.DataAccess, TypeKinds.ExternalCall];
 
     /// <summary>Nominates components whose reach crosses architectural layers.</summary>
     public static IEnumerable<Finding> Detect(SolutionModel model)

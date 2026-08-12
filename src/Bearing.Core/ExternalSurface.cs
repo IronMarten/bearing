@@ -28,10 +28,10 @@ public readonly record struct IntegrationMap(
 public static class ExternalSurface
 {
     /// <summary>Types that receive calls from outside the solution.</summary>
-    private const string Inbound = "ApiBoundary";
+    private const string Inbound = TypeKinds.ApiBoundary;
 
     /// <summary>Types that make calls to outside the solution.</summary>
-    private const string Outbound = "ExternalCall";
+    private const string Outbound = TypeKinds.ExternalCall;
 
     /// <summary>
     /// Language and framework namespaces, which are not integrations.

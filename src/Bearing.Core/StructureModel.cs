@@ -62,7 +62,7 @@ public sealed class Edge
 public readonly record struct TypeClassification(string Kind, string Evidence)
 {
     /// <summary>The catch-all: nothing identified this type as playing an architectural role.</summary>
-    public static TypeClassification Internal { get; } = new("Internal", "no classifying evidence");
+    public static TypeClassification Internal { get; } = new(TypeKinds.Internal, "no classifying evidence");
 }
 
 /// <summary>What kind of member a declaration is.</summary>
@@ -457,18 +457,18 @@ public sealed class SolutionModel
     /// </para>
     /// </remarks>
     public IReadOnlyList<ProjectCoupling> ProjectCouplings =>
-        ProjectCoupling.ForSolution(
+        _projectCouplings ??= ProjectCoupling.ForSolution(
             Types.Select(t => (t.Subject.Canonical, t.Project, t.IsAbstractOrInterface)),
             Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
     /// <summary>Mutually dependent namespaces, largest cycle first.</summary>
-    public IReadOnlyList<Cycle> NamespaceCycles => Cycles.AmongNamespaces(this);
+    public IReadOnlyList<Cycle> NamespaceCycles => _namespaceCycles ??= Cycles.AmongNamespaces(this);
 
     /// <summary>
     /// Groups of types that all reach each other, largest first. Gated at
     /// <see cref="AnalysisPolicy.MinTangle"/>.
     /// </summary>
-    public IReadOnlyList<Cycle> TypeTangles => Cycles.AmongTypes(this);
+    public IReadOnlyList<Cycle> TypeTangles => _typeTangles ??= Cycles.AmongTypes(this);
 
     /// <summary>
     /// Projects no other project depends on, ordered by name.
@@ -492,26 +492,25 @@ public sealed class SolutionModel
     /// types — see <see cref="ProjectCouplings"/>.
     /// </para>
     /// </remarks>
-    public IReadOnlyList<ProjectNode> UnreferencedProjects
-    {
-        get
-        {
-            var unreferenced = ProjectReachability.Unreferenced(
-                Projects.Select(p => (p.Name, p.HasEntryPoint, p.IsLibrary)),
-                ProjectCouplings,
-                Types
-                    .Where(t => string.Equals(t.Classification.Kind, "ApiBoundary", StringComparison.Ordinal))
-                    .Select(t => t.Project));
+    public IReadOnlyList<ProjectNode> UnreferencedProjects => _unreferencedProjects ??= Unreferenced();
 
-            var byName = Projects.ToDictionary(p => p.Name, StringComparer.Ordinal);
-            return unreferenced.Select(name => byName[name]).ToList();
-        }
+    private List<ProjectNode> Unreferenced()
+    {
+        var unreferenced = ProjectReachability.Unreferenced(
+            Projects.Select(p => (p.Name, p.HasEntryPoint, p.IsLibrary)),
+            ProjectCouplings,
+            Types
+                .Where(t => string.Equals(t.Classification.Kind, TypeKinds.ApiBoundary, StringComparison.Ordinal))
+                .Select(t => t.Project));
+
+        var byName = Projects.ToDictionary(p => p.Name, StringComparer.Ordinal);
+        return unreferenced.Select(name => byName[name]).ToList();
     }
 
     /// <summary>
     /// The solution's external contact points, split inbound and outbound.
     /// </summary>
-    public ContactPoints ContactPoints => ExternalSurface.Of(this);
+    public ContactPoints ContactPoints => _contactPoints ??= ExternalSurface.Of(this);
 
     /// <summary>
     /// External systems this codebase talks to, with the plumbing filtered out and counted.
@@ -521,11 +520,11 @@ public sealed class SolutionModel
     /// that <c>System.Linq</c> is not an integration is a judgement, and the raw list is what
     /// makes the judgement checkable.
     /// </remarks>
-    public IntegrationMap Integrations => ExternalSurface.Integrations(this);
+    public IntegrationMap Integrations => _integrations ??= ExternalSurface.Integrations(this);
 
     /// <summary>Every namespace outside the solution that analysed types touch.</summary>
     public IReadOnlyList<ExternalDependency> ExternalDependencies =>
-        Types
+        _externalDependencies ??= Types
             .SelectMany(t => t.ExternalNamespaces)
             .GroupBy(ns => ns, StringComparer.Ordinal)
             .Select(g => new ExternalDependency(g.Key, g.Count()))
@@ -535,7 +534,7 @@ public sealed class SolutionModel
 
     /// <summary>Namespaces declared inside the solution, with the types they contain.</summary>
     public IReadOnlyList<(string Namespace, IReadOnlyList<TypeNode> Types)> Namespaces =>
-        Types
+        _namespaces ??= Types
             .GroupBy(t => string.IsNullOrEmpty(t.Namespace) ? "<global>" : t.Namespace, StringComparer.Ordinal)
             .OrderBy(g => g.Key, StringComparer.Ordinal)
             .Select(g => (g.Key, (IReadOnlyList<TypeNode>)g.ToList()))
@@ -549,5 +548,30 @@ public sealed class SolutionModel
         return _byId.GetValueOrDefault(subject.Canonical);
     }
 
+    // ---------------------------------------------------------------- memoisation ----
+    //
+    // Every projection above is a pure function of the model, and the model is frozen: each of
+    // TypeNode's `internal set` accessors is written inside ModelBuilder.Build, which finishes
+    // before `new SolutionModel(...)` is reached. So a computed answer cannot go stale, and the
+    // only question is how many times a renderer pays for it.
+    //
+    // It pays more than once. R4's three CSVs, R3's HTML and the terminal output all read the
+    // same model, the stability section and the unreferenced-projects section are two reads of
+    // ProjectCouplings, and Integrations reads ExternalDependencies twice inside one call. On the
+    // 132-type fixture that is invisible; on the solutions this tool is aimed at it is a linear
+    // pass per read, repeated for no reason.
+    //
+    // Not thread-safe, deliberately: a torn read here recomputes a pure function and assigns an
+    // equal value, so the cost of a race is one wasted pass rather than a wrong answer. Locking
+    // every projection to save that would be the more expensive mistake. If a renderer ever
+    // parallelises across sections, this is the note to revisit.
     private Dictionary<string, TypeNode>? _byId;
+    private IReadOnlyList<ProjectCoupling>? _projectCouplings;
+    private IReadOnlyList<Cycle>? _namespaceCycles;
+    private IReadOnlyList<Cycle>? _typeTangles;
+    private IReadOnlyList<ProjectNode>? _unreferencedProjects;
+    private IReadOnlyList<ExternalDependency>? _externalDependencies;
+    private IReadOnlyList<(string Namespace, IReadOnlyList<TypeNode> Types)>? _namespaces;
+    private ContactPoints? _contactPoints;
+    private IntegrationMap? _integrations;
 }

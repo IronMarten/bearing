@@ -98,7 +98,7 @@ public static class CohortCandidates
     /// the namespace it would displace.
     /// </remarks>
     public static CohortCandidate? ForArchitecturalKind(string kind) =>
-        string.IsNullOrEmpty(kind) || string.Equals(kind, "Internal", StringComparison.Ordinal)
+        string.IsNullOrEmpty(kind) || string.Equals(kind, TypeKinds.Internal, StringComparison.Ordinal)
             ? null
             : new CohortCandidate("kind:" + kind, "architectural kind", CohortBasis.ArchitecturalKind);
 

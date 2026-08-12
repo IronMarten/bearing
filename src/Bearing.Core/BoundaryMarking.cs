@@ -29,7 +29,7 @@ namespace IronMarten.Bearing;
 public static class BoundaryMarking
 {
     /// <summary>The kinds that are external contact points.</summary>
-    private static readonly string[] Boundaries = ["ApiBoundary", "ExternalCall"];
+    private static readonly string[] Boundaries = [TypeKinds.ApiBoundary, TypeKinds.ExternalCall];
 
     /// <summary>Boundaries with real decisions inside them.</summary>
     /// <remarks>

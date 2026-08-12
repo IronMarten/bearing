@@ -49,7 +49,7 @@ public static class ChangeCost
     /// <summary>
     /// The kinds whose consumers may lie outside the solution — which is why the finding says so.
     /// </summary>
-    private static readonly string[] Eligible = ["Contract", "ApiBoundary"];
+    private static readonly string[] Eligible = [TypeKinds.Contract, TypeKinds.ApiBoundary];
 
     /// <summary>Nominates the types an edit is most distributed across.</summary>
     public static IEnumerable<Finding> Detect(SolutionModel model)

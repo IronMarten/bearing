@@ -164,45 +164,45 @@ internal sealed class ModelBuilder
         var attribute = attributes.FirstOrDefault(a => a is "ApiControllerAttribute" or "RouteAttribute");
         if (attribute is not null)
         {
-            node.Classification = new TypeClassification("ApiBoundary", "attribute:" + attribute);
+            node.Classification = new TypeClassification(TypeKinds.ApiBoundary, "attribute:" + attribute);
             return;
         }
 
         var baseType = bases.FirstOrDefault(b => b is "ControllerBase" or "Controller" or "ApiController");
         if (baseType is not null)
         {
-            node.Classification = new TypeClassification("ApiBoundary", "base:" + baseType);
+            node.Classification = new TypeClassification(TypeKinds.ApiBoundary, "base:" + baseType);
             return;
         }
 
         if (type.Name.EndsWith("Controller", StringComparison.Ordinal))
         {
-            node.Classification = new TypeClassification("ApiBoundary", "name-suffix:Controller");
+            node.Classification = new TypeClassification(TypeKinds.ApiBoundary, "name-suffix:Controller");
             return;
         }
 
         if (ExternalMatch("Microsoft.AspNetCore") is { } web)
         {
-            node.Classification = new TypeClassification("ApiBoundary", "external-ns:" + web);
+            node.Classification = new TypeClassification(TypeKinds.ApiBoundary, "external-ns:" + web);
             return;
         }
 
         if (bases.Contains("DbContext"))
         {
-            node.Classification = new TypeClassification("DataAccess", "base:DbContext");
+            node.Classification = new TypeClassification(TypeKinds.DataAccess, "base:DbContext");
             return;
         }
 
         if (ExternalMatch("Microsoft.EntityFrameworkCore", "System.Data", "Dapper", "NHibernate") is { } data)
         {
-            node.Classification = new TypeClassification("DataAccess", "external-ns:" + data);
+            node.Classification = new TypeClassification(TypeKinds.DataAccess, "external-ns:" + data);
             return;
         }
 
         if (ExternalMatch("System.Net.Http", "Azure.", "Amazon.", "RabbitMQ", "Confluent.Kafka",
                           "MassTransit", "Stripe", "Twilio", "SendGrid", "Polly") is { } external)
         {
-            node.Classification = new TypeClassification("ExternalCall", "external-ns:" + external);
+            node.Classification = new TypeClassification(TypeKinds.ExternalCall, "external-ns:" + external);
             return;
         }
 
@@ -214,7 +214,7 @@ internal sealed class ModelBuilder
         if (node.MemberCount > 0 && node.PublicMemberCount > 0 && node.ExecutableMemberCount == 0
             && !type.GetMembers().OfType<IMethodSymbol>().Any(m => m.MethodKind == MethodKind.Ordinary))
         {
-            node.Classification = new TypeClassification("Contract", "shape:no executable members");
+            node.Classification = new TypeClassification(TypeKinds.Contract, "shape:no executable members");
         }
     }
 
@@ -229,9 +229,8 @@ internal sealed class ModelBuilder
         }
 
         var insulating = _types.Values
-            .Where(t => t.IsAbstract
-                        || string.Equals(t.TypeKeyword, "Interface", StringComparison.Ordinal)
-                        || string.Equals(t.Classification.Kind, "Contract", StringComparison.Ordinal))
+            .Where(t => t.IsAbstractOrInterface
+                        || string.Equals(t.Classification.Kind, TypeKinds.Contract, StringComparison.Ordinal))
             .Select(t => t.Subject.Canonical)
             .ToHashSet(StringComparer.Ordinal);
 

@@ -76,7 +76,7 @@ public static class Suppression
     /// <summary>
     /// Architectural roles at which the tool cannot see who else is depending on a type.
     /// </summary>
-    private static readonly string[] Unseeable = ["ApiBoundary", "ExternalCall", "Contract"];
+    private static readonly string[] Unseeable = [TypeKinds.ApiBoundary, TypeKinds.ExternalCall, TypeKinds.Contract];
 
     /// <summary>The rows implemented so far, in matrix order.</summary>
     public static IReadOnlyList<SuppressionRule> Rules { get; } =

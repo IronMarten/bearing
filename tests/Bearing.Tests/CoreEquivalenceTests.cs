@@ -476,6 +476,42 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
     public void Plumbing_is_what_the_map_is_not_about(string @namespace, bool expected) =>
         Assert.Equal(expected, ExternalSurface.IsPlumbing(@namespace));
 
+    // ------------------------------------------------------------------ the model ----
+
+    /// <summary>
+    /// The model's projections are memoised, which is only sound because the model is frozen.
+    /// </summary>
+    /// <remarks>
+    /// Reference equality on the second read. <b>Deleting a cache is already a build error</b> —
+    /// the backing field goes unused and warnings are errors here — so what this catches is the
+    /// case the compiler cannot see: a <c>??=</c> weakened to <c>=</c>, which recomputes on every
+    /// read while still looking memoised. Verified by making that change; this is the only test
+    /// that fails.
+    /// <para>
+    /// The claim underneath is the one worth pinning. <see cref="TypeNode"/> has
+    /// <c>internal set</c> accessors, and caching a projection over a type that can still change
+    /// would serve a stale answer silently. They are all written inside <c>ModelBuilder.Build</c>,
+    /// which finishes before the model is constructed. If that ever stops being true, this is the
+    /// assertion that should have been read first.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Projections_are_computed_once_because_the_model_cannot_change()
+    {
+        var model = core.Model;
+
+        Assert.Same(model.ProjectCouplings, model.ProjectCouplings);
+        Assert.Same(model.NamespaceCycles, model.NamespaceCycles);
+        Assert.Same(model.TypeTangles, model.TypeTangles);
+        Assert.Same(model.UnreferencedProjects, model.UnreferencedProjects);
+        Assert.Same(model.ExternalDependencies, model.ExternalDependencies);
+        Assert.Same(model.Namespaces, model.Namespaces);
+
+        // Value types, so identity is not the question — that the answer is stable is.
+        Assert.Equal(model.ContactPoints.Count, model.ContactPoints.Count);
+        Assert.Equal(model.Integrations.PlumbingReferences, model.Integrations.PlumbingReferences);
+    }
+
     // ------------------------------------------------------------------ adapters ----
 
     private static double ValueOf(TypeMetrics t, string dimension) => dimension switch
