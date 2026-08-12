@@ -99,6 +99,7 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `GraphTests` | Tarjan over synthetic input, no Roslyn. Includes a 50,000-deep chain, which pins the iterative implementation against a well-meaning recursive rewrite. |
 | `StructureTests` | load health, fixture shape, generated-code exclusion, `Kind` classification, namespace truncation, cohort discovery, contract fan-in, hub magnitudes |
 | `OracleGoldenTests` | the three frozen baselines |
+| `OrderingTests` | that every artifact is a function of the analysis and not of its enumeration order — see below |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
@@ -116,6 +117,30 @@ a diff nobody reads.
 one place the suite reads report text rather than the model, because the threshold is a
 literal inside `PrintNominations` and there is no model surface to assert against. That
 absence is the defect; only the subject names are read, never the sentence.
+
+### A snapshot that reproduces is not the same as a snapshot that is determined
+
+`OrderingTests` exists because the goldens passed for weeks while resting on nothing. Every
+writer sorted on a non-total key — 257 of 261 edges tie on `Weight` alone — so the position of
+most rows was decided by `Dictionary` enumeration order, which is insertion order, which is
+project load order. Reversing the project declaration order in `TestBed.sln`, an edit with no
+semantic content, moved all of it. Nothing was ever measured differently; the rows just landed
+somewhere else.
+
+That distinction is the whole point during extraction. `Bearing.Core` is a reimplementation
+rather than a port, so it will not reproduce the probe's incidental insertion order however
+correct its numbers are. A frozen snapshot that encodes enumeration order would have gone red on
+day one for no reason, and the real regression would have been invisible in the noise.
+
+So the test does not ask *does it reproduce*. It renders each artifact twice — once from the
+analysis, once from a shuffled view of the same objects — and requires the bytes to match. That
+is the question extraction actually poses. It is also its own control: remove any `ThenBy` in
+`Report.cs` and it fails while every golden stays green, which is the failure mode it was
+written to catch.
+
+When you add a writer or a nomination list, give it a total key. `Id` for types,
+`(From, To)` for edges, `(DeclaringTypeId, Id, File, Line)` for methods — **not `Id` alone for
+methods**, which is the bare method name and ties twelve ways on `Apply`.
 
 ### Order matters in `StructureTests`
 
