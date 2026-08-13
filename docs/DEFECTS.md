@@ -856,7 +856,7 @@ whose subject is ambiguous: *anyone* can be read as the reader, the author, or t
 
 
 **Fixed.** It names the shape instead — *broad rather than deep, a lot to hold at once but nothing intricate inside it*. The claim is unchanged and the same receipts back it. §16's test asserts the old phrasing **absent** as well as the new one present, because that is the kind of sentence that returns by being copied from an old snapshot.
-### 30. External dependencies do not separate framework from third-party from first-party
+### 30. External dependencies do not separate framework from third-party from first-party — **fixed**
 
 `Microsoft.AspNetCore.Mvc`, `System.IO` and a payment SDK are listed alike. Requested unprompted,
 and with the reason attached: *"it would help to indicate what the project built versus what is
@@ -868,6 +868,12 @@ does not carry. `ExternalSurface` already makes a judgement here — the plumbin
 classifier exists and is one distinction short. Related to §5, which is the same classifier being
 too narrow in a different direction, and the two want fixing together.
 
+
+**Fixed — the row says who provides it, read off how the SDK resolved the assembly.** Framework references resolve out of the targeting packs and the shared framework, packages out of the NuGet cache; both are facts about how restore works rather than a list of names to maintain. That matters because names cannot answer it — `System.Text.Json` is in the shared framework on one target and a package on another — and because a curated list is §5's defect, which is the one this entry sits next to.
+
+**Origin does not decide the integration map, and the fixture is why.** The first attempt treated framework-resolved as plumbing and emptied the map: `System.Data` and `System.Net.Http` both resolve from the framework, and both are exactly how TestBed reaches a database and the network. `CoreEquivalenceTests.The_integration_map_over_the_fixture_is_what_it_should_be` caught it in one run. **The two questions are different** — origin answers *"could somebody change this dependency"*, the filter answers *"does this reach outside the process"* — and the reader asked the first, whose answer is a label on the row rather than a reason to drop it.
+
+Unknown says nothing rather than guessing a third answer, and the name-based filter still applies to those. On nopCommerce: `Newtonsoft.Json` and `FluentValidation` are packages, `System.IO` is framework, and `Microsoft.AspNetCore.Mvc` resolves as a package while `Microsoft.AspNetCore.Http` resolves as framework — a distinction no name list makes.
 ### 31. A folded diagram box does not read as containing the projects that are missing — **fixed**
 
 *"Why isn't `Nop.Plugin` in the graph above?"* — asked while looking at the Projects list directly
