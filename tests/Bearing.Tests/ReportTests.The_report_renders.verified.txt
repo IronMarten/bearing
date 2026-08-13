@@ -192,3 +192,4 @@ Every claim shows the numbers behind it.
    Skipped as test projects: Core.Tests
    Excluded by path: 2 types, under 16 patterns (--exclude-path, --no-default-excludes)
    Load diagnostics: none
+   Dependencies pointing outside the analysed set: none

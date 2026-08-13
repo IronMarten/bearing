@@ -386,6 +386,19 @@ public sealed class Coverage
 
     /// <summary>Types dropped because they matched an exclusion.</summary>
     public required int ExcludedTypes { get; init; }
+
+    /// <summary>
+    /// Dependencies whose endpoint the walk never declared, and which are therefore absent from
+    /// the graph.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §7. A reference can resolve to a symbol that belongs to this solution
+    /// while pointing at a type no node was built for — excluded by path, in a skipped project, or
+    /// compiler-generated. Those cannot be edges, and a graph quietly missing some of them
+    /// understates fan-in exactly where a reader would not think to look. Set during
+    /// <c>ModelBuilder.Build</c>, which is the only place that can know it.
+    /// </remarks>
+    public int EdgesToUnanalysedTypes { get; internal set; }
 }
 
 /// <summary>

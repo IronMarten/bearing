@@ -224,7 +224,9 @@ internal sealed class ModelBuilder
         foreach (var (key, references) in _references)
         {
             if (!_types.TryGetValue(key.To, out var target)) continue;
-            target.AddInbound(_subjects[key.From]);
+            if (!_subjects.TryGetValue(key.From, out var source)) continue;
+
+            target.AddInbound(source);
             target.InboundReferenceCount += references.Count;
         }
 
@@ -250,11 +252,34 @@ internal sealed class ModelBuilder
             type.CohortSize = cohorts.SizeOf(type.Subject.Canonical);
         }
 
-        var edges = _references
-            .Select(kv => new Edge(_subjects[kv.Key.From], _subjects[kv.Key.To], kv.Value))
+        // An endpoint the walk never declared cannot be an edge in the report, and looking one up
+        // unguarded is what crashed Bearing on both reference solutions — docs/DEFECTS.md §7, whose
+        // consequence turned out to be a KeyNotFoundException rather than a small inaccuracy.
+        //
+        // `_isInSolution` answers "does this symbol belong to a project in this solution", which is
+        // not the same question as "did the walk produce a node for it": a type is skipped when its
+        // file matches an exclusion, when it lives in a skipped project, or when it is compiler
+        // territory rather than anyone's design. Every one of those still resolves to a symbol a
+        // reference can point at.
+        //
+        // Dropped rather than invented, and counted rather than dropped silently — invariant 8. A
+        // reader who sees no disclosure is entitled to assume the graph is complete.
+        var edges = new List<Edge>(_references.Count);
+        var unresolved = 0;
+
+        foreach (var (key, references) in _references)
+        {
+            if (_subjects.TryGetValue(key.From, out var from) && _subjects.TryGetValue(key.To, out var to))
+                edges.Add(new Edge(from, to, references));
+            else
+                unresolved++;
+        }
+
+        coverage.EdgesToUnanalysedTypes = unresolved;
+
+        edges = [.. edges
             .OrderBy(e => e.From.Canonical, StringComparer.Ordinal)
-            .ThenBy(e => e.To.Canonical, StringComparer.Ordinal)
-            .ToList();
+            .ThenBy(e => e.To.Canonical, StringComparer.Ordinal)];
 
         var types = _types.Values
             .OrderBy(t => t.Subject.Canonical, StringComparer.Ordinal)
@@ -362,6 +387,13 @@ internal sealed class ModelBuilder
         if (candidate is null) return null;
         if (candidate.SpecialType != SpecialType.None) return null;      // int, string, object...
         if (candidate.TypeKind == TypeKind.Error) return null;
+
+        // An anonymous type belongs to the compilation, so `_isInSolution` accepts it, and it then
+        // becomes a reference target with a canonical name of `global::<anonymous type: int id>`
+        // that no walk ever declared. On nopCommerce that crashed the build outright. It is also
+        // not a component in any sense the report means: a reader cannot navigate to it, name it,
+        // or change it, and the type that projected it is already the subject.
+        if (candidate.IsAnonymousType) return null;
 
         return (INamedTypeSymbol)candidate.OriginalDefinition;
     }

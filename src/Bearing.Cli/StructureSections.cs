@@ -309,6 +309,13 @@ internal static class StructureSections
 
         if (coverage.LoadDiagnostics.Count == 0)
             yield return "   Load diagnostics: none";
+
+        // Stated whether or not any were dropped, because "none" is the reassurance and the
+        // absence of a line is not. docs/DEFECTS.md §7.
+        yield return coverage.EdgesToUnanalysedTypes > 0
+            ? $"   Dependencies pointing outside the analysed set: "
+              + $"{Sentences.Whole(coverage.EdgesToUnanalysedTypes)} (fan-in is a lower bound)"
+            : "   Dependencies pointing outside the analysed set: none";
     }
 
     /// <summary>
