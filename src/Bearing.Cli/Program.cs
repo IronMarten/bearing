@@ -120,7 +120,7 @@ internal static class Program
 
         if (invocation.HtmlPath is { } html)
         {
-            HtmlReport.Write(html, model, findings, DateTimeOffset.UtcNow);
+            HtmlReport.Write(html, model, findings, DateTimeOffset.UtcNow, invocation.Full);
             Console.Error.WriteLine($"Wrote {html}");
         }
 
