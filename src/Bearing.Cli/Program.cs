@@ -59,7 +59,9 @@ internal static class Program
             return invocation.ShowHelp ? 0 : 2;
         }
 
-        var options = invocation.Options;
+        // The version the tool actually ships, told to Core rather than guessed by it.
+        // docs/DEFECTS.md §21: the model used to read Bearing.Core's assembly, which sets none.
+        var options = invocation.Options with { ToolVersion = version };
 
         if (!File.Exists(options.SolutionPath))
         {
@@ -71,7 +73,7 @@ internal static class Program
 
         try
         {
-            return await AnalyseAsync(options).ConfigureAwait(false);
+            return await AnalyseAsync(options, invocation).ConfigureAwait(false);
         }
         catch (SolutionLoadException ex)
         {
@@ -94,12 +96,20 @@ internal static class Program
     /// question — it reintroduces the load-order bug.
     /// </remarks>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-    private static async Task<int> AnalyseAsync(WalkOptions options)
+    private static async Task<int> AnalyseAsync(WalkOptions options, Invocation invocation)
     {
         var model = await new SolutionWalker(options).WalkAsync().ConfigureAwait(false);
         var findings = Analysis.FindingsFor(model);
 
         foreach (var line in Report.For(model, findings)) Console.WriteLine(line);
+
+        // After the report, and to stderr, so that neither the file nor the note about it can
+        // land in the middle of output somebody is piping.
+        if (invocation.JsonPath is { } json)
+        {
+            JsonOutput.Write(json, model, DateTimeOffset.UtcNow);
+            Console.Error.WriteLine($"Wrote {json}");
+        }
 
         return 0;
     }

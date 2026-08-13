@@ -414,6 +414,7 @@ public sealed class SolutionModel
     internal SolutionModel(
         string solutionPath,
         AnalysisPolicy policy,
+        string toolVersion,
         IReadOnlyList<ProjectNode> projects,
         IReadOnlyList<TypeNode> types,
         IReadOnlyList<Edge> edges,
@@ -421,6 +422,7 @@ public sealed class SolutionModel
     {
         SolutionPath = solutionPath;
         Policy = policy;
+        ToolVersion = toolVersion;
         Projects = projects;
         Types = types;
         Edges = edges;
@@ -433,9 +435,17 @@ public sealed class SolutionModel
     /// <summary>The thresholds this analysis was produced under.</summary>
     public AnalysisPolicy Policy { get; }
 
-    /// <summary>The tool version that produced it.</summary>
-    public string ToolVersion { get; } =
-        ToolInfo.ReadVersion(typeof(SolutionModel).Assembly);
+    /// <summary>
+    /// The version of the tool that produced this analysis, as the host reported it.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §21. This used to read <c>typeof(SolutionModel).Assembly</c>, which
+    /// is <c>Bearing.Core</c> — a project that sets no version and therefore reported the SDK
+    /// default <c>1.0.0</c> against a tool shipping <c>0.0.1-preview.1</c>. It comes from
+    /// <see cref="WalkOptions.ToolVersion"/> now, because the version belongs to whatever packs
+    /// and Core has no way to find that out that is not a guess.
+    /// </remarks>
+    public string ToolVersion { get; }
 
     /// <summary>Every project analysed.</summary>
     public IReadOnlyList<ProjectNode> Projects { get; }

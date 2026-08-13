@@ -113,19 +113,34 @@ public sealed class ReportTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// <c>SolutionModel.ToolVersion</c> is not the tool's version, and the header does not use it.
+    /// <c>SolutionModel.ToolVersion</c> is whatever the host said, and never a version of its own
+    /// invention.
     /// </summary>
     /// <remarks>
-    /// Found by rendering it. <c>&lt;Version&gt;</c> lives on <c>Bearing.Cli</c>; the property
-    /// reads <c>typeof(SolutionModel).Assembly</c>, which is <c>Bearing.Core</c>, which sets none
-    /// and so reports the SDK default. Nothing rendered it before A0, so nothing caught it. Pinned
-    /// as a defect rather than quietly worked around, because it is still the value that will
-    /// reach the JSON writer at A4 and become a field somebody parses.
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §21, <b>closed at A4</b>. The property used to read
+    /// <c>typeof(SolutionModel).Assembly</c> — <c>Bearing.Core</c>, which sets no
+    /// <c>&lt;Version&gt;</c> and therefore reported the SDK default <c>1.0.0</c> against a tool
+    /// shipping <c>0.0.1-preview.1</c>. It comes from <c>WalkOptions.ToolVersion</c> now, which
+    /// the host supplies because the version lives on whatever packs and Core is not it.
+    /// </para>
+    /// <para>
+    /// The fixture walks without supplying one, so what it pins is the <i>default</i>: <c>0.0.0</c>,
+    /// which reads as "nobody told me", where <c>1.0.0</c> read as a release that does not exist.
+    /// The old value is asserted absent, because that is the one a reader would have believed.
+    /// <c>JsonOutputTests</c> carries the other half — a real walk with a version set — since the
+    /// defect lived in the path from options to model and the header never took that path.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void The_models_tool_version_reports_the_wrong_assembly()
+    public void The_models_tool_version_is_the_hosts_to_supply()
     {
-        Assert.NotEqual(ToolInfo.ReadVersion(typeof(Report).Assembly), core.Model.ToolVersion);
+        Assert.Equal(ToolInfo.UnknownVersion, core.Model.ToolVersion);
+        Assert.NotEqual("1.0.0", core.Model.ToolVersion);
+
+        // The header reads the Cli's assembly directly and is unaffected either way — which is
+        // what let the defect sit unnoticed, so it is worth still saying the two are not the same
+        // read.
         Assert.DoesNotContain($"BEARING {core.Model.ToolVersion}", Text, StringComparison.Ordinal);
     }
 

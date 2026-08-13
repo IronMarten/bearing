@@ -17,6 +17,27 @@ public sealed record WalkOptions
     public bool IncludeTests { get; init; }
 
     /// <summary>
+    /// The version of the tool doing the analysing, which the host supplies because Core cannot
+    /// know it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §21. <see cref="SolutionModel.ToolVersion"/> used to read
+    /// <c>typeof(SolutionModel).Assembly</c> — <c>Bearing.Core</c>, which sets no version and so
+    /// reported the SDK default <c>1.0.0</c> against a tool shipping <c>0.0.1-preview.1</c>. The
+    /// version lives on whatever packs, and Core is not it.
+    /// </para>
+    /// <para>
+    /// <b>The default is <see cref="ToolInfo.UnknownVersion"/> rather than Core's own.</b> A host
+    /// that does not say produces <c>0.0.0</c>, which reads as "nobody told me" — where
+    /// <c>1.0.0</c> read as a release that does not exist, and did so in a field a consumer was
+    /// about to parse and compare. <see cref="Assembly.GetEntryAssembly"/> is not the answer for
+    /// the reason <see cref="ToolInfo.ReadVersion"/> gives: under a test host it is the runner.
+    /// </para>
+    /// </remarks>
+    public string ToolVersion { get; init; } = ToolInfo.UnknownVersion;
+
+    /// <summary>
     /// Path fragments that exclude a file from analysis.
     /// </summary>
     /// <remarks>

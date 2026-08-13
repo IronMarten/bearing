@@ -37,7 +37,7 @@ internal static partial class VerifyConfiguration
         {
             var scrubbed = FixturePath().Replace(
                 builder.ToString(),
-                m => "TestBed/" + m.Groups[1].Value.Replace('\\', '/'));
+                m => "TestBed/" + Separators(m.Groups[1].Value));
 
             // The report header names the build that produced it, which is the one genuinely
             // volatile thing in it: every release moves it, and re-accepting a snapshot for a
@@ -50,6 +50,22 @@ internal static partial class VerifyConfiguration
             builder.Append(scrubbed);
         });
     }
+
+    /// <summary>
+    /// Turns any run of separators into one <c>/</c>.
+    /// </summary>
+    /// <remarks>
+    /// A run, not a character, because <b>JSON escapes the separator</b>: a Windows path inside a
+    /// string literal is <c>C:\\Users\\...</c>, so a scrubber converting one backslash at a time
+    /// produced <c>TestBed//Core//Gauges.cs</c> in the A4 snapshot — a path no reader would
+    /// recognise and no reviewer would trust. The CSV and text snapshots carry the same paths
+    /// unescaped, and both forms have to normalise to the same text or the two regimes disagree
+    /// about a file they both name.
+    /// </remarks>
+    private static string Separators(string path) => SeparatorRun().Replace(path, "/");
+
+    [GeneratedRegex(pattern: """[\\/]+""", options: RegexOptions.CultureInvariant)]
+    private static partial Regex SeparatorRun();
 
     /// <summary>
     /// Matches the version in the report header, and only there.
@@ -73,9 +89,13 @@ internal static partial class VerifyConfiguration
     /// normalises a checkout at any location — including the second pristine copy kept
     /// outside this repository (<c>oracle/README.md</c>) — to the same text. Stops at a
     /// comma, quote or newline so it cannot swallow the rest of a CSV row.
+    /// <para>
+    /// Separators are matched in <b>runs</b>, so one expression fits a raw path and a
+    /// JSON-escaped one, where every backslash is doubled. See <see cref="Separators"/>.
+    /// </para>
     /// </remarks>
     [GeneratedRegex(
-        pattern: """(?:[A-Za-z]:\\|/)[^,\r\n"]*?[\\/]TestBed[\\/]([^,\r\n"]*)""",
+        pattern: """(?:[A-Za-z]:[\\/]+|/)[^,\r\n"]*?[\\/]+TestBed[\\/]+([^,\r\n"]*)""",
         options: RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex FixturePath();
 }

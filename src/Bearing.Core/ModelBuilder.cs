@@ -285,7 +285,8 @@ internal sealed class ModelBuilder
             .OrderBy(t => t.Subject.Canonical, StringComparer.Ordinal)
             .ToList();
 
-        return new SolutionModel(solutionPath, _options.Policy, projects, types, edges, coverage);
+        return new SolutionModel(
+            solutionPath, _options.Policy, _options.ToolVersion, projects, types, edges, coverage);
     }
 
     private IEnumerable<CohortSubject> CohortSubjects() =>

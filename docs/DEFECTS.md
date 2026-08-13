@@ -634,6 +634,21 @@ the version on the package. The report header now reads the Cli's assembly and
 Still open, because the *model's* copy is the one that reaches the JSON writer at **A4**, where it
 stops being a printed string and becomes a field somebody parses and compares against a release.
 
+**Fixed at A4, by making the version an input rather than a lookup.** `WalkOptions.ToolVersion` is
+what the model carries, and the host supplies it — `Program` passes the version it already reads
+off its own assembly for the header, so there is now one read where there were two disagreeing
+ones. Core cannot find this out for itself: the version lives on whatever packs, `Bearing.Core`
+does not, and `Assembly.GetEntryAssembly` is the test runner under a test host, which is the reason
+`ToolInfo.ReadVersion` takes an assembly in the first place.
+
+**The default is `ToolInfo.UnknownVersion` — `0.0.0` — and not Core's own.** A host that says
+nothing now reports "nobody told me". The old value reported a release that does not exist, in a
+field a consumer was about to parse; of the two ways to be wrong, only one of them is visible to
+the person reading it. The fixture walks without supplying a version, so that default is what
+`ReportTests` pins, and `JsonOutputTests.The_tool_version_is_the_one_the_host_supplies` does a real
+second walk with one set — the defect lived in the path from options to model, and a test that
+built the model some other way would not cross it.
+
 ### 22. Anonymous types are collected as components — **fixed in Core at A2**
 
 `global::<anonymous type: int id>` reached the reference graph as a target and killed nopCommerce
