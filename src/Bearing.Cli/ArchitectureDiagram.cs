@@ -221,6 +221,37 @@ public static class ArchitectureDiagram
     }
 
     /// <summary>
+    /// Every box that stands for more than one project, with the label it carries and the
+    /// projects inside it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §31.</b> The fold is this artifact's best compression — 27
+    /// projects to 10 boxes on nopCommerce, against 1444px unfolded — and to a first reader it
+    /// reads as an omission. Asked <i>"why isn't Nop.Plugin in the graph?"</i> while looking at the
+    /// projects table directly below it, where the plugin names are. The caption says folding
+    /// happened; nothing connected a folded box to the names inside it.
+    /// </para>
+    /// <para>
+    /// Offered as data rather than drawn into the SVG. Names in a picture are unsearchable and
+    /// force the box to grow to fit them, which is the thing the fold exists to prevent — so the
+    /// caller renders these as text beside the diagram. <see cref="Title"/> is shared with the
+    /// boxes, so a legend cannot disagree with the label it explains.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<(string Label, IReadOnlyList<string> Projects)> Folded(SolutionModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        var graph = model.ProjectGraph;
+        var labels = Labels(graph);
+
+        return [.. graph.Groups
+            .Where(g => g.Size > 1)
+            .Select(g => (Title(g, labels), (IReadOnlyList<string>)g.Projects))];
+    }
+
+    /// <summary>
     /// The second line: what the box is, in words.
     /// </summary>
     /// <remarks>

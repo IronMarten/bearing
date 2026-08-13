@@ -141,6 +141,17 @@ public static class HtmlReport
         page.Append($"{Html.Count(graph.Depth)} layer(s) deep.</p>\n");
 
         page.Append("<div class=\"scroll\">\n").Append(ArchitectureDiagram.Render(model)).Append("</div>\n");
+
+        // docs/DEFECTS.md §31. Saying that folding happened is not the same as saying what is
+        // inside, and a reader scanning for a project name reads a fold as an omission. The names
+        // go here rather than into the boxes: a picture cannot be searched, and a box that grows
+        // to fit its members is the thing the fold exists to prevent.
+        foreach (var (label, projects) in ArchitectureDiagram.Folded(model))
+        {
+            page.Append($"<p class=\"sub\"><strong>{Html.Text(label)}</strong> holds ");
+            page.Append(Html.Text(string.Join(", ", projects)));
+            page.Append("</p>\n");
+        }
     }
 
     private static void Projects(StringBuilder page, SolutionModel model)
