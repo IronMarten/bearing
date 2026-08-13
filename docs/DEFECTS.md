@@ -768,6 +768,104 @@ The file writers never depended on it — `JsonOutput` and `CsvOutput` pass thei
 Found by reading the *bytes* of a redirected run rather than the run, which is the only way this
 shows up: on screen the terminal renders whatever it was given and nothing looks wrong.
 
+---
+
+**26–31 are a third class: defects a reader outside the build made visible.** 1–17 were carried
+through the port. 18–25 were made visible by the port, when it produced a report a user could read
+— but the reader was still the author. These came from `TASKS.md` A11 round 1, run to the protocol
+in the private spec set: two developers unfamiliar with nopCommerce, given the shipped HTML report
+and nothing else. **None could have come from the suite, and none came from the author running the
+binary either** — every one is about whether a label, a sentence or a table means anything to
+someone who does not already know what it is for. They are open, none is pinned, and all six are
+`Bearing.Cli`.
+
+### 26. The three facts under a finding's name are unlabelled, and are not the same kind of thing
+
+`<p class="where">Nop.Core · BaseAttribute.cs:9 · the 31 implementations of ILocalizedEntity</p>`
+
+The first two are identity and location. The third is **the population the claim is measured
+against** — the cohort, which is the entire basis on which the finding was made and the one thing
+on the card that is not an address. Joined by middots, unlabelled, it reads as a third address.
+
+Participants understood the phrase perfectly well and could not tell what job it was doing,
+guessing *"project membership, definition location, caller set"* and wanting to open the code to
+check. **The phrase is not the defect.** This is not `PRD-free-tier.md` §5 failing to transmit; it
+is §5's mechanism arriving with nothing to say it is a mechanism.
+
+`ARCHITECTURE.md` §4 already states the general form, written at A6 about `Participants`:
+heterogeneous data rendered by a generic renderer, where one relationship per kind means a renderer
+label suffices. **The `where` line has the same disease and was never covered by that rule.** The
+remedy is the same, and it is a label rather than a redesign.
+
+### 27. `Why this fired` publishes 65 internal identifiers
+
+The receipts table renders `Measured / Value / Had to clear` as raw policy and metric field names.
+Across one nopCommerce run that is **65 distinct identifiers** shown to the reader —
+`MaxMemberCyclomaticXMedian`, `FanInSolutionRankLimit`, `RollCallDivisor`, `Dsm`, `OutlierFactor`,
+sixty more.
+
+`PRD-free-tier.md` §4 forbids exactly this: *"every metric exists to support an interpreted claim a
+non-expert can act on. If a number does not end in a sentence someone changes their behaviour over,
+it does not ship."* The rule was taken because a validation session found developers did not hold
+*stability* as a vocabulary concept; the report duly never prints `instability 0.296`, and then
+prints `MaxMemberCyclomaticPctl` in a table.
+
+**It is the designed explanation, which is what makes it worse than an ordinary leak.** Asked what
+the pane told them, participants reported understanding **less** after expanding it than before —
+*"I have no idea what that is, but it seems like a big number. Is that a problem?"* A disclosure
+that reduces comprehension is not a disclosure.
+
+### 28. A ratio against a zero median renders as `∞`
+
+`MaxMemberCyclomaticXMedian` is displayed as `∞` when the cohort's median is 0 — a real value in
+the receipts table of a real card. The quantity is undefined, not infinite, and the gate it feeds
+cannot discriminate in that cohort at all.
+
+**Rare, and it found its own worst case.** 62 of nopCommerce's 163 cohorts have a median
+`maxMemberCyclomatic` of 0, holding 46% of types — but only **10 types of 3,209** both clear
+`MinDecisionCc` and sit in one, so `∞` reaches a card about three times in a thousand.
+`BaseAttribute` is one of the ten and was the first card a participant opened.
+
+**Worth being clear about what this is not.** It was investigated as a possible cause of the 1,091
+method-level nominations on that run and **it is not one** — the volume is granularity times scale,
+which §3.2's method-level primacy chose on purpose. This is a display defect of narrow scope, and
+recording it as anything larger would be wrong.
+
+### 29. *"too large for anyone to hold at once"* reads as the tool giving up
+
+Asked directly, on the god-object-by-size arm: *"is that a sign of a problem, or is the report
+giving up?"*
+
+The sentence is D16's, and D16's fix was correct — the two arms are independent qualifiers, so a
+renderer cannot tell a god object by size that it carries real logic. What survived is a phrase
+whose subject is ambiguous: *anyone* can be read as the reader, the author, or the tool. One line.
+
+### 30. External dependencies do not separate framework from third-party from first-party
+
+`Microsoft.AspNetCore.Mvc`, `System.IO` and a payment SDK are listed alike. Requested unprompted,
+and with the reason attached: *"it would help to indicate what the project built versus what is
+language or framework provided — I'm not going to change any of those, so I'm not worried about
+them."*
+
+That is a reader dividing the list by **what they could act on**, which is the axis the section
+does not carry. `ExternalSurface` already makes a judgement here — the plumbing filter — so the
+classifier exists and is one distinction short. Related to §5, which is the same classifier being
+too narrow in a different direction, and the two want fixing together.
+
+### 31. A folded diagram box does not read as containing the projects that are missing
+
+*"Why isn't `Nop.Plugin` in the graph above?"* — asked while looking at the Projects list directly
+below the diagram, where the plugin names are.
+
+The boxes say *"Omnisend +5"* and *"6 projects, same shape"*. **The fold is the artifact's best
+compression** — 27 projects to 10 boxes on nopCommerce, against 1444px unfolded — and to a first
+reader it reads as an omission rather than as a container. The caption explains that folding
+happened; nothing connects a folded box to the names that are inside it.
+
+The same session found the flat Projects list **outperforming the diagram** at the actual
+navigation task: asked where they would change tax calculation, nobody reached it through the map,
+and everybody found `Nop.Plugin.Tax` by scrolling the list.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.
