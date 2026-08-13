@@ -250,8 +250,14 @@ public sealed class ReportTests(CoreWalkFixture core)
     {
         var line = Assert.Single(Lines, l => l.Contains("DispatchRegistry [", StringComparison.Ordinal));
 
-        Assert.Contains("too large for anyone to hold at once", line, StringComparison.Ordinal);
+        Assert.Contains("broad rather than deep", line, StringComparison.Ordinal);
         Assert.DoesNotContain("carries real logic", line, StringComparison.Ordinal);
+
+        // docs/DEFECTS.md §29. The claim this arm makes has not changed; the words have. "Too
+        // large for anyone to hold at once" was read by a reader outside the build as the report
+        // giving up rather than as a statement about the type, and the old phrasing is asserted
+        // absent because that is the kind of sentence that comes back from an old snapshot.
+        Assert.DoesNotContain("too large for anyone", line, StringComparison.Ordinal);
 
         // The receipt that refuted the probe's sentence is still shown, because the reader has to
         // be able to check the claim that replaced it.

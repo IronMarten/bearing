@@ -874,6 +874,41 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// No constructor is nominated here, so the report never has to name one — and the guard
+    /// against naming it badly is vacuous until that changes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §24.</b> A constructor's member name <i>is</i> <c>.ctor</c>, so
+    /// joining it to its type with a dot yields <c>CustomerInfoValidator..ctor</c>. The fixture
+    /// declares no constructor complex enough to be nominated, which is why the defect was found
+    /// by reading nopCommerce and not by this suite — and why it sat filed as cosmetic while being
+    /// the first row of that solution's concealed-decision section.
+    /// </para>
+    /// <para>
+    /// Both halves matter. The first asserts the hole so it stays visible; the second is a guard
+    /// that costs nothing now and starts doing real work the moment a plant fills the hole, which
+    /// is the only point at which this could regress.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_constructor_is_nominated_so_the_member_naming_guard_is_vacuous()
+    {
+        var findings = Analysis.FindingsFor(core.Model);
+
+        var constructors = findings.All
+            .Select(f => f.Subject.DeclaringType is null ? null : f.Subject)
+            .Count(s => s?.Canonical.Contains(".ctor", StringComparison.Ordinal) == true);
+
+        Assert.Equal(0, constructors);
+
+        // Qualified: this file's `using ArchProbe` puts the probe's Report in scope first.
+        var text = string.Join(
+            Environment.NewLine, IronMarten.Bearing.Cli.Report.For(core.Model, findings));
+        Assert.DoesNotContain("..ctor", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// No cohort here has a median complexity of zero, so the ranking rule for an undefined
     /// ratio never runs on this fixture.
     /// </summary>

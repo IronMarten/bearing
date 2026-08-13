@@ -59,7 +59,7 @@ internal static class FindingSections
                 ? "the only complexity among "
                 : $"{Sentences.Number(times)}x the median internal complexity of ";
 
-            yield return $"   {type.Name}.{member?.Name} — {opening}{claim}"
+            yield return $"   {Sentences.Member(type.Name, member?.Name ?? "")} — {opening}{claim}"
                          + $"{Sentences.PeerGroup(type.Cohort, type.CohortSize)}. "
                          + $"(top {Sentences.TopPercent(percentile)}; "
                          + $"cc {type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
@@ -93,7 +93,7 @@ internal static class FindingSections
                 ? "the only complexity among its "
                 : $"{Sentences.Number(times)}x the median complexity of its ";
 
-            yield return $"   {type.Name}.{member.Name} — {basis}"
+            yield return $"   {Sentences.Member(type.Name, member.Name)} — {basis}"
                          + $"{Sentences.Whole(peers)} peers "
                          + $"(cc {member.Cyclomatic}, dsm {member.Dsm}, "
                          + $"nesting {member.MaxNestingDepth}, {member.LinesOfCode} lines) — "
@@ -282,8 +282,13 @@ internal static class FindingSections
             (true, false) => $"AND carries real logic ({type.MemberCount} members, worst method "
                              + $"{worst?.Name} at cc {type.MaxMemberCyclomatic}, dsm {type.Dsm})",
             // The size arm alone. No claim about logic, because the receipts would refute it.
-            _ => $"AND is too large for anyone to hold at once ({type.MemberCount} members, and "
-                 + $"no method above cc {type.MaxMemberCyclomatic})",
+            // docs/DEFECTS.md §29. "Too large for anyone to hold at once" was read as the
+            // report giving up rather than as a claim about the type — "anyone" has no clear
+            // referent, and this arm makes no logic claim to anchor it. Naming the shape says
+            // the same thing and cannot be read as an apology.
+            _ => $"AND is broad rather than deep ({type.MemberCount} members, no method above "
+                 + $"cc {type.MaxMemberCyclomatic}) — a lot to hold at once, but nothing "
+                 + "intricate inside it",
         };
 
         return "Architectural bottleneck: it both depends on and is depended on by much of "

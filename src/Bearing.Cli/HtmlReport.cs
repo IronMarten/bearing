@@ -547,10 +547,10 @@ public static class HtmlReport
             var member = owner.Members
                 .FirstOrDefault(m => string.Equals(m.Subject.Canonical, subject.Canonical, StringComparison.Ordinal));
 
-            // The dot that produced Type..ctor — docs/DEFECTS.md §24 — so the member's own name is
-            // used where it already reads as one and the join is skipped where it does not.
-            if (member is not null)
-                return member.Name.StartsWith('.') ? $"{owner.Name} {member.Name[1..]}" : $"{owner.Name}.{member.Name}";
+            // docs/DEFECTS.md §24, and one rule for both renderers now. This medium had its own
+            // half-fix that skipped the dot and produced "CustomerInfoValidator ctor", which is
+            // not wrong so much as still addressed to the runtime rather than to a reader.
+            if (member is not null) return Sentences.Member(owner.Name, member.Name);
         }
 
         return subject.Kind switch

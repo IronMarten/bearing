@@ -28,6 +28,28 @@ internal static class Sentences
     internal static string Plural(double count, string noun) =>
         count == 1 ? $"1 {noun}" : $"{Whole(count)} {noun}s";
 
+    /// <summary>A member named under its declaring type, in words a reader can search for.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §24.</b> A constructor's member name <i>is</i> <c>.ctor</c>, so
+    /// joining type and member with a dot produced <c>CustomerInfoValidator..ctor</c>. It was
+    /// filed as cosmetic and only visible on real code; it is now the first row of nopCommerce's
+    /// concealed-decision section, because the ranking fix moved a pair of constructors to the top.
+    /// </para>
+    /// <para>
+    /// Spelled out rather than trimmed to <c>ctor</c>. The name is here so a reader can find the
+    /// thing, and <i>constructor</i> is what they would call it — <c>.ctor</c> is what the runtime
+    /// calls it, which is the same mistake one level down as printing <c>MaxMemberCyclomaticPctl</c>
+    /// at somebody (§27).
+    /// </para>
+    /// </remarks>
+    internal static string Member(string owner, string member) => member switch
+    {
+        ".ctor" => $"{owner} constructor",
+        ".cctor" => $"{owner} static constructor",
+        _ => $"{owner}.{member}",
+    };
+
     /// <summary>
     /// A percentile as a "top N%" phrase, floored at 1%.
     /// </summary>
