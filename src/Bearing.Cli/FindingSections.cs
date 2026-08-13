@@ -46,18 +46,23 @@ internal static class FindingSections
             // its peers" still means widely depended on. Core decides which is true; this picks
             // the words.
             var opening = finding.Holds(Qualifiers.LowAbsoluteConnectivity)
-                ? "looks like plumbing but is in the top "
-                : "connectivity is unremarkable for its peers, but it is in the top ";
+                ? "looks like plumbing but is "
+                : "connectivity is unremarkable for its peers, but it is ";
 
-            var basis = double.IsInfinity(times)
-                ? "(its peers all measure 0; cc "
-                : $"({Sentences.Number(times)}x the peer median; cc ";
+            // The number that ranked the row leads the sentence. This section is ordered on the
+            // multiple of the peer median — the quantity `OutlierFactor` gated — and it used to
+            // open on the percentile, so nopCommerce printed "top 2%" above two rows reading
+            // "top 1%" and the section read as unsorted. An order the reader cannot see is not an
+            // order that helps them. Method level already reads this way, and the two are one
+            // finding at two granularities.
+            var claim = double.IsInfinity(times)
+                ? "the only complexity among "
+                : $"{Sentences.Number(times)}x the median internal complexity of ";
 
-            yield return $"   {type.Name}.{member?.Name} — {opening}"
-                         + $"{Sentences.TopPercent(percentile)} of internal complexity among "
+            yield return $"   {type.Name}.{member?.Name} — {opening}{claim}"
                          + $"{Sentences.PeerGroup(type.Cohort, type.CohortSize)}. "
-                         + basis
-                         + $"{type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
+                         + $"(top {Sentences.TopPercent(percentile)}; "
+                         + $"cc {type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
                          + $"fan-in {type.FanIn}, fan-out {type.FanOut})";
         }
 
@@ -213,7 +218,13 @@ internal static class FindingSections
         yield return "";
         yield return "-- HUBS AND GOD OBJECTS (no cohort required) -------------------";
         yield return $"   (fan-in AND fan-out both >= {model.Policy.HubMin} — a ratio cannot see these, since";
-        yield return "    high-in + high-out lands mid-range, same as a trivial one-in one-out leaf)";
+        yield return "    high-in + high-out lands mid-range, same as a trivial one-in one-out leaf.";
+
+        // Both counts are on every row and neither of them is the sort key, so the order is
+        // invisible without this line: nopCommerce puts fan-in 89 third, under 28 and 24, which
+        // reads as a mistake. Said once per section rather than added to every row, because the
+        // rows are already the densest thing in the report.
+        yield return "    Ordered by the smaller of the two: a thing is only as much a hub as its narrower side.)";
 
         var found = findings.OfKind(FindingKind.HubOrGodObject);
         if (found.Count == 0) yield return "   (none)";
