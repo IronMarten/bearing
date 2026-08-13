@@ -54,6 +54,7 @@ public static class HtmlReport
         page.Append("<style>\n").Append(HtmlStyle.Css).Append("\n</style>\n</head>\n<body>\n<div class=\"wrap\">\n");
 
         Header(page, model, solution, findings, generatedAt);
+        Picture(page, model, findings);
         Orientation(page, model);
         Findings(page, model, findings);
         DrillDown(page, model, findings);
@@ -82,7 +83,7 @@ public static class HtmlReport
 
         page.Append("<p class=\"lede\">A map of this solution and a short list of the components that are ");
         page.Append("unusual <em>for what they are</em> — measured against their structural peers, never scored. ");
-        page.Append("Start with the shape of the system below; the findings are further down and they assume it.</p>\n");
+        page.Append("Start with the picture; the findings are further down and they assume it.</p>\n");
 
         page.Append("<div class=\"tiles\">\n");
         Tile(page, Html.Count(model.Types.Count), "types");
@@ -94,6 +95,67 @@ public static class HtmlReport
 
     private static void Tile(StringBuilder page, string value, string label) =>
         page.Append($"<div class=\"tile\"><b>{value}</b><span>{Html.Text(label)}</span></div>\n");
+
+    // ---------------------------------------------------------------------- picture ----
+
+    /// <summary>
+    /// The mosaic — A13 tier 1, and the first thing on the page.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>First because of what it is for, which is not what the rest of the page is for.</b> The
+    /// tiers below it answer to <c>PRD-free-tier.md</c> §4 — a number that does not end in a
+    /// sentence somebody changes their behaviour over does not ship. This one answers to §9's third
+    /// metric instead, and the difference is stated here rather than left for a reader to infer
+    /// from the fact that it makes no claim.
+    /// </para>
+    /// <para>
+    /// <b>The caption does the work §4 would otherwise do.</b> An area encoding is read badly by
+    /// eye, so what a cell is, what its size means, what the mark means and how many cells carry it
+    /// are all said in words underneath — and the projects too small to hold a name are listed,
+    /// which is <c>docs/DEFECTS.md</c> §31's lesson applied before a reader has to find it again.
+    /// </para>
+    /// </remarks>
+    private static void Picture(StringBuilder page, SolutionModel model, FindingSet findings)
+    {
+        if (model.Types.Count == 0) return;
+
+        var marks = Mosaic.Marked(model, findings);
+
+        page.Append("<div class=\"picture\">\n").Append(Mosaic.Render(model, findings)).Append("</div>\n");
+
+        page.Append($"<p class=\"sub\">Every one of the {Html.Count(model.Types.Count)} types this run analysed, ");
+        page.Append("one cell each, sized by how many lines it spans and grouped into the project that declares it — ");
+        page.Append("biggest project first. ");
+        page.Append($"Some finding below is about {Html.Count(marks.Named)} of them, which is the tint; ");
+        page.Append($"<strong>the {Html.Count(marks.Leading)} outlined in red are where to start</strong>. ");
+        page.Append("Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a ");
+        page.Append("component is would be a score, and this tool does not have one.</p>\n");
+
+        // The lead is X10's selection and nothing else, so the picture and the findings pane cannot
+        // disagree about which components a reader should open first. Named here as well as drawn,
+        // because a reader who wants to find one has to be able to search for it — the same reason
+        // docs/DEFECTS.md §31 puts the folded project names beside the project map.
+        var leading = Selection.Exemplars(findings)
+            .Select(f => model.Find(f.Subject) ?? (f.Subject.DeclaringType is { } d ? model.Find(d) : null))
+            .Where(t => t is not null)
+            .Select(t => t!.Name)
+            .ToList();
+
+        if (leading.Count > 0)
+            page.Append("<p class=\"sub\">Those are one per kind of finding this run made, ")
+                .Append("<em>ordered by how uncommon each kind is in this codebase</em> — which is an ordering and ")
+                .Append("not a severity, because the tool has no way to say a hub is worse than a cycle: ")
+                .Append(Html.Text(string.Join(", ", leading)))
+                .Append(".</p>\n");
+
+        var unlabelled = Mosaic.Unlabelled(model);
+        if (unlabelled.Count > 0)
+            page.Append($"<p class=\"sub\">{Html.Count(unlabelled.Count)} project(s) are on the picture but too small ")
+                .Append("to hold a name at this size: ")
+                .Append(Html.Text(string.Join(", ", unlabelled)))
+                .Append(".</p>\n");
+    }
 
     // ------------------------------------------------------------------- orientation ----
 

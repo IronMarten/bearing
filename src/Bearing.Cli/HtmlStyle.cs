@@ -51,6 +51,8 @@ th,td{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--line);ve
 th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .scroll{overflow-x:auto}
+.picture{margin:1.25rem 0 .5rem;border:1px solid var(--line);border-radius:.5rem;overflow:hidden}
+.picture svg{display:block;width:100%;height:auto}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:.6rem;padding:.9rem 1rem;margin:.6rem 0}
 .card>h4{margin:0 0 .15rem;font-size:1rem}
 .claim{margin:.15rem 0 .5rem}
