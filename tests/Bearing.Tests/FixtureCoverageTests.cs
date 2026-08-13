@@ -872,4 +872,38 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
         Assert.Equal(1, run.Result.Types.Single(t => t.Name == "TenantPolicySink").FanIn);
         Assert.Equal(0, run.Result.Types.Single(t => t.Name == "AuditPolicySink").FanIn);
     }
+
+    /// <summary>
+    /// No cohort here has a median complexity of zero, so the ranking rule for an undefined
+    /// ratio never runs on this fixture.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>ConcealedDecision</c> ranks a nomination whose peer median is 0 <b>after</b> every one
+    /// whose extremity was measured, and orders that group by absolute complexity, because a
+    /// ratio against zero is undefined rather than infinite. Ordering on the ratio alone put ten
+    /// tied rows at the top of nopCommerce's section — cc 6 leading — ahead of a constructor at
+    /// 37x its peer median. <c>docs/DEFECTS.md</c> §28.
+    /// </para>
+    /// <para>
+    /// <b>The fixture cannot show any of it.</b> Every cohort here has a non-zero median, so that
+    /// branch is exercised only by real solutions and the accepted snapshot is no evidence about
+    /// it either way. This fails the day a plant adds a cohort of property bags with one complex
+    /// member among them — which is the point at which the ordering needs a test of its own and
+    /// this assertion should be deleted rather than widened.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_cohort_has_a_median_of_zero_so_the_undefined_ratio_ranking_never_runs()
+    {
+        var findings = Analysis.FindingsFor(core.Model);
+
+        var undefined = findings.OfKind(FindingKind.ConcealedDecisionType)
+            .Select(f => f.ValueOf("MaxMemberCyclomaticXMedian"))
+            .Concat(findings.OfKind(FindingKind.ConcealedDecisionMethod)
+                .Select(f => f.ValueOf("CyclomaticXMedian")))
+            .Count(times => double.IsInfinity(times ?? 0));
+
+        Assert.Equal(0, undefined);
+    }
 }

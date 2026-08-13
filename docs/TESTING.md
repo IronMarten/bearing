@@ -329,6 +329,21 @@ Tidying it up changes the expected answers.
 
 ### The fixture's known gaps
 
+**For the undefined-ratio ranking (Job B).** `ConcealedDecision` ranks a nomination whose peer
+median is 0 *after* every one whose extremity was measured, and orders that group by absolute
+complexity — a ratio against zero is undefined rather than infinite, so it must not outrank a
+measured one. **No cohort in the fixture has a median of 0**, so the branch never runs here and
+the accepted snapshot is no evidence about it in either direction.
+`FixtureCoverageTests.No_cohort_has_a_median_of_zero_so_the_undefined_ratio_ranking_never_runs`
+asserts the absence and fails the day a plant supplies the case, which is when the ordering needs
+a test of its own.
+
+> **Measured only on a real solution, which is the whole reason it was found.** On nopCommerce
+> **10 of 79** type-level nominations divide by a zero median. Ranking on the ratio alone put all
+> ten at the top of the section, tied, settled alphabetically — so the report opened on `cc 6`
+> where it now opens on a constructor at **37x its peer median, cc 37**. `MinDecisionCc` already
+> floors the population (`SESSION-NOTES.md` #25); what it does not do is order what survives.
+
 **~~For dead code (Job A).~~ Filled — the plants are in ahead of the feature.** `Core.Tests`
 exists, and `AuditPolicySink`, `SchemaMigrationHandler` and `FixtureBuilder` each read as
 unreferenced for a different legitimate reason. `FixtureCoverageTests` asserts all three have
