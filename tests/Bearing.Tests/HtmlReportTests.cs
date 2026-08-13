@@ -45,13 +45,34 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     [Fact]
     public void The_page_requests_nothing_from_the_network()
     {
-        var external = Regex.Matches(Page, """(?:src|href)\s*=\s*["'](?!#)([^"']+)""")
+        var page = Page;
+
+        var external = Regex.Matches(page, """(?:src|href)\s*=\s*["'](?!#)([^"']+)""")
             .Select(m => m.Groups[1].Value)
             .ToList();
 
         Assert.Empty(external);
-        Assert.DoesNotContain("http://", Page, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("https://", Page, StringComparison.OrdinalIgnoreCase);
+
+        // No CSS fetch either: url() and @import are the two ways a stylesheet reaches out, and
+        // the page's styles are inline where nobody looks for them.
+        Assert.DoesNotContain("url(", page, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("@import", page, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<image", page, StringComparison.OrdinalIgnoreCase);
+
+        // A URL that is not in a fetching position. `xmlns="http://www.w3.org/2000/svg"` is an
+        // XML namespace — an identifier that happens to be spelled as a URL, which nothing
+        // resolves and no browser has ever requested — so the assertion is on where a URL
+        // appears rather than on whether the characters are present anywhere.
+        var fetched = Regex.Matches(page, """https?://""")
+            .Count(m => !InAnXmlNamespace(page, m.Index));
+
+        Assert.Equal(0, fetched);
+    }
+
+    private static bool InAnXmlNamespace(string page, int index)
+    {
+        var from = Math.Max(0, index - 40);
+        return page[from..index].Contains("xmlns", StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -115,6 +136,11 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
             "doctype", "html", "head", "meta", "title", "style", "body", "div", "h1", "h2", "h3",
             "h4", "p", "b", "em", "strong", "span", "table", "tr", "td", "th", "ul", "li",
             "details", "summary", "footer", "br", "a", "code",
+
+            // The embedded project map — A7. Inline SVG, so its elements are part of this
+            // document rather than a separate one, and they belong on this list for the same
+            // reason the rest do: anything here that is not one of these came out of a name.
+            "svg", "rect", "text", "path",
         ];
 
         Assert.Empty(tags.Except(known, StringComparer.Ordinal));

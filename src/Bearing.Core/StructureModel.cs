@@ -502,6 +502,11 @@ public sealed class SolutionModel
     public IReadOnlyList<Cycle> ProjectCycles => _projectCycles ??= Cycles.AmongProjects(this);
 
     /// <summary>
+    /// The project dependency graph, layered and folded — what the architecture diagram draws.
+    /// </summary>
+    public ProjectGraph ProjectGraph => _projectGraph ??= ProjectGraph.Of(this);
+
+    /// <summary>
     /// Groups of types that all reach each other, largest first. Gated at
     /// <see cref="AnalysisPolicy.MinTangle"/>.
     /// </summary>
@@ -606,6 +611,7 @@ public sealed class SolutionModel
     private IReadOnlyList<ProjectCoupling>? _projectCouplings;
     private IReadOnlyList<Cycle>? _namespaceCycles;
     private IReadOnlyList<Cycle>? _projectCycles;
+    private ProjectGraph? _projectGraph;
     private IReadOnlyList<Cycle>? _typeTangles;
     private IReadOnlyList<ProjectNode>? _unreferencedProjects;
     private IReadOnlyList<ExternalDependency>? _externalDependencies;

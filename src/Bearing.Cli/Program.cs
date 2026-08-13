@@ -124,6 +124,12 @@ internal static class Program
             Console.Error.WriteLine($"Wrote {html}");
         }
 
+        if (invocation.DiagramPath is { } diagram)
+        {
+            ArchitectureDiagram.Write(diagram, model);
+            Console.Error.WriteLine($"Wrote {diagram}");
+        }
+
         return 0;
     }
 

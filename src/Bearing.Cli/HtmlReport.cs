@@ -101,10 +101,46 @@ public static class HtmlReport
     {
         page.Append("<h2>Orientation</h2>\n");
 
+        Diagram(page, model);
         Projects(page, model);
         Integrations(page, model);
         Cycles(page, model);
         Coverage(page, model);
+    }
+
+    /// <summary>
+    /// The project map, inline.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// First, because §6 puts diagrams at the top of orientation and because it is the only thing
+    /// on the page a reader can take in without reading. It is the same SVG <c>--diagram</c> writes
+    /// standalone, from one renderer — a second copy drawn for the page would be
+    /// <c>docs/ARCHITECTURE.md</c> §3's failure in a new place.
+    /// </para>
+    /// <para>
+    /// <b>Inline SVG rather than an <c>&lt;img&gt;</c></b>, which would be a second file and break
+    /// the one promise this artifact makes. It costs 4–9KB on the two reference solutions, against
+    /// a page of 220–275KB.
+    /// </para>
+    /// </remarks>
+    private static void Diagram(StringBuilder page, SolutionModel model)
+    {
+        var graph = model.ProjectGraph;
+        if (graph.Groups.Count == 0) return;
+
+        page.Append("<h3>The shape of it</h3>\n");
+        page.Append("<p class=\"sub\">Projects, and what depends on what. Dependencies run downward, ");
+        page.Append("so the bottom row is what everything rests on. ");
+
+        var folded = graph.Groups.Count(g => g.Size > 1 && !g.IsCycle);
+        if (folded > 0)
+            page.Append($"{Html.Count(folded)} box(es) hold several projects that are the same shape — ")
+                .Append("same dependencies and same dependents — because that is one fact rather than several. ");
+
+        page.Append($"{Html.Count(graph.Depth)} layer(s) deep.</p>\n");
+
+        page.Append("<div class=\"scroll\">\n").Append(ArchitectureDiagram.Render(model)).Append("</div>\n");
     }
 
     private static void Projects(StringBuilder page, SolutionModel model)
