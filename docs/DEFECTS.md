@@ -663,6 +663,28 @@ tool's answer to it is a stack trace.
 
 Cheap to fix and user-visible; not fixed at A2, whose job was to measure.
 
+**Fixed, and it was three causes rather than one.** Pointing at a `.csproj` crashes identically —
+the likeliest first-run mistake of the three, and the one the register had not named. All three
+arrive from MSBuild as the same sentence, `No file format header found`, so the message cannot
+discriminate between them and anything switching on it would be wrong two times in three.
+
+`SolutionWalker.OpenAsync` turns any failure to open the workspace into `SolutionLoadException`,
+which `Program` catches and `Failure.CouldNotRead` renders. Two decisions are worth keeping:
+
+- **The catch is narrow in scope, not in type.** It covers one call — open this file as a
+  solution — and the whole walk is outside it, so it cannot swallow an analysis bug. Within that
+  call the failure types are MSBuild's, from assemblies Core deliberately does not reference;
+  listing the ones we happen to have seen is how the next unlisted one reaches a user as a stack
+  trace, which is this defect exactly.
+- **The `.slnx` advice is chosen after the load fails, never before it.** There is no pre-flight
+  extension check, so the day MSBuild parses `.slnx` (§8) the load simply succeeds and the text
+  stops being reached. A guard in front of the load would go on refusing a file that had started
+  working, and nothing would fail to say so.
+
+Pinned by `SolutionLoadFailureTests`, which asserts the absence of a stack frame as well as the
+presence of the new text — the new sentence alone stays green if a later change prints it *and*
+lets the exception escape, which is the same eleven frames with a heading.
+
 ### 24. A constructor renders as `Type..ctor`
 
 `CustomerInfoValidator..ctor` — from nopCommerce. The member's name *is* `.ctor`, and the sentence

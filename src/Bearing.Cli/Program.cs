@@ -21,6 +21,13 @@ namespace IronMarten.Bearing.Cli;
 /// than in <c>Main</c>. A library that registered a process-wide singleton on load could not be
 /// composed, so Core does not do it and says so in its csproj.
 /// </para>
+/// <para>
+/// <b>Exit codes.</b> <c>0</c> analysed, <c>1</c> the analysis failed, <c>2</c> the invocation was
+/// wrong — bad arguments, or a solution this tool cannot read — and <c>3</c> no MSBuild. The
+/// second and third are separated because they are different people's problems: <c>2</c> is
+/// something the user typed and can retype, <c>3</c> is the machine. Every failure the load can
+/// produce now has an arm here; <c>docs/DEFECTS.md</c> §23 is what the missing one looked like.
+/// </para>
 /// </remarks>
 internal static class Program
 {
@@ -65,6 +72,11 @@ internal static class Program
         try
         {
             return await AnalyseAsync(options).ConfigureAwait(false);
+        }
+        catch (SolutionLoadException ex)
+        {
+            foreach (var line in Failure.CouldNotRead(ex)) Console.Error.WriteLine(line);
+            return 2;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
         {
