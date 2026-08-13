@@ -117,6 +117,8 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
 | `FixtureCoverageTests` | what the fixture does *not* cover, asserted so it stays visible |
 | `SelectionTests` | X10's rule — one exemplar per kind that fired, rarest first — asserted **as derived** rather than as an answer, which is what X10 asks for |
+| `ClaimsTests` | that every finding can be worded, that every kind is named in a reader's words, and **that the terminal and the page cannot say different things about one finding** |
+| `HighlightsTests` | that the lead is the selection and not a re-pick, that every item says how many more of its kind there are, that the ordering is stated, and that moving the enumeration behind `--full` did not take invariant 8's disclosure with it |
 | `MosaicTests` | that every analysed type is one cell, that the two marks are the findings and the selection, and that no measurement reaches the drawing as text |
 
 ### Pinning a defect you are not allowed to fix
