@@ -55,6 +55,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .picture svg{display:block;width:100%;height:auto}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:.6rem;padding:.9rem 1rem;margin:.6rem 0}
 .card>h4{margin:0 0 .15rem;font-size:1rem}
+.card.lead{border-left:3px solid var(--accent)}
 .claim{margin:.15rem 0 .5rem}
 .where{color:var(--muted);font-size:.82rem;font-family:var(--mono)}
 .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0 0}

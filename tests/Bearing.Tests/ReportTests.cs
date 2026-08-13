@@ -45,6 +45,13 @@ public sealed class ReportTests(CoreWalkFixture core)
     [Fact]
     public void The_sections_are_the_probes_sections_in_the_probes_order()
     {
+        // A13 tier 2, and above the probe's first section on purpose: the report already led with
+        // findings, and the first line was still one of 1,091 rows of one kind.
+        string[] leading =
+        [
+            "-- START HERE --------------------------------------------------",
+        ];
+
         string[] probes =
         [
             "-- CONCEALED DECISION ------------------------------------------",
@@ -71,7 +78,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         ];
 
         Assert.Equal(
-            [.. probes, .. additions],
+            [.. leading, .. probes, .. additions],
             Lines.Where(l => l.StartsWith("-- ", StringComparison.Ordinal)));
     }
 
@@ -269,10 +276,19 @@ public sealed class ReportTests(CoreWalkFixture core)
     {
         // The control. Without it the assertion above passes on a renderer that never makes the
         // claim at all, which would be a different defect with the same shape.
-        var line = Assert.Single(Lines, l => l.Contains("ShipmentCoordinator [", StringComparison.Ordinal));
+        //
+        // Every line that names it, and there are two since A13 tier 2 — the section's row and the
+        // lead above it. Asserting over both is the stronger test rather than a concession to the
+        // new one: the whole point of extracting the wording is that the two cannot disagree, so a
+        // renderer that softened the claim in one place would fail here.
+        var lines = Lines.Where(l => l.Contains("ShipmentCoordinator [", StringComparison.Ordinal)).ToList();
 
-        Assert.Contains("carries real logic", line, StringComparison.Ordinal);
-        Assert.Contains("at cc 13", line, StringComparison.Ordinal);
+        Assert.Equal(2, lines.Count);
+        Assert.All(lines, line =>
+        {
+            Assert.Contains("carries real logic", line, StringComparison.Ordinal);
+            Assert.Contains("at cc 13", line, StringComparison.Ordinal);
+        });
     }
 
     // ------------------------------------------------------------------ defect 17 ----

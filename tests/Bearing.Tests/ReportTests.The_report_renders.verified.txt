@@ -5,6 +5,36 @@ BEARING {version} — TestBed.sln
 Every claim shows the numbers behind it.
 ================================================================
 
+-- START HERE --------------------------------------------------
+   10 claims, one for each kind of risk this run found,
+   ordered by how uncommon each kind is in this codebase. That is an ordering
+   and not a severity: this tool has no way to say a hub is worse than a
+   cycle, and does not pretend to.
+
+   ShipmentLedger — 11 distinct callers (11x its peer median) and internally complex. A bug here propagates widely.
+     Core · Ledgers.cs:36 · bug blast radius, and it is the only one
+   ShipmentController — Post is cc 12. Business decisions at an external edge are the hardest kind to change later.
+     Core · Controllers.cs:52 · boundary carries logic, 1 of 2
+   RoutingDepot — instability 0.8: only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.
+     Core · Depots.cs:49 · breaks alone, 1 of 2
+   ShipmentLedger — instability 0: 11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.
+     Core · Ledgers.cs:36 · load-bearing and intricate, 1 of 2
+   QuoteAssembler — 2 writes to static state, and 0 types call into it. Whether these are genuinely contended is a runtime question this analysis cannot answer — but the sharing is certain from the code.
+     Core · QuoteAssembler.cs:9 · shared mutable state, 1 of 2
+   NormalizationContext — 20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis.
+     Core · Contracts.cs:25 · change cost, 1 of 3
+   ShipmentCoordinator [Internal] — fan-in 7, fan-out 7, instability 0.3. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
+     Core · ShipmentCoordinator.cs:5 · hub or god object, 1 of 3
+   ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.
+     Core · Controllers.cs:52 · concealed decision, 1 of 5
+   TariffCalculator.Apply — 22x the median complexity of its 33 peers
+     Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 12
+   AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
+     Core · AuthenticationMiddleware.cs:8 · spans architectural layers, 1 of 14
+
+   Each one is the strongest row of its section. The rest of that section is
+   below, and every finding this run made is in --json and --csv.
+
 -- CONCEALED DECISION ------------------------------------------
    (complexity far above peers, connectivity ordinary)
    ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase. (top 6%; cc 12, dsm 4, fan-in 0, fan-out 5)

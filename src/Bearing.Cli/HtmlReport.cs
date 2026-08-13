@@ -40,7 +40,8 @@ public static class HtmlReport
     /// When the run happened — a parameter, not a clock read, for the reason
     /// <see cref="JsonOutput.Render"/> gives.
     /// </param>
-    public static string Render(SolutionModel model, FindingSet findings, DateTimeOffset generatedAt)
+    public static string Render(
+        SolutionModel model, FindingSet findings, DateTimeOffset generatedAt, bool full = false)
     {
         ArgumentNullException.ThrowIfNull(model);
         ArgumentNullException.ThrowIfNull(findings);
@@ -55,9 +56,22 @@ public static class HtmlReport
 
         Header(page, model, solution, findings, generatedAt);
         Picture(page, model, findings);
+        Risks(page, model, findings);
         Orientation(page, model);
-        Findings(page, model, findings);
-        DrillDown(page, model, findings);
+
+        // Tier 4. The enumeration is the artifact A11 round 1 called "a wall of text", and every
+        // row of it is still reachable — in --json, in --csv, and here behind a flag for CI and for
+        // whoever wants it. `PRD-free-tier.md` §9's anti-metric is that more findings is worse.
+        if (full)
+        {
+            Findings(page, model, findings);
+            DrillDown(page, model, findings);
+        }
+        else
+        {
+            Everything(page, model, findings);
+        }
+
         Footer(page, model);
 
         page.Append("</div>\n</body>\n</html>\n");
@@ -65,11 +79,12 @@ public static class HtmlReport
     }
 
     /// <summary>Renders the report and writes it to <paramref name="path"/>.</summary>
-    public static void Write(string path, SolutionModel model, FindingSet findings, DateTimeOffset generatedAt)
+    public static void Write(
+        string path, SolutionModel model, FindingSet findings, DateTimeOffset generatedAt, bool full = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        File.WriteAllText(path, Render(model, findings, generatedAt), new UTF8Encoding(false));
+        File.WriteAllText(path, Render(model, findings, generatedAt, full), new UTF8Encoding(false));
     }
 
     // ------------------------------------------------------------------------ header ----
@@ -155,6 +170,138 @@ public static class HtmlReport
                 .Append("to hold a name at this size: ")
                 .Append(Html.Text(string.Join(", ", unlabelled)))
                 .Append(".</p>\n");
+    }
+
+    // ------------------------------------------------------------------------ risks ----
+
+    /// <summary>
+    /// The risk highlights — A13 tier 2.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The same selection and the same sentences the terminal leads with</b>, from
+    /// <see cref="Selection.Exemplars"/> and <see cref="Claims"/>, because two renderers wording one
+    /// claim differently is how a reader learns not to trust either. What differs is the shape: this
+    /// medium can afford a card, a peer group on its own line and a link into the section.
+    /// </para>
+    /// <para>
+    /// <b>Above orientation, which reverses the order §6 asks for, and the reversal is the item.</b>
+    /// §6 puts orientation first so a newcomer is not led with claims about components they cannot
+    /// place — and A11 round 1 tested exactly that arrangement and found people placing the
+    /// components correctly and not knowing why any of it mattered. The picture above now does the
+    /// placing, in one image rather than five sections, which is what makes leading with nine claims
+    /// something other than what §6 warned against.
+    /// </para>
+    /// </remarks>
+    private static void Risks(StringBuilder page, SolutionModel model, FindingSet findings)
+    {
+        var leading = Selection.Exemplars(findings)
+            .Where(f => Claims.IsRiskClaim(f.Kind))
+            .ToList();
+
+        page.Append("<h2>Start here</h2>\n");
+
+        if (leading.Count == 0)
+        {
+            page.Append("<p class=\"empty\">Nothing was nominated. That is a real answer, not an error — ");
+            page.Append("every threshold this run used is listed at the foot of the page.</p>\n");
+            return;
+        }
+
+        page.Append($"<p class=\"lede\">{Html.Count(leading.Count)} claims, one for each kind of risk this run found, ");
+        page.Append("<em>ordered by how uncommon each kind is in this codebase</em>. That is an ordering and not a ");
+        page.Append("severity — this tool has no way to say a hub is worse than a cycle, and does not pretend to. ");
+        page.Append("Each one is the strongest row of its section.</p>\n");
+
+        foreach (var finding in leading)
+        {
+            var claim = Claims.For(model, finding);
+            if (!claim.Exists) continue;
+
+            var type = model.Find(finding.Subject)
+                       ?? (finding.Subject.DeclaringType is { } d ? model.Find(d) : null);
+            var total = findings.OfKind(finding.Kind).Count;
+
+            page.Append("<div class=\"card lead\">\n");
+            page.Append($"<h4>{Html.Text(claim.Subject)}</h4>\n");
+
+            // Where it is. The claim's own location wins where it has one — a member-level finding
+            // knows where the member is, and sending a reader to the top of the file instead is
+            // docs/DEFECTS.md §24's mistake in a different element.
+            if (type is not null)
+            {
+                var at = claim.Trailer.Length > 0
+                    ? claim.Trailer
+                    : type.Location.IsKnown
+                        ? $"{Path.GetFileName(type.Location.File)}:{Html.Count(type.Location.Line)}"
+                        : "";
+
+                page.Append($"<p class=\"where\">{Html.Text(type.Project)}");
+                if (at.Length > 0) page.Append($" · {Html.Text(at)}");
+                page.Append("</p>\n");
+            }
+
+            page.Append($"<p class=\"claim\">{Html.Text(claim.Sentence)}</p>\n");
+
+            if (claim.Evidence.Length > 0)
+                page.Append($"<p class=\"sub mono\">{Html.Text(claim.Evidence)}</p>\n");
+
+            // What kind this is, and how many more of it there are. A lead item with no count reads
+            // as the only one of its kind — true of layer span on nopCommerce and false of the
+            // 1,091 concealed decisions, and telling those apart is the whole job of this section.
+            page.Append("<p class=\"sub\">");
+            page.Append($"<strong>{Html.Text(Claims.KindName(finding.Kind))}</strong> — ");
+            page.Append(Html.Text(Claims.KindBlurb(finding.Kind)));
+            page.Append(total == 1
+                ? " This is the only one in this codebase."
+                : $" {Html.Count(total)} of these were found; this is the strongest.");
+            page.Append("</p>\n");
+
+            page.Append("</div>\n");
+        }
+    }
+
+    /// <summary>
+    /// Where the rest is — tier 4, which was already built.
+    /// </summary>
+    /// <remarks>
+    /// <b>A pointer rather than a fourth document.</b> A13 tier 4 is explicit that the full
+    /// population already ships twice, in <c>--json</c> and <c>--csv</c>, and that writing another
+    /// one is the mistake. What this has to do is make the omission visible: a page that quietly
+    /// showed nine findings out of 1,642 would be <c>docs/DEFECTS.md</c> §3 at the scale of a whole
+    /// artifact, and invariant 8 says silence is never a clean bill.
+    /// </remarks>
+    private static void Everything(StringBuilder page, SolutionModel model, FindingSet findings)
+    {
+        page.Append("<h2>Everything else</h2>\n");
+
+        var kinds = findings.All.Select(f => f.Kind).Distinct().Count();
+
+        page.Append($"<p class=\"lede\">This run made {Html.Count(findings.Count)} findings across ");
+        page.Append($"{Html.Count(kinds)} kinds, and the page above leads with the strongest of each. ");
+        page.Append("<strong>The rest are not hidden and not summarised away</strong> — they are in the exports, ");
+        page.Append("which carry every finding, every type, every member and every dependency:</p>\n");
+
+        page.Append("<ul class=\"sub\">\n");
+        page.Append("<li><span class=\"mono\">--json</span> — the whole model, with a schema version, ")
+            .Append("for anything that reads it back.</li>\n");
+        page.Append("<li><span class=\"mono\">--csv</span> — <span class=\"mono\">types.csv</span>, ")
+            .Append("<span class=\"mono\">members.csv</span> and <span class=\"mono\">edges.csv</span>, which join ")
+            .Append("on identity rather than on a name.</li>\n");
+        page.Append("<li><span class=\"mono\">--full</span> — this page with every section enumerated, ")
+            .Append($"capped at <span class=\"mono\">--top</span> ({Html.Count(model.Policy.Top)}) per kind. ")
+            .Append("For CI, and for whoever wants it.</li>\n");
+        page.Append("</ul>\n");
+
+        // The disclosure, which is not a risk claim and is not led with as one — but which invariant
+        // 8 will not let the page drop just because the enumeration moved behind a flag.
+        var coverage = findings.OfKind(FindingKind.Coverage);
+        if (coverage.Count > 0)
+            page.Append($"<p class=\"note\"><strong>{Html.Count(coverage.Count)} of this solution's ")
+                .Append($"{Html.Count(model.Types.Count)} types sit in a group too small to compare them against</strong>, ")
+                .Append($"so no peer reading was possible for them and none is implied above. That is not a finding ")
+                .Append("about those types — it is a record that the tool stayed quiet about them, which is the ")
+                .Append("one thing it is not allowed to do silently. They carry a row each in the exports.</p>\n");
     }
 
     // ------------------------------------------------------------------- orientation ----
@@ -419,8 +566,8 @@ public static class HtmlReport
             var all = group.ToList();
             var shown = all.Take(model.Policy.Top).ToList();
 
-            page.Append($"<h3>{Html.Text(Claim(group.Key))} — {Html.Count(all.Count)}</h3>\n");
-            page.Append($"<p class=\"sub\">{Html.Text(Blurb(group.Key))}</p>\n");
+            page.Append($"<h3>{Html.Text(Claims.KindName(group.Key))} — {Html.Count(all.Count)}</h3>\n");
+            page.Append($"<p class=\"sub\">{Html.Text(Claims.KindBlurb(group.Key))}</p>\n");
 
             foreach (var finding in shown)
                 Card(page, model, finding);
@@ -668,63 +815,6 @@ public static class HtmlReport
         var separator = subject.Canonical.IndexOf('|', StringComparison.Ordinal);
         return separator < 0 ? subject.Canonical : subject.Canonical[(separator + 1)..];
     }
-
-    /// <summary>
-    /// The claim each kind makes, in the reader's words.
-    /// </summary>
-    /// <remarks>
-    /// <b>This is one of the two things building the pane said about the finding record.</b> A
-    /// finding carries its kind as an enum and nothing a reader can be shown, so every renderer
-    /// needs this table and a second one would drift from it. It stays in the renderer — Core
-    /// decides facts and Cli decides words, <c>docs/ARCHITECTURE.md</c> §3 — but the terminal and
-    /// this page should read from one copy, which is work this item did not do and the next
-    /// renderer should.
-    /// </remarks>
-    private static string Claim(FindingKind kind) => kind switch
-    {
-        FindingKind.SpansArchitecturalLayers => "Spans architectural layers",
-        FindingKind.ConcealedDecisionType => "Concealed decision",
-        FindingKind.ConcealedDecisionMethod => "Concealed decision, method level",
-        FindingKind.BugBlastRadius => "Bug blast radius",
-        FindingKind.ChangeCost => "Change cost",
-        FindingKind.LoadBearingAndIntricate => "Load-bearing and intricate",
-        FindingKind.BreaksAlone => "Breaks alone",
-        FindingKind.HubOrGodObject => "Hub or god object",
-        FindingKind.SharedMutableState => "Shared mutable state",
-        FindingKind.BoundaryCarriesLogic => "Boundary carries logic",
-        FindingKind.WidestContractSurface => "Widest contract surface",
-        FindingKind.Coverage => "No peer group",
-        _ => kind.ToString(),
-    };
-
-    private static string Blurb(FindingKind kind) => kind switch
-    {
-        FindingKind.SpansArchitecturalLayers =>
-            "Named for one concern, reaching across several — it is doing cross-cutting work whatever it is called.",
-        FindingKind.ConcealedDecisionType =>
-            "Looks like plumbing, but is far more complex than its peers — and is probably tested like plumbing.",
-        FindingKind.ConcealedDecisionMethod =>
-            "The same claim about one method. This is the primary level, not a drill-down of the one above.",
-        FindingKind.BugBlastRadius =>
-            "Widely depended on relative to its peers, and internally complex. A defect here propagates.",
-        FindingKind.ChangeCost =>
-            "Changing this means changing a lot of callers, judged against the whole solution.",
-        FindingKind.LoadBearingAndIntricate =>
-            "Much depends on it, it depends on little, and it is intricate enough to hide a bug.",
-        FindingKind.BreaksAlone =>
-            "Structurally isolated and unstable — it can break on its own, without anything else changing.",
-        FindingKind.HubOrGodObject =>
-            "Depends on, and is depended on by, much of the system.",
-        FindingKind.SharedMutableState =>
-            "Writes to static mutable state. Every caller on every thread shares it.",
-        FindingKind.BoundaryCarriesLogic =>
-            "A boundary type carrying real logic — the place where an outside caller reaches decision-making directly.",
-        FindingKind.WidestContractSurface =>
-            "The widest contracts this solution exposes, and the most expensive ones to change.",
-        FindingKind.Coverage =>
-            "Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.",
-        _ => "",
-    };
 
     /// <summary>
     /// What a kind's participants <i>are</i> — the relationship, not just the names.

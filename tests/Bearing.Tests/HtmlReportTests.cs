@@ -28,8 +28,32 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
 
     private string Page => HtmlReport.Render(core.Model, Analysis.FindingsFor(core.Model), Instant);
 
+    /// <summary>
+    /// The page with every section enumerated — <c>--full</c>.
+    /// </summary>
+    /// <remarks>
+    /// <b>A13 tier 2 moved the enumeration behind a flag</b>, so the assertions about cards,
+    /// receipts and the drill-down read this rather than the default page. They are not weaker for
+    /// it: what they cover is what <c>--full</c> renders, which is exactly the artifact those
+    /// sections are. What the default page does instead is <c>HighlightsTests</c>'.
+    /// </remarks>
+    private string FullPage =>
+        HtmlReport.Render(core.Model, Analysis.FindingsFor(core.Model), Instant, full: true);
+
     [Fact]
     public Task The_report_renders() => Verify(Page, extension: "html");
+
+    /// <summary>
+    /// The same page with every section enumerated — <c>--full</c>.
+    /// </summary>
+    /// <remarks>
+    /// <b>A second snapshot rather than a wider first one, because the two are different
+    /// artifacts.</b> A13 tier 2 moved the enumeration behind a flag, and snapshotting only the
+    /// default page would leave the cards, the receipts table and the drill-down — the wording three
+    /// of A11 round 1's defects were found in — with nothing watching them move.
+    /// </remarks>
+    [Fact]
+    public Task The_full_report_renders() => Verify(FullPage, extension: "html");
 
     // ------------------------------------------------------------------ defect 26 ----
 
@@ -70,7 +94,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
                 && (core.Model.Find(f.Subject)
                     ?? core.Model.Find(f.Subject.DeclaringType ?? f.Subject)) is not null);
 
-        var rendered = Page.Split("Compared against").Length - 1;
+        var rendered = FullPage.Split("Compared against").Length - 1;
 
         Assert.True(expected > 0, "the fixture no longer nominates anything cohort-relative");
         Assert.True(
@@ -221,7 +245,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     public void A_capped_findings_list_says_what_it_dropped()
     {
         var model = core.WalkWith(AnalysisPolicy.Default with { Top = 2 });
-        var page = HtmlReport.Render(model, Analysis.FindingsFor(model), Instant);
+        var page = HtmlReport.Render(model, Analysis.FindingsFor(model), Instant, full: true);
 
         Assert.Contains("Showing 2 of", page, StringComparison.Ordinal);
         Assert.Contains("--top", page, StringComparison.Ordinal);
@@ -238,7 +262,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     [Fact]
     public void The_drill_down_says_it_is_not_every_type()
     {
-        Assert.Contains("This is not every type", Page, StringComparison.Ordinal);
+        Assert.Contains("This is not every type", FullPage, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -253,7 +277,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     [Fact]
     public void The_page_says_the_findings_are_not_ranked()
     {
-        Assert.Contains("not ranked against each other", Page, StringComparison.Ordinal);
+        Assert.Contains("not ranked against each other", FullPage, StringComparison.Ordinal);
     }
 
     /// <summary>Every threshold the run used is on the page, all twenty-six.</summary>
@@ -293,7 +317,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
 
         var value = core.Model.Policy.Values.First(v => string.Equals(v.Name, gate, StringComparison.Ordinal));
 
-        Assert.Contains($">{gate}</span> = {Html.Number(value.Value)}", Page, StringComparison.Ordinal);
+        Assert.Contains($">{gate}</span> = {Html.Number(value.Value)}", FullPage, StringComparison.Ordinal);
     }
 
     // ------------------------------------------------------------------- the budget ----
