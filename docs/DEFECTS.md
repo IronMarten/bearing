@@ -897,3 +897,25 @@ the questions it was built to answer.** The complement — *is this output addre
 does it read as one thing* — has no test and probably cannot have one, which is an argument for
 running the shipped binary on real solutions as a scheduled activity rather than as a
 demonstration.
+
+**That complement does have a test. It is just not an automated one, and it found six defects in
+one session.** Defects 26–31 came from handing the report to two developers who had never seen the
+codebase and had not built the tool, and asking them to answer questions about it — `TASKS.md` A11,
+protocol in the private spec set. Three things about the method are worth keeping:
+
+**The author is the wrong reader, and knows too much to stop being one.** Defects 18–20 were the
+best the author's own eyes could do, and they were real. 26–31 sat in the same output afterwards
+and were invisible from inside, because every one of them is a question about what a label means to
+someone who does not know the model behind it. There is no amount of careful re-reading that
+recovers not knowing something.
+
+**Ask for a task, never for an opinion.** Every one of these came out of someone trying to answer a
+question and failing, or asking what a thing was *for* while trying to use it. None came from
+asking whether the report was good; that question was never put, on purpose, and would have
+produced politeness instead.
+
+**A pre-registered bar is what makes a bad result usable.** The session's headline outcome — nobody
+could answer the acceptance question in `TECHREQ-job-a.md` §5.5 — was graded against a rule written
+down before anyone was booked, including what each outcome would mean for the work. Without that
+the temptation to re-read the result as *"they needed more time"* is close to irresistible, and the
+same session yields nothing.
