@@ -605,6 +605,33 @@ three survivors belong to §3.1.
 > survivors above are §3.1's, and the port took an afternoon because §3.8's and §3.9's cases were
 > planted before anyone wrote a detector. `TECHREQ-job-b.md` §10 puts B0 before B2 and it means it.
 
+### What only a real solution can show, and what that cost
+
+**A whole class of defect is invisible here by construction, and A2 is where it surfaced.** Pointed
+at Jellyfin and nopCommerce for the first time, Bearing did not produce a slow report or an
+inaccurate one — **it crashed on both**, before printing anything. The fixture had been green
+throughout, and could not have been otherwise.
+
+| Condition | Why TestBed cannot show it | Found as |
+|---|---|---|
+| An edge endpoint the walk never declared | every type TestBed declares is analysed, so no edge has ever had an absent endpoint | `DEFECTS.md` §7 — a `KeyNotFoundException`, not the recorded inaccuracy. 123 such edges on Jellyfin, 57 on nopCommerce |
+| An anonymous type as a reference target | TestBed projects none into a position the collector reaches | §22, and the crash on nopCommerce |
+| Zero external contact points | TestBed has 19, so the disagreeing case is the zero case | §20 — needed a solution that is a library and a CLI and nothing else |
+| A load diagnostic | every solution in this repository loads cleanly | §4, confirmed: nopCommerce's six are NuGet **vulnerability advisories**, not failures |
+| An unreadable solution | the fixture is a valid `.sln` | §23 — eleven frames of MSBuild stack trace at the user |
+| A constructor nominated by name | no TestBed constructor is complex enough to be nominated | §24 — `CustomerInfoValidator..ctor` |
+
+> **The lesson is about what a synthetic fixture is for, not about this fixture being bad.** TestBed
+> is built to make *judgements* checkable — which finding fires, against which population, at which
+> threshold — and it is very good at that. Every row above is a question about *inputs* rather than
+> judgements: what a real compiler emits, what a real repository contains, what a real user
+> mistypes. No amount of planting reaches them, because planting is how a fixture is made
+> well-formed and these are all cases of something not being.
+>
+> **So the second measurement is a real run, and it is not optional.** `tools/leave-one-out.sh` and
+> `PolicySweepTests` cover the judgements. Nothing covered the inputs, and the gap ran from the
+> first commit to A2 with a green suite the whole way.
+
 ### The complete inventory, measured in one pass
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
