@@ -366,10 +366,25 @@ public static class HtmlReport
 
         if (type is not null)
         {
+            // docs/DEFECTS.md §26. This line used to join three facts with middots, and the third
+            // was not the same kind of thing as the first two: project and file are addresses,
+            // the cohort is the population the claim is measured against — the whole basis of the
+            // finding. Readers understood the phrase and guessed at its job ("project membership?
+            // definition location? caller set?"). Two addresses stay together; the comparison gets
+            // its own line and says what it is.
             page.Append($"<p class=\"where\">{Html.Text(type.Project)}");
             if (type.Location.IsKnown)
                 page.Append($" · {Html.Text(Path.GetFileName(type.Location.File))}:{Html.Count(type.Location.Line)}");
-            page.Append($" · {Html.Text(Sentences.PeerGroup(type.Cohort, type.CohortSize))}</p>\n");
+            page.Append("</p>\n");
+
+            // And only where the finding actually consulted a cohort. §3.6 to §3.9 are cohort-free
+            // by design, so printing a peer group on those cards claims a relative reading the
+            // finding never made — defect 17's mistake in a different element. The gated
+            // CohortSize receipt is what distinguishes them, and it is the detector's own record
+            // rather than a list of kinds kept in the renderer.
+            if (finding.Receipts.Any(r => string.Equals(r.Name, "CohortSize", StringComparison.Ordinal)))
+                page.Append("<p class=\"sub\">Compared against "
+                            + $"{Html.Text(Sentences.PeerGroup(type.Cohort, type.CohortSize))}</p>\n");
         }
 
         var holding = finding.Qualifiers.Where(q => q.Holds).ToList();

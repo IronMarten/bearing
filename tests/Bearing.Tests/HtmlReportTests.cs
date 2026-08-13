@@ -31,6 +31,54 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     [Fact]
     public Task The_report_renders() => Verify(Page, extension: "html");
 
+    // ------------------------------------------------------------------ defect 26 ----
+
+    /// <summary>
+    /// A card names its peer group only where the finding consulted one, and the count is
+    /// derived from the findings rather than read off the page.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §26.</b> The cohort used to be middot-joined to the project and
+    /// the file location, which are addresses — so the population a claim is measured against read
+    /// as a third address, and readers guessed at what it was for. It has its own line now, and it
+    /// says what it is.
+    /// </para>
+    /// <para>
+    /// <b>The half that is a correctness fix rather than a labelling one</b>: it was printed on
+    /// every card, including the cohort-free findings. §3.6 to §3.9 carry <i>"no cohort required"</i>
+    /// in their own headings, so a peer group on those cards claimed a relative reading the finding
+    /// never made — defect 17's mistake in a different element. On this fixture that is most of
+    /// them. Change cost is the one worth watching: it is solution-wide by X2's decision rather
+    /// than cohort-relative, so it correctly names no peer group despite being about a population.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_card_names_a_peer_group_only_where_the_finding_used_one()
+    {
+        var findings = Analysis.FindingsFor(core.Model);
+
+        // Mirrors two things the pane does for reasons of its own — it groups by kind and applies
+        // Top, and it resolves a member subject to its declaring type. Neither is what this test
+        // is about; both have to be reproduced or the count is of a different population. The
+        // claim being pinned is only that the CohortSize receipt is what decides.
+        var expected = findings.All
+            .GroupBy(f => f.Kind)
+            .SelectMany(g => g.Take(core.Model.Policy.Top))
+            .Count(f =>
+                f.Receipts.Any(r => string.Equals(r.Name, "CohortSize", StringComparison.Ordinal))
+                && (core.Model.Find(f.Subject)
+                    ?? core.Model.Find(f.Subject.DeclaringType ?? f.Subject)) is not null);
+
+        var rendered = Page.Split("Compared against").Length - 1;
+
+        Assert.True(expected > 0, "the fixture no longer nominates anything cohort-relative");
+        Assert.True(
+            findings.All.Count > expected,
+            "the fixture no longer nominates anything cohort-free, so this asserts nothing");
+        Assert.Equal(expected, rendered);
+    }
+
     // ------------------------------------------------------------- self-contained ----
 
     /// <summary>

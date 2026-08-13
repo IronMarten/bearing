@@ -13,9 +13,14 @@ namespace IronMarten.Bearing.Cli;
 /// </remarks>
 internal static class Sentences
 {
-    /// <summary>Two decimal places at most, invariant, with infinity spelled out.</summary>
+    /// <summary>Two decimal places at most, invariant, with an undefined ratio said so.</summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §28. Infinity here is always a ratio against a zero median, which
+    /// is undefined and not enormous. The sections that can produce one mostly branch before they
+    /// get here — <i>"the only complexity among its 37 peers"</i> — and this is what is left.
+    /// </remarks>
     internal static string Number(double value) =>
-        double.IsInfinity(value) ? "inf" : value.ToString("0.##", CultureInfo.InvariantCulture);
+        double.IsInfinity(value) ? "undefined" : value.ToString("0.##", CultureInfo.InvariantCulture);
 
     /// <summary>Three decimal places at most — instability, where the third digit carries meaning.</summary>
     internal static string Ratio(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);

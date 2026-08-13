@@ -55,8 +55,14 @@ public static class Html
     }
 
     /// <summary>A number, in the invariant culture, with trailing zeros trimmed.</summary>
+    /// <remarks>
+    /// <b>Infinity reads as "undefined" — <c>docs/DEFECTS.md</c> §28.</b> Every infinity this
+    /// renderer can meet is a ratio whose denominator was zero, which is undefined rather than
+    /// unboundedly large, and <c>∞</c> in a table of measurements invites a reader to treat it as
+    /// the biggest value in the column. It is the absence of one.
+    /// </remarks>
     public static string Number(double value) =>
-        double.IsPositiveInfinity(value) ? "∞"
+        double.IsPositiveInfinity(value) ? "undefined"
         : double.IsNaN(value) ? ""
         : value.ToString("0.###", CultureInfo.InvariantCulture);
 
