@@ -732,7 +732,7 @@ Pinned by `SolutionLoadFailureTests`, which asserts the absence of a stack frame
 presence of the new text — the new sentence alone stays green if a later change prints it *and*
 lets the exception escape, which is the same eleven frames with a heading.
 
-### 24. A constructor renders as `Type..ctor`
+### 24. A constructor renders as `Type..ctor` — **fixed**
 
 `CustomerInfoValidator..ctor` — from nopCommerce. The member's name *is* `.ctor`, and the sentence
 joins type and member with a dot.
@@ -741,6 +741,12 @@ Cosmetic, one line, and **only visible on real code**: TestBed declares no const
 enough to be nominated, so no fixture case and no snapshot shows it. Related to §13, which is the
 same identity question one level deeper.
 
+
+**Fixed.** `Sentences.Member` is one rule for both renderers and spells the word out — *constructor*, not *ctor*, because the name is there so a reader can find the thing and `.ctor` is what the runtime calls it. The HTML had its own half-fix producing `CustomerInfoValidator ctor`, which was less wrong and still addressed to the runtime.
+
+**It stopped being cosmetic before it was fixed.** Ranking undefined ratios last moved a pair of constructors to the top of nopCommerce's concealed-decision section, so this was the report's opening line. *Cosmetic* was a judgement about where the sentence sat, not about the sentence.
+
+No fixture case — TestBed declares no constructor complex enough to be nominated, which is why nopCommerce found this and the suite did not. Named as a hole in `FixtureCoverageTests` with a guard beside it that starts working the day a plant fills it.
 ### 25. A redirected report is transcoded through the process code page
 
 `bearing App.sln > report.txt` on a Windows machine whose code page is not UTF-8 encodes
@@ -779,7 +785,7 @@ binary either** — every one is about whether a label, a sentence or a table me
 someone who does not already know what it is for. They are open, none is pinned, and all six are
 `Bearing.Cli`.
 
-### 26. The three facts under a finding's name are unlabelled, and are not the same kind of thing
+### 26. The three facts under a finding's name are unlabelled, and are not the same kind of thing — **fixed**
 
 `<p class="where">Nop.Core · BaseAttribute.cs:9 · the 31 implementations of ILocalizedEntity</p>`
 
@@ -797,6 +803,10 @@ heterogeneous data rendered by a generic renderer, where one relationship per ki
 label suffices. **The `where` line has the same disease and was never covered by that rule.** The
 remedy is the same, and it is a label rather than a redesign.
 
+
+**Fixed, and half of it was a correctness fix rather than a labelling one.** The addresses stay joined; the comparison gets its own line and says it is one.
+
+**The half that was not reported**: the peer group printed on *every* card, including the cohort-free findings. §3.6–§3.9 carry *"no cohort required"* in their own headings, so those cards claimed a relative reading their finding never made — §17's mistake in a different element, and on the fixture it is **74 of 107 cards**. The gate is the detector's own gated `CohortSize` receipt rather than a list of kinds kept in the renderer, and the split it produces is right on inspection: change cost names no peer group because X2 made it solution-wide, and coverage does because the peer group is its whole subject. `HtmlReportTests.A_card_names_a_peer_group_only_where_the_finding_used_one`.
 ### 27. `Why this fired` publishes 65 internal identifiers
 
 The receipts table renders `Measured / Value / Had to clear` as raw policy and metric field names.
@@ -815,7 +825,7 @@ the pane told them, participants reported understanding **less** after expanding
 *"I have no idea what that is, but it seems like a big number. Is that a problem?"* A disclosure
 that reduces comprehension is not a disclosure.
 
-### 28. A ratio against a zero median renders as `∞`
+### 28. A ratio against a zero median renders as `∞` — **fixed**
 
 `MaxMemberCyclomaticXMedian` is displayed as `∞` when the cohort's median is 0 — a real value in
 the receipts table of a real card. The quantity is undefined, not infinite, and the gate it feeds
@@ -831,7 +841,11 @@ method-level nominations on that run and **it is not one** — the volume is gra
 which §3.2's method-level primacy chose on purpose. This is a display defect of narrow scope, and
 recording it as anything larger would be wrong.
 
-### 29. *"too large for anyone to hold at once"* reads as the tool giving up
+
+**Fixed in both formatters: it reads `undefined`.** An infinity glyph in a column of measurements invites a reader to treat it as the largest value there, and it is the absence of one.
+
+**The ranking was wrong for the same reason and that mattered more.** `ConcealedDecision` ordered on the ratio alone, so all ten of nopCommerce's undefined rows sorted above every type whose extremity was measured, and `Nomination`'s tiebreak settled them alphabetically. The section opened on `cc 6` where it now opens on a constructor at 37x its peer median. Undefined ratios rank last and among themselves by absolute complexity. `docs/TESTING.md` §6 records that the fixture cannot reach any of it.
+### 29. *"too large for anyone to hold at once"* reads as the tool giving up — **fixed**
 
 Asked directly, on the god-object-by-size arm: *"is that a sign of a problem, or is the report
 giving up?"*
@@ -840,6 +854,8 @@ The sentence is D16's, and D16's fix was correct — the two arms are independen
 renderer cannot tell a god object by size that it carries real logic. What survived is a phrase
 whose subject is ambiguous: *anyone* can be read as the reader, the author, or the tool. One line.
 
+
+**Fixed.** It names the shape instead — *broad rather than deep, a lot to hold at once but nothing intricate inside it*. The claim is unchanged and the same receipts back it. §16's test asserts the old phrasing **absent** as well as the new one present, because that is the kind of sentence that returns by being copied from an old snapshot.
 ### 30. External dependencies do not separate framework from third-party from first-party
 
 `Microsoft.AspNetCore.Mvc`, `System.IO` and a payment SDK are listed alike. Requested unprompted,
@@ -852,7 +868,7 @@ does not carry. `ExternalSurface` already makes a judgement here — the plumbin
 classifier exists and is one distinction short. Related to §5, which is the same classifier being
 too narrow in a different direction, and the two want fixing together.
 
-### 31. A folded diagram box does not read as containing the projects that are missing
+### 31. A folded diagram box does not read as containing the projects that are missing — **fixed**
 
 *"Why isn't `Nop.Plugin` in the graph above?"* — asked while looking at the Projects list directly
 below the diagram, where the plugin names are.
@@ -866,6 +882,8 @@ The same session found the flat Projects list **outperforming the diagram** at t
 navigation task: asked where they would change tax calculation, nobody reached it through the map,
 and everybody found `Nop.Plugin.Tax` by scrolling the list.
 
+
+**Fixed — the names go beside the diagram, not into it.** A picture cannot be searched, and a box that grows to fit its members is the thing the fold exists to prevent. `ArchitectureDiagram.Folded` shares `Title` with the boxes, so a legend cannot disagree with the label it explains. On nopCommerce it answers the question that was actually asked: *"CustomerRoles +6 holds Nop.Plugin.DiscountRules.CustomerRoles, …"*, and `Nop.Plugin.Tax` is findable in it.
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.
