@@ -116,6 +116,8 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `ToolInfoTests` | the first logic in Core |
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
 | `FixtureCoverageTests` | what the fixture does *not* cover, asserted so it stays visible |
+| `SelectionTests` | X10's rule — one exemplar per kind that fired, rarest first — asserted **as derived** rather than as an answer, which is what X10 asks for |
+| `MosaicTests` | that every analysed type is one cell, that the two marks are the findings and the selection, and that no measurement reaches the drawing as text |
 
 ### Pinning a defect you are not allowed to fix
 
@@ -668,7 +670,24 @@ both. Four things came out of it that the fixture could not have produced:
 | **"the other 1 are entangled too"** — a verb agreed with a computed number, ten times across the two runs | TestBed's two remainders are 2 and 5. Reworded to carry no verb rather than patched, since the next such number is a defect waiting on the right input |
 | **§25: a redirected report is transcoded through the code page** | *not a fixture gap at all* — every snapshot calls `Report.For` and asserts on the returned strings, so `Console.Out` is not on the path under test |
 
-> **The last row is a different kind of gap and worth separating.** The rows in the table above it
+**The third real run, at A13, and it changed the artifact rather than fixing it.** The mosaic was
+green on the fixture and correct on it — 132 cells, every type placed, marks resolving. What
+nopCommerce showed is that the *rule* was wrong, and no fixture could have said so:
+
+| Found | Why the fixture could not show it |
+|---|---|
+| **One mark paints the picture.** Marking every finding-named type put **651 of 3,209 cells — 20% by count and 72% by area** — in the alarm colour, and 492 of Jellyfin's 1,545 at 70%. Findings select large complex components and cell area is lines of code, so the two correlate hard enough that a true mark becomes a false picture. Repaired with a third state, not a threshold — `ARCHITECTURE.md` §10 | **the fixture is 132 types across 3 projects and its skew runs the other way.** One project holds 94% of the lines, so the layout is a wide block and a narrow column, and the marked *share* on it is a number about TestBed rather than about codebases. A correlation between two measures needs a population to appear in, and 132 types is not one |
+| **Legibility is a property of the distribution, not of the code.** nopCommerce's median cell is 7×7px with a worst aspect of 7:1; the fixture's narrow column produces slivers at every size | the fixture has three projects, so the top-level treemap has three rectangles and the squarify step it exists to exercise never runs against a real spread |
+| **13 of 27 projects are too small to hold a name**, which is what makes `Mosaic.Unlabelled` load-bearing rather than defensive | TestBed's three projects all take a name, so the arm that lists the rest never renders |
+
+> **This is the same lesson one row further out.** The rows above are inputs a synthetic fixture
+> cannot contain. This one is a *distribution* a synthetic fixture cannot contain: the marks were
+> individually correct and the picture was still wrong, which no assertion about individual marks
+> can catch. The measurement that found it — marked area as a share of drawn ink — is not something
+> the suite computes, and it is written down here rather than pinned, because what it measures is a
+> property of whatever solution is in front of it.
+
+> **The last row of the previous table is a different kind of gap and worth separating.** The rows in the table above it
 > are inputs a synthetic fixture cannot contain. This one is a **stage the harness does not
 > execute**: the encoding boundary is not untested, it is absent from the test. Planting cannot
 > reach it and neither can a better fixture; only running the shipped binary and reading the bytes
