@@ -130,6 +130,12 @@ internal static class Program
             Console.Error.WriteLine($"Wrote {diagram}");
         }
 
+        if (invocation.MosaicPath is { } mosaic)
+        {
+            Mosaic.Write(mosaic, model, findings);
+            Console.Error.WriteLine($"Wrote {mosaic}");
+        }
+
         return 0;
     }
 

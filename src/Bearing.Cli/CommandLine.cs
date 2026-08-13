@@ -12,6 +12,7 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="CsvDirectory">Where to write the CSV files, or null for not at all.</param>
 /// <param name="HtmlPath">Where to write the HTML report, or null for not at all.</param>
 /// <param name="DiagramPath">Where to write the architecture diagram as SVG, or null.</param>
+/// <param name="MosaicPath">Where to write the mosaic as SVG, or null.</param>
 /// <remarks>
 /// The file outputs are <b>additions</b> to the terminal report rather than alternatives to it.
 /// A run that writes JSON still prints, because the two answer different people: a report is read
@@ -25,7 +26,8 @@ public sealed record Invocation(
     string? JsonPath = null,
     string? CsvDirectory = null,
     string? HtmlPath = null,
-    string? DiagramPath = null);
+    string? DiagramPath = null,
+    string? MosaicPath = null);
 
 /// <summary>
 /// Raised when the command line cannot be understood. Carries a message a user can act on.
@@ -139,6 +141,7 @@ public static class CommandLine
         string? csvDirectory = null;
         string? htmlPath = null;
         string? diagramPath = null;
+        string? mosaicPath = null;
 
         for (var i = 0; i < args.Count; i++)
         {
@@ -179,6 +182,10 @@ public static class CommandLine
 
                 case "--diagram":
                     diagramPath = Path.GetFullPath(Next(args, ref i, arg));
+                    continue;
+
+                case "--mosaic":
+                    mosaicPath = Path.GetFullPath(Next(args, ref i, arg));
                     continue;
             }
 
@@ -223,7 +230,8 @@ public static class CommandLine
             JsonPath: jsonPath,
             CsvDirectory: csvDirectory,
             HtmlPath: htmlPath,
-            DiagramPath: diagramPath);
+            DiagramPath: diagramPath,
+            MosaicPath: mosaicPath);
     }
 
     private static string Next(IReadOnlyList<string> args, ref int i, string flag)
@@ -246,6 +254,7 @@ public static class CommandLine
         yield return "  --csv <dir>                also write types.csv, members.csv, edges.csv";
         yield return "  --html <file>              also write the shareable single-file report";
         yield return "  --diagram <file.svg>       also write the project map, for pasting into chat";
+        yield return "  --mosaic <file.svg>        also write the mosaic: every type as one cell";
         yield return "  --version                  print the version and exit";
         yield return "";
         yield return "  Thresholds — every value the report cites can be moved:";
