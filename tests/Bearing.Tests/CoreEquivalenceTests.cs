@@ -335,6 +335,79 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
     }
 
     /// <summary>
+    /// The type tangle's loop is a walk somebody can follow: every step is an edge that exists,
+    /// and the last one closes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A3's half of circular references, and the assertion that matters most about it. A path is
+    /// the one thing here a reader will act on directly — they will open the first file and look
+    /// for the reference to the second — so a path with a step that is not really there sends
+    /// them looking for something that does not exist. Membership can be checked against the
+    /// probe; a path cannot, because the probe has none.
+    /// </para>
+    /// <para>
+    /// Asserted over the type graph rather than the namespace graph because the type graph is the
+    /// one the model carries edges for: a namespace edge is derived, and re-deriving it here to
+    /// check it would be asserting this computation against a second copy of itself.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_step_of_a_tangles_loop_is_a_real_dependency()
+    {
+        var tangle = Assert.Single(core.Model.TypeTangles);
+
+        Assert.NotEmpty(tangle.Path);
+        Assert.Equal(tangle.Path.Count, tangle.Path.Distinct().Count());
+        Assert.All(tangle.Path, step => Assert.Contains(step, tangle.Members));
+
+        for (var i = 0; i < tangle.Path.Count; i++)
+        {
+            var from = core.Model.Find(tangle.Path[i])!;
+            var to = tangle.Path[(i + 1) % tangle.Path.Count];
+
+            Assert.True(
+                from.Outbound.Contains(to),
+                $"{from.Name} does not depend on {core.Model.Find(to)!.Name}, so the loop is not walkable.");
+        }
+    }
+
+    /// <summary>
+    /// The fixture's cycles are both larger than their loops, so the disclosure arm is what it
+    /// exercises — and the covering arm is not exercised here at all.
+    /// </summary>
+    /// <remarks>
+    /// Recorded as an assertion rather than left to the snapshot because it is a fixture gap and
+    /// not a property of the tool: <c>docs/TESTING.md</c> §6. A component whose shortest loop
+    /// visits every member renders a line with no qualifier on it, and nothing in TestBed
+    /// produces one — <c>GraphTests</c> and <c>ProjectCycleTests</c> are where that arm is
+    /// covered. If a plant ever makes this fail, the fixture got better and this is the note to
+    /// delete.
+    /// </remarks>
+    [Fact]
+    public void Neither_of_the_fixtures_loops_covers_its_whole_component()
+    {
+        Assert.All(core.Model.NamespaceCycles, c => Assert.False(c.PathCoversEveryMember));
+        Assert.All(core.Model.TypeTangles, c => Assert.False(c.PathCoversEveryMember));
+    }
+
+    /// <summary>
+    /// The fixture has no project cycle, and that is the correct answer rather than an empty one.
+    /// </summary>
+    /// <remarks>
+    /// Every cross-project edge in a solution that builds normally follows a project reference,
+    /// and MSBuild forbids those from cycling — so the aggregate is the reference DAG.
+    /// <c>ProjectCycleTests</c> constructs the shape that does cycle, because no plant in TestBed
+    /// can: it needs an analysed assembly reached some way other than a project reference, which
+    /// is a property of a build rather than of a source file.
+    /// </remarks>
+    [Fact]
+    public void The_fixture_has_no_project_cycle()
+    {
+        Assert.Empty(core.Model.ProjectCycles);
+    }
+
+    /// <summary>
     /// The collision fix does not reach the cycles, and cannot on this fixture.
     /// </summary>
     /// <remarks>
@@ -509,6 +582,7 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
 
         Assert.Same(model.ProjectCouplings, model.ProjectCouplings);
         Assert.Same(model.NamespaceCycles, model.NamespaceCycles);
+        Assert.Same(model.ProjectCycles, model.ProjectCycles);
         Assert.Same(model.TypeTangles, model.TypeTangles);
         Assert.Same(model.UnreferencedProjects, model.UnreferencedProjects);
         Assert.Same(model.ExternalDependencies, model.ExternalDependencies);

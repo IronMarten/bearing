@@ -115,6 +115,86 @@ public static class Graphs
         return result;
     }
 
+    /// <summary>
+    /// The shortest cycle through <paramref name="seed"/>, as a walk: <c>A, B, C</c> for
+    /// <c>A → B → C → A</c>. Empty when the seed is on no cycle at all.
+    /// </summary>
+    /// <param name="adjacency">
+    /// The graph to walk. Callers pass the subgraph induced on one component, so every node
+    /// reaches every other and the answer is guaranteed to exist.
+    /// </param>
+    /// <param name="seed">Where the walk starts and ends.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>Why a path at all.</b> Tarjan answers "these six namespaces are mutually entangled",
+    /// and a reader cannot act on that — <c>TECHREQ-job-a.md</c> §5.1 asks for
+    /// <c>A → B → C → A</c>, which names an edge they can go and delete. The reason this was
+    /// deferred is real and is not dissolved by implementing it: a component holds many cycles,
+    /// and any one of them is a choice. So the choice is made where it can be stated — shortest,
+    /// through the component's first member by identity — and the caller is told when the walk is
+    /// shorter than the component so it can say so rather than imply the path *is* the cycle.
+    /// </para>
+    /// <para>
+    /// <b>Deterministic.</b> Breadth-first gives the shortest, the seed is the ordinal minimum of
+    /// a set rather than whatever Tarjan popped first, and ties between equal-length walks are
+    /// broken by visiting neighbours in ordinal order. None of the three is cosmetic: a
+    /// representative that moved between runs would make an acknowledged finding come back.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<string> ShortestCycleThrough(
+        IReadOnlyDictionary<string, IReadOnlyList<string>> adjacency, string seed)
+    {
+        ArgumentNullException.ThrowIfNull(adjacency);
+        ArgumentException.ThrowIfNullOrWhiteSpace(seed);
+
+        if (!adjacency.ContainsKey(seed)) return [];
+
+        var previous = new Dictionary<string, string>(StringComparer.Ordinal);
+        var queue = new Queue<string>();
+        queue.Enqueue(seed);
+
+        while (queue.Count > 0)
+        {
+            var node = queue.Dequeue();
+
+            foreach (var next in Neighbours(adjacency, node))
+            {
+                if (string.Equals(next, seed, StringComparison.Ordinal))
+                {
+                    // A self-reference is a component of one, which is not a cycle this tool
+                    // reports; every caller filters those out before getting here.
+                    if (string.Equals(node, seed, StringComparison.Ordinal)) continue;
+
+                    return Walk(previous, node, seed);
+                }
+
+                if (previous.ContainsKey(next)) continue;
+
+                previous[next] = node;
+                queue.Enqueue(next);
+            }
+        }
+
+        return [];
+    }
+
+    private static IEnumerable<string> Neighbours(
+        IReadOnlyDictionary<string, IReadOnlyList<string>> adjacency, string node) =>
+        adjacency.TryGetValue(node, out var next)
+            ? next.Distinct(StringComparer.Ordinal).OrderBy(n => n, StringComparer.Ordinal)
+            : [];
+
+    private static List<string> Walk(IReadOnlyDictionary<string, string> previous, string last, string seed)
+    {
+        var reversed = new List<string> { last };
+
+        while (!string.Equals(reversed[^1], seed, StringComparison.Ordinal))
+            reversed.Add(previous[reversed[^1]]);
+
+        reversed.Reverse();
+        return reversed;
+    }
+
     private sealed class Frame(string node)
     {
         public string Node { get; } = node;

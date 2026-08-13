@@ -10,9 +10,9 @@ namespace Bearing.Tests;
 /// a dangling edge that threw. At R2 the probe row comes out of the theory data and the cases
 /// stay exactly as they are.
 ///
-/// Job A needs one thing neither implementation provides: a traversable cycle PATH. Tarjan
-/// returns component membership ("these six namespaces are entangled"), and what a user can act
-/// on is A to B to C to A. See TECHREQ-job-a.md 5.1.
+/// The traversable PATH — A to B to C to A, which is what a user can act on, where component
+/// membership is not — is Core's alone and shipped at A3. The probe row is deliberately absent
+/// from those cases: it is not a port and there is nothing to diff it against.
 /// </summary>
 public sealed class GraphTests
 {
@@ -135,5 +135,81 @@ public sealed class GraphTests
         var backward = StronglyConnected(implementation, Graph([.. edges.Reverse()]), 2);
 
         Assert.Equal(forward, backward);
+    }
+
+    // ------------------------------------------------------ the traversable path, A3 ----
+
+    private static IReadOnlyList<string> Loop(Dictionary<string, List<string>> graph, string seed) =>
+        IronMarten.Bearing.Graphs.ShortestCycleThrough(
+            graph.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<string>)kv.Value, StringComparer.Ordinal),
+            seed);
+
+    /// <summary>The walk is the cycle in order, and it does not repeat the seed at the end.</summary>
+    /// <remarks>
+    /// The closing edge is implied — <c>[a, b, c]</c> means <c>a → b → c → a</c> — because a walk
+    /// that carried its own last step would let a renderer print it twice or a consumer read the
+    /// length as one too many. Every caller closes the loop itself.
+    /// </remarks>
+    [Fact]
+    public void A_loop_is_returned_in_traversal_order()
+    {
+        Assert.Equal(["a", "b", "c"], Loop(Graph(("a", ["b"]), ("b", ["c"]), ("c", ["a"])), "a"));
+    }
+
+    /// <summary>Shortest, not first-found — the whole reason it is breadth-first.</summary>
+    /// <remarks>
+    /// Depth-first from <c>a</c> visiting neighbours in order would take the four-node detour and
+    /// return it, which is a real cycle and the wrong one to show: a reader shown the long way
+    /// round has more edges to consider than the problem needs.
+    /// </remarks>
+    [Fact]
+    public void The_shortest_loop_wins_over_the_first_one_found()
+    {
+        var g = Graph(
+            ("a", ["b", "z"]),
+            ("b", ["c"]), ("c", ["a"]),
+            ("z", ["a"]));
+
+        Assert.Equal(["a", "z"], Loop(g, "a"));
+    }
+
+    /// <summary>
+    /// Two loops of equal length resolve the same way every run.
+    /// </summary>
+    /// <remarks>
+    /// Breadth-first settles the length and neighbour order settles the tie, and neither can be
+    /// left to dictionary enumeration: a representative that moved between runs would make an
+    /// acknowledged finding come back as new, which is what <c>SubjectRef.ForSet</c> exists to
+    /// prevent one level up.
+    /// </remarks>
+    [Fact]
+    public void Equal_length_loops_are_broken_by_identity_and_not_by_insertion_order()
+    {
+        (string, string[])[] edges = [("a", ["m", "b"]), ("b", ["a"]), ("m", ["a"])];
+
+        Assert.Equal(["a", "b"], Loop(Graph(edges), "a"));
+        Assert.Equal(["a", "b"], Loop(Graph([.. edges.Reverse()]), "a"));
+    }
+
+    /// <summary>A node on no cycle has no loop, and saying so is not an exception.</summary>
+    [Fact]
+    public void A_node_on_no_cycle_has_no_loop()
+    {
+        Assert.Empty(Loop(Graph(("a", ["b"]), ("b", [])), "a"));
+        Assert.Empty(Loop(Graph(("a", ["b"]), ("b", [])), "absent"));
+    }
+
+    /// <summary>A self-reference is not a loop this tool reports.</summary>
+    /// <remarks>
+    /// The same judgement as <see cref="A_self_loop_alone_is_not_a_component"/>, and it has to be
+    /// made twice: Tarjan drops the component at min-size, and this walks a subgraph it was
+    /// handed. A seed with an edge to itself would otherwise return a one-step path, which reads
+    /// as a circular dependency between a type and itself.
+    /// </remarks>
+    [Fact]
+    public void A_self_reference_is_not_a_loop()
+    {
+        Assert.Empty(Loop(Graph(("a", ["a"])), "a"));
+        Assert.Equal(["a", "b"], Loop(Graph(("a", ["a", "b"]), ("b", ["a"])), "a"));
     }
 }

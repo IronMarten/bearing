@@ -478,6 +478,20 @@ public sealed class SolutionModel
     public IReadOnlyList<Cycle> NamespaceCycles => _namespaceCycles ??= Cycles.AmongNamespaces(this);
 
     /// <summary>
+    /// Mutually dependent projects, largest cycle first.
+    /// </summary>
+    /// <remarks>
+    /// Usually empty, and that is the expected answer rather than a broken one: an ordinary
+    /// cross-project edge follows a project reference, and MSBuild forbids those from cycling, so
+    /// aggregating the type graph reproduces the reference DAG. A cycle here means an analysed
+    /// assembly was reached some way other than a project reference — see
+    /// <see cref="Cycles.AmongProjects(SolutionModel)"/>, and note what
+    /// <c>docs/DEFECTS.md</c> §1 fabricated here before <see cref="SubjectRef"/> keyed types by
+    /// assembly.
+    /// </remarks>
+    public IReadOnlyList<Cycle> ProjectCycles => _projectCycles ??= Cycles.AmongProjects(this);
+
+    /// <summary>
     /// Groups of types that all reach each other, largest first. Gated at
     /// <see cref="AnalysisPolicy.MinTangle"/>.
     /// </summary>
@@ -581,6 +595,7 @@ public sealed class SolutionModel
     private Dictionary<string, TypeNode>? _byId;
     private IReadOnlyList<ProjectCoupling>? _projectCouplings;
     private IReadOnlyList<Cycle>? _namespaceCycles;
+    private IReadOnlyList<Cycle>? _projectCycles;
     private IReadOnlyList<Cycle>? _typeTangles;
     private IReadOnlyList<ProjectNode>? _unreferencedProjects;
     private IReadOnlyList<ExternalDependency>? _externalDependencies;

@@ -23,6 +23,12 @@ internal static class StructureSections
     private const int TypesPerTangle = 8;
 
     /// <summary>
+    /// The same again for projects. Lower because a solution has far fewer projects than
+    /// namespaces, so a cycle naming more than four of them is already the whole story.
+    /// </summary>
+    private const int ProjectsPerCycle = 4;
+
+    /// <summary>
     /// The types at this solution's edge — and, when there are none, why that is worth doubting.
     /// </summary>
     /// <remarks>
@@ -113,12 +119,39 @@ internal static class StructureSections
         var namespaceNames = model.Namespaces
             .ToDictionary(n => SubjectRef.ForNamespace(n.Namespace), n => n.Namespace);
 
+        string NamespaceName(SubjectRef id) => namespaceNames.GetValueOrDefault(id, id.Canonical);
+
         foreach (var cycle in shownCycles)
-            yield return "     " + Members(
-                cycle, "namespaces", NamespacesPerCycle, " <-> ",
-                id => namespaceNames.GetValueOrDefault(id, id.Canonical));
+        {
+            yield return "     " + Members(cycle, "namespaces", NamespacesPerCycle, " <-> ", NamespaceName);
+            yield return "       " + Loop(cycle, NamespaceName);
+        }
 
         foreach (var line in cycleDisclosure) yield return line;
+
+        yield return "";
+        yield return "   PROJECT CYCLES — two projects each naming a type in the other. Legal";
+        yield return "   MSBuild: only project references cannot cycle, and this is the type";
+        yield return "   graph aggregated, which is finer than the references are:";
+
+        var projectCycles = model.ProjectCycles;
+        if (projectCycles.Count == 0)
+            yield return "     (none — every cross-project dependency runs one way)";
+
+        var (shownProjects, projectDisclosure) = Sentences.Cap(projectCycles, model.Policy.Top, "cycle", "     ");
+
+        var projectNames = model.Projects
+            .ToDictionary(p => SubjectRef.ForProject(p.Name), p => p.Name);
+
+        string ProjectName(SubjectRef id) => projectNames.GetValueOrDefault(id, id.Canonical);
+
+        foreach (var cycle in shownProjects)
+        {
+            yield return "     " + Members(cycle, "projects", ProjectsPerCycle, " <-> ", ProjectName);
+            yield return "       " + Loop(cycle, ProjectName);
+        }
+
+        foreach (var line in projectDisclosure) yield return line;
 
         yield return "";
         yield return $"   TYPE TANGLES — {model.Policy.MinTangle}+ types that all reach each other, so none of";
@@ -130,11 +163,48 @@ internal static class StructureSections
 
         var (shownTangles, tangleDisclosure) = Sentences.Cap(tangles, model.Policy.Top, "tangle", "     ");
 
+        string TypeName(SubjectRef id) => model.Find(id)?.Name ?? id.Canonical;
+
         foreach (var tangle in shownTangles)
-            yield return "     " + Members(
-                tangle, "types", TypesPerTangle, ", ", id => model.Find(id)?.Name ?? id.Canonical);
+        {
+            yield return "     " + Members(tangle, "types", TypesPerTangle, ", ", TypeName);
+            yield return "       " + Loop(tangle, TypeName);
+        }
 
         foreach (var line in tangleDisclosure) yield return line;
+    }
+
+    /// <summary>
+    /// One traversable loop through a cycle — <c>A -&gt; B -&gt; C -&gt; A</c> — saying so when
+    /// it is smaller than the entanglement it came out of.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The line above this one gives the extent of the problem and this one gives an instance of
+    /// it, which is <c>TECHREQ-job-a.md</c> §5.1's ask: "these six namespaces are mutually
+    /// entangled" is true and cannot be acted on, and a named edge can.
+    /// </para>
+    /// <para>
+    /// <b>The qualifier is the point, not decoration.</b> A component of six can have a loop of
+    /// two inside it, and a two-name loop printed with nothing to say otherwise reads as the
+    /// whole cycle — so it reads as "delete this one edge and the entanglement is gone", which is
+    /// false and is invariant 4's failure mode. When the walk covers everything, there is nothing
+    /// to disclose and nothing is said.
+    /// </para>
+    /// <para>
+    /// It is deliberately not capped the way the membership line is. A loop with a member removed
+    /// is not a shorter loop, it is not a loop — so if this is ever long enough to need cutting,
+    /// the fix is to say the length and drop the line, not to print most of a path.
+    /// </para>
+    /// </remarks>
+    private static string Loop(Cycle cycle, Func<SubjectRef, string> name)
+    {
+        var steps = cycle.Path.Select(name).ToList();
+        var loop = $"loop: {string.Join(" -> ", steps)} -> {steps[0]}";
+
+        return cycle.PathCoversEveryMember
+            ? loop
+            : $"{loop} — one loop of {steps.Count}; the other {cycle.Size - steps.Count} are entangled too";
     }
 
     /// <summary>

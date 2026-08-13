@@ -601,6 +601,15 @@ three survivors belong to §3.1.
 > recorded both branches as verified *at the time*, and nobody re-read the golden when the fixture
 > moved underneath it.
 
+**A cycle whose loop covers every member.** A3 gives each cycle a traversable path, and the
+renderer says so when the path is shorter than the component. The fixture has one namespace cycle
+of 4 with a loop of 2 and one type tangle of 8 with a loop of 3, so **only the disclosing arm ever
+renders** — a component whose shortest loop visits everything produces a line with no qualifier,
+and nothing in TestBed produces one. `GraphTests` and `ProjectCycleTests` cover it directly, and
+`CoreEquivalenceTests.Neither_of_the_fixtures_loops_covers_its_whole_component` states the gap as
+an assertion so it fails the day a plant closes it. A second tangle (**P8**) is the obvious place
+for it and would close the ordering and truncation gaps in the same plant.
+
 > **The inventory is now the cheapest step in a port, and it keeps paying.** Two of the three
 > survivors above are §3.1's, and the port took an afternoon because §3.8's and §3.9's cases were
 > planted before anyone wrote a detector. `TECHREQ-job-b.md` §10 puts B0 before B2 and it means it.
@@ -618,8 +627,9 @@ throughout, and could not have been otherwise.
 | An anonymous type as a reference target | TestBed projects none into a position the collector reaches | §22, and the crash on nopCommerce |
 | Zero external contact points | TestBed has 19, so the disagreeing case is the zero case | §20 — needed a solution that is a library and a CLI and nothing else |
 | A load diagnostic | every solution in this repository loads cleanly | §4, confirmed: nopCommerce's six are NuGet **vulnerability advisories**, not failures |
-| An unreadable solution | the fixture is a valid `.sln` | §23 — eleven frames of MSBuild stack trace at the user |
+| An unreadable solution | the fixture is a valid `.sln` | §23 — eleven frames of MSBuild stack trace at the user. **Closed**: `SolutionLoadFailureTests` writes the malformed inputs to a temporary directory rather than committing them, which is the shape every row here could take and only some should |
 | A constructor nominated by name | no TestBed constructor is complex enough to be nominated | §24 — `CustomerInfoValidator..ctor` |
+| A **project cycle** | every cross-project edge in a solution that builds follows a project reference, and MSBuild forbids those from cycling — so aggregating the type graph over any well-formed solution reproduces the reference DAG | A3. **No plant can reach it**: the shape needs an analysed assembly resolved some way other than a project reference, which is a property of a build. `ProjectCycleTests` constructs it from primitives, and `CoreEquivalenceTests` asserts the fixture's empty answer is the *correct* one rather than an untested one |
 
 > **The lesson is about what a synthetic fixture is for, not about this fixture being bad.** TestBed
 > is built to make *judgements* checkable — which finding fires, against which population, at which
