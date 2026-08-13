@@ -366,6 +366,20 @@ shape: `SymbolDisplayMemberOptions.IncludeContainingType`, and key a member as
 Worked around in `Report.cs` with `DeclaringTypeId` as a sort tiebreak; the field itself is left
 alone for Core.
 
+**Closed at A5, and it was closed by construction rather than repaired.** Core never had the
+defect: `SubjectRef.ForMember(assembly, declaring type, signature)` is what `ModelBuilder` keys a
+member on, which is the remedy above, arrived at when member subjects were built rather than when
+a CSV needed them. What A5 changes is that the identity is now **published** — `members.csv` has an
+`Id` column and `types.csv` has a matching one, so the two files join without a heuristic where the
+probe's `methods.csv` emits a column nothing can join on.
+
+The board attached this defect to A5 because *"a CSV keyed on a colliding id is worse than no
+CSV"*, and that is the right instinct: a file whose key column repeats invites a join that silently
+merges rows, which is defect 1's failure mode one level down.
+`CsvOutputTests.A_member_id_is_an_identifier_and_not_a_bare_name` asserts uniqueness **and** that
+the bare `Name` column still collides — without the second half the test would keep passing over a
+fixture that had stopped containing the case.
+
 ### 14. A percentile floor can be unsatisfiable, and `FanInPctl >= 95` is
 
 `Percentile` is midrank — `100·(below + 0.5·equal)/n` — so a unique maximum tops out at

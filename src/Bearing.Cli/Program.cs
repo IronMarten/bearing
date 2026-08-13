@@ -111,6 +111,10 @@ internal static class Program
             Console.Error.WriteLine($"Wrote {json}");
         }
 
+        if (invocation.CsvDirectory is { } csv)
+            foreach (var path in CsvOutput.Write(csv, model))
+                Console.Error.WriteLine($"Wrote {path}");
+
         return 0;
     }
 
