@@ -92,8 +92,13 @@ internal static class StructureSections
 
         var (shown, disclosure) = Sentences.Cap(map.Systems, model.Policy.Top, "system", "     ");
 
+        // docs/DEFECTS.md §30. The row says what somebody could change: the framework is not a
+        // dependency anybody is going to rewrite, and a package is. Origin decides the label and
+        // deliberately not the list -- see ExternalSurface.Integrations for what that cost when
+        // it was tried the other way round.
         foreach (var system in shown)
-            yield return $"     {system.Namespace,-42} {Sentences.Plural(system.TypesTouching, "type")}";
+            yield return $"     {system.Namespace,-42} {Sentences.Plural(system.TypesTouching, "type")}"
+                         + Sentences.Origin(system.Origin);
 
         foreach (var line in disclosure) yield return line;
 

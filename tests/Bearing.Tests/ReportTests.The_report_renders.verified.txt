@@ -43,8 +43,8 @@ Every claim shows the numbers behind it.
 
    INTEGRATION MAP — external systems this solution calls into,
    by how many of its types touch them:
-     System.Data                                3 types
-     System.Net.Http                            3 types
+     System.Data                                3 types  (framework)
+     System.Net.Http                            3 types  (framework)
      (22 language/runtime references omitted as plumbing)
 
    BOUNDARIES CARRYING REAL LOGIC — decisions made at the edge:

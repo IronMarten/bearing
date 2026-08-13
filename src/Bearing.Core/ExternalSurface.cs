@@ -78,6 +78,25 @@ public static class ExternalSurface
     /// <summary>
     /// What this codebase talks to, and how widely.
     /// </summary>
+    /// <summary>
+    /// What this codebase talks to, and how widely.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Origin does not decide this, and the fixture's known answer is why.</b>
+    /// <c>docs/DEFECTS.md</c> §30 was read once as "framework-resolved means plumbing", which
+    /// emptied the fixture's integration map: <c>System.Data</c> and <c>System.Net.Http</c> both
+    /// resolve from the framework, and both are exactly how that solution reaches a database and
+    /// the network. `CoreEquivalenceTests` caught it in one run.
+    /// </para>
+    /// <para>
+    /// <b>The two questions are different.</b> Origin answers <i>"could somebody change this
+    /// dependency"</i>; this filter answers <i>"does this reach outside the process"</i>. A reader
+    /// asked for the first — they are not going to rewrite <c>System.IO</c> — and the answer to it
+    /// is a label on the row, not a reason to drop the row. §5's list still makes this judgement,
+    /// with its failure mode unchanged and stated where it is defined.
+    /// </para>
+    /// </remarks>
     public static IntegrationMap Integrations(SolutionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);

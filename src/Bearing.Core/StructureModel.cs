@@ -363,7 +363,49 @@ public readonly record struct ProjectNode(string Name, bool HasEntryPoint, bool 
 /// <summary>An out-of-solution namespace, and who touches it.</summary>
 /// <param name="Namespace">The namespace label, e.g. <c>System.Net.Http</c>.</param>
 /// <param name="TypesTouching">How many analysed types reference it.</param>
-public readonly record struct ExternalDependency(string Namespace, int TypesTouching);
+/// <summary>
+/// Where an external namespace came from, as the SDK resolved it.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b><c>docs/DEFECTS.md</c> §30.</b> A reader asked for the list to separate what the project
+/// built from what the language and framework provide, with the reason attached: <i>"I'm not going
+/// to change any of those, so I'm not worried about them."</i> That is the list divided by what
+/// somebody could act on, which is the axis it did not carry.
+/// </para>
+/// <para>
+/// <b>Read off the resolved reference path rather than off the name.</b> Classifying by name is
+/// §5's defect — a curated list that silently mis-sorts whatever it has not heard of — and it is
+/// wrong in a specific way here: <c>System.Text.Json</c> ships in the shared framework on one
+/// target and as a package on another, so the same name has two different answers and only the
+/// resolution knows which. Framework assemblies resolve out of the targeting packs and the shared
+/// framework; package assemblies resolve out of the NuGet cache. Both are structural facts about
+/// how the SDK resolves, not a list of names to maintain.
+/// </para>
+/// <para>
+/// <see cref="Unknown"/> is honest rather than a third guess: it means the path was neither, and
+/// the name-based plumbing filter still gets its say for those.
+/// </para>
+/// </remarks>
+public enum ExternalOrigin
+{
+    /// <summary>The reference resolved from somewhere this tool does not recognise.</summary>
+    Unknown = 0,
+
+    /// <summary>The targeting pack or shared framework — the platform, not a dependency.</summary>
+    Framework,
+
+    /// <summary>A NuGet package: a dependency somebody chose and could change.</summary>
+    Package,
+}
+
+/// <param name="Namespace">The namespace, as written.</param>
+/// <param name="TypesTouching">How many analysed types reference it.</param>
+/// <param name="Origin">Where the SDK resolved it from — <see cref="ExternalOrigin"/>.</param>
+public readonly record struct ExternalDependency(
+    string Namespace,
+    int TypesTouching,
+    ExternalOrigin Origin = ExternalOrigin.Unknown);
 
 /// <summary>
 /// What the analysis did not see.
@@ -418,8 +460,10 @@ public sealed class SolutionModel
         IReadOnlyList<ProjectNode> projects,
         IReadOnlyList<TypeNode> types,
         IReadOnlyList<Edge> edges,
-        Coverage coverage)
+        Coverage coverage,
+        IReadOnlyDictionary<string, ExternalOrigin>? externalOrigins = null)
     {
+        _externalOrigins = externalOrigins;
         SolutionPath = solutionPath;
         Policy = policy;
         ToolVersion = toolVersion;
@@ -569,7 +613,7 @@ public sealed class SolutionModel
         _externalDependencies ??= Types
             .SelectMany(t => t.ExternalNamespaces)
             .GroupBy(ns => ns, StringComparer.Ordinal)
-            .Select(g => new ExternalDependency(g.Key, g.Count()))
+            .Select(g => new ExternalDependency(g.Key, g.Count(), OriginOf(g.Key)))
             .OrderByDescending(d => d.TypesTouching)
             .ThenBy(d => d.Namespace, StringComparer.Ordinal)
             .ToList();
@@ -614,6 +658,19 @@ public sealed class SolutionModel
     private ProjectGraph? _projectGraph;
     private IReadOnlyList<Cycle>? _typeTangles;
     private IReadOnlyList<ProjectNode>? _unreferencedProjects;
+    private readonly IReadOnlyDictionary<string, ExternalOrigin>? _externalOrigins;
+
+    /// <summary>Where a namespace resolved from, or <see cref="ExternalOrigin.Unknown"/>.</summary>
+    /// <remarks>
+    /// A model built without origins — every test that constructs one by hand — answers Unknown
+    /// for everything, which is the answer that changes no behaviour: the name-based plumbing
+    /// filter still decides, exactly as it did before origins existed.
+    /// </remarks>
+    public ExternalOrigin OriginOf(string @namespace) =>
+        _externalOrigins is not null && _externalOrigins.TryGetValue(@namespace, out var origin)
+            ? origin
+            : ExternalOrigin.Unknown;
+
     private IReadOnlyList<ExternalDependency>? _externalDependencies;
     private IReadOnlyList<(string Namespace, IReadOnlyList<TypeNode> Types)>? _namespaces;
     private ContactPoints? _contactPoints;

@@ -30,13 +30,29 @@ internal sealed class ModelBuilder
 
     private readonly WalkOptions _options;
     private readonly Func<ISymbol?, bool> _isInSolution;
+    private readonly Func<ISymbol?, ExternalOrigin> _originOf;
+
+    /// <summary>
+    /// Where each external namespace resolved from — <c>docs/DEFECTS.md</c> §30.
+    /// </summary>
+    /// <remarks>
+    /// One namespace can be reached through more than one assembly, and the answers can differ:
+    /// a package that also ships in the shared framework is the ordinary case. <b>Package wins.</b>
+    /// The question the origin answers is "could somebody change this", and if any route to the
+    /// namespace is a package reference then somebody could.
+    /// </remarks>
+    private readonly Dictionary<string, ExternalOrigin> _externalOrigins = new(StringComparer.Ordinal);
     private readonly Dictionary<string, TypeNode> _types = new(StringComparer.Ordinal);
     private readonly Dictionary<string, List<CohortCandidate>> _candidates = new(StringComparer.Ordinal);
     private readonly Dictionary<(string From, string To), List<TypeReference>> _references = [];
     private readonly Dictionary<string, SubjectRef> _subjects = new(StringComparer.Ordinal);
 
-    internal ModelBuilder(WalkOptions options, Func<ISymbol?, bool> isInSolution)
+    internal ModelBuilder(
+        WalkOptions options,
+        Func<ISymbol?, bool> isInSolution,
+        Func<ISymbol?, ExternalOrigin>? originOf = null)
     {
+        _originOf = originOf ?? (_ => ExternalOrigin.Unknown);
         _options = options;
         _isInSolution = isInSolution;
     }
@@ -138,6 +154,7 @@ internal sealed class ModelBuilder
             else if (ExternalNamespaceLabel(target) is { } ns)
             {
                 node.ExternalNamespaces.Add(ns);
+                RecordOrigin(ns, _originOf(target));
             }
         });
 
@@ -286,7 +303,15 @@ internal sealed class ModelBuilder
             .ToList();
 
         return new SolutionModel(
-            solutionPath, _options.Policy, _options.ToolVersion, projects, types, edges, coverage);
+            solutionPath, _options.Policy, _options.ToolVersion, projects, types, edges, coverage,
+            _externalOrigins);
+    }
+
+    /// <summary>Package beats Framework beats Unknown. See <see cref="_externalOrigins"/>.</summary>
+    private void RecordOrigin(string @namespace, ExternalOrigin origin)
+    {
+        if (_externalOrigins.TryGetValue(@namespace, out var seen) && seen >= origin) return;
+        _externalOrigins[@namespace] = origin;
     }
 
     private IEnumerable<CohortSubject> CohortSubjects() =>

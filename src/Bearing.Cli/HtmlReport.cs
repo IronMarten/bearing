@@ -229,10 +229,12 @@ public static class HtmlReport
         }
         else
         {
-            page.Append("<div class=\"scroll\"><table>\n<tr><th>External system</th><th class=\"n\">Types touching it</th></tr>\n");
+            page.Append("<div class=\"scroll\"><table>\n<tr><th>External system</th>")
+                .Append("<th class=\"n\">Types touching it</th><th>Provided by</th></tr>\n");
             foreach (var system in map.Systems)
                 page.Append($"<tr><td class=\"mono\">{Html.Text(system.Namespace)}</td>")
-                    .Append($"<td class=\"n\">{Html.Count(system.TypesTouching)}</td></tr>\n");
+                    .Append($"<td class=\"n\">{Html.Count(system.TypesTouching)}</td>")
+                    .Append($"<td>{Html.Text(Provider(system.Origin))}</td></tr>\n");
             page.Append("</table></div>\n");
         }
 
@@ -563,6 +565,14 @@ public static class HtmlReport
     }
 
     // ------------------------------------------------------------------------ words ----
+
+    /// <summary><c>docs/DEFECTS.md</c> §30 — what a reader could change, said in the row.</summary>
+    private static string Provider(ExternalOrigin origin) => origin switch
+    {
+        ExternalOrigin.Framework => "the framework",
+        ExternalOrigin.Package => "a package",
+        _ => "not determined",
+    };
 
     private static string Display(SolutionModel model, SubjectRef subject)
     {

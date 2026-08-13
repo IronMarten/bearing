@@ -203,7 +203,27 @@ public sealed class SolutionWalker
         bool IsInSolution(ISymbol? s) =>
             s?.ContainingAssembly is not null && solutionAssemblies.Contains(s.ContainingAssembly.Name);
 
-        var builder = new ModelBuilder(_options, IsInSolution);
+        var originByAssembly = new Dictionary<string, ExternalOrigin>(StringComparer.Ordinal);
+        foreach (var (_, compilation) in compilations)
+        {
+            foreach (var reference in compilation.References.OfType<PortableExecutableReference>())
+            {
+                if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assembly) continue;
+
+                var origin = OriginOfPath(reference.FilePath);
+                if (origin == ExternalOrigin.Unknown) continue;
+                if (originByAssembly.TryGetValue(assembly.Name, out var seen) && seen >= origin) continue;
+
+                originByAssembly[assembly.Name] = origin;
+            }
+        }
+
+        ExternalOrigin OriginOf(ISymbol? s) =>
+            s?.ContainingAssembly is { } a && originByAssembly.TryGetValue(a.Name, out var origin)
+                ? origin
+                : ExternalOrigin.Unknown;
+
+        var builder = new ModelBuilder(_options, IsInSolution, OriginOf);
 
         foreach (var (project, compilation) in compilations)
         {
@@ -256,6 +276,56 @@ public sealed class SolutionWalker
     /// Cancellation is not a load failure and passes through.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// Framework or package, decided by where the SDK resolved the assembly from.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §30, and the reason it is not a list of names.</b> §5 is the
+    /// standing example of what a curated list costs: it decides a classification, so anything the
+    /// list has not heard of is silently sorted wrong. Names are also genuinely ambiguous here —
+    /// <c>System.Text.Json</c> is in the shared framework on one target framework and a package on
+    /// another, so the name cannot answer the question and the resolution always can.
+    /// </para>
+    /// <para>
+    /// <b>What each path means.</b> The SDK resolves framework references out of the targeting
+    /// packs (<c>packs/Microsoft.NETCore.App.Ref/…</c>) and the shared framework
+    /// (<c>shared/Microsoft.NETCore.App/…</c>); NuGet restores packages into its global cache,
+    /// which is <c>NUGET_PACKAGES</c> when set and <c>~/.nuget/packages</c> otherwise. Those are
+    /// facts about how restore works rather than about what anything is called.
+    /// </para>
+    /// <para>
+    /// Anything else is <see cref="ExternalOrigin.Unknown"/> and stays unknown — a solution-local
+    /// <c>packages/</c> folder, a checked-in lib directory, a reference assembly somebody points at
+    /// directly. Guessing there would reintroduce exactly the failure this avoids, and the
+    /// name-based plumbing filter still applies to whatever lands here.
+    /// </para>
+    /// </remarks>
+    private static ExternalOrigin OriginOfPath(string? path)
+    {
+        if (string.IsNullOrEmpty(path)) return ExternalOrigin.Unknown;
+
+        var normalized = path.Replace('\\', '/');
+
+        var cache = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+        if (!string.IsNullOrEmpty(cache)
+            && normalized.StartsWith(cache.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase))
+        {
+            return ExternalOrigin.Package;
+        }
+
+        if (normalized.Contains("/.nuget/packages/", StringComparison.OrdinalIgnoreCase))
+            return ExternalOrigin.Package;
+
+        if (normalized.Contains("/packs/", StringComparison.OrdinalIgnoreCase)
+            || normalized.Contains("/shared/microsoft.", StringComparison.OrdinalIgnoreCase))
+        {
+            return ExternalOrigin.Framework;
+        }
+
+        return ExternalOrigin.Unknown;
+    }
+
     private async Task<Solution> OpenAsync(MSBuildWorkspace workspace, CancellationToken cancellationToken)
     {
         try

@@ -33,6 +33,21 @@ internal static class Sentences
     internal static string Plural(double count, string noun) =>
         count == 1 ? $"1 {noun}" : $"{Whole(count)} {noun}s";
 
+    /// <summary>Where an external namespace came from, as a trailing phrase, or nothing.</summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §30. Worded rather than coloured, because the terminal has no colour
+    /// to spend and the HTML should say the same thing as the text it was generated beside.
+    /// <see cref="ExternalOrigin.Unknown"/> says nothing at all: a row with no marker is one this
+    /// tool could not place, and inventing a third label for it would be the guess the origin
+    /// exists to avoid.
+    /// </remarks>
+    internal static string Origin(ExternalOrigin origin) => origin switch
+    {
+        ExternalOrigin.Framework => "  (framework)",
+        ExternalOrigin.Package => "  (package)",
+        _ => "",
+    };
+
     /// <summary>A member named under its declaring type, in words a reader can search for.</summary>
     /// <remarks>
     /// <para>
