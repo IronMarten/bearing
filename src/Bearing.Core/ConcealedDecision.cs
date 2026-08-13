@@ -43,7 +43,7 @@ public static class ConcealedDecision
         ArgumentNullException.ThrowIfNull(model);
 
         var policy = model.Policy;
-        var found = new List<(double Rank, Finding Finding)>();
+        var found = new List<(double Rank, double Absolute, Finding Finding)>();
 
         var population = model.Types
             .SelectMany(type => type.Members
@@ -68,7 +68,7 @@ public static class ConcealedDecision
                 if (complexity.Read(member.Cyclomatic) is not { } reading) continue;
                 if (reading.TimesMedian < policy.OutlierFactor) continue;
 
-                found.Add((reading.TimesMedian, new Finding(
+                found.Add((reading.TimesMedian, member.Cyclomatic, new Finding(
                     new FindingKey(FindingKind.ConcealedDecisionMethod, member.Subject),
                     [
                         Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
@@ -100,7 +100,7 @@ public static class ConcealedDecision
         ArgumentNullException.ThrowIfNull(model);
 
         var policy = model.Policy;
-        var found = new List<(double Rank, Finding Finding)>();
+        var found = new List<(double Rank, double Absolute, Finding Finding)>();
 
         foreach (var group in model.Types.GroupBy(t => t.Cohort.Key, StringComparer.Ordinal))
         {
@@ -123,7 +123,7 @@ public static class ConcealedDecision
                 if (inbound.TimesMedian > policy.ConcealedFanInCeiling) continue;
                 if (outbound.TimesMedian > policy.ConcealedFanOutCeiling) continue;
 
-                found.Add((cc.TimesMedian, new Finding(
+                found.Add((cc.TimesMedian, type.MaxMemberCyclomatic, new Finding(
                     new FindingKey(FindingKind.ConcealedDecisionType, type.Subject),
                     [
                         Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
@@ -154,7 +154,35 @@ public static class ConcealedDecision
         return Ranked(found);
     }
 
-    /// <summary>Strongest outlier first. See <see cref="Nomination"/> for the tiebreak.</summary>
-    private static List<Finding> Ranked(IEnumerable<(double Rank, Finding Finding)> found) =>
-        Nomination.Ranked(found.OrderByDescending(f => f.Rank), f => f.Finding);
+    /// <summary>Strongest outlier first. See <see cref="Nomination"/> for the final tiebreak.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A ratio against a zero median is undefined, not infinite, and must not outrank a
+    /// measured one.</b> <c>MinDecisionCc</c> already stops a cohort of property bags making every
+    /// constructor an infinite outlier (<c>SESSION-NOTES.md</c> #25), but what survives that floor
+    /// still divides by zero: on nopCommerce, 10 of 79 type-level nominations sit in a cohort whose
+    /// median is 0. Ordering on the ratio alone put all ten at the top of the section, tied, ahead
+    /// of every type whose extremity was actually measured — and <see cref="Nomination"/>'s
+    /// tiebreak then settled them alphabetically, which is deterministic and carries no evidence.
+    /// </para>
+    /// <para>
+    /// So the undefined ones rank last and among themselves by absolute complexity, which is the
+    /// only thing left that was measured. The section still says <i>"the only complexity among its
+    /// N peers"</i> for them, which is true and is a weaker claim than <i>"93x the median"</i>
+    /// rather than a stronger one: a cohort of zeros is cleared by any complexity at all.
+    /// </para>
+    /// <para>
+    /// The absolute is a secondary key for the finite ones too. Two types equally extreme against
+    /// their own peers are not equally interesting, and alphabetical order says nothing about
+    /// which. This matters beyond the section: <c>ARCHITECTURE.md</c> §10 makes each kind's top
+    /// row the exemplar the report leads with, so a tiebreak with no evidence in it chooses what
+    /// a reader sees first.
+    /// </para>
+    /// </remarks>
+    private static List<Finding> Ranked(IEnumerable<(double Rank, double Absolute, Finding Finding)> found) =>
+        Nomination.Ranked(
+            found.OrderByDescending(f => double.IsFinite(f.Rank))
+                .ThenByDescending(f => f.Rank)
+                .ThenByDescending(f => f.Absolute),
+            f => f.Finding);
 }
