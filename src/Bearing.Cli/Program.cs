@@ -118,6 +118,12 @@ internal static class Program
             foreach (var path in CsvOutput.Write(csv, model))
                 Console.Error.WriteLine($"Wrote {path}");
 
+        if (invocation.HtmlPath is { } html)
+        {
+            HtmlReport.Write(html, model, findings, DateTimeOffset.UtcNow);
+            Console.Error.WriteLine($"Wrote {html}");
+        }
+
         return 0;
     }
 

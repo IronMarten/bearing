@@ -1,0 +1,1297 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bearing — TestBed.sln</title>
+<style>
+:root{--bg:#fbfbfa;--panel:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e3e3e0;--accent:#8a5a2b;
+--accent-soft:#f5ede3;--ok:#3d6b47;--warn:#8a6d1f;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#16171a;--panel:#1d1e22;--ink:#e9e8e6;--muted:#9a9a97;
+--line:#2e3036;--accent:#d8a76a;--accent-soft:#2a2320;--ok:#8fc79c;--warn:#d9bd6a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:60rem;margin:0 auto;padding:2.5rem 1.25rem 5rem}
+h1{font-size:1.6rem;margin:0 0 .25rem;letter-spacing:-.01em}
+h2{font-size:1.15rem;margin:2.75rem 0 .5rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+h3{font-size:.95rem;margin:1.5rem 0 .5rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+p{margin:.5rem 0}
+a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.87em}
+.sub{color:var(--muted);font-size:.9rem}
+.lede{color:var(--muted);max-width:44rem}
+.tiles{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:.5rem;padding:.6rem .85rem;min-width:7rem}
+.tile b{display:block;font-size:1.35rem;font-weight:600;letter-spacing:-.02em}
+.tile span{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:.5rem 0}
+th,td{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:.6rem;padding:.9rem 1rem;margin:.6rem 0}
+.card>h4{margin:0 0 .15rem;font-size:1rem}
+.claim{margin:.15rem 0 .5rem}
+.where{color:var(--muted);font-size:.82rem;font-family:var(--mono)}
+.tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0 0}
+.tag{background:var(--accent-soft);color:var(--accent);border-radius:.3rem;padding:.1rem .45rem;font-size:.75rem}
+details{margin:.5rem 0 0}
+summary{cursor:pointer;color:var(--muted);font-size:.82rem}
+summary:hover{color:var(--accent)}
+.receipts{margin:.4rem 0 0;font-size:.85rem}
+.receipts td:first-child{font-family:var(--mono)}
+.empty{color:var(--muted);font-style:italic}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.6rem .85rem;border-radius:0 .4rem .4rem 0;margin:.75rem 0;font-size:.9rem}
+.loop{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:.15rem 0 .6rem}
+footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+@media print{body{background:#fff}.card,.tile{break-inside:avoid}details{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>TestBed.sln</h1>
+<p class="sub">Bearing 0.0.0 · 2026-01-01 00:00 UTC</p>
+<p class="lede">A map of this solution and a short list of the components that are unusual <em>for what they are</em> — measured against their structural peers, never scored. Start with the shape of the system below; the findings are further down and they assume it.</p>
+<div class="tiles">
+<div class="tile"><b>145</b><span>types</span></div>
+<div class="tile"><b>3</b><span>projects</span></div>
+<div class="tile"><b>317</b><span>dependencies</span></div>
+<div class="tile"><b>64</b><span>findings</span></div>
+</div>
+<h2>Orientation</h2>
+<h3>Projects</h3>
+<p class="sub">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are abstract or interfaces. D = distance from the main sequence. <em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>
+<div class="scroll"><table>
+<tr><th>Project</th><th class="n">Types</th><th class="n">Ca</th><th class="n">Ce</th><th class="n">A</th><th class="n">I</th><th class="n">D</th><th>Zone</th></tr>
+<tr><td>Core</td><td class="n">140</td><td class="n">2</td><td class="n">0</td><td class="n">0.043</td><td class="n">0</td><td class="n">0.957</td><td>zone of pain — stable and concrete</td></tr>
+<tr><td>Data <span class="tag">nothing depends on it</span></td><td class="n">3</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td>near the main sequence</td></tr>
+<tr><td>Tools <span class="tag">nothing depends on it</span></td><td class="n">2</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td>near the main sequence</td></tr>
+</table></div>
+<h3>What it talks to</h3>
+<p class="sub">16 way(s) in and 3 way(s) out. The map below counts what this solution <em>calls into</em>, which is not the same question.</p>
+<div class="scroll"><table>
+<tr><th>External system</th><th class="n">Types touching it</th></tr>
+<tr><td class="mono">System.Data</td><td class="n">3</td></tr>
+<tr><td class="mono">System.Net.Http</td><td class="n">3</td></tr>
+</table></div>
+<p class="sub">22 reference(s) to language and framework plumbing were filtered out of that list rather than dropped silently.</p>
+<h3>Circular references</h3>
+<p><strong>Namespaces</strong> — <span class="sub">Mutually dependent namespaces cannot be layered, understood or extracted independently.</span></p>
+<p class="claim">4: TestBed.Core, TestBed.Core.Depots, TestBed.Core.Pricing, TestBed.Core.Vaults</p>
+<p class="loop">loop: TestBed.Core → TestBed.Core.Depots → TestBed.Core — 2 of the 4; all 4 reach each other</p>
+<p><strong>Projects</strong> — <span class="sub">Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.</span></p>
+<p class="empty">None.</p>
+<p><strong>Type tangles (4+)</strong> — <span class="sub">Groups of types that all reach each other, so none of them can be tested or changed alone.</span></p>
+<p class="claim">8: AccessorialNormalizer, AddressNormalizer, RateNormalizer, ReferenceNormalizer, Router, ShipmentCoordinator, TrackingNormalizer, TransitNormalizer</p>
+<p class="loop">loop: AccessorialNormalizer → ShipmentCoordinator → Router → AccessorialNormalizer — 3 of the 8; all 8 reach each other</p>
+<h3>What was not analysed</h3>
+<p class="sub">Every number above is computed over what was actually read. This is the rest.</p>
+<ul class="sub">
+<li>Skipped as test projects: Core.Tests. A library used only by tests therefore has no visible consumer here.</li>
+<li>2 type(s) dropped by 16 path exclusion(s) — generated and scaffolded code.</li>
+<li>Every dependency found had both endpoints in the analysed set.</li>
+</ul>
+<h2>Findings</h2>
+<p class="lede">Each of these is a claim about one component, with the measurements it rests on. <strong>None of them is a score and they are not ranked against each other</strong> — the tool does not have a severity model, and a list sorted by an invented one reads as though it did.</p>
+<h3>Spans architectural layers — 14</h3>
+<p class="sub">Named for one concern, reaching across several — it is doing cross-cutting work whatever it is called.</p>
+<div class="card" id="c1e5694df">
+<h4>AuthenticationMiddleware</h4>
+<p class="where">Core · AuthenticationMiddleware.cs:8 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Reaches: TenantStore, AuditClient</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c4d61a560">
+<h4>PolicyBridge</h4>
+<p class="where">Core · Bridges.cs:49 · the 28 types in TestBed.Core</p>
+<p class="claim sub">Reaches: QuoteController, TenantStore, CarrierGateway</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c16fba73f">
+<h4>PublicIntakeConduit</h4>
+<p class="where">Core · Layering.cs:184 · the 8 types whose name ends in Conduit</p>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c6d6fa51e">
+<h4>PublicRelayConduit</h4>
+<p class="where">Core · Layering.cs:194 · the 8 types whose name ends in Conduit</p>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c1d740b71">
+<h4>QuoteController</h4>
+<p class="where">Core · Controllers.cs:16 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Reaches: TenantStore, CarrierGateway</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c60101f36">
+<h4>DocumentController</h4>
+<p class="where">Core · Controllers.cs:43 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Reaches: TenantStore, CarrierGateway</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ce7f785ed">
+<h4>RateController</h4>
+<p class="where">Core · Controllers.cs:25 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Reaches: TenantStore, CarrierGateway</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c12b89a4e">
+<h4>TrackingController</h4>
+<p class="where">Core · Controllers.cs:34 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Reaches: TenantStore, CarrierGateway</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ca37d423d">
+<h4>EgressConduit</h4>
+<p class="where">Core · Layering.cs:164 · the 8 types whose name ends in Conduit</p>
+<div class="tags">
+<span class="tag">one of a repeated pattern</span>
+</div>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c4b5dc03c">
+<h4>IntakeConduit</h4>
+<p class="where">Core · Layering.cs:119 · the 8 types whose name ends in Conduit</p>
+<div class="tags">
+<span class="tag">one of a repeated pattern</span>
+</div>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c90c45ef9">
+<h4>MirrorConduit</h4>
+<p class="where">Core · Layering.cs:137 · the 8 types whose name ends in Conduit</p>
+<div class="tags">
+<span class="tag">one of a repeated pattern</span>
+</div>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cbcf56567">
+<h4>RelayConduit</h4>
+<p class="where">Core · Layering.cs:128 · the 8 types whose name ends in Conduit</p>
+<div class="tags">
+<span class="tag">one of a repeated pattern</span>
+</div>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="caa294241">
+<h4>ReplayConduit</h4>
+<p class="where">Core · Layering.cs:155 · the 8 types whose name ends in Conduit</p>
+<div class="tags">
+<span class="tag">one of a repeated pattern</span>
+</div>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cc0acfd85">
+<h4>SyncConduit</h4>
+<p class="where">Core · Layering.cs:146 · the 8 types whose name ends in Conduit</p>
+<div class="tags">
+<span class="tag">one of a repeated pattern</span>
+</div>
+<p class="claim sub">Reaches: LayeringEndpoint, LayeringArchive, LayeringBeacon</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>KindSpan</td><td class="n">3</td><td><span class="mono">MinKindSpan</span> = 3</td></tr>
+<tr><td>KindsThroughDependencies</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>PatternGroupSize</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Concealed decision — 5</h3>
+<p class="sub">Looks like plumbing, but is far more complex than its peers — and is probably tested like plumbing.</p>
+<div class="card" id="c2e8b3235">
+<h4>ShipmentController</h4>
+<p class="where">Core · Controllers.cs:52 · the 8 types deriving from ControllerBase</p>
+<div class="tags">
+<span class="tag">genuinely low connectivity</span>
+</div>
+<p class="claim sub">Most complex member: ShipmentController.Post</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">12</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">12</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
+<tr><td>FanOutXMedian</td><td class="n">0.769</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
+<tr><td>MaxMemberCyclomaticPctl</td><td class="n">93.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ce9fa6c94">
+<h4>ThroughputGauge</h4>
+<p class="where">Core · Gauges.cs:51 · the 5 types whose name ends in Gauge</p>
+<p class="claim sub">Most complex member: ThroughputGauge.Sample</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">5</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">8</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">8</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
+<tr><td>FanOutXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
+<tr><td>MaxMemberCyclomaticPctl</td><td class="n">90</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c1e5694df">
+<h4>AuthenticationMiddleware</h4>
+<p class="where">Core · AuthenticationMiddleware.cs:8 · the 8 types deriving from ControllerBase</p>
+<div class="tags">
+<span class="tag">genuinely low connectivity</span>
+</div>
+<p class="claim sub">Most complex member: AuthenticationMiddleware.Authenticate</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">5</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
+<tr><td>FanOutXMedian</td><td class="n">0.769</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
+<tr><td>MaxMemberCyclomaticPctl</td><td class="n">68.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c2029adcb">
+<h4>RateReconciler</h4>
+<p class="where">Core · Reconcilers.cs:113 · the 9 types whose name ends in Reconciler</p>
+<div class="tags">
+<span class="tag">genuinely low connectivity</span>
+</div>
+<p class="claim sub">Most complex member: RateReconciler.Reconcile</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">4.333</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
+<tr><td>FanOutXMedian</td><td class="n">2</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
+<tr><td>MaxMemberCyclomaticPctl</td><td class="n">88.889</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c1a976abb">
+<h4>GuaranteedServiceNormalizer</h4>
+<p class="where">Core · GuaranteedServiceNormalizer.cs:4 · the 7 implementations of IResponseNormalizer</p>
+<div class="tags">
+<span class="tag">genuinely low connectivity</span>
+</div>
+<p class="claim sub">Most complex member: GuaranteedServiceNormalizer.Normalize</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">7</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">21</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">3.5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
+<tr><td>FanOutXMedian</td><td class="n">0.714</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
+<tr><td>MaxMemberCyclomaticPctl</td><td class="n">92.857</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">16</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Concealed decision, method level — 12</h3>
+<p class="sub">The same claim about one method. This is the primary level, not a drill-down of the one above.</p>
+<div class="card" id="cfed71cea">
+<h4>TariffCalculator.Apply</h4>
+<p class="where">Core · TariffCalculator.cs:5 · the 28 types in TestBed.Core</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">33</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">22</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">22</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">98.485</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">30</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c5d62d0c4">
+<h4>ShipmentLedger.Record</h4>
+<p class="where">Core · Ledgers.cs:36 · the 12 types whose name ends in Ledger</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">13</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">16</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">16</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">96.154</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">26</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c20fa82bd">
+<h4>ShipmentCoordinator.Coordinate</h4>
+<p class="where">Core · ShipmentCoordinator.cs:5 · the 28 types in TestBed.Core</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">33</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">13</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">95.455</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">11</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">25</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c1560b9ac">
+<h4>ShipmentController.Post</h4>
+<p class="where">Core · Controllers.cs:52 · the 8 types deriving from ControllerBase</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">12</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">12</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">93.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">20</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cd5333f93">
+<h4>ReconciliationController.Reconcile</h4>
+<p class="where">Core · Reconcilers.cs:283 · the 8 types deriving from ControllerBase</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">11</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">11</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">81.25</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c2c2ef45d">
+<h4>ThroughputGauge.Sample</h4>
+<p class="where">Core · Gauges.cs:51 · the 5 types whose name ends in Gauge</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">5</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">8</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">8</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">90</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">15</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ce8791126">
+<h4>AuthenticationMiddleware.Authenticate</h4>
+<p class="where">Core · AuthenticationMiddleware.cs:8 · the 8 types deriving from ControllerBase</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">5</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">68.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c6b5b93f7">
+<h4>MethodReconciler.Reconcile</h4>
+<p class="where">Core · Reconcilers.cs:179 · the 9 types whose name ends in Reconciler</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">4.333</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">88.889</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">20</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cdb43b7e3">
+<h4>RateReconciler.Reconcile</h4>
+<p class="where">Core · Reconcilers.cs:113 · the 9 types whose name ends in Reconciler</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">4.333</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">88.889</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">20</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c31873d7b">
+<h4>AuditReconciler.Reconcile</h4>
+<p class="where">Core · Reconcilers.cs:146 · the 9 types whose name ends in Reconciler</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">11</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">3.667</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">66.667</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c56e63823">
+<h4>TariffReconciler.Reconcile</h4>
+<p class="where">Core · Reconcilers.cs:81 · the 9 types whose name ends in Reconciler</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">11</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">3.667</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">66.667</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c8daacfbd">
+<h4>GuaranteedServiceNormalizer.Normalize</h4>
+<p class="where">Core · GuaranteedServiceNormalizer.cs:4 · the 7 implementations of IResponseNormalizer</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>Cyclomatic</td><td class="n">21</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">3.5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">93.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">15</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxNestingDepth</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>LinesOfCode</td><td class="n">57</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Bug blast radius — 1</h3>
+<p class="sub">Widely depended on relative to its peers, and internally complex. A defect here propagates.</p>
+<div class="card" id="cbce93030">
+<h4>ShipmentLedger</h4>
+<p class="where">Core · Ledgers.cs:36 · the 12 types whose name ends in Ledger</p>
+<p class="claim sub">A defect here reaches: AccessorialLedger, AuditLedger, CarrierLedger, DocumentLedger, QuoteLedger, RateLedger, ReferenceLedger, SurchargeLedger, TariffLedger, TrackingLedger, TransitLedger</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">12</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>FanIn</td><td class="n">11</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
+<tr><td>FanInXMedian</td><td class="n">11</td><td><span class="mono">BlastFanInMultiple</span> = 2</td></tr>
+<tr><td>FanInRank</td><td class="n">1</td><td><span class="mono">BlastTopFraction</span> = 0.05</td></tr>
+<tr><td>CyclomaticPctl</td><td class="n">95.833</td><td><span class="mono">BlastComplexityPercentile</span> = 70</td></tr>
+<tr><td>FanInTopRankLimit</td><td class="n">1.1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInPctl</td><td class="n">95.833</td><td><span class="empty">context</span></td></tr>
+<tr><td>Cyclomatic</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>InboundReferenceCount</td><td class="n">22</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Change cost — 3</h3>
+<p class="sub">Changing this means changing a lot of callers, judged against the whole solution.</p>
+<div class="card" id="c39d0b057">
+<h4>NormalizationContext</h4>
+<p class="where">Core · Contracts.cs:25 · the 8 types classified as Contract</p>
+<p class="claim sub">Changing it reaches: AccessorialNormalizer, AddressNormalizer, AuthenticationMiddleware, CarrierGateway, DocumentController, GuaranteedServiceNormalizer, IResponseNormalizer, SurchargeTable, QuoteController, RateController, RateNormalizer, ReferenceNormalizer, Router, ShipmentController, ShipmentCoordinator, SurchargeApplier, TrackingController, TrackingNormalizer, TransitNormalizer, OrderRepository</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>FanIn</td><td class="n">20</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
+<tr><td>FanInSolutionRank</td><td class="n">2</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">7.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">98.966</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+<tr><td>DataShape</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>InboundReferenceCount</td><td class="n">47</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c4e2f9340">
+<h4>RawResponse</h4>
+<p class="where">Core · Contracts.cs:18 · the 8 types classified as Contract</p>
+<p class="claim sub">Changing it reaches: AccessorialNormalizer, AddressNormalizer, AuthenticationMiddleware, CarrierGateway, DocumentController, FixtureBuilder, GuaranteedServiceNormalizer, IResponseNormalizer, QuoteController, RateController, RateNormalizer, ReferenceNormalizer, Router, ShipmentController, ShipmentCoordinator, TrackingController, TrackingNormalizer, TransitNormalizer, PayloadAuditor</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>FanIn</td><td class="n">19</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
+<tr><td>FanInSolutionRank</td><td class="n">3</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">7.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">98.276</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+<tr><td>DataShape</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>InboundReferenceCount</td><td class="n">51</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cca854271">
+<h4>NormalizedResponse</h4>
+<p class="where">Core · Contracts.cs:9 · the 8 types classified as Contract</p>
+<p class="claim sub">Changing it reaches: AccessorialNormalizer, AddressNormalizer, DocumentController, GuaranteedServiceNormalizer, IResponseNormalizer, QuoteController, RateController, RateNormalizer, ReferenceNormalizer, Router, ShipmentController, ShipmentCoordinator, TrackingController, TrackingNormalizer, TransitNormalizer</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>FanIn</td><td class="n">15</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
+<tr><td>FanInSolutionRank</td><td class="n">4</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">7.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">97.586</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+<tr><td>DataShape</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>InboundReferenceCount</td><td class="n">85</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Load-bearing and intricate — 2</h3>
+<p class="sub">Much depends on it, it depends on little, and it is intricate enough to hide a bug.</p>
+<div class="card" id="cbce93030">
+<h4>ShipmentLedger</h4>
+<p class="where">Core · Ledgers.cs:36 · the 12 types whose name ends in Ledger</p>
+<p class="claim sub">Most complex member: ShipmentLedger.Record</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>Instability</td><td class="n">0</td><td><span class="mono">StableThreshold</span> = 0.2</td></tr>
+<tr><td>FanIn</td><td class="n">11</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">16</td><td><span class="mono">HighCc</span> = 10</td></tr>
+<tr><td>EffectiveFanOut</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>InstabilityRaw</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>Cyclomatic</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cbcca41e1">
+<h4>TariffCalculator</h4>
+<p class="where">Core · TariffCalculator.cs:5 · the 28 types in TestBed.Core</p>
+<p class="claim sub">Most complex member: TariffCalculator.Apply</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>Instability</td><td class="n">0.125</td><td><span class="mono">StableThreshold</span> = 0.2</td></tr>
+<tr><td>FanIn</td><td class="n">7</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">22</td><td><span class="mono">HighCc</span> = 10</td></tr>
+<tr><td>EffectiveFanOut</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>InstabilityRaw</td><td class="n">0.125</td><td><span class="empty">context</span></td></tr>
+<tr><td>Cyclomatic</td><td class="n">22</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Breaks alone — 2</h3>
+<p class="sub">Structurally isolated and unstable — it can break on its own, without anything else changing.</p>
+<div class="card" id="c3d091116">
+<h4>RoutingDepot</h4>
+<p class="where">Core · Depots.cs:49 · the 3 types whose name ends in Depot</p>
+<p class="claim sub">Most complex member: RoutingDepot.Route</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>Instability</td><td class="n">0.8</td><td><span class="mono">IsolatedThreshold</span> = 0.8</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">12</td><td><span class="mono">HighCc</span> = 10</td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>EffectiveFanOut</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c3f481aa7">
+<h4>SurchargeEvaluator</h4>
+<p class="where">Core · Evaluators.cs:211 · the 6 types whose name ends in Evaluator</p>
+<p class="claim sub">Most complex member: SurchargeEvaluator.Apply</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>Instability</td><td class="n">0.8</td><td><span class="mono">IsolatedThreshold</span> = 0.8</td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">11</td><td><span class="mono">HighCc</span> = 10</td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>EffectiveFanOut</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Hub or god object — 3</h3>
+<p class="sub">Depends on, and is depended on by, much of the system.</p>
+<div class="card" id="ce8cc5e45">
+<h4>ShipmentCoordinator</h4>
+<p class="where">Core · ShipmentCoordinator.cs:5 · the 28 types in TestBed.Core</p>
+<div class="tags">
+<span class="tag">carries real logic</span>
+</div>
+<p class="claim sub">Most complex member: ShipmentCoordinator.Coordinate</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>FanIn</td><td class="n">7</td><td><span class="mono">HubMin</span> = 5</td></tr>
+<tr><td>FanOut</td><td class="n">7</td><td><span class="mono">HubMin</span> = 5</td></tr>
+<tr><td>Coupling</td><td class="n">7</td><td><span class="empty">context</span></td></tr>
+<tr><td>MemberCount</td><td class="n">16</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">13</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">15</td><td><span class="empty">context</span></td></tr>
+<tr><td>Instability</td><td class="n">0.3</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cfafd4d0c">
+<h4>DispatchRegistry</h4>
+<p class="where">Core · Dispatch.cs:91 · the 2 types in TestBed.Core.Dispatch</p>
+<div class="tags">
+<span class="tag">too large to hold at once</span>
+</div>
+<p class="claim sub">Most complex member: DispatchRegistry.Registered</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>FanIn</td><td class="n">5</td><td><span class="mono">HubMin</span> = 5</td></tr>
+<tr><td>FanOut</td><td class="n">5</td><td><span class="mono">HubMin</span> = 5</td></tr>
+<tr><td>Coupling</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>MemberCount</td><td class="n">23</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>Instability</td><td class="n">0.5</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c03930f76">
+<h4>Router</h4>
+<p class="where">Core · Router.cs:3 · the 28 types in TestBed.Core</p>
+<p class="claim sub">Most complex member: Router.Route</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>FanIn</td><td class="n">5</td><td><span class="mono">HubMin</span> = 5</td></tr>
+<tr><td>FanOut</td><td class="n">11</td><td><span class="mono">HubMin</span> = 5</td></tr>
+<tr><td>Coupling</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>MemberCount</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>Instability</td><td class="n">0.583</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Shared mutable state — 2</h3>
+<p class="sub">Writes to static mutable state. Every caller on every thread shares it.</p>
+<div class="card" id="c49ba4679">
+<h4>QuoteAssembler</h4>
+<p class="where">Core · QuoteAssembler.cs:9 · the 28 types in TestBed.Core</p>
+<p class="claim sub">Written by: QuoteAssembler.Build, QuoteAssembler.Reset</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>StaticMutations</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c752e682d">
+<h4>DispatchCounter</h4>
+<p class="where">Core · Dispatch.cs:134 · the 2 types in TestBed.Core.Dispatch</p>
+<p class="claim sub">Written by: DispatchCounter.Record</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>StaticMutations</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>Boundary carries logic — 2</h3>
+<p class="sub">A boundary type carrying real logic — the place where an outside caller reaches decision-making directly.</p>
+<div class="card" id="c2e8b3235">
+<h4>ShipmentController</h4>
+<p class="where">Core · Controllers.cs:52 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Most complex member: ShipmentController.Post</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">12</td><td><span class="mono">HighCc</span> = 10</td></tr>
+<tr><td>DataShape</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c1fa1b3e2">
+<h4>ReconciliationController</h4>
+<p class="where">Core · Reconcilers.cs:283 · the 8 types deriving from ControllerBase</p>
+<p class="claim sub">Most complex member: ReconciliationController.Reconcile</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">11</td><td><span class="mono">HighCc</span> = 10</td></tr>
+<tr><td>DataShape</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanOut</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<h3>No peer group — 18</h3>
+<p class="sub">Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.</p>
+<div class="card" id="c8ae4520d">
+<h4>LayeringArchive</h4>
+<p class="where">Core · Layering.cs:97 · the 3 types in TestBed.Core.Layering</p>
+<div class="tags">
+<span class="tag">extreme fan-in solution-wide</span>
+</div>
+<p class="claim sub">Most complex member: LayeringArchive.Read</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">94.138</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">70.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ce2b944f1">
+<h4>LayeringBeacon</h4>
+<p class="where">Core · Layering.cs:105 · the 3 types in TestBed.Core.Layering</p>
+<div class="tags">
+<span class="tag">extreme fan-in solution-wide</span>
+</div>
+<p class="claim sub">Most complex member: LayeringBeacon.Send</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">94.138</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">70.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c43b9f3f4">
+<h4>LayeringEndpoint</h4>
+<p class="where">Core · Layering.cs:91 · the 1 type classified as ApiBoundary</p>
+<div class="tags">
+<span class="tag">extreme fan-in solution-wide</span>
+</div>
+<p class="claim sub">Most complex member: LayeringEndpoint.Receive</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">1</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">94.138</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c3d091116">
+<h4>RoutingDepot</h4>
+<p class="where">Core · Depots.cs:49 · the 3 types whose name ends in Depot</p>
+<div class="tags">
+<span class="tag">extreme complexity solution-wide</span>
+</div>
+<p class="claim sub">Most complex member: RoutingDepot.Route</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">92.759</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c7b57e93f">
+<h4>OrderRepository</h4>
+<p class="where">Data · OrderRepository.cs:8 · the 1 type classified as DataAccess</p>
+<div class="tags">
+<span class="tag">extreme complexity solution-wide</span>
+</div>
+<p class="claim sub">Most complex member: OrderRepository.BuildQuery</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">1</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">16.207</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">98.276</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c7a8a3a4d">
+<h4>PayloadTag</h4>
+<p class="where">Tools · PayloadTag.cs:12 · the 2 types whose name ends in Tag</p>
+<div class="tags">
+<span class="tag">extreme complexity solution-wide</span>
+</div>
+<p class="claim sub">Most complex member: PayloadTag.Score</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">16.207</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">95.862</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">13</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c752e682d">
+<h4>DispatchCounter</h4>
+<p class="where">Core · Dispatch.cs:134 · the 2 types in TestBed.Core.Dispatch</p>
+<p class="claim sub">Most complex member: DispatchCounter.Record</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">84.138</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="cfafd4d0c">
+<h4>DispatchRegistry</h4>
+<p class="where">Core · Dispatch.cs:91 · the 2 types in TestBed.Core.Dispatch</p>
+<p class="claim sub">Most complex member: DispatchRegistry.Registered</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">84.138</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c98df57a5">
+<h4>RouteAttribute</h4>
+<p class="where">Core · Layering.cs:80 · the 3 types in TestBed.Core.Layering</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">79.655</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">6.897</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ca0945942">
+<h4>LabelDepot</h4>
+<p class="where">Core · Depots.cs:81 · the 3 types whose name ends in Depot</p>
+<p class="claim sub">Most complex member: LabelDepot.Label</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ce29d9a4b">
+<h4>ManifestDepot</h4>
+<p class="where">Core · Depots.cs:89 · the 3 types whose name ends in Depot</p>
+<p class="claim sub">Most complex member: ManifestDepot.Manifest</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c8d99c7e9">
+<h4>SurchargeTable</h4>
+<p class="where">Core · SurchargeTable.cs:6 · the 1 type whose name ends in Table</p>
+<p class="claim sub">Most complex member: SurchargeTable.Lookup</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">1</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">80</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="ce94c9d9e">
+<h4>PricingVault</h4>
+<p class="where">Core · Vaults.cs:43 · the 3 types whose name ends in Vault</p>
+<p class="claim sub">Most complex member: PricingVault.Price</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">86.207</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c89f8aef4">
+<h4>SessionVault</h4>
+<p class="where">Core · Vaults.cs:74 · the 3 types whose name ends in Vault</p>
+<p class="claim sub">Most complex member: SessionVault.Read</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="c3555f3f3">
+<h4>TokenVault</h4>
+<p class="where">Core · Vaults.cs:67 · the 3 types whose name ends in Vault</p>
+<p class="claim sub">Most complex member: TokenVault.Read</p>
+<details>
+<summary>Why this fired</summary>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.448</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">40.345</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">145</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<p class="note">Showing 15 of 18. Raise <span class="mono">--top</span> to see more, or read the JSON or CSV export, which carry every one.</p>
+<h2>Components named above</h2>
+<p class="lede">The 46 component(s) the findings above are <em>about</em>. Types those findings merely <em>name</em> are named in the card that names them and do not get a row here. <strong>This is not every type</strong> — the solution has 145, and a row each would make this file too large to send. The CSV and JSON exports carry every type, every member and every dependency.</p>
+<div class="scroll"><table>
+<tr><th>Component</th><th>Project</th><th>Role</th><th class="n">Fan-in</th><th class="n">Fan-out</th><th class="n">Cc</th><th class="n">Max member</th><th class="n">Members</th><th class="n">Lines</th></tr>
+<tr><td id="c615dc7fc">AuditReconciler<br><span class="where">Reconcilers.cs:146</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">5</td><td class="n">11</td><td class="n">11<br><span class="where">Reconcile</span></td><td class="n">6</td><td class="n">27</td></tr>
+<tr><td id="c1e5694df">AuthenticationMiddleware<br><span class="where">AuthenticationMiddleware.cs:8</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">5</td><td class="n">5</td><td class="n">5<br><span class="where">Authenticate</span></td><td class="n">3</td><td class="n">18</td></tr>
+<tr><td id="ca0945942">LabelDepot<br><span class="where">Depots.cs:81</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">2</td><td class="n">1</td><td class="n">1<br><span class="where">Label</span></td><td class="n">3</td><td class="n">7</td></tr>
+<tr><td id="ce29d9a4b">ManifestDepot<br><span class="where">Depots.cs:89</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">2</td><td class="n">1</td><td class="n">1<br><span class="where">Manifest</span></td><td class="n">3</td><td class="n">7</td></tr>
+<tr><td id="c3d091116">RoutingDepot<br><span class="where">Depots.cs:49</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">4</td><td class="n">12</td><td class="n">12<br><span class="where">Route</span></td><td class="n">5</td><td class="n">27</td></tr>
+<tr><td id="c752e682d">DispatchCounter<br><span class="where">Dispatch.cs:134</span></td><td>Core</td><td>Internal</td><td class="n">5</td><td class="n">0</td><td class="n">2</td><td class="n">1<br><span class="where">Record</span></td><td class="n">3</td><td class="n">8</td></tr>
+<tr><td id="cfafd4d0c">DispatchRegistry<br><span class="where">Dispatch.cs:91</span></td><td>Core</td><td>Internal</td><td class="n">5</td><td class="n">5</td><td class="n">1</td><td class="n">1<br><span class="where">Registered</span></td><td class="n">23</td><td class="n">33</td></tr>
+<tr><td id="c60101f36">DocumentController<br><span class="where">Controllers.cs:43</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">7</td><td class="n">1</td><td class="n">1<br><span class="where">Get</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c1a976abb">GuaranteedServiceNormalizer<br><span class="where">GuaranteedServiceNormalizer.cs:4</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">5</td><td class="n">27</td><td class="n">21<br><span class="where">Normalize</span></td><td class="n">2</td><td class="n">82</td></tr>
+<tr><td id="ca37d423d">EgressConduit<br><span class="where">Layering.cs:164</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c4b5dc03c">IntakeConduit<br><span class="where">Layering.cs:119</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c8ae4520d">LayeringArchive<br><span class="where">Layering.cs:97</span></td><td>Core</td><td>DataAccess</td><td class="n">8</td><td class="n">0</td><td class="n">2</td><td class="n">2<br><span class="where">Read</span></td><td class="n">2</td><td class="n">6</td></tr>
+<tr><td id="ce2b944f1">LayeringBeacon<br><span class="where">Layering.cs:105</span></td><td>Core</td><td>ExternalCall</td><td class="n">8</td><td class="n">0</td><td class="n">2</td><td class="n">2<br><span class="where">Send</span></td><td class="n">2</td><td class="n">6</td></tr>
+<tr><td id="c43b9f3f4">LayeringEndpoint<br><span class="where">Layering.cs:91</span></td><td>Core</td><td>ApiBoundary</td><td class="n">8</td><td class="n">1</td><td class="n">1</td><td class="n">1<br><span class="where">Receive</span></td><td class="n">1</td><td class="n">5</td></tr>
+<tr><td id="c90c45ef9">MirrorConduit<br><span class="where">Layering.cs:137</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c16fba73f">PublicIntakeConduit<br><span class="where">Layering.cs:184</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">4</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">9</td></tr>
+<tr><td id="c6d6fa51e">PublicRelayConduit<br><span class="where">Layering.cs:194</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">4</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">9</td></tr>
+<tr><td id="cbcf56567">RelayConduit<br><span class="where">Layering.cs:128</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="caa294241">ReplayConduit<br><span class="where">Layering.cs:155</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c98df57a5">RouteAttribute<br><span class="where">Layering.cs:80</span></td><td>Core</td><td>Internal</td><td class="n">3</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+<tr><td id="cc0acfd85">SyncConduit<br><span class="where">Layering.cs:146</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Handle</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c9c05afe4">MethodReconciler<br><span class="where">Reconcilers.cs:179</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">6</td><td class="n">13</td><td class="n">13<br><span class="where">Reconcile</span></td><td class="n">7</td><td class="n">30</td></tr>
+<tr><td id="c39d0b057">NormalizationContext<br><span class="where">Contracts.cs:25</span></td><td>Core</td><td>Contract</td><td class="n">20</td><td class="n">0</td><td class="n">0</td><td class="n">0<br><span class="where">TenantId</span></td><td class="n">2</td><td class="n">5</td></tr>
+<tr><td id="cca854271">NormalizedResponse<br><span class="where">Contracts.cs:9</span></td><td>Core</td><td>Contract</td><td class="n">15</td><td class="n">0</td><td class="n">0</td><td class="n">0<br><span class="where">CarrierCode</span></td><td class="n">5</td><td class="n">8</td></tr>
+<tr><td id="c4d61a560">PolicyBridge<br><span class="where">Bridges.cs:49</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">3</td><td class="n">1</td><td class="n">1<br><span class="where">Apply</span></td><td class="n">4</td><td class="n">12</td></tr>
+<tr><td id="c8d99c7e9">SurchargeTable<br><span class="where">SurchargeTable.cs:6</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">4</td><td class="n">4<br><span class="where">Lookup</span></td><td class="n">1</td><td class="n">8</td></tr>
+<tr><td id="c49ba4679">QuoteAssembler<br><span class="where">QuoteAssembler.cs:9</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">1</td><td class="n">2</td><td class="n">1<br><span class="where">Build</span></td><td class="n">4</td><td class="n">27</td></tr>
+<tr><td id="c1d740b71">QuoteController<br><span class="where">Controllers.cs:16</span></td><td>Core</td><td>ApiBoundary</td><td class="n">1</td><td class="n">7</td><td class="n">1</td><td class="n">1<br><span class="where">Get</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="ce7f785ed">RateController<br><span class="where">Controllers.cs:25</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">7</td><td class="n">1</td><td class="n">1<br><span class="where">Get</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="c2029adcb">RateReconciler<br><span class="where">Reconcilers.cs:113</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">4</td><td class="n">13</td><td class="n">13<br><span class="where">Reconcile</span></td><td class="n">5</td><td class="n">28</td></tr>
+<tr><td id="c3f481aa7">SurchargeEvaluator<br><span class="where">Evaluators.cs:211</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">4</td><td class="n">18</td><td class="n">11<br><span class="where">Apply</span></td><td class="n">6</td><td class="n">36</td></tr>
+<tr><td id="c4e2f9340">RawResponse<br><span class="where">Contracts.cs:18</span></td><td>Core</td><td>Contract</td><td class="n">19</td><td class="n">0</td><td class="n">0</td><td class="n">0<br><span class="where">Payload</span></td><td class="n">3</td><td class="n">6</td></tr>
+<tr><td id="c1fa1b3e2">ReconciliationController<br><span class="where">Reconcilers.cs:283</span></td><td>Core</td><td>ApiBoundary</td><td class="n">1</td><td class="n">6</td><td class="n">11</td><td class="n">11<br><span class="where">Reconcile</span></td><td class="n">6</td><td class="n">27</td></tr>
+<tr><td id="c03930f76">Router<br><span class="where">Router.cs:3</span></td><td>Core</td><td>Internal</td><td class="n">5</td><td class="n">11</td><td class="n">2</td><td class="n">2<br><span class="where">Route</span></td><td class="n">2</td><td class="n">16</td></tr>
+<tr><td id="c2e8b3235">ShipmentController<br><span class="where">Controllers.cs:52</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">5</td><td class="n">12</td><td class="n">12<br><span class="where">Post</span></td><td class="n">2</td><td class="n">25</td></tr>
+<tr><td id="ce8cc5e45">ShipmentCoordinator<br><span class="where">ShipmentCoordinator.cs:5</span></td><td>Core</td><td>Internal</td><td class="n">7</td><td class="n">7</td><td class="n">20</td><td class="n">13<br><span class="where">Coordinate</span></td><td class="n">16</td><td class="n">47</td></tr>
+<tr><td id="cbce93030">ShipmentLedger<br><span class="where">Ledgers.cs:36</span></td><td>Core</td><td>Internal</td><td class="n">11</td><td class="n">0</td><td class="n">18</td><td class="n">16<br><span class="where">Record</span></td><td class="n">3</td><td class="n">36</td></tr>
+<tr><td id="cbcca41e1">TariffCalculator<br><span class="where">TariffCalculator.cs:5</span></td><td>Core</td><td>Internal</td><td class="n">7</td><td class="n">1</td><td class="n">22</td><td class="n">22<br><span class="where">Apply</span></td><td class="n">2</td><td class="n">35</td></tr>
+<tr><td id="cc0427ad3">TariffReconciler<br><span class="where">Reconcilers.cs:81</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">5</td><td class="n">11</td><td class="n">11<br><span class="where">Reconcile</span></td><td class="n">6</td><td class="n">27</td></tr>
+<tr><td id="ce9fa6c94">ThroughputGauge<br><span class="where">Gauges.cs:51</span></td><td>Core</td><td>Internal</td><td class="n">5</td><td class="n">1</td><td class="n">8</td><td class="n">8<br><span class="where">Sample</span></td><td class="n">2</td><td class="n">20</td></tr>
+<tr><td id="c12b89a4e">TrackingController<br><span class="where">Controllers.cs:34</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">7</td><td class="n">1</td><td class="n">1<br><span class="where">Get</span></td><td class="n">4</td><td class="n">8</td></tr>
+<tr><td id="ce94c9d9e">PricingVault<br><span class="where">Vaults.cs:43</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">8</td><td class="n">8<br><span class="where">Price</span></td><td class="n">2</td><td class="n">20</td></tr>
+<tr><td id="c89f8aef4">SessionVault<br><span class="where">Vaults.cs:74</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1<br><span class="where">Read</span></td><td class="n">2</td><td class="n">6</td></tr>
+<tr><td id="c3555f3f3">TokenVault<br><span class="where">Vaults.cs:67</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1<br><span class="where">Read</span></td><td class="n">2</td><td class="n">6</td></tr>
+<tr><td id="c7b57e93f">OrderRepository<br><span class="where">OrderRepository.cs:8</span></td><td>Data</td><td>DataAccess</td><td class="n">0</td><td class="n">1</td><td class="n">19</td><td class="n">18<br><span class="where">BuildQuery</span></td><td class="n">2</td><td class="n">41</td></tr>
+<tr><td id="c7a8a3a4d">PayloadTag<br><span class="where">PayloadTag.cs:12</span></td><td>Tools</td><td>Internal</td><td class="n">0</td><td class="n">0</td><td class="n">14</td><td class="n">13<br><span class="where">Score</span></td><td class="n">4</td><td class="n">33</td></tr>
+</table></div>
+<h2>The thresholds this run used</h2>
+<p class="lede">Every number a finding was tested against. They are all movable from the command line, and a finding that looks wrong is often a threshold that is wrong for this codebase rather than a claim that is wrong about the component.</p>
+<details>
+<summary>Show all thresholds</summary>
+<div class="scroll"><table>
+<tr><th>Value</th><th class="n">Setting</th><th>Flag</th></tr>
+<tr><td>MinCohort</td><td class="n">5</td><td class="mono">--min-cohort</td></tr>
+<tr><td>OutlierFactor</td><td class="n">3</td><td class="mono">--outlier-factor</td></tr>
+<tr><td>MinFanIn</td><td class="n">5</td><td class="mono">--min-fan-in</td></tr>
+<tr><td>Top</td><td class="n">15</td><td class="mono">--top</td></tr>
+<tr><td>HighCc</td><td class="n">10</td><td class="mono">--high-cc</td></tr>
+<tr><td>MinDecisionCc</td><td class="n">5</td><td class="mono">--min-decision-cc</td></tr>
+<tr><td>HubMin</td><td class="n">5</td><td class="mono">--hub-min</td></tr>
+<tr><td>GodObjectMembers</td><td class="n">20</td><td class="mono">--god-object-members</td></tr>
+<tr><td>MinKindSpan</td><td class="n">3</td><td class="mono">--min-kind-span</td></tr>
+<tr><td>StableThreshold</td><td class="n">0.2</td><td class="mono">--stable-threshold</td></tr>
+<tr><td>IsolatedThreshold</td><td class="n">0.8</td><td class="mono">--isolated-threshold</td></tr>
+<tr><td>BreaksAloneMinFanIn</td><td class="n">1</td><td class="mono">--breaks-alone-min-fan-in</td></tr>
+<tr><td>ConcealedFanInCeiling</td><td class="n">2</td><td class="mono">--concealed-fan-in-ceiling</td></tr>
+<tr><td>ConcealedFanOutCeiling</td><td class="n">2</td><td class="mono">--concealed-fan-out-ceiling</td></tr>
+<tr><td>BlastFanInMultiple</td><td class="n">2</td><td class="mono">--blast-fan-in-multiple</td></tr>
+<tr><td>BlastTopFraction</td><td class="n">0.05</td><td class="mono">--blast-top-fraction</td></tr>
+<tr><td>BlastComplexityPercentile</td><td class="n">70</td><td class="mono">--blast-complexity-percentile</td></tr>
+<tr><td>ChangeCostTopFraction</td><td class="n">0.05</td><td class="mono">--change-cost-top-fraction</td></tr>
+<tr><td>RollCallDivisor</td><td class="n">3</td><td class="mono">--roll-call-divisor</td></tr>
+<tr><td>SurfaceOutlierMultiple</td><td class="n">1.5</td><td class="mono">--surface-outlier-multiple</td></tr>
+<tr><td>SurfaceOutlierFloor</td><td class="n">1</td><td class="mono">--surface-outlier-floor</td></tr>
+<tr><td>MaxNamedSurfaces</td><td class="n">5</td><td class="mono">--max-named-surfaces</td></tr>
+<tr><td>GlobalFanInPercentile</td><td class="n">90</td><td class="mono">--global-fan-in-percentile</td></tr>
+<tr><td>GlobalComplexityPercentile</td><td class="n">90</td><td class="mono">--global-complexity-percentile</td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td class="mono">--global-complexity-floor</td></tr>
+<tr><td>MinTangle</td><td class="n">4</td><td class="mono">--min-tangle</td></tr>
+</table></div>
+</details>
+<footer>Generated by Bearing 0.0.0 from TestBed/TestBed.sln. This file is self-contained: it makes no network requests and runs no script.</footer>
+</div>
+</body>
+</html>

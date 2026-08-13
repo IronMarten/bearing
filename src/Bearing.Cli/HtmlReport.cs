@@ -1,0 +1,646 @@
+using System.Text;
+
+namespace IronMarten.Bearing.Cli;
+
+/// <summary>
+/// The shareable artifact: one self-contained HTML file — <c>TECHREQ-job-a.md</c> §6.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>Orientation, then findings, then drill-down</b>, which is the order §6 asks for and is the
+/// opposite of the terminal report's. That is deliberate rather than an inconsistency: the
+/// terminal is read by somebody who already ran the tool on purpose and wants the answer without
+/// scrolling (<c>PRD-free-tier.md</c> §7.3), and this is opened by somebody who was sent a link and
+/// does not yet know what system they are looking at. Leading a newcomer with nominations is
+/// leading with claims about components they cannot place.
+/// </para>
+/// <para>
+/// <b>No external requests and no script.</b> Everything is inlined; collapsing is
+/// <c>&lt;details&gt;</c> rather than JavaScript, so the page prints, works with script disabled,
+/// and gives a corporate proxy nothing to block. See <see cref="HtmlStyle"/>.
+/// </para>
+/// <para>
+/// <b>The drill-down covers components a finding names, not every type.</b> nopCommerce has 3,209
+/// types and a row each would make the artifact several megabytes — and §6 makes bundle size a
+/// real budget. The bound is the finding set rather than a cap, so it scales with what there is to
+/// say rather than with the size of the codebase, and the section says what it left out and where
+/// the rest is. A silent subset would be <c>docs/DEFECTS.md</c> §3 again in a new medium.
+/// </para>
+/// <para>
+/// <b>What building this said about the finding record</b> — which is the job §6 assigns it —
+/// is recorded at <see cref="Claim"/> and in <c>docs/ARCHITECTURE.md</c> §4.
+/// </para>
+/// </remarks>
+public static class HtmlReport
+{
+    /// <summary>Renders the whole report as one HTML document.</summary>
+    /// <param name="model">The analysed solution.</param>
+    /// <param name="findings">Its findings, already suppressed.</param>
+    /// <param name="generatedAt">
+    /// When the run happened — a parameter, not a clock read, for the reason
+    /// <see cref="JsonOutput.Render"/> gives.
+    /// </param>
+    public static string Render(SolutionModel model, FindingSet findings, DateTimeOffset generatedAt)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(findings);
+
+        var page = new StringBuilder();
+        var solution = Path.GetFileName(model.SolutionPath);
+
+        page.Append("<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n");
+        page.Append("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n");
+        page.Append($"<title>Bearing — {Html.Text(solution)}</title>\n");
+        page.Append("<style>\n").Append(HtmlStyle.Css).Append("\n</style>\n</head>\n<body>\n<div class=\"wrap\">\n");
+
+        Header(page, model, solution, findings, generatedAt);
+        Orientation(page, model);
+        Findings(page, model, findings);
+        DrillDown(page, model, findings);
+        Footer(page, model);
+
+        page.Append("</div>\n</body>\n</html>\n");
+        return page.ToString();
+    }
+
+    /// <summary>Renders the report and writes it to <paramref name="path"/>.</summary>
+    public static void Write(string path, SolutionModel model, FindingSet findings, DateTimeOffset generatedAt)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
+        File.WriteAllText(path, Render(model, findings, generatedAt), new UTF8Encoding(false));
+    }
+
+    // ------------------------------------------------------------------------ header ----
+
+    private static void Header(
+        StringBuilder page, SolutionModel model, string solution, FindingSet findings, DateTimeOffset at)
+    {
+        page.Append($"<h1>{Html.Text(solution)}</h1>\n");
+        page.Append($"<p class=\"sub\">Bearing {Html.Text(model.ToolVersion)} · ");
+        page.Append($"{Html.Text(at.ToString("yyyy-MM-dd HH:mm 'UTC'", System.Globalization.CultureInfo.InvariantCulture))}</p>\n");
+
+        page.Append("<p class=\"lede\">A map of this solution and a short list of the components that are ");
+        page.Append("unusual <em>for what they are</em> — measured against their structural peers, never scored. ");
+        page.Append("Start with the shape of the system below; the findings are further down and they assume it.</p>\n");
+
+        page.Append("<div class=\"tiles\">\n");
+        Tile(page, Html.Count(model.Types.Count), "types");
+        Tile(page, Html.Count(model.Projects.Count), "projects");
+        Tile(page, Html.Count(model.Edges.Count), "dependencies");
+        Tile(page, Html.Count(findings.Count), "findings");
+        page.Append("</div>\n");
+    }
+
+    private static void Tile(StringBuilder page, string value, string label) =>
+        page.Append($"<div class=\"tile\"><b>{value}</b><span>{Html.Text(label)}</span></div>\n");
+
+    // ------------------------------------------------------------------- orientation ----
+
+    private static void Orientation(StringBuilder page, SolutionModel model)
+    {
+        page.Append("<h2>Orientation</h2>\n");
+
+        Projects(page, model);
+        Integrations(page, model);
+        Cycles(page, model);
+        Coverage(page, model);
+    }
+
+    private static void Projects(StringBuilder page, SolutionModel model)
+    {
+        page.Append("<h3>Projects</h3>\n");
+        page.Append("<p class=\"sub\">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are ");
+        page.Append("abstract or interfaces. D = distance from the main sequence. ");
+        page.Append("<em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>\n");
+
+        var unreferenced = model.UnreferencedProjects.Select(p => p.Name).ToHashSet(StringComparer.Ordinal);
+
+        page.Append("<div class=\"scroll\"><table>\n<tr><th>Project</th><th class=\"n\">Types</th>");
+        page.Append("<th class=\"n\">Ca</th><th class=\"n\">Ce</th><th class=\"n\">A</th><th class=\"n\">I</th>");
+        page.Append("<th class=\"n\">D</th><th>Zone</th></tr>\n");
+
+        foreach (var c in model.ProjectCouplings)
+        {
+            var flag = unreferenced.Contains(c.Project)
+                ? " <span class=\"tag\">nothing depends on it</span>"
+                : "";
+
+            page.Append($"<tr><td>{Html.Text(c.Project)}{flag}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(c.TotalTypes)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(c.TypesElsewhereReachingIn)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(c.TypesHereReachingOut)}</td>");
+            page.Append($"<td class=\"n\">{Html.Number(c.Abstractness)}</td>");
+            page.Append($"<td class=\"n\">{Optional(c.Instability)}</td>");
+            page.Append($"<td class=\"n\">{Optional(c.DistanceFromMainSequence)}</td>");
+            page.Append($"<td>{Html.Text(Zone(c.Zone))}</td></tr>\n");
+        }
+
+        page.Append("</table></div>\n");
+
+        // Two lists that are not the same list, and saying so is the whole point of the sentence:
+        // a project declaring no analysed type has no metrics rather than metrics of zero.
+        var empty = model.Projects.Count - model.ProjectCouplings.Count;
+        if (empty > 0)
+            page.Append($"<p class=\"sub\">{Html.Count(empty)} project(s) declared no analysed type and have no ")
+                .Append("metrics to report — an empty project has no abstractness, not an abstractness of zero.</p>\n");
+    }
+
+    /// <summary>A measurement that may not exist. Blank, never a stand-in — invariant 6.</summary>
+    private static string Optional(double? value) => value is { } d ? Html.Number(d) : "<span class=\"empty\">—</span>";
+
+    /// <summary>
+    /// The zone, worded for this medium.
+    /// </summary>
+    /// <remarks>
+    /// Which zone a project is in is Core's judgement; the words are the renderer's, so this says
+    /// the same things as the terminal's version without borrowing its <c>&lt;--</c> arrows, which
+    /// exist to point along a fixed-width row and mean nothing in a table cell.
+    /// </remarks>
+    private static string Zone(MainSequenceZone zone) => zone switch
+    {
+        MainSequenceZone.Pain => "zone of pain — stable and concrete",
+        MainSequenceZone.Uselessness => "zone of uselessness — abstract, unused",
+        MainSequenceZone.NearMainSequence => "near the main sequence",
+        _ => "",
+    };
+
+    private static void Integrations(StringBuilder page, SolutionModel model)
+    {
+        var map = model.Integrations;
+        var contact = model.ContactPoints;
+
+        page.Append("<h3>What it talks to</h3>\n");
+        page.Append($"<p class=\"sub\">{Html.Count(contact.Inbound.Count)} way(s) in and ");
+        page.Append($"{Html.Count(contact.Outbound.Count)} way(s) out. The map below counts what this solution ");
+        page.Append("<em>calls into</em>, which is not the same question.</p>\n");
+
+        if (map.Systems.Count == 0)
+        {
+            page.Append("<p class=\"empty\">No external system recognised. That means either this solution ");
+            page.Append("genuinely calls nothing out, or it uses frameworks this classifier does not know.</p>\n");
+        }
+        else
+        {
+            page.Append("<div class=\"scroll\"><table>\n<tr><th>External system</th><th class=\"n\">Types touching it</th></tr>\n");
+            foreach (var system in map.Systems)
+                page.Append($"<tr><td class=\"mono\">{Html.Text(system.Namespace)}</td>")
+                    .Append($"<td class=\"n\">{Html.Count(system.TypesTouching)}</td></tr>\n");
+            page.Append("</table></div>\n");
+        }
+
+        if (map.PlumbingReferences > 0)
+            page.Append($"<p class=\"sub\">{Html.Count(map.PlumbingReferences)} reference(s) to language and ")
+                .Append("framework plumbing were filtered out of that list rather than dropped silently.</p>\n");
+    }
+
+    private static void Cycles(StringBuilder page, SolutionModel model)
+    {
+        page.Append("<h3>Circular references</h3>\n");
+
+        CycleGroup(page, "Namespaces", model.NamespaceCycles,
+            "Mutually dependent namespaces cannot be layered, understood or extracted independently.",
+            id => Name(model, id));
+
+        CycleGroup(page, "Projects", model.ProjectCycles,
+            "Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.",
+            id => Name(model, id));
+
+        CycleGroup(page, $"Type tangles ({Html.Number(model.Policy.MinTangle)}+)", model.TypeTangles,
+            "Groups of types that all reach each other, so none of them can be tested or changed alone.",
+            id => Name(model, id));
+    }
+
+    private static void CycleGroup(
+        StringBuilder page, string title, IReadOnlyList<Cycle> cycles, string blurb, Func<SubjectRef, string> name)
+    {
+        page.Append($"<p><strong>{Html.Text(title)}</strong> — <span class=\"sub\">{Html.Text(blurb)}</span></p>\n");
+
+        if (cycles.Count == 0)
+        {
+            page.Append("<p class=\"empty\">None.</p>\n");
+            return;
+        }
+
+        foreach (var cycle in cycles)
+        {
+            page.Append($"<p class=\"claim\">{Html.Count(cycle.Size)}: ");
+            page.Append(Html.Text(string.Join(", ", cycle.Members.Select(name))));
+            page.Append("</p>\n");
+
+            var loop = string.Join(" → ", cycle.Path.Select(name));
+            var closes = cycle.Path.Count > 0 ? name(cycle.Path[0]) : "";
+
+            page.Append($"<p class=\"loop\">loop: {Html.Text(loop)} → {Html.Text(closes)}");
+            if (!cycle.PathCoversEveryMember)
+                page.Append($" — {Html.Count(cycle.Path.Count)} of the {Html.Count(cycle.Size)}; ")
+                    .Append($"all {Html.Count(cycle.Size)} reach each other");
+            page.Append("</p>\n");
+        }
+    }
+
+    private static void Coverage(StringBuilder page, SolutionModel model)
+    {
+        var coverage = model.Coverage;
+
+        page.Append("<h3>What was not analysed</h3>\n");
+        page.Append("<p class=\"sub\">Every number above is computed over what was actually read. ");
+        page.Append("This is the rest.</p>\n");
+
+        page.Append("<ul class=\"sub\">\n");
+
+        page.Append(coverage.SkippedProjects.Count == 0
+            ? "<li>No project was skipped as a test project.</li>\n"
+            : $"<li>Skipped as test projects: {Html.Text(string.Join(", ", coverage.SkippedProjects))}. "
+              + "A library used only by tests therefore has no visible consumer here.</li>\n");
+
+        page.Append($"<li>{Html.Count(coverage.ExcludedTypes)} type(s) dropped by ")
+            .Append($"{Html.Count(coverage.ExclusionsApplied.Count)} path exclusion(s) — generated and scaffolded code.</li>\n");
+
+        page.Append(coverage.EdgesToUnanalysedTypes == 0
+            ? "<li>Every dependency found had both endpoints in the analysed set.</li>\n"
+            : $"<li><strong>{Html.Count(coverage.EdgesToUnanalysedTypes)} dependency reference(s)</strong> pointed at "
+              + "types the walk never analysed and were dropped. Read fan-in as a lower bound.</li>\n");
+
+        if (coverage.LoadDiagnostics.Count > 0)
+        {
+            page.Append($"<li>{Html.Count(coverage.LoadDiagnostics.Count)} diagnostic(s) while loading. ");
+            page.Append("These are <em>not</em> reliably failures — on one reference solution every one of them ");
+            page.Append("was a NuGet vulnerability advisory, and 3,209 types loaded anyway.</li>\n");
+        }
+
+        page.Append("</ul>\n");
+    }
+
+    // --------------------------------------------------------------------- findings ----
+
+    /// <summary>
+    /// The findings, grouped by claim.
+    /// </summary>
+    /// <remarks>
+    /// <b>Grouped rather than ranked, and that is a consequence of the record rather than a layout
+    /// preference.</b> <see cref="Finding"/> carries no severity and no rank, deliberately —
+    /// <c>docs/ARCHITECTURE.md</c> §4 excludes them because banding severity into identity would
+    /// make a retune invalidate every stored acknowledgment. So there is no honest global order to
+    /// sort by, and inventing one here would be a renderer manufacturing a judgement Core refused
+    /// to make. Within a kind the order is the model's, which is by subject identity.
+    /// </remarks>
+    private static void Findings(StringBuilder page, SolutionModel model, FindingSet findings)
+    {
+        page.Append("<h2>Findings</h2>\n");
+
+        if (findings.Count == 0)
+        {
+            page.Append("<p class=\"empty\">Nothing was nominated. That is a real answer, not an error — ");
+            page.Append("every threshold this run used is listed at the foot of the page.</p>\n");
+            return;
+        }
+
+        page.Append("<p class=\"lede\">Each of these is a claim about one component, with the measurements it ");
+        page.Append("rests on. <strong>None of them is a score and they are not ranked against each other</strong> — ");
+        page.Append("the tool does not have a severity model, and a list sorted by an invented one reads as though ");
+        page.Append("it did.</p>\n");
+
+        foreach (var group in findings.All
+                     .GroupBy(f => f.Kind)
+                     .OrderBy(g => g.Key))
+        {
+            var all = group.ToList();
+            var shown = all.Take(model.Policy.Top).ToList();
+
+            page.Append($"<h3>{Html.Text(Claim(group.Key))} — {Html.Count(all.Count)}</h3>\n");
+            page.Append($"<p class=\"sub\">{Html.Text(Blurb(group.Key))}</p>\n");
+
+            foreach (var finding in shown)
+                Card(page, model, finding);
+
+            if (shown.Count < all.Count)
+                page.Append($"<p class=\"note\">Showing {Html.Count(shown.Count)} of ")
+                    .Append($"{Html.Count(all.Count)}. Raise <span class=\"mono\">--top</span> to see more, ")
+                    .Append("or read the JSON or CSV export, which carry every one.</p>\n");
+        }
+    }
+
+    private static void Card(StringBuilder page, SolutionModel model, Finding finding)
+    {
+        var type = model.Find(finding.Subject) ?? model.Find(finding.Subject.DeclaringType ?? finding.Subject);
+
+        page.Append($"<div class=\"card\" id=\"{Html.Text(Html.Anchor(finding.Subject.Canonical))}\">\n");
+        page.Append($"<h4>{Html.Text(Display(model, finding.Subject))}</h4>\n");
+
+        if (type is not null)
+        {
+            page.Append($"<p class=\"where\">{Html.Text(type.Project)}");
+            if (type.Location.IsKnown)
+                page.Append($" · {Html.Text(Path.GetFileName(type.Location.File))}:{Html.Count(type.Location.Line)}");
+            page.Append($" · {Html.Text(Sentences.PeerGroup(type.Cohort, type.CohortSize))}</p>\n");
+        }
+
+        var holding = finding.Qualifiers.Where(q => q.Holds).ToList();
+        if (holding.Count > 0)
+        {
+            page.Append("<div class=\"tags\">\n");
+            foreach (var qualifier in holding)
+                page.Append($"<span class=\"tag\">{Html.Text(QualifierText(qualifier.Name))}</span>\n");
+            page.Append("</div>\n");
+        }
+
+        if (finding.Participants.Count > 0)
+        {
+            page.Append($"<p class=\"claim sub\">{Html.Text(ParticipantsAre(finding.Kind))}: ");
+            page.Append(Html.Text(string.Join(", ", finding.Participants.Select(p => Display(model, p)))));
+            page.Append("</p>\n");
+        }
+
+        if (finding.Receipts.Count > 0)
+        {
+            page.Append("<details>\n<summary>Why this fired</summary>\n");
+            page.Append("<table class=\"receipts\">\n<tr><th>Measured</th><th class=\"n\">Value</th><th>Had to clear</th></tr>\n");
+
+            foreach (var receipt in finding.Receipts)
+            {
+                page.Append($"<tr><td>{Html.Text(receipt.Name)}</td>");
+                page.Append($"<td class=\"n\">{Html.Number(receipt.Value)}</td>");
+                page.Append("<td>");
+
+                // The gate is a name; the number comes from the policy this run used, so a finding
+                // and the policy cannot disagree about what gated it.
+                if (receipt.Gate is { } gate)
+                {
+                    var threshold = model.Policy.Values
+                        .Where(v => string.Equals(v.Name, gate, StringComparison.Ordinal))
+                        .Select(v => (double?)v.Value)
+                        .FirstOrDefault();
+
+                    page.Append($"<span class=\"mono\">{Html.Text(gate)}</span>");
+                    if (threshold is { } value) page.Append($" = {Html.Number(value)}");
+                }
+                else
+                {
+                    page.Append("<span class=\"empty\">context</span>");
+                }
+
+                page.Append("</td></tr>\n");
+            }
+
+            page.Append("</table>\n</details>\n");
+        }
+
+        page.Append("</div>\n");
+    }
+
+    // -------------------------------------------------------------------- drill-down ----
+
+    /// <summary>
+    /// One row per component a shown finding is <i>about</i>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Subjects, and deliberately not participants.</b> Including the types a finding merely
+    /// names took nopCommerce from 125 rendered cards to 1,701 rows and made the drill-down
+    /// two-thirds of the whole file — 525KB of the 765KB — for components that are not themselves
+    /// nominated. §6 makes bundle size a real budget, and it exists to leave room for the diagrams
+    /// A7 and A8 will inline; spending it on context is spending it on the wrong thing.
+    /// </para>
+    /// <para>
+    /// Nothing is lost that the page did not already have: a participant is named in the card that
+    /// names it, which is where invariant 7's <i>"why is authentication calling TenantStore?"</i>
+    /// actually lives. What a participant does not get here is its own row of numbers, and the
+    /// section says where those are.
+    /// </para>
+    /// <para>
+    /// Bounded by the finding set rather than by a cap, so it grows with what there is to say
+    /// rather than with the size of the codebase.
+    /// </para>
+    /// </remarks>
+    private static void DrillDown(StringBuilder page, SolutionModel model, FindingSet findings)
+    {
+        var named = new HashSet<string>(StringComparer.Ordinal);
+
+        // The findings actually rendered, not every finding: a component named only by a card the
+        // pane dropped has nothing on this page pointing at it, and a row for it would be an
+        // answer to a question the reader was never shown.
+        foreach (var finding in findings.All
+                     .GroupBy(f => f.Kind)
+                     .SelectMany(g => g.Take(model.Policy.Top)))
+        {
+            Include(finding.Subject);
+        }
+
+        void Include(SubjectRef subject)
+        {
+            var type = model.Find(subject) ?? (subject.DeclaringType is { } d ? model.Find(d) : null);
+            if (type is not null) named.Add(type.Subject.Canonical);
+        }
+
+        var components = model.Types.Where(t => named.Contains(t.Subject.Canonical)).ToList();
+
+        page.Append("<h2>Components named above</h2>\n");
+
+        if (components.Count == 0)
+        {
+            page.Append("<p class=\"empty\">No finding named a component.</p>\n");
+            return;
+        }
+
+        page.Append($"<p class=\"lede\">The {Html.Count(components.Count)} component(s) the findings above are ");
+        page.Append("<em>about</em>. Types those findings merely <em>name</em> are named in the card that names ");
+        page.Append("them and do not get a row here. ");
+        page.Append($"<strong>This is not every type</strong> — the solution has {Html.Count(model.Types.Count)}, ");
+        page.Append("and a row each would make this file too large to send. The CSV and JSON exports carry every ");
+        page.Append("type, every member and every dependency.</p>\n");
+
+        page.Append("<div class=\"scroll\"><table>\n<tr><th>Component</th><th>Project</th><th>Role</th>");
+        page.Append("<th class=\"n\">Fan-in</th><th class=\"n\">Fan-out</th><th class=\"n\">Cc</th>");
+        page.Append("<th class=\"n\">Max member</th><th class=\"n\">Members</th><th class=\"n\">Lines</th></tr>\n");
+
+        foreach (var type in components)
+        {
+            page.Append($"<tr><td id=\"{Html.Text(Html.Anchor(type.Subject.Canonical))}\">{Html.Text(type.Name)}");
+            if (type.Location.IsKnown)
+                page.Append($"<br><span class=\"where\">{Html.Text(Path.GetFileName(type.Location.File))}:")
+                    .Append($"{Html.Count(type.Location.Line)}</span>");
+            page.Append("</td>");
+            page.Append($"<td>{Html.Text(type.Project)}</td>");
+            page.Append($"<td>{Html.Text(type.Classification.Kind)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(type.FanIn)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(type.FanOut)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(type.Cyclomatic)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(type.MaxMemberCyclomatic)}");
+            if (type.MostComplexMember is { } member)
+                page.Append($"<br><span class=\"where\">{Html.Text(member.Name)}</span>");
+            page.Append("</td>");
+            page.Append($"<td class=\"n\">{Html.Count(type.MemberCount)}</td>");
+            page.Append($"<td class=\"n\">{Html.Count(type.LinesOfCode)}</td></tr>\n");
+        }
+
+        page.Append("</table></div>\n");
+    }
+
+    // ----------------------------------------------------------------------- footer ----
+
+    private static void Footer(StringBuilder page, SolutionModel model)
+    {
+        page.Append("<h2>The thresholds this run used</h2>\n");
+        page.Append("<p class=\"lede\">Every number a finding was tested against. They are all movable from the ");
+        page.Append("command line, and a finding that looks wrong is often a threshold that is wrong for this ");
+        page.Append("codebase rather than a claim that is wrong about the component.</p>\n");
+
+        page.Append("<details>\n<summary>Show all thresholds</summary>\n<div class=\"scroll\"><table>\n");
+        page.Append("<tr><th>Value</th><th class=\"n\">Setting</th><th>Flag</th></tr>\n");
+
+        foreach (var (name, value) in model.Policy.Values)
+            page.Append($"<tr><td>{Html.Text(name)}</td><td class=\"n\">{Html.Number(value)}</td>")
+                .Append($"<td class=\"mono\">{Html.Text(CommandLine.FlagFor(name))}</td></tr>\n");
+
+        page.Append("</table></div>\n</details>\n");
+
+        page.Append("<footer>Generated by Bearing ").Append(Html.Text(model.ToolVersion));
+        page.Append(" from ").Append(Html.Text(model.SolutionPath));
+        page.Append(". This file is self-contained: it makes no network requests and runs no script.</footer>\n");
+    }
+
+    // ------------------------------------------------------------------------ words ----
+
+    private static string Display(SolutionModel model, SubjectRef subject)
+    {
+        if (model.Find(subject) is { } type) return type.Name;
+
+        if (subject.DeclaringType is { } declaring && model.Find(declaring) is { } owner)
+        {
+            var member = owner.Members
+                .FirstOrDefault(m => string.Equals(m.Subject.Canonical, subject.Canonical, StringComparison.Ordinal));
+
+            // The dot that produced Type..ctor — docs/DEFECTS.md §24 — so the member's own name is
+            // used where it already reads as one and the join is skipped where it does not.
+            if (member is not null)
+                return member.Name.StartsWith('.') ? $"{owner.Name} {member.Name[1..]}" : $"{owner.Name}.{member.Name}";
+        }
+
+        return subject.Kind switch
+        {
+            SubjectKind.Set => string.Join(" + ", subject.Members.Select(m => Display(model, m))),
+            SubjectKind.Solution => "this solution",
+            _ => subject.Canonical,
+        };
+    }
+
+    private static string Name(SolutionModel model, SubjectRef subject)
+    {
+        if (model.Find(subject) is { } type) return type.Name;
+
+        // A namespace or project subject has no node to look up; its canonical form is
+        // "kind|name", and the name is what a reader recognises.
+        var separator = subject.Canonical.IndexOf('|', StringComparison.Ordinal);
+        return separator < 0 ? subject.Canonical : subject.Canonical[(separator + 1)..];
+    }
+
+    /// <summary>
+    /// The claim each kind makes, in the reader's words.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is one of the two things building the pane said about the finding record.</b> A
+    /// finding carries its kind as an enum and nothing a reader can be shown, so every renderer
+    /// needs this table and a second one would drift from it. It stays in the renderer — Core
+    /// decides facts and Cli decides words, <c>docs/ARCHITECTURE.md</c> §3 — but the terminal and
+    /// this page should read from one copy, which is work this item did not do and the next
+    /// renderer should.
+    /// </remarks>
+    private static string Claim(FindingKind kind) => kind switch
+    {
+        FindingKind.SpansArchitecturalLayers => "Spans architectural layers",
+        FindingKind.ConcealedDecisionType => "Concealed decision",
+        FindingKind.ConcealedDecisionMethod => "Concealed decision, method level",
+        FindingKind.BugBlastRadius => "Bug blast radius",
+        FindingKind.ChangeCost => "Change cost",
+        FindingKind.LoadBearingAndIntricate => "Load-bearing and intricate",
+        FindingKind.BreaksAlone => "Breaks alone",
+        FindingKind.HubOrGodObject => "Hub or god object",
+        FindingKind.SharedMutableState => "Shared mutable state",
+        FindingKind.BoundaryCarriesLogic => "Boundary carries logic",
+        FindingKind.WidestContractSurface => "Widest contract surface",
+        FindingKind.Coverage => "No peer group",
+        _ => kind.ToString(),
+    };
+
+    private static string Blurb(FindingKind kind) => kind switch
+    {
+        FindingKind.SpansArchitecturalLayers =>
+            "Named for one concern, reaching across several — it is doing cross-cutting work whatever it is called.",
+        FindingKind.ConcealedDecisionType =>
+            "Looks like plumbing, but is far more complex than its peers — and is probably tested like plumbing.",
+        FindingKind.ConcealedDecisionMethod =>
+            "The same claim about one method. This is the primary level, not a drill-down of the one above.",
+        FindingKind.BugBlastRadius =>
+            "Widely depended on relative to its peers, and internally complex. A defect here propagates.",
+        FindingKind.ChangeCost =>
+            "Changing this means changing a lot of callers, judged against the whole solution.",
+        FindingKind.LoadBearingAndIntricate =>
+            "Much depends on it, it depends on little, and it is intricate enough to hide a bug.",
+        FindingKind.BreaksAlone =>
+            "Structurally isolated and unstable — it can break on its own, without anything else changing.",
+        FindingKind.HubOrGodObject =>
+            "Depends on, and is depended on by, much of the system.",
+        FindingKind.SharedMutableState =>
+            "Writes to static mutable state. Every caller on every thread shares it.",
+        FindingKind.BoundaryCarriesLogic =>
+            "A boundary type carrying real logic — the place where an outside caller reaches decision-making directly.",
+        FindingKind.WidestContractSurface =>
+            "The widest contracts this solution exposes, and the most expensive ones to change.",
+        FindingKind.Coverage =>
+            "Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.",
+        _ => "",
+    };
+
+    /// <summary>
+    /// What a kind's participants <i>are</i> — the relationship, not just the names.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This is the second thing building the pane said about the finding record, and it is the
+    /// one worth acting on.</b> <see cref="Finding.Participants"/> is an untyped
+    /// <c>SubjectRef</c> list, and across the eleven kinds it holds at least four unrelated
+    /// relationships: the <i>dependencies that make the span</i> for layer span, the <i>members
+    /// that write</i> for shared mutable state, the <i>callers</i> for change cost and blast
+    /// radius, and the <i>most complex member</i> for the six that name one. Rendering them all as
+    /// "Names: …" is wrong in a specific way — for a god object nominated on the size arm, the
+    /// named member exists to show the reader there is <i>no</i> method carrying the weight, and
+    /// listing it beside a dependency set says the opposite.
+    /// </para>
+    /// <para>
+    /// <b>A per-kind renderer could not have found this and a generic one cannot avoid it.</b> The
+    /// terminal writes a bespoke sentence per section, so each one wraps its participants in words
+    /// that happen to fit; this pane renders every kind through one path, which is what makes the
+    /// mismatch visible. That is precisely the job <c>TECHREQ-job-a.md</c> §6 assigns the HTML
+    /// pane.
+    /// </para>
+    /// <para>
+    /// <b>The record does not need a role field yet, and the reason is a constraint rather than an
+    /// accident:</b> every kind carries exactly one relationship, so the relationship is a function
+    /// of the kind and a label here is complete. **The day a kind carries two** — a hub naming both
+    /// its callers and its worst method, say — this table cannot express it and
+    /// <c>Participant(Subject, Role)</c> becomes necessary in Core. Recorded in
+    /// <c>docs/ARCHITECTURE.md</c> §4 so the constraint is written down rather than rediscovered
+    /// by whoever breaks it.
+    /// </para>
+    /// </remarks>
+    private static string ParticipantsAre(FindingKind kind) => kind switch
+    {
+        FindingKind.SpansArchitecturalLayers => "Reaches",
+        FindingKind.SharedMutableState => "Written by",
+        FindingKind.ChangeCost => "Changing it reaches",
+        FindingKind.BugBlastRadius => "A defect here reaches",
+        _ => "Most complex member",
+    };
+
+    private static string QualifierText(string qualifier) => qualifier switch
+    {
+        Qualifiers.LowAbsoluteConnectivity => "genuinely low connectivity",
+        Qualifiers.CarriesRealLogic => "carries real logic",
+        Qualifiers.TooLargeToHold => "too large to hold at once",
+        Qualifiers.PartOfALayeringPattern => "one of a repeated pattern",
+        Qualifiers.GloballyExtremeFanIn => "extreme fan-in solution-wide",
+        Qualifiers.GloballyExtremeComplexity => "extreme complexity solution-wide",
+        _ => qualifier,
+    };
+}

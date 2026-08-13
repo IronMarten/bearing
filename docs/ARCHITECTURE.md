@@ -273,6 +273,43 @@ needed them and none is a guess about what the HTML pane will want.
 
 Severity, rank and position stay out, for the reasons the key excludes them.
 
+### What the HTML pane said about the record — A6
+
+`TECHREQ-job-a.md` §6 defers the full record until the findings pane can say what it needs. It has
+now been built, and the answer is **three observations and one constraint**, not a list of missing
+fields.
+
+**The record needs nothing added today.** Location, cohort and metrics are all reachable by looking
+the subject up in the model, which the renderer has anyway — so keeping them off the finding was
+right, and the key's exclusions cost the pane nothing.
+
+**Excluding severity was right, and it is visible.** With no rank there is no honest global order,
+so the pane groups by kind and *says* the findings are not ranked. A list rendered top-to-bottom
+is read as ranked whatever the model believes, so the alternative was not "no order" but "an
+invented one" — a renderer manufacturing the judgement Core refused to make.
+
+**`Participants` is untyped, and one generic renderer is what exposes it.** Across the eleven kinds
+the list holds at least four unrelated relationships: the *dependencies that make the span*, the
+*members that write to static state*, the *callers* a defect or a change reaches, and the *most
+complex member*. The terminal never noticed because it writes a bespoke sentence per section; a
+pane that renders every kind through one path cannot avoid it, and rendering them all as
+*"Names: …"* is wrong in a specific way — for a god object nominated on the **size** arm the named
+member exists to show there is *no* method carrying the weight, and listing it the way a dependency
+set is listed says the opposite.
+
+> **The constraint, written down because breaking it is what forces the change:** *every finding
+> kind carries exactly one participant relationship.* While that holds, the relationship is a
+> function of the kind and a label in the renderer is complete — which is what `HtmlReport`
+> does, and it keeps words in the Cli where §3 wants them. **The day one kind carries two** — a hub
+> naming both its callers and its worst method — a label cannot express it, and
+> `Participant(Subject, Role)` becomes necessary in Core. That is a model change touching every
+> detector, so it should be made deliberately and not discovered.
+
+**One thing to clean up rather than a finding:** kind → title and kind → explanation now exist
+twice in the Cli, once in `FindingSections` as section headers and once in `HtmlReport`. Both are
+words and both belong in the Cli, so §3 is not violated — but they will drift, and the next
+renderer should read from one copy.
+
 **Detection and suppression are separate passes** (`Analysis`). Every detector sees the model
 and nothing else, so no detector can depend on having run after another one; relationships
 between findings are resolved afterwards against the whole `FindingSet`. In the probe they are

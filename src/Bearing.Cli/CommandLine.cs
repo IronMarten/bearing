@@ -10,6 +10,7 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="ShowVersion">Whether to print the version instead of analysing.</param>
 /// <param name="JsonPath">Where to write the model as JSON, or null for not at all.</param>
 /// <param name="CsvDirectory">Where to write the CSV files, or null for not at all.</param>
+/// <param name="HtmlPath">Where to write the HTML report, or null for not at all.</param>
 /// <remarks>
 /// The file outputs are <b>additions</b> to the terminal report rather than alternatives to it.
 /// A run that writes JSON still prints, because the two answer different people: a report is read
@@ -21,7 +22,8 @@ public sealed record Invocation(
     bool ShowHelp,
     bool ShowVersion,
     string? JsonPath = null,
-    string? CsvDirectory = null);
+    string? CsvDirectory = null,
+    string? HtmlPath = null);
 
 /// <summary>
 /// Raised when the command line cannot be understood. Carries a message a user can act on.
@@ -133,6 +135,7 @@ public static class CommandLine
         var clearDefaultExcludes = false;
         string? jsonPath = null;
         string? csvDirectory = null;
+        string? htmlPath = null;
 
         for (var i = 0; i < args.Count; i++)
         {
@@ -165,6 +168,10 @@ public static class CommandLine
 
                 case "--csv":
                     csvDirectory = Path.GetFullPath(Next(args, ref i, arg));
+                    continue;
+
+                case "--html":
+                    htmlPath = Path.GetFullPath(Next(args, ref i, arg));
                     continue;
             }
 
@@ -207,7 +214,8 @@ public static class CommandLine
             ShowHelp: false,
             ShowVersion: false,
             JsonPath: jsonPath,
-            CsvDirectory: csvDirectory);
+            CsvDirectory: csvDirectory,
+            HtmlPath: htmlPath);
     }
 
     private static string Next(IReadOnlyList<string> args, ref int i, string flag)
@@ -228,6 +236,7 @@ public static class CommandLine
         yield return "  --no-default-excludes      drop the built-in exclusions instead of adding to them";
         yield return "  --json <file>              also write the whole model as JSON";
         yield return "  --csv <dir>                also write types.csv, members.csv, edges.csv";
+        yield return "  --html <file>              also write the shareable single-file report";
         yield return "  --version                  print the version and exit";
         yield return "";
         yield return "  Thresholds — every value the report cites can be moved:";
