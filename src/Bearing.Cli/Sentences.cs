@@ -6,12 +6,21 @@ namespace IronMarten.Bearing.Cli;
 /// The small phrasing decisions every section shares.
 /// </summary>
 /// <remarks>
+/// <para>
+/// <b>Public for the reason <see cref="Html"/> is public.</b> These are the rules whose failure is
+/// silent and whose cases a fixture cannot always reach — <c>docs/DEFECTS.md</c> §32 is three
+/// sentences that agreed a verb with a number no solution in this repository makes singular, so the
+/// rule has to be assertable without a solution that exercises it. <c>Bearing.Cli</c> packs as a
+/// tool and not as a library, so nothing about its surface is a contract.
+/// </para>
+/// <para>
 /// Presentation only. Nothing here decides whether a claim may be made — that is settled before
 /// a finding reaches the renderer — and nothing here reads the model. These turn numbers already
 /// on a finding into the words the probe used for them, so that moving the report does not also
 /// move the report's voice.
+/// </para>
 /// </remarks>
-internal static class Sentences
+public static class Sentences
 {
     /// <summary>Two decimal places at most, invariant, with an undefined ratio said so.</summary>
     /// <remarks>
@@ -19,19 +28,54 @@ internal static class Sentences
     /// is undefined and not enormous. The sections that can produce one mostly branch before they
     /// get here — <i>"the only complexity among its 37 peers"</i> — and this is what is left.
     /// </remarks>
-    internal static string Number(double value) =>
+    public static string Number(double value) =>
         double.IsInfinity(value) ? "undefined" : value.ToString("0.##", CultureInfo.InvariantCulture);
 
     /// <summary>Three decimal places at most — instability, where the third digit carries meaning.</summary>
-    internal static string Ratio(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+    public static string Ratio(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
     /// <summary>Whole numbers, invariant.</summary>
-    internal static string Whole(double value) =>
+    public static string Whole(double value) =>
         value.ToString("0", CultureInfo.InvariantCulture);
 
     /// <summary><c>1 type</c> / <c>3 types</c>.</summary>
-    internal static string Plural(double count, string noun) =>
+    public static string Plural(double count, string noun) =>
         count == 1 ? $"1 {noun}" : $"{Whole(count)} {noun}s";
+
+    /// <summary>
+    /// The verb that agrees with a counted noun — <c>1 type <b>calls</b></c>, <c>3 types
+    /// <b>call</b></c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §32, and it is the third instance of one mistake.</b> The register
+    /// already carries <i>"the other 1 are entangled too"</i>, reworded at A3 to carry no verb at
+    /// all, with the note that <i>"the next such number is a defect waiting on the right input"</i>.
+    /// It was: three sentences agreed a verb with a plural that a real solution made singular —
+    /// shared mutable state's <i>"1 type call into it"</i>, change cost's <i>"1 internal caller
+    /// depend on this contract"</i>, and load-bearing's <i>"1 type depend on it"</i>.
+    /// </para>
+    /// <para>
+    /// <b>Removing the verb was the right fix once and the wrong fix three times.</b> A rule that
+    /// says <i>do not write verbs after computed numbers</i> is a rule nobody can follow while
+    /// writing the sentences this report is made of — <c>PRD-free-tier.md</c> §4 asks for sentences,
+    /// not for phrases. Breaks-alone already had the conditional inline and got it right, which is
+    /// the proof this is a missing helper rather than a missing discipline.
+    /// </para>
+    /// </remarks>
+    public static string Do(double count, string singular, string plural) =>
+        count == 1 ? singular : plural;
+
+    /// <summary>
+    /// A count of the shapes crossing a public surface, agreeing with itself.
+    /// </summary>
+    /// <remarks>
+    /// The same defect in a compound noun, where the conditional cannot be written inline without
+    /// repeating the number: <c>1 fields/params</c> shipped on nopCommerce's opening change-cost
+    /// row, which is <c>BaseEntity</c> — 458 callers, and the first contract a reader meets.
+    /// </remarks>
+    public static string Surface(double count) =>
+        count == 1 ? "1 field/param" : $"{Whole(count)} fields/params";
 
     /// <summary>Where an external namespace came from, as a trailing phrase, or nothing.</summary>
     /// <remarks>
@@ -41,7 +85,7 @@ internal static class Sentences
     /// tool could not place, and inventing a third label for it would be the guess the origin
     /// exists to avoid.
     /// </remarks>
-    internal static string Origin(ExternalOrigin origin) => origin switch
+    public static string Origin(ExternalOrigin origin) => origin switch
     {
         ExternalOrigin.Framework => "  (framework)",
         ExternalOrigin.Package => "  (package)",
@@ -63,7 +107,7 @@ internal static class Sentences
     /// at somebody (§27).
     /// </para>
     /// </remarks>
-    internal static string Member(string owner, string member) => member switch
+    public static string Member(string owner, string member) => member switch
     {
         ".ctor" => $"{owner} constructor",
         ".cctor" => $"{owner} static constructor",
@@ -77,7 +121,7 @@ internal static class Sentences
     /// Floored because "top 0%" reads as a rounding artefact rather than as the strongest
     /// possible claim, and the strongest possible claim is what it is.
     /// </remarks>
-    internal static string TopPercent(double percentile) =>
+    public static string TopPercent(double percentile) =>
         $"{Math.Max(1, Math.Round(100 - percentile)):0}%";
 
     /// <summary>
@@ -108,7 +152,7 @@ internal static class Sentences
     /// wrong-but-honest rather than silently ungrammatical.
     /// </para>
     /// </remarks>
-    internal static string PeerGroup(Cohort cohort, int size)
+    public static string PeerGroup(Cohort cohort, int size)
     {
         ArgumentNullException.ThrowIfNull(cohort);
 
@@ -139,7 +183,7 @@ internal static class Sentences
     /// report — <c>"the 1 type classified as ApiBoundary"</c> is a true sentence about a type that
     /// has no peers at all, and reads as though it had one.
     /// </remarks>
-    internal static string PeerGroupNoun(Cohort cohort)
+    public static string PeerGroupNoun(Cohort cohort)
     {
         ArgumentNullException.ThrowIfNull(cohort);
 
@@ -157,7 +201,7 @@ internal static class Sentences
     }
 
     /// <summary><c>base:global::App.ControllerBase</c> becomes <c>ControllerBase</c>.</summary>
-    internal static string ShortName(string cohortKey)
+    public static string ShortName(string cohortKey)
     {
         var afterPrefix = FullName(cohortKey);
 
@@ -169,7 +213,7 @@ internal static class Sentences
     /// The cohort key with its basis prefix and <c>global::</c> removed, but nothing else — a
     /// namespace is only itself when it is complete.
     /// </summary>
-    internal static string FullName(string cohortKey)
+    public static string FullName(string cohortKey)
     {
         ArgumentNullException.ThrowIfNull(cohortKey);
 
@@ -198,7 +242,7 @@ internal static class Sentences
     /// true. Invariant 8.
     /// </para>
     /// </remarks>
-    internal static IEnumerable<string> Truncation(int total, int shown, string noun, string indent = "   ")
+    public static IEnumerable<string> Truncation(int total, int shown, string noun, string indent = "   ")
     {
         if (total <= shown) yield break;
 
@@ -207,7 +251,7 @@ internal static class Sentences
     }
 
     /// <summary>Applies the display cap and reports what it cost, in one pass.</summary>
-    internal static (IReadOnlyList<T> Shown, IReadOnlyList<string> Disclosure) Cap<T>(
+    public static (IReadOnlyList<T> Shown, IReadOnlyList<string> Disclosure) Cap<T>(
         IReadOnlyList<T> items, int limit, string noun, string indent = "   ")
     {
         if (items.Count <= limit) return (items, []);

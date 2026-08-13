@@ -1,21 +1,27 @@
 namespace IronMarten.Bearing.Cli;
 
 /// <summary>
-/// Job B's sections: the claims, worded.
+/// Job B's sections: the claims, laid out.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Every sentence here is built from what the finding already carries. Nothing re-derives a
-/// number from the model, because a renderer that recomputes can disagree with the claim it is
-/// printing — and nothing decides whether a claim may be made, because suppression settled that
-/// before the set arrived.
+/// <b>The wording moved to <see cref="Claims"/> at A13 tier 2; the layout stayed here.</b> Every
+/// section used to weave the two together, which was fine for as long as one renderer printed
+/// them — the page then needed the same claims in a different shape, and a second copy of a
+/// sentence is a sentence that will disagree with itself. What is left in this file is the
+/// sequence, the headings, the caps and the two sections whose *structure* is the finding.
+/// </para>
+/// <para>
+/// Nothing here decides whether a claim may be made, because suppression settled that before the
+/// set arrived, and nothing re-derives a number from the model.
 /// </para>
 /// <para>
 /// <b>Where this deliberately differs from the probe</b>: defect 16 (the god-object sentence is
 /// chosen from the qualifier that actually holds), defect 17 (the coverage section asks the
-/// finding set instead of asserting an absence), defect 11's layer-span wording, and defect 3
-/// (every capped list says what it dropped). Everything else is the probe's voice, on purpose —
-/// so that a reader comparing the two sees one tool, and every difference is one that was chosen.
+/// finding set instead of asserting an absence), defect 11's layer-span wording, defect 3 (every
+/// capped list says what it dropped) and defect 32 (a verb agrees with a number a real solution
+/// made singular). Everything else is the probe's voice, on purpose — so that a reader comparing
+/// the two sees one tool, and every difference is one that was chosen.
 /// </para>
 /// </remarks>
 internal static class FindingSections
@@ -31,42 +37,7 @@ internal static class FindingSections
         if (found.Count == 0)
             yield return "   (none — no type's complexity stands that far above its peers)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            var member = type.MostComplexMember;
-            var times = finding.ValueOf("MaxMemberCyclomaticXMedian") ?? 0;
-            var percentile = finding.ValueOf("MaxMemberCyclomaticPctl") ?? 0;
-
-            // "Looks like plumbing" only holds when connectivity is low in ABSOLUTE terms. The
-            // gate is relative, so in a cohort where every member is heavily used "ordinary for
-            // its peers" still means widely depended on. Core decides which is true; this picks
-            // the words.
-            var opening = finding.Holds(Qualifiers.LowAbsoluteConnectivity)
-                ? "looks like plumbing but is "
-                : "connectivity is unremarkable for its peers, but it is ";
-
-            // The number that ranked the row leads the sentence. This section is ordered on the
-            // multiple of the peer median — the quantity `OutlierFactor` gated — and it used to
-            // open on the percentile, so nopCommerce printed "top 2%" above two rows reading
-            // "top 1%" and the section read as unsorted. An order the reader cannot see is not an
-            // order that helps them. Method level already reads this way, and the two are one
-            // finding at two granularities.
-            var claim = double.IsInfinity(times)
-                ? "the only complexity among "
-                : $"{Sentences.Number(times)}x the median internal complexity of ";
-
-            yield return $"   {Sentences.Member(type.Name, member?.Name ?? "")} — {opening}{claim}"
-                         + $"{Sentences.PeerGroup(type.Cohort, type.CohortSize)}. "
-                         + $"(top {Sentences.TopPercent(percentile)}; "
-                         + $"cc {type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
-                         + $"fan-in {type.FanIn}, fan-out {type.FanOut})";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> ConcealedDecisionAtMethodLevel(
@@ -79,28 +50,7 @@ internal static class FindingSections
         if (found.Count == 0)
             yield return "   (none — no method's complexity stands that far above its peers)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            var (type, member) = Member(model, finding.Subject);
-            if (type is null || member is null) continue;
-
-            var times = finding.ValueOf("CyclomaticXMedian") ?? 0;
-            var peers = finding.ValueOf("CohortSize") ?? 0;
-
-            var basis = double.IsInfinity(times)
-                ? "the only complexity among its "
-                : $"{Sentences.Number(times)}x the median complexity of its ";
-
-            yield return $"   {Sentences.Member(type.Name, member.Name)} — {basis}"
-                         + $"{Sentences.Whole(peers)} peers "
-                         + $"(cc {member.Cyclomatic}, dsm {member.Dsm}, "
-                         + $"nesting {member.MaxNestingDepth}, {member.LinesOfCode} lines) — "
-                         + $"{Path.GetFileName(member.Location.File)}:{member.Location.Line}";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> BlastRadius(SolutionModel model, FindingSet findings)
@@ -113,20 +63,7 @@ internal static class FindingSections
         if (found.Count == 0)
             yield return "   (none — nothing is both widely depended on and internally complex)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"   {type.Name} — {Sentences.Plural(type.FanIn, "distinct caller")} "
-                         + $"({Sentences.Number(finding.ValueOf("FanInXMedian") ?? 0)}x its peer median) and "
-                         + "internally complex. A bug here propagates widely. "
-                         + $"(cc {type.Cyclomatic}, fan-out {type.FanOut}, "
-                         + $"{Sentences.Plural(type.InboundReferenceCount, "call site")})";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> ChangeCost(SolutionModel model, FindingSet findings)
@@ -139,20 +76,7 @@ internal static class FindingSections
         if (found.Count == 0)
             yield return "   (none — no contract carries enough of the solution's callers)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"   {type.Name} — {Sentences.Plural(type.FanIn, "internal caller")} "
-                         + $"depend on this contract ({type.DataShape} fields/params of surface). "
-                         + "Changing it is a distributed edit, not a local one. "
-                         + "EXTERNAL consumers are not visible to this analysis. "
-                         + $"({type.Classification.Kind})";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> LoadBearing(SolutionModel model, FindingSet findings)
@@ -165,27 +89,7 @@ internal static class FindingSections
         var found = findings.OfKind(FindingKind.LoadBearingAndIntricate);
         if (found.Count == 0) yield return "   (none)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            // Effective fan-out excludes abstractions, so "depends on nothing" and "depends on
-            // nothing concrete" are different claims and the second one names the difference.
-            var dependsOn = type.EffectiveFanOut == 0
-                ? type.FanOut == 0 ? "nothing" : $"nothing concrete ({type.FanOut} abstractions/contracts)"
-                : type.EffectiveFanOut == type.FanOut
-                    ? $"{type.EffectiveFanOut}"
-                    : $"{type.EffectiveFanOut} concrete types ({type.FanOut} total)";
-
-            yield return $"   {type.Name} — instability {Sentences.Ratio(finding.ValueOf("Instability") ?? 0)}: "
-                         + $"{Sentences.Plural(type.FanIn, "type")} depend on it, it depends on {dependsOn}. "
-                         + $"And {type.MostComplexMember?.Name} is cc {type.MaxMemberCyclomatic}. "
-                         + "Hard to change safely, and intricate enough to hide a bug.";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> BreaksAlone(SolutionModel model, FindingSet findings)
@@ -197,20 +101,7 @@ internal static class FindingSections
         var found = findings.OfKind(FindingKind.BreaksAlone);
         if (found.Count == 0) yield return "   (none)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"   {type.Name} — instability {Sentences.Ratio(finding.ValueOf("Instability") ?? 0)}: "
-                         + $"only {Sentences.Plural(type.FanIn, "type")} "
-                         + $"{(type.FanIn == 1 ? "depends" : "depend")} on it. "
-                         + $"Complex inside (cc {type.MaxMemberCyclomatic}) but isolated — "
-                         + "if it breaks, it breaks alone.";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> HubsAndGodObjects(SolutionModel model, FindingSet findings)
@@ -229,19 +120,7 @@ internal static class FindingSections
         var found = findings.OfKind(FindingKind.HubOrGodObject);
         if (found.Count == 0) yield return "   (none)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"   {type.Name} [{type.Classification.Kind}] — "
-                         + $"fan-in {type.FanIn}, fan-out {type.FanOut}, "
-                         + $"instability {Sentences.Ratio(finding.ValueOf("Instability") ?? 0)}. "
-                         + Verdict(finding, type);
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
 
         if (found.Count > 0)
         {
@@ -249,50 +128,6 @@ internal static class FindingSections
             yield return "   does not make the flag wrong — those are exactly the things not to change";
             yield return "   lightly. Mark the known ones rather than tuning them away.";
         }
-    }
-
-    /// <summary>
-    /// Which danger this hub actually presents.
-    /// </summary>
-    /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §16.</b> The probe treats the two arms as one disjunction and
-    /// prints "AND carries real logic" whenever either fires — which is false by construction on
-    /// the size arm, since a type reaches it precisely by having bulk and no logic. The receipts
-    /// in the same sentence then refute the sentence: <i>"carries real logic (23 members, worst
-    /// method at cc 1)"</i>. Core carries the two as independent qualifiers, so the sentence is
-    /// chosen from what actually holds and cannot contradict its own evidence.
-    /// </remarks>
-    private static string Verdict(Finding finding, TypeNode type)
-    {
-        var logic = finding.Holds(Qualifiers.CarriesRealLogic);
-        var size = finding.Holds(Qualifiers.TooLargeToHold);
-        var worst = type.MostComplexMember;
-
-        if (!logic && !size)
-        {
-            return "Wiring hub: high coupling both ways but little logic inside "
-                   + $"(worst method cc {type.MaxMemberCyclomatic}). Risky to re-route, not to reason about.";
-        }
-
-        var what = (logic, size) switch
-        {
-            (true, true) => $"AND carries real logic in something too large to hold at once "
-                            + $"({type.MemberCount} members, worst method {worst?.Name} at cc "
-                            + $"{type.MaxMemberCyclomatic}, dsm {type.Dsm})",
-            (true, false) => $"AND carries real logic ({type.MemberCount} members, worst method "
-                             + $"{worst?.Name} at cc {type.MaxMemberCyclomatic}, dsm {type.Dsm})",
-            // The size arm alone. No claim about logic, because the receipts would refute it.
-            // docs/DEFECTS.md §29. "Too large for anyone to hold at once" was read as the
-            // report giving up rather than as a claim about the type — "anyone" has no clear
-            // referent, and this arm makes no logic claim to anchor it. Naming the shape says
-            // the same thing and cannot be read as an apology.
-            _ => $"AND is broad rather than deep ({type.MemberCount} members, no method above "
-                 + $"cc {type.MaxMemberCyclomatic}) — a lot to hold at once, but nothing "
-                 + "intricate inside it",
-        };
-
-        return "Architectural bottleneck: it both depends on and is depended on by much of "
-               + $"the system, {what}. Cross-domain orchestration and shared state tend to collect here.";
     }
 
     internal static IEnumerable<string> SharedMutableState(SolutionModel model, FindingSet findings)
@@ -304,19 +139,7 @@ internal static class FindingSections
         var found = findings.OfKind(FindingKind.SharedMutableState);
         if (found.Count == 0) yield return "   (none)";
 
-        var (shown, disclosure) = Sentences.Cap(found, model.Policy.Top, "nomination");
-
-        foreach (var finding in shown)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"   {type.Name} — {Sentences.Plural(type.StaticMutations, "write")} to static state, "
-                         + $"and {Sentences.Plural(type.FanIn, "type")} call into it. Whether these are "
-                         + "genuinely contended is a runtime question this analysis cannot answer — "
-                         + "but the sharing is certain from the code.";
-        }
-
-        foreach (var line in disclosure) yield return line;
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
     internal static IEnumerable<string> SpansArchitecturalLayers(SolutionModel model, FindingSet findings)
@@ -359,12 +182,14 @@ internal static class FindingSections
                              : "");
         }
 
+        // The one section whose rows are not one line, because §3.1 says the per-kind breakdown
+        // IS the finding. The headline is Claims'; everything under it is this section's.
         foreach (var finding in detailed)
         {
             if (model.Find(finding.Subject) is not { } type) continue;
 
-            yield return $"   {type.Name} [{type.Classification.Kind}] — reaches across "
-                         + $"{Sentences.Whole(finding.ValueOf("KindSpan") ?? 0)} kinds:";
+            var claim = Claims.For(model, finding);
+            yield return $"   {claim.Subject} — {claim.Sentence}:";
 
             foreach (var line in ByKind(model, finding, type)) yield return line;
 
@@ -430,12 +255,35 @@ internal static class FindingSections
             .Distinct(StringComparer.Ordinal)
             .OrderBy(k => k, StringComparer.Ordinal));
 
-    /// <summary>Resolves a member subject back to its declaring type and the member itself.</summary>
-    private static (TypeNode? Type, Member? Member) Member(SolutionModel model, SubjectRef subject)
+    /// <summary>
+    /// A capped list of nominations, as the terminal prints them.
+    /// </summary>
+    /// <remarks>
+    /// <b>The wording is <see cref="Claims"/>' and the layout is this file's</b>, which is the
+    /// split that lets the page make the same claims without borrowing the fixed-width shape they
+    /// were written for. The cap and its disclosure stay here because how many lines fit on a
+    /// screen is a property of this medium — <c>docs/DEFECTS.md</c> §3.
+    /// </remarks>
+    internal static IEnumerable<string> Rows(
+        SolutionModel model,
+        IReadOnlyList<Finding> found,
+        int top,
+        string indent = "   ",
+        string noun = "nomination")
     {
-        if (subject.DeclaringType is not { } declaring) return (null, null);
-        if (model.Find(declaring) is not { } type) return (null, null);
+        var (shown, disclosure) = Sentences.Cap(found, top, noun, indent);
 
-        return (type, type.Members.FirstOrDefault(m => m.Subject == subject));
+        foreach (var finding in shown)
+        {
+            var claim = Claims.For(model, finding);
+            if (!claim.Exists) continue;
+
+            var evidence = claim.Evidence.Length > 0 ? $" ({claim.Evidence})" : "";
+            var trailer = claim.Trailer.Length > 0 ? $" — {claim.Trailer}" : "";
+
+            yield return $"{indent}{claim.Subject} — {claim.Sentence}{evidence}{trailer}";
+        }
+
+        foreach (var line in disclosure) yield return line;
     }
 }

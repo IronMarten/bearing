@@ -33,22 +33,12 @@ internal static class CoverageSection
 
         if (globallyExtreme.Count > 0)
         {
-            var (shown, disclosure) = Sentences.Cap(globallyExtreme, model.Policy.Top, "type", "     ");
-
             yield return "";
             yield return "   Extreme against the WHOLE SOLUTION despite having no peer group.";
             yield return "   Weaker evidence — this compares unlike things — but not nothing:";
 
-            foreach (var finding in shown)
-            {
-                if (model.Find(finding.Subject) is not { } type) continue;
-
-                yield return $"     {type.Name} [{type.Classification.Kind}] — "
-                             + $"{string.Join(" and ", Claims(finding, type))}, "
-                             + "solution-wide. (no cohort to compare against)";
-            }
-
-            foreach (var line in disclosure) yield return line;
+            foreach (var line in FindingSections.Rows(model, globallyExtreme, model.Policy.Top, "     ", "type"))
+                yield return line;
         }
 
         var byFanIn = coverage
@@ -112,30 +102,6 @@ internal static class CoverageSection
         yield return $"   {alsoNominated} of them {(alsoNominated == 1 ? "does" : "do")} still appear "
                      + "in the nominations above:";
         yield return "   the findings that need no cohort judge a peerless type like any other.";
-    }
-
-    /// <summary>
-    /// Only the dimension that actually qualifies is stated.
-    /// </summary>
-    /// <remarks>
-    /// In a codebase where most types have no callers, a fan-in of zero lands at a high midrank
-    /// percentile — <i>"top 86% by fan-in, 0 callers"</i> is both absurd and corrosive. Core
-    /// decides which dimension survives that check and carries it as a qualifier; this only picks
-    /// the words for the ones that did.
-    /// </remarks>
-    private static IEnumerable<string> Claims(Finding finding, TypeNode type)
-    {
-        if (finding.Holds(Qualifiers.GloballyExtremeFanIn))
-        {
-            yield return $"top {Sentences.TopPercent(finding.ValueOf("GlobalFanInPctl") ?? 0)} by fan-in "
-                         + $"({Sentences.Plural(type.FanIn, "caller")})";
-        }
-
-        if (finding.Holds(Qualifiers.GloballyExtremeComplexity))
-        {
-            yield return $"top {Sentences.TopPercent(finding.ValueOf("GlobalMaxCcPctl") ?? 0)} by complexity "
-                         + $"(cc {type.MaxMemberCyclomatic} in {type.MostComplexMember?.Name})";
-        }
     }
 
 }

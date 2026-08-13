@@ -890,6 +890,38 @@ and everybody found `Nop.Plugin.Tax` by scrolling the list.
 
 
 **Fixed — the names go beside the diagram, not into it.** A picture cannot be searched, and a box that grows to fit its members is the thing the fold exists to prevent. `ArchitectureDiagram.Folded` shares `Title` with the boxes, so a legend cannot disagree with the label it explains. On nopCommerce it answers the question that was actually asked: *"CustomerRoles +6 holds Nop.Plugin.DiscountRules.CustomerRoles, …"*, and `Nop.Plugin.Tax` is findable in it.
+### 32. A verb agrees with a number a real solution made singular — **fixed**
+
+*"AzurePictureService — 7 writes to static state, and 1 type call into it."* Three sentences, one
+mistake, and the register already warned about it.
+
+**A3 met this once and reworded around it**: *"the other 1 are entangled too"* became a phrase with
+no verb in it, recorded with the note that *"the next such number is a defect waiting on the right
+input"*. It was three of them, all reachable on nopCommerce and none on TestBed:
+
+| Section | Shipped | Should read |
+|---|---|---|
+| Shared mutable state | `1 type call into it` — **6 of 19 rows** | `1 type calls into it` |
+| Change cost | `1 fields/params of surface` — `BaseEntity`, the section's opening row | `1 field/param of surface` |
+| Load-bearing | `1 type depend on it` | `1 type depends on it` |
+
+**Breaks alone got it right**, inline: `{(type.FanIn == 1 ? "depends" : "depend")}`. That is what
+makes this a missing helper rather than missing care — the same author wrote both, and the one that
+was correct is the one where the singular case had already been seen.
+
+**The remedy A3 chose does not scale, and that is the more useful half of this entry.** *Do not
+write a verb after a computed number* is a rule nobody can follow while writing the sentences this
+report is made of; `PRD-free-tier.md` §4 asks for sentences, not for phrases, and a report that
+avoids verbs to stay safe is a report that has stopped making claims.
+
+
+**Fixed — `Sentences.Do` and `Sentences.Surface`**, beside `Plural`, which is where a reader
+writing the next sentence will find them. Found while extracting the wording into `Claims` for A13
+tier 2: reading eleven sentences side by side is what made three of them visibly the same mistake,
+where each had looked fine in its own section. **The fixture cannot show any of it** — TestBed has
+no shared-mutable-state type with one caller and no contract with a one-field surface — so this
+ships asserted against a real run and named here as a hole, the way §24 was.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.

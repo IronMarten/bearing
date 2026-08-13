@@ -32,6 +32,10 @@ public static class Report
 
         foreach (var line in Header(model)) yield return line;
 
+        // A13 tier 2. Above every section, because the report already led with findings and the
+        // first line was still one of 1,091 rows of one kind.
+        foreach (var line in Highlights.For(model, findings)) yield return line;
+
         foreach (var line in FindingSections.ConcealedDecisionAtTypeLevel(model, findings)) yield return line;
         foreach (var line in FindingSections.ConcealedDecisionAtMethodLevel(model, findings)) yield return line;
         foreach (var line in FindingSections.BlastRadius(model, findings)) yield return line;
@@ -127,18 +131,8 @@ public static class Report
         if (logic.Count == 0)
             yield return "     (none — logic lives behind the boundary, which is what you want)";
 
-        var (shownLogic, logicDisclosure) = Sentences.Cap(logic, model.Policy.Top, "boundary", "     ");
-
-        foreach (var finding in shownLogic)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"     {type.Name} — {type.MostComplexMember?.Name} is cc "
-                         + $"{type.MaxMemberCyclomatic}. Business decisions at an external edge "
-                         + "are the hardest kind to change later.";
-        }
-
-        foreach (var line in logicDisclosure) yield return line;
+        foreach (var line in FindingSections.Rows(model, logic, model.Policy.Top, "     ", "boundary"))
+            yield return line;
 
         // Suppressed as a set when it stops discriminating, so an empty list here is a decision
         // rather than an absence of candidates — docs/DEFECTS.md §12. Saying nothing at all is
@@ -149,16 +143,7 @@ public static class Report
         yield return "";
         yield return "   WIDEST CONTRACT SURFACE — most to get wrong, most to break:";
 
-        var (shownSurfaces, surfaceDisclosure) = Sentences.Cap(surfaces, model.Policy.Top, "boundary", "     ");
-
-        foreach (var finding in shownSurfaces)
-        {
-            if (model.Find(finding.Subject) is not { } type) continue;
-
-            yield return $"     {type.Name} — {type.DataShape} fields/params across "
-                         + $"{Sentences.Plural(type.PublicMemberCount, "public member")}.";
-        }
-
-        foreach (var line in surfaceDisclosure) yield return line;
+        foreach (var line in FindingSections.Rows(model, surfaces, model.Policy.Top, "     ", "boundary"))
+            yield return line;
     }
 }
