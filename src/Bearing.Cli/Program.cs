@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text;
 using Microsoft.Build.Locator;
 
 namespace IronMarten.Bearing.Cli;
@@ -33,6 +34,8 @@ internal static class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        UseUtf8();
+
         var version = ToolInfo.ReadVersion(Assembly.GetExecutingAssembly());
 
         Invocation invocation;
@@ -116,6 +119,39 @@ internal static class Program
                 Console.Error.WriteLine($"Wrote {path}");
 
         return 0;
+    }
+
+    /// <summary>
+    /// Writes UTF-8, so the report says what it was written to say.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §25. Redirected to a file, <c>Console.Out</c> encodes through the
+    /// process code page, and on a Windows machine that is not UTF-8 every em dash in the report
+    /// best-fit-maps to an ASCII hyphen — 247 of them in one nopCommerce run, none surviving.
+    /// </para>
+    /// <para>
+    /// <b>The mangling is not the em dash.</b> Best-fit mapping is silent and lossy for anything
+    /// the code page cannot represent, and a character with no mapping becomes <c>?</c> — so a
+    /// nominated type named with a non-ASCII identifier is reported under a name the reader cannot
+    /// search for. Naming the component is the whole job of a finding.
+    /// </para>
+    /// <para>
+    /// Best effort: setting this fails on a host with no console attached, and a tool that refused
+    /// to run because it could not choose an encoding would be worse than one whose dashes are
+    /// hyphens. The file writers do not depend on it — they pass their own <see cref="UTF8Encoding"/>.
+    /// </para>
+    /// </remarks>
+    private static void UseUtf8()
+    {
+        try
+        {
+            Console.OutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+        }
+        catch (IOException)
+        {
+            // No console to configure. The report still renders; its dashes may not survive.
+        }
     }
 
     private static bool RegisterMSBuild()

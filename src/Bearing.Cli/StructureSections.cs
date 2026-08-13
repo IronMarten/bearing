@@ -202,9 +202,15 @@ internal static class StructureSections
         var steps = cycle.Path.Select(name).ToList();
         var loop = $"loop: {string.Join(" -> ", steps)} -> {steps[0]}";
 
+        // "N of the M" is the same idiom the membership line above uses, and it is phrased this
+        // way to dodge a verb: the first version read "the other 1 are entangled too" wherever a
+        // component was exactly one larger than its loop, which happened ten times across
+        // Jellyfin and nopCommerce and cannot happen on the fixture, whose two remainders are 2
+        // and 5. Agreeing a verb with a computed number is a defect waiting on the right input;
+        // not having one is not. A cycle is always two or more, so "all M" never has the problem.
         return cycle.PathCoversEveryMember
             ? loop
-            : $"{loop} — one loop of {steps.Count}; the other {cycle.Size - steps.Count} are entangled too";
+            : $"{loop} — {steps.Count} of the {cycle.Size}; all {cycle.Size} reach each other";
     }
 
     /// <summary>

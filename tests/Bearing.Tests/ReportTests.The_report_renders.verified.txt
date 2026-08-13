@@ -122,7 +122,7 @@ Every claim shows the numbers behind it.
    NAMESPACE CYCLES — mutually dependent namespaces cannot be layered,
    understood, or extracted independently:
      4 namespaces: TestBed.Core <-> TestBed.Core.Depots <-> TestBed.Core.Pricing <-> TestBed.Core.Vaults
-       loop: TestBed.Core -> TestBed.Core.Depots -> TestBed.Core — one loop of 2; the other 2 are entangled too
+       loop: TestBed.Core -> TestBed.Core.Depots -> TestBed.Core — 2 of the 4; all 4 reach each other
 
    PROJECT CYCLES — two projects each naming a type in the other. Legal
    MSBuild: only project references cannot cycle, and this is the type
@@ -132,7 +132,7 @@ Every claim shows the numbers behind it.
    TYPE TANGLES — 4+ types that all reach each other, so none of
    them can be tested or changed in isolation:
      8 types: AccessorialNormalizer, AddressNormalizer, RateNormalizer, ReferenceNormalizer, Router, ShipmentCoordinator, TrackingNormalizer, TransitNormalizer
-       loop: AccessorialNormalizer -> ShipmentCoordinator -> Router -> AccessorialNormalizer — one loop of 3; the other 5 are entangled too
+       loop: AccessorialNormalizer -> ShipmentCoordinator -> Router -> AccessorialNormalizer — 3 of the 8; all 8 reach each other
 
 -- SHARED MUTABLE STATE (no cohort required) -------------------
    (writes to static mutable state — every caller on every thread shares these)

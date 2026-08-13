@@ -91,6 +91,24 @@ Pinned: `Two_types_sharing_a_name_across_assemblies_merge_into_one_row` — a pi
 behaviour, not a guard on Core's. It asserts against the probe's run, and the probe cannot change,
 so it can never fire. It retires with the oracle at R2.
 
+> **The case where the difference decides something has now been observed — on nopCommerce, not
+> in the fixture.** `SPIKE-job-a-prior-art.md` §7 recorded the exact mechanism:
+> `Nop.Data.Mapping.BaseNameCompatibility` is a partial class in `Nop.Data` and is declared again
+> in the Avalara tax plugin, a deliberate nopCommerce extension pattern. Keyed by name the two
+> merge, the plugin's outbound references are attributed to `Nop.Data`, and the phantom edge closes
+> a **five-project cycle**: `Nop.Data → Nop.Plugin.Tax.Avalara → Nop.Services → Nop.Web →
+> Nop.Web.Framework`.
+>
+> Run at A3, Core reports **two rows and no project cycle**. Both declarations are present, each
+> attributed to the project that declares it — `type|Nop.Data|…` with fan-out 28 and
+> `type|Nop.Plugin.Tax.Avalara|…` with fan-out 2 — and a scan of all 3,209 types finds **exactly
+> one** FQN declared in two assemblies, which is the count the spike found by reading source.
+>
+> **This is an observation and not a regression test.** It does not run in CI and it will not fail
+> if the fix regresses. **P8 is still wanted**, and its justification is unchanged. What has moved
+> is that the fix is no longer only *asserted*: the thing it was supposed to prevent is measured as
+> absent, on the codebase where it was measured as present.
+
 ### 2. Absolute gates saturate; percentile gates do not — **one of three converted**
 
 Change cost fires on 7.9% of nopCommerce, hubs on 6.9% of Jellyfin, both truncated to 15 by
@@ -722,6 +740,33 @@ joins type and member with a dot.
 Cosmetic, one line, and **only visible on real code**: TestBed declares no constructor complex
 enough to be nominated, so no fixture case and no snapshot shows it. Related to §13, which is the
 same identity question one level deeper.
+
+### 25. A redirected report is transcoded through the process code page
+
+`bearing App.sln > report.txt` on a Windows machine whose code page is not UTF-8 encodes
+`Console.Out` through that code page. Every em dash in the report best-fit-maps to an ASCII
+hyphen: **247 of them in one nopCommerce run, and not one U+2014 survived**.
+
+**The em dash is not the problem.** Best-fit mapping is silent and lossy for anything the code
+page cannot represent, and a character with no mapping at all becomes `?`. A type named with a
+non-ASCII identifier — legal C#, and ordinary in a codebase that is not written in English — is
+then reported under a name the reader cannot search for. Naming the component is the whole job of
+a finding.
+
+**Invisible to the suite by construction, and not because the fixture is synthetic.** Every
+snapshot calls `Report.For` and asserts on the strings it returns; nothing in the suite goes
+through `Console.Out` at all, so the encoding boundary is not merely untested, it is not on the
+path under test. That is a different gap from the ones in `TESTING.md` §6 — those are inputs the
+fixture cannot contain, and this is a stage the harness does not execute.
+
+**Fixed at the same time it was found.** `Program.UseUtf8` sets `Console.OutputEncoding` before
+anything is written, best-effort: it throws where no console is attached, and a tool that refused
+to run because it could not choose an encoding would be worse than one whose dashes are hyphens.
+The file writers never depended on it — `JsonOutput` and `CsvOutput` pass their own
+`UTF8Encoding(false)`.
+
+Found by reading the *bytes* of a redirected run rather than the run, which is the only way this
+shows up: on screen the terminal renders whatever it was given and nothing looks wrong.
 
 ## How these were found
 

@@ -642,6 +642,24 @@ throughout, and could not have been otherwise.
 > `PolicySweepTests` cover the judgements. Nothing covered the inputs, and the gap ran from the
 > first commit to A2 with a green suite the whole way.
 
+**The second real run, after A3–A5, and it paid again.** Both solutions completed — no crash, no
+dangling edge in 27,028 emitted edges, no ragged row in 37,251 CSV rows, and the JSON parsed on
+both. Four things came out of it that the fixture could not have produced:
+
+| Found | Why the fixture could not show it |
+|---|---|
+| **D1's fix decides something, measured.** nopCommerce has exactly one FQN in two assemblies — the spike's `BaseNameCompatibility` — and Core reports two rows and **no project cycle** where name-keying fabricated a five-project one | the fixture's colliding pair has fan-in 0 and sits in no cycle, so merged and split give identical components. `DEFECTS.md` §1 called this out as still owed |
+| **A3's covering arm renders** — 7 of Jellyfin's 13 namespace loops and 8 of nopCommerce's 22 visit every member | both TestBed cycles are the partial case, so only the disclosing arm had ever rendered |
+| **"the other 1 are entangled too"** — a verb agreed with a computed number, ten times across the two runs | TestBed's two remainders are 2 and 5. Reworded to carry no verb rather than patched, since the next such number is a defect waiting on the right input |
+| **§25: a redirected report is transcoded through the code page** | *not a fixture gap at all* — every snapshot calls `Report.For` and asserts on the returned strings, so `Console.Out` is not on the path under test |
+
+> **The last row is a different kind of gap and worth separating.** The rows in the table above it
+> are inputs a synthetic fixture cannot contain. This one is a **stage the harness does not
+> execute**: the encoding boundary is not untested, it is absent from the test. Planting cannot
+> reach it and neither can a better fixture; only running the shipped binary and reading the bytes
+> can. It was found by reading bytes, not output — on screen the terminal renders what it is given
+> and nothing looks wrong.
+
 ### The complete inventory, measured in one pass
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
