@@ -13,6 +13,7 @@
     "top": 15,
     "highCc": 10,
     "minDecisionCc": 5,
+    "concealedTopRank": 3,
     "hubMin": 5,
     "godObjectMembers": 20,
     "minKindSpan": 3,

@@ -61,6 +61,29 @@ public sealed record AnalysisPolicy
     /// <summary>Below this, "concealed decision" contradicts itself — there is no decision.</summary>
     public int MinDecisionCc { get; init; } = 5;
 
+    /// <summary>
+    /// How far down its peer group a method may sit and still be a concealed decision: rank 1 is
+    /// the cohort's most complex method, and this admits that one and the next two.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A fixed rank, deliberately not a fraction.</b> <see cref="BlastTopFraction"/> and
+    /// <see cref="ChangeCostTopFraction"/> read a proportion of their population through
+    /// <see cref="Distribution.TopRankLimit"/>, and that is right for them because their
+    /// population is the whole solution and a proportion of it is the claim. Here the population
+    /// is one cohort, cohorts differ in size by three orders of magnitude, and a proportion of
+    /// the largest is not a short list: on nopCommerce the <c>suffix:Service</c> cohort holds
+    /// 2,909 methods, so a 1% limit admits 30 of them and a 5% limit admits 142.
+    /// </para>
+    /// <para>
+    /// A fixed rank also bounds the output by the <i>taxonomy</i> rather than by the codebase —
+    /// nominations land at roughly this many per qualifying cohort however large the solution is,
+    /// where a proportion grows with it. That is the whole reason this replaced a ratio: see
+    /// <c>MEASURE-concealed-decision.md</c>.
+    /// </para>
+    /// </remarks>
+    public int ConcealedTopRank { get; init; } = 3;
+
     // ------------------------------------------------------------------ shape ----
 
     /// <summary>Fan-in and fan-out both at or above this is a hub.</summary>
@@ -273,6 +296,7 @@ public sealed record AnalysisPolicy
         (nameof(Top), Top),
         (nameof(HighCc), HighCc),
         (nameof(MinDecisionCc), MinDecisionCc),
+        (nameof(ConcealedTopRank), ConcealedTopRank),
         (nameof(HubMin), HubMin),
         (nameof(GodObjectMembers), GodObjectMembers),
         (nameof(MinKindSpan), MinKindSpan),

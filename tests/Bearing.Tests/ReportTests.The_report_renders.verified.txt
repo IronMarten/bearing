@@ -15,12 +15,12 @@ Every claim shows the numbers behind it.
      Core · Ledgers.cs:36 · bug blast radius, and it is the only one
    ShipmentController — Post is cc 12. Business decisions at an external edge are the hardest kind to change later.
      Core · Controllers.cs:52 · boundary carries logic, 1 of 2
-   RoutingDepot — instability 0.8: only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.
-     Core · Depots.cs:49 · breaks alone, 1 of 2
    ShipmentLedger — instability 0: 11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.
      Core · Ledgers.cs:36 · load-bearing and intricate, 1 of 2
    QuoteAssembler — 2 writes to static state, and 0 types call into it. Whether these are genuinely contended is a runtime question this analysis cannot answer — but the sharing is certain from the code.
      Core · QuoteAssembler.cs:9 · shared mutable state, 1 of 2
+   RoutingDepot — instability 0.8: only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.
+     Core · Depots.cs:49 · breaks alone, 1 of 3
    NormalizationContext — 20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis.
      Core · Contracts.cs:25 · change cost, 1 of 3
    ShipmentCoordinator [Internal] — fan-in 7, fan-out 7, instability 0.3. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
@@ -28,7 +28,7 @@ Every claim shows the numbers behind it.
    ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.
      Core · Controllers.cs:52 · concealed decision, 1 of 5
    TariffCalculator.Apply — 22x the median complexity of its 33 peers
-     Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 12
+     Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 10
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
      Core · AuthenticationMiddleware.cs:8 · spans architectural layers, 1 of 14
 
@@ -53,8 +53,6 @@ Every claim shows the numbers behind it.
    AuthenticationMiddleware.Authenticate — 5x the median complexity of its 8 peers (cc 5, dsm 2, nesting 1, 12 lines) — AuthenticationMiddleware.cs:13
    MethodReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:188
    RateReconciler.Reconcile — 4.33x the median complexity of its 9 peers (cc 13, dsm 0, nesting 1, 20 lines) — Reconcilers.cs:120
-   AuditReconciler.Reconcile — 3.67x the median complexity of its 9 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:154
-   TariffReconciler.Reconcile — 3.67x the median complexity of its 9 peers (cc 11, dsm 0, nesting 1, 18 lines) — Reconcilers.cs:89
    GuaranteedServiceNormalizer.Normalize — 3.5x the median complexity of its 8 peers (cc 21, dsm 15, nesting 4, 57 lines) — GuaranteedServiceNormalizer.cs:6
 
 -- BUG BLAST RADIUS --------------------------------------------
@@ -91,6 +89,7 @@ Every claim shows the numbers behind it.
    (complex, but almost nothing depends on it — the reassuring message)
    RoutingDepot — instability 0.8: only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.
    SurchargeEvaluator — instability 0.8: only 1 type depends on it. Complex inside (cc 11) but isolated — if it breaks, it breaks alone.
+   TariffReconciler — instability 0.833: only 1 type depends on it. Complex inside (cc 11) but isolated — if it breaks, it breaks alone.
 
 -- HUBS AND GOD OBJECTS (no cohort required) -------------------
    (fan-in AND fan-out both >= 5 — a ratio cannot see these, since

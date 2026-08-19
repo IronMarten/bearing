@@ -29,14 +29,38 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// <summary>The probe's cap, lifted past anything the fixture can produce.</summary>
     private static Options Uncapped => new() { Top = 500 };
 
+    /// <summary>
+    /// Method-level concealed decisions are the probe's, <b>less the ones a rank gate refuses</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The probe gates on the multiple of the peer median alone, and that is the defect measured
+    /// in <c>MEASURE-concealed-decision.md</c>: a cohort median of 1 makes <c>3x median</c>
+    /// evaluate to 3, so <c>MinDecisionCc</c> decides the nomination and the count grows with the
+    /// size of the codebase. On nopCommerce it produced 1,091 nominations of which the report can
+    /// show 15. Core adds <see cref="AnalysisPolicy.ConcealedTopRank"/>: a method must also be one
+    /// of the three most complex in its cohort.
+    /// </para>
+    /// <para>
+    /// The difference is asserted as a set, in one direction, for the same reason
+    /// <see cref="Breaks_alone_diverges_from_the_probe_by_exactly_the_defect_fifteen_fix"/> does:
+    /// a regression that emptied the finding would satisfy "Core says fewer" just as well.
+    /// <c>AuditReconciler.Reconcile</c> and <c>TariffReconciler.Reconcile</c> both sit at 3.667x
+    /// their peer median and both rank fourth or worse within it — the two the ratio admits and
+    /// the rank refuses. Nothing is added, because a narrower gate cannot nominate.
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void Method_level_concealed_decisions_are_the_probes()
+    public void Method_level_concealed_decisions_are_the_probes_less_what_rank_refuses()
     {
-        var expected = ProbeNominations("-- CONCEALED DECISION, METHOD LEVEL");
-        var actual = CoreNominations(FindingKind.ConcealedDecisionMethod);
+        var probeSaid = ProbeNominations("-- CONCEALED DECISION, METHOD LEVEL");
+        var coreSays = CoreNominations(FindingKind.ConcealedDecisionMethod);
 
-        Assert.Equal(expected, actual);
-        Assert.NotEmpty(actual);
+        Assert.NotEmpty(coreSays);
+        Assert.Empty(coreSays.Except(probeSaid, StringComparer.Ordinal));
+        Assert.Equal(
+            ["AuditReconciler.Reconcile", "TariffReconciler.Reconcile"],
+            probeSaid.Except(coreSays, StringComparer.Ordinal).Order(StringComparer.Ordinal));
     }
 
     [Fact]
@@ -77,7 +101,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
             .Select(f => f.Subject.Canonical)
             .ToHashSet(StringComparer.Ordinal);
 
-        Assert.Equal(7, byMethod.Except(byType, StringComparer.Ordinal).Count());
+        Assert.Equal(5, byMethod.Except(byType, StringComparer.Ordinal).Count());
     }
 
     /// <summary>
@@ -750,26 +774,37 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.Equal(
             ["MethodReconciler", "RoutingDepot", "SurchargeEvaluator", "TariffReconciler"],
             probeSaid);
-        Assert.Equal(["RoutingDepot", "SurchargeEvaluator"], coreSays);
+        Assert.Equal(["RoutingDepot", "SurchargeEvaluator", "TariffReconciler"], coreSays);
 
-        // The difference is entirely the fix, in one direction only: Core removes two claims and
+        // The difference is entirely the fix, in one direction only: Core removes one claim and
         // adds none. A suppression is allowed to silence, never to nominate.
+        //
+        // It removed two until ConcealedTopRank landed. TariffReconciler.Reconcile is no longer a
+        // concealed decision — it ranks fourth in its cohort — so the suppression that hid this
+        // row no longer reaches it, and Core now agrees with the probe about it. The suppression
+        // did not change; the finding it keys on did.
         Assert.Equal(
-            ["MethodReconciler", "TariffReconciler"],
+            ["MethodReconciler"],
             probeSaid.Except(coreSays, StringComparer.Ordinal).Order(StringComparer.Ordinal));
         Assert.Empty(coreSays.Except(probeSaid, StringComparer.Ordinal));
 
-        // And it is the method-level nomination doing it, which is the whole of §15. Neither is
-        // nominated at type level, so the probe's query could not have found them however it was
-        // ordered.
+        // And it is the method-level nomination doing it, which is the whole of §15. It is not
+        // nominated at type level either, so the probe's query could not have found it however it
+        // was ordered.
         var detected = Analysis.Detected(core.Model);
-        foreach (var name in (string[])["MethodReconciler", "TariffReconciler"])
-        {
-            var subject = core.Model.Types.Single(t => t.Name == name).Subject;
+        var methodReconciler = core.Model.Types.Single(t => t.Name == "MethodReconciler").Subject;
 
-            Assert.True(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, subject));
-            Assert.False(detected.Contains(FindingKind.ConcealedDecisionType, subject));
-        }
+        Assert.True(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, methodReconciler));
+        Assert.False(detected.Contains(FindingKind.ConcealedDecisionType, methodReconciler));
+
+        // TariffReconciler is the control for the other direction, and it is why this test moved:
+        // it has no method-level nomination for the suppression to key on, so nothing withdraws
+        // its breaks-alone row and Core keeps it. If a future change re-nominates it, the row
+        // disappears again and the set assertion above is what catches it.
+        var tariffReconciler = core.Model.Types.Single(t => t.Name == "TariffReconciler").Subject;
+
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, tariffReconciler));
+        Assert.False(detected.Contains(FindingKind.ConcealedDecisionType, tariffReconciler));
     }
 
     /// <summary>
@@ -829,6 +864,13 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// catches: <c>ReconciliationController</c> is a boundary with a caller, and
     /// <c>AuditReconciler</c> is unreferenced and not a boundary. Without these two, either row
     /// could be deleted and the surviving set would not move.
+    /// <para>
+    /// <c>AuditReconciler</c> only became row 3's case when
+    /// <see cref="AnalysisPolicy.ConcealedTopRank"/> landed. It ranks fourth in its cohort, so it
+    /// is no longer a concealed decision, so row 2 no longer reaches it first — and the row-3-only
+    /// case this test previously recorded as *missing* now exists. The rows did not change; the
+    /// finding one of them keys on did.
+    /// </para>
     /// </remarks>
     [Fact]
     public void The_boundary_and_unreferenced_rows_are_not_the_same_rule()
@@ -838,12 +880,12 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         Assert.True(boundaryWithCallers.FanIn >= core.Model.Policy.BreaksAloneMinFanIn);
         Assert.Equal("breaks-alone-at-a-boundary", SilencingRuleFor(boundaryWithCallers.Name));
 
-        // And the case row 3 would catch alone does not exist: AuditReconciler is unreferenced
-        // and not a boundary, but it is a concealed decision, so row 2 reaches it first.
+        // And row 3 has a case it catches alone: AuditReconciler is unreferenced, not a boundary,
+        // and no longer a concealed decision, so no earlier row reaches it.
         var unreferencedNonBoundary = core.Model.Types.Single(t => t.Name == "AuditReconciler");
         Assert.NotEqual("ApiBoundary", unreferencedNonBoundary.Classification.Kind);
         Assert.Equal(0, unreferencedNonBoundary.FanIn);
-        Assert.Equal("breaks-alone-decides-something", SilencingRuleFor(unreferencedNonBoundary.Name));
+        Assert.Equal("breaks-alone-is-unreferenced", SilencingRuleFor(unreferencedNonBoundary.Name));
     }
 
     /// <summary>
@@ -1062,10 +1104,17 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// The fixture ties, so the tiebreak above is exercised rather than merely present.
     /// </summary>
     /// <remarks>
-    /// Two pairs of reconcilers tie at method level — 4.333 and 3.667 times their peer median —
-    /// and a tie group is where a non-total sort key hides. Without one, deleting the
-    /// <c>ThenBy</c> on identity would change nothing and the ordering test would still pass.
+    /// One pair of reconcilers ties at method level — 4.333 times their peer median — and a tie
+    /// group is where a non-total sort key hides. Without one, deleting the <c>ThenBy</c> on
+    /// identity would change nothing and the ordering test would still pass.
     /// Only method level ties: the type-level gap is recorded in <c>FixtureCoverageTests</c>.
+    /// <para>
+    /// There were two pairs until <see cref="AnalysisPolicy.ConcealedTopRank"/> landed. The
+    /// 3.667x pair ranked fourth and fifth in its cohort and the rank gate refuses both, which
+    /// takes the tie with it. One pair is still enough to exercise the tiebreak, but the margin
+    /// is now one pair rather than two — if a later gate change takes this one too, the tiebreak
+    /// stops being exercised and this test is what says so.
+    /// </para>
     /// </remarks>
     [Fact]
     public void The_fixture_ties_method_level_findings()
@@ -1075,7 +1124,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
             .Select(f => f.ValueOf("CyclomaticXMedian"))
             .ToList();
 
-        Assert.Equal(2, ranks.Count - ranks.Distinct().Count());
+        Assert.Equal(1, ranks.Count - ranks.Distinct().Count());
     }
 
     // --------------------------------------------------------------------- adapters ----

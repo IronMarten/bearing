@@ -68,12 +68,28 @@ public static class ConcealedDecision
                 if (complexity.Read(member.Cyclomatic) is not { } reading) continue;
                 if (reading.TimesMedian < policy.OutlierFactor) continue;
 
+                // Rank is the gate the ratio could not be. A multiple of a cohort median that
+                // sits on the floor is not an outlier test: nopCommerce's method medians are 1
+                // in 56 of 70 cohorts, so `3x median` evaluates to 3, `cc >= 5` decides 82% of
+                // nominations by itself, and the count then grows with the size of the codebase
+                // rather than with how unusual anything is — 1,091 nominations on one solution,
+                // of which the report can show 15.
+                //
+                // It is added to the ratio rather than replacing it, and that is deliberate.
+                // Replacing it widens the finding in the other direction: a method at rank 1 of
+                // a cohort whose median is already high clears the rank bar while being twice
+                // its peers rather than many times them, and the fixture has three of those
+                // (FindingEquivalenceTests). The conjunction is strictly narrower than either
+                // half, which is what was measured. MEASURE-concealed-decision.md.
+                if (reading.Rank > policy.ConcealedTopRank) continue;
+
                 found.Add((reading.TimesMedian, member.Cyclomatic, new Finding(
                     new FindingKey(FindingKind.ConcealedDecisionMethod, member.Subject),
                     [
                         Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
                         Receipt.Gated("Cyclomatic", member.Cyclomatic, nameof(AnalysisPolicy.MinDecisionCc)),
                         Receipt.Gated("CyclomaticXMedian", reading.TimesMedian, nameof(AnalysisPolicy.OutlierFactor)),
+                        Receipt.Gated("CyclomaticRank", reading.Rank, nameof(AnalysisPolicy.ConcealedTopRank)),
                         Receipt.Of("CyclomaticPctl", reading.Percentile),
                         Receipt.Of("Dsm", member.Dsm),
                         Receipt.Of("MaxNestingDepth", member.MaxNestingDepth),

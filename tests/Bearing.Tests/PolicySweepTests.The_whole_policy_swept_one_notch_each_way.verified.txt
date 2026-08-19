@@ -9,6 +9,7 @@ MinFanIn                             5       1   -          moves
 Top                                 15       1   -          -
 HighCc                              10       1   -          -
 MinDecisionCc                        5       1   -          moves
+ConcealedTopRank                     3       1   moves      moves
 HubMin                               5       1   -          moves
 GodObjectMembers                    20       1   -          -
 MinKindSpan                          3       1   -          moves

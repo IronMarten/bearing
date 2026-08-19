@@ -360,13 +360,17 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
             ["AuditReconciler", "DetentionEvaluator", "ShipmentController"],
             unreferenced.Select(t => t.Name).Order(StringComparer.Ordinal));
 
-        // DetentionEvaluator is the one that is neither, so row 3 is the only rule that reaches
-        // it. The other two are still taken first, which is why the row was dead before.
+        // DetentionEvaluator and AuditReconciler are the ones that are neither, so row 3 is the
+        // only rule that reaches them. ShipmentController is still taken first, by row 1.
+        //
+        // AuditReconciler joined them when ConcealedTopRank landed: it ranks fourth in its cohort,
+        // so it is no longer a concealed decision and row 2 no longer takes it. The row is further
+        // from dead than it was, not closer.
         Assert.Equal(
-            ["DetentionEvaluator"],
+            ["AuditReconciler", "DetentionEvaluator"],
             unreferenced
                 .Where(t => !IsConcealed(t) && t.Classification.Kind is not ("ApiBoundary" or "ExternalCall" or "Contract"))
-                .Select(t => t.Name));
+                .Select(t => t.Name).Order(StringComparer.Ordinal));
     }
 
     /// <summary>

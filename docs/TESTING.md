@@ -700,7 +700,7 @@ nopCommerce showed is that the *rule* was wrong, and no fixture could have said 
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
 every session. This is the whole of it, measured rather than reasoned, by two sweeps over the
-**26 named policy values** (`AnalysisPolicy.Values`, pinned in `AnalysisPolicyTests`) and every
+**27 named policy values** (`AnalysisPolicy.Values`, pinned in `AnalysisPolicyTests`) and every
 gate in every Core detector.
 
 **Method.** *Leave-one-out*: delete each gate in turn and see whether anything notices — this asks
@@ -779,12 +779,13 @@ Read it there.
 > workspace load, which is the suite's cost centre, and it is the price of the table being measured
 > instead of remembered.
 
-**11 of 26 decide something at one notch; 15 do not.** The rows worth a sentence beyond the
+**12 of 27 decide something at one notch; 15 do not.** The rows worth a sentence beyond the
 snapshot:
 
 | Value | Read by | Note |
 |---|---|---|
 | `OutlierFactor` 3.0 | §3.2, §3.3 | nominations sit at 3.5×–22×; nothing is near the bar |
+| `ConcealedTopRank` 3 | §3.3 | moves both ways — the gate that replaced the ratio as the binding one; see `MEASURE-concealed-decision.md` |
 | `HighCc` 10 | §3.6, §3.7, §3.8, §3.10 | complexity is bimodal — cc 1 or cc 11+ |
 | `GodObjectMembers` 20 | §3.8 | `DispatchRegistry` at 23 is the only case; observable at ±4, not ±1 |
 | `ConcealedFanInCeiling` 2.0 | §3.2 | every nominee is at 0 or infinity, never between |
