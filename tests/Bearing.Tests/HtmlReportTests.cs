@@ -366,4 +366,41 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
             directory.Delete(recursive: true);
         }
     }
+
+    // ------------------------------------------------------------------ defect 27 ----
+
+    /// <summary>
+    /// The receipts table is reachable only where a reader asked for everything, and it says it is
+    /// evidence rather than an explanation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §27, settled at A13 tier 3.</b> The pane was headed <i>"why this
+    /// fired"</i> — the promise of an explanation over a table of 65 field names, which
+    /// participants said left them understanding less than before. The names stay unchanged,
+    /// because they are the join to the threshold table at the foot of the page and renaming them
+    /// would break the one thing the pane is good for. What changed is where it lives and what it
+    /// claims to be.
+    /// </para>
+    /// <para>
+    /// <b>Asserted as an absence on the default page as well as a presence on <c>--full</c></b>,
+    /// because half of this fix is tier 4's and a page that started rendering cards again would
+    /// undo it silently.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_receipts_table_is_evidence_and_only_where_it_was_asked_for()
+    {
+        // The threshold table at the foot is also a <details> and is on both pages on purpose,
+        // so this names the pane rather than the element.
+        Assert.DoesNotContain("The receipts behind this claim", Page, StringComparison.Ordinal);
+        Assert.DoesNotContain("Why this fired", FullPage, StringComparison.Ordinal);
+
+        Assert.Contains("<summary>The receipts behind this claim</summary>", FullPage, StringComparison.Ordinal);
+        Assert.Contains("evidence rather than an explanation", FullPage, StringComparison.Ordinal);
+
+        // The names themselves are deliberately not translated — this is what makes the table
+        // checkable against the policy, and it is why the pane moved rather than being reworded.
+        Assert.Contains("MaxMemberCyclomatic", FullPage, StringComparison.Ordinal);
+    }
 }

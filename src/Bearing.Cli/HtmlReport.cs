@@ -726,7 +726,19 @@ public static class HtmlReport
 
         if (finding.Receipts.Count > 0)
         {
-            page.Append("<details>\n<summary>Why this fired</summary>\n");
+            // docs/DEFECTS.md §27, settled by A13 tier 3. The pane used to be headed "Why this
+            // fired", which promises the explanation — and participants who opened it understood
+            // LESS than before, because what it delivers is 65 field names. Two things changed and
+            // neither is a rename of the sixty-five: tier 4 took the whole enumeration off the
+            // default page, so nobody meets this without asking for it, and the summary now says
+            // what the table is. A reader checking a claim wants these names unchanged, because
+            // they are the join to the threshold table at the foot of the page; a reader trying to
+            // understand the finding was never supposed to be sent here.
+            page.Append("<details>\n<summary>The receipts behind this claim</summary>\n");
+            page.Append("<p class=\"sub\">The tool's own field names, unchanged, so a number here can be matched ");
+            page.Append("to the thresholds at the foot of the page and checked against the code. These are ");
+            page.Append("evidence rather than an explanation — the sentence above is the claim, and nothing in ");
+            page.Append("this table adds to it.</p>\n");
             page.Append("<table class=\"receipts\">\n<tr><th>Measured</th><th class=\"n\">Value</th><th>Had to clear</th></tr>\n");
 
             foreach (var receipt in finding.Receipts)

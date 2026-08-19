@@ -807,7 +807,7 @@ remedy is the same, and it is a label rather than a redesign.
 **Fixed, and half of it was a correctness fix rather than a labelling one.** The addresses stay joined; the comparison gets its own line and says it is one.
 
 **The half that was not reported**: the peer group printed on *every* card, including the cohort-free findings. §3.6–§3.9 carry *"no cohort required"* in their own headings, so those cards claimed a relative reading their finding never made — §17's mistake in a different element, and on the fixture it is **74 of 107 cards**. The gate is the detector's own gated `CohortSize` receipt rather than a list of kinds kept in the renderer, and the split it produces is right on inspection: change cost names no peer group because X2 made it solution-wide, and coverage does because the peer group is its whole subject. `HtmlReportTests.A_card_names_a_peer_group_only_where_the_finding_used_one`.
-### 27. `Why this fired` publishes 65 internal identifiers
+### 27. `Why this fired` publishes 65 internal identifiers — **settled**
 
 The receipts table renders `Measured / Value / Had to clear` as raw policy and metric field names.
 Across one nopCommerce run that is **65 distinct identifiers** shown to the reader —
@@ -824,6 +824,33 @@ prints `MaxMemberCyclomaticPctl` in a table.
 the pane told them, participants reported understanding **less** after expanding it than before —
 *"I have no idea what that is, but it seems like a big number. Is that a problem?"* A disclosure
 that reduces comprehension is not a disclosure.
+
+
+**Settled at A13 tier 3, and the answer is what the pane is *for* rather than what it is called.**
+Held deliberately until then, because deciding it twice is how the two decisions disagree.
+
+**The table is a receipt, not an explanation, and the page is now built that way.** Two changes,
+neither of which is a translation of the sixty-five:
+
+- **Tier 4 took the enumeration off the default page**, so the pane exists only under `--full`.
+  Nobody meets it without having asked for every finding, which is the point at which a reader is
+  auditing rather than orienting. That is most of the fix, and it shipped before this entry was
+  answered.
+- **The summary says what the table is** — *"the receipts behind this claim"*, over a line saying
+  the names are the tool's own, kept unchanged so a number can be matched to the threshold table at
+  the foot of the page, and that the sentence above is the claim. *"Why this fired"* promised the
+  explanation and delivered field names; that promise is the defect, and it is the half a rename
+  can fix.
+
+**What was considered and rejected**, all three for the reason `TASKS.md` recorded when it held
+this entry: translating 65 identifiers is a vocabulary to maintain and to drift, dropping the table
+loses the receipts that let a reader check a claim against the code, and a curated subset is a
+standing choice about which gates are explainable. The unchanged names are the join to
+`AnalysisPolicy`; renaming them here would break the one thing the pane is good for.
+
+**The reader who wanted an explanation is now served above it** — the annotated card names what
+each line of a finding is for, and the per-kind census says what every kind means. Whether that
+lands is A11 round 2's question, not this entry's.
 
 ### 28. A ratio against a zero median renders as `∞` — **fixed**
 
