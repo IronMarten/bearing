@@ -166,7 +166,18 @@ public static class Mosaic
         ArgumentNullException.ThrowIfNull(findings);
 
         var (named, leading) = Marks(model, findings);
-        return new MosaicMarks(named.Count, leading.Count);
+
+        // The share of the DRAWN AREA the tint covers, which is not the share of the cells — cell
+        // area is lines of code, and the types a finding names are systematically the large ones.
+        // On nopCommerce that is 17% of the types holding 58% of the code, and a caption that reads
+        // the count out over a picture drawn by size is telling a reader something the picture in
+        // front of them contradicts. docs/TESTING.md's third real run measured this for the mark
+        // rule; this is the same measurement, offered so the caption can state it instead of
+        // walking into it.
+        var lines = (double)model.Types.Sum(t => t.LinesOfCode);
+        var tinted = model.Types.Where(t => named.Contains(t.Subject.Canonical)).Sum(t => t.LinesOfCode);
+
+        return new MosaicMarks(named.Count, leading.Count, lines > 0 ? tinted / lines : 0);
     }
 
     /// <summary>
@@ -499,4 +510,10 @@ public static class Mosaic
 /// Types the report leads with — <see cref="Selection.Exemplars"/>, and a subset of
 /// <paramref name="Named"/>.
 /// </param>
-public readonly record struct MosaicMarks(int Named, int Leading);
+/// <param name="NamedInk">
+/// The share of the drawn area those named cells cover, from 0 to 1. <b>It is not
+/// <paramref name="Named"/> over the type count and the gap is the point</b>: area is lines of
+/// code, findings select large components, and on nopCommerce 17% of the types are 58% of the ink.
+/// A caption stating a count over a picture drawn by size is contradicted by the picture.
+/// </param>
+public readonly record struct MosaicMarks(int Named, int Leading, double NamedInk);

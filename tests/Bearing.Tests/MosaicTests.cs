@@ -235,4 +235,45 @@ public sealed class MosaicTests(CoreWalkFixture core)
             .Where(t => t is not null)
             .Select(t => t!.Subject.Canonical)
     ];
+
+    /// <summary>
+    /// The caption states the tinted <i>area</i> as well as the tinted <i>count</i>, because they
+    /// are not the same number and the reader can see the difference.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The measurement that forced this.</b> On nopCommerce <b>17% of the types are named and
+    /// they hold 58% of the code</b>, so a caption reading the count out over a picture drawn by
+    /// size tells a reader something the picture in front of them contradicts — and the first
+    /// reader to try to synthesise a claim from the drawing produced three wrong ones, every one of
+    /// them the area encoding read exactly as drawn: the biggest project looked worst and is the
+    /// <i>least</i> dense, the densest project went unmentioned because it is small, and a project
+    /// at 26% read as <i>"almost all of it"</i>.
+    /// </para>
+    /// <para>
+    /// <b>This pins the disclosure, not the encoding.</b> Whether area should mean lines of code at
+    /// all is A11 round 2's question — <c>PROTOCOL-a11-newcomer.md</c> §12 pre-registers the three
+    /// misreads and what each outcome decides. Until then the page says what it is doing rather
+    /// than hoping the reader compensates.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_caption_says_the_tinted_area_is_not_the_tinted_count()
+    {
+        var findings = Analysis.FindingsFor(core.Model);
+        var marks = Mosaic.Marked(core.Model, findings);
+
+        var byCount = (double)marks.Named / core.Model.Types.Count;
+
+        Assert.True(
+            marks.NamedInk > byCount,
+            "the fixture no longer paints more ink than cells, so this asserts nothing");
+
+        var page = HtmlReport.Render(
+            core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+
+        Assert.Contains("counting types", page, StringComparison.Ordinal);
+        Assert.Contains(
+            $"they cover {Math.Round(100 * marks.NamedInk):0}% of the picture", page, StringComparison.Ordinal);
+    }
 }

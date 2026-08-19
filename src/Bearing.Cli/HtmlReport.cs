@@ -120,6 +120,10 @@ public static class HtmlReport
         page.Append("</div>\n");
     }
 
+    /// <summary>A share of one, as a whole percentage.</summary>
+    private static string Percent(double share) =>
+        $"{Sentences.Whole(Math.Round(100 * share))}%";
+
     // ---------------------------------------------------------------------- picture ----
 
     /// <summary>
@@ -166,15 +170,34 @@ public static class HtmlReport
 
         page.Append("<p class=\"lede\">");
 
+        // And the count is said as a count, because the picture is not drawn in counts. Claiming
+        // 83% is "the pale area" is a claim the reader can see is false — the pale area is 42% —
+        // so the gap is stated instead of asserted away. It is the same measurement the mark rule
+        // needed at tier 1, one level up: findings select large components, so a tint that is true
+        // cell by cell covers more of the drawing than of the codebase.
         if (clean is { } share)
-            page.Append($"<strong>{Html.Text(share.Value)} of this codebase has nothing said about it</strong> — ")
-                .Append("that is the pale area, and it is most of the picture. ");
+            page.Append($"<strong>{Html.Text(share.Value)} of this codebase has nothing said about it</strong>, ")
+                .Append("counting types. ")
+                .Append($"The pale area is smaller than that — cells are sized by lines of code and the components ")
+                .Append($"a finding names are the large ones, so they cover {Html.Text(Percent(marks.NamedInk))} of ")
+                .Append("the picture. ");
 
         if (concentration is { } where)
             page.Append("<strong>What is named clusters rather than spreading</strong>: ")
                 .Append($"{Html.Text(where.Subject)} carries {Html.Text(where.Value)} its share of them. ");
 
-        page.Append("Both are above, as numbers; this is what they look like.</p>\n");
+        // The third sentence, and the one the picture cannot draw — see Foundations. A reader
+        // assembling this by eye reads tinted AREA, which is lines of code, and area is not the
+        // quantity any claim on this page is about. So the two numbers that decide "where will this
+        // hurt me" are stated: what the most of the codebase rests on, and how much of that is
+        // named. Never their product, which would be a severity model with no unit.
+        if (Foundations.Of(model, findings) is { } rests)
+            page.Append($"<strong>{Html.Text(rests.Project)} is what the most of it rests on</strong> — ")
+                .Append($"{Html.Count(rests.Dependents)} types outside it reach in, and ")
+                .Append($"{Html.Text(rests.Share)} of its own {Html.Count(rests.Types)} are named. ");
+
+        page.Append("Those are above as numbers, or beside the picture; this is what they look ")
+            .Append("like.</p>\n");
 
         page.Append($"<p class=\"sub\">Every one of the {Html.Count(model.Types.Count)} types this run analysed, ");
         page.Append("one cell each, sized by how many lines it spans and grouped into the project that declares it — ");
