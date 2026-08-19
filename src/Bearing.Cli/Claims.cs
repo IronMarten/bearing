@@ -258,8 +258,7 @@ public static class Claims
 
         return new Claim(
             type.Name,
-            $"instability {Sentences.Ratio(finding.ValueOf("Instability") ?? 0)}: "
-            + $"{Sentences.Plural(type.FanIn, "type")} "
+            $"{Sentences.Plural(type.FanIn, "type")} "
             + $"{Sentences.Do(type.FanIn, "depends", "depend")} on it, it depends on {dependsOn}. "
             + $"And {type.MostComplexMember?.Name} is cc {type.MaxMemberCyclomatic}. "
             + "Hard to change safely, and intricate enough to hide a bug.",
@@ -273,8 +272,7 @@ public static class Claims
 
         return new Claim(
             type.Name,
-            $"instability {Sentences.Ratio(finding.ValueOf("Instability") ?? 0)}: "
-            + $"only {Sentences.Plural(type.FanIn, "type")} "
+            $"only {Sentences.Plural(type.FanIn, "type")} "
             + $"{Sentences.Do(type.FanIn, "depends", "depend")} on it. "
             + $"Complex inside (cc {type.MaxMemberCyclomatic}) but isolated — "
             + "if it breaks, it breaks alone.",
@@ -288,8 +286,7 @@ public static class Claims
 
         return new Claim(
             $"{type.Name} [{type.Classification.Kind}]",
-            $"fan-in {type.FanIn}, fan-out {type.FanOut}, "
-            + $"instability {Sentences.Ratio(finding.ValueOf("Instability") ?? 0)}. "
+            $"fan-in {type.FanIn}, fan-out {type.FanOut}. "
             + Verdict(finding, type),
             "",
             "");

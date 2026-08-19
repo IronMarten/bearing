@@ -31,9 +31,6 @@ public static class Sentences
     public static string Number(double value) =>
         double.IsInfinity(value) ? "undefined" : value.ToString("0.##", CultureInfo.InvariantCulture);
 
-    /// <summary>Three decimal places at most — instability, where the third digit carries meaning.</summary>
-    public static string Ratio(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
-
     /// <summary>Whole numbers, invariant.</summary>
     public static string Whole(double value) =>
         value.ToString("0", CultureInfo.InvariantCulture);

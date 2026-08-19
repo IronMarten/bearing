@@ -114,7 +114,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="card lead">
 <h4>ShipmentLedger</h4>
 <p class="where">Core · Ledgers.cs:36</p>
-<p class="claim">instability 0: 11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.</p>
+<p class="claim">11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.</p>
 <p class="sub"><strong>Load-bearing and intricate</strong> — Much depends on it, it depends on little, and it is intricate enough to hide a bug. 2 of these were found; this is the strongest.</p>
 </div>
 <div class="card lead">
@@ -126,7 +126,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="card lead">
 <h4>RoutingDepot</h4>
 <p class="where">Core · Depots.cs:49</p>
-<p class="claim">instability 0.8: only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.</p>
+<p class="claim">only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.</p>
 <p class="sub"><strong>Breaks alone</strong> — Structurally isolated and unstable — it can break on its own, without anything else changing. 3 of these were found; this is the strongest.</p>
 </div>
 <div class="card lead">
@@ -139,7 +139,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="card lead">
 <h4>ShipmentCoordinator [Internal]</h4>
 <p class="where">Core · ShipmentCoordinator.cs:5</p>
-<p class="claim">fan-in 7, fan-out 7, instability 0.3. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.</p>
+<p class="claim">fan-in 7, fan-out 7. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.</p>
 <p class="sub"><strong>Hub or god object</strong> — Depends on, and is depended on by, much of the system. 3 of these were found; this is the strongest.</p>
 </div>
 <div class="card lead">
