@@ -922,6 +922,57 @@ where each had looked fine in its own section. **The fixture cannot show any of 
 no shared-mutable-state type with one caller and no contract with a one-field surface — so this
 ships asserted against a real run and named here as a hole, the way §24 was.
 
+### 33. A boundary finding fires on a third of the boundaries it filters
+
+`BoundaryMarking.CarryingRealLogic` gates on `maxMemberCyclomatic >= HighCc (10)`, absolute, with
+no cohort and no distribution behind it. Measured 2026-08-18: it fires on **19.5% of nopCommerce's
+672 boundaries and 33.3% of jellyfin's 174**.
+
+**A gate that names a third of the population it filters is describing that population rather than
+finding an anomaly in it.** The counts themselves are printable — 131 and 58 — so this is not the
+volume defect that 1,091 concealed decisions were. It is a selectivity defect, and it is worse for
+being invisible: a reader has no way to know that *"boundaries carrying real logic"* means *"a
+third of the boundaries"* here and a fifth somewhere else.
+
+The same constant also means different things per solution. The median `maxMemberCyclomatic` among
+boundaries is **2 on nopCommerce and 5 on jellyfin**, so `HighCc = 10` is five times the median in
+one and twice it in the other, and nothing in the output says so.
+
+**The rule this breaks is written twelve lines above it in its own file.** The remarks on
+`ExternalSurface`'s sibling finding, at `BoundaryMarking.cs:73-76`, state that the section prints
+only when it discriminates and suppresses when the qualifying set exceeds half the boundaries. That
+principle was articulated for one finding and not applied to `CarryingRealLogic` immediately above
+it; at 33.3% this gate is two thirds of the way to its sibling's stated absurdity threshold.
+
+The fix is the shape defect 2 wants everywhere: gate on rank within the boundary population rather
+than on an absolute constant. Rank forms measured at the same time — top 5% admits 34 on
+nopCommerce and 9 on jellyfin; top 10% admits 68 and 17. The private `MEASURE-concealed-decision.md`
+§10 carries the sensitivity tables.
+
+### 34. A cohort of 2,909 is not a peer group
+
+Cohorts are assigned by name suffix, base type, namespace or kind, and at the top end they swallow
+the solution. `suffix:Service` holds **2,909 of nopCommerce's 9,219 method-like members — 53% of
+everything analysed**; `suffix:Factory` holds 1,307; jellyfin's `suffix:Manager` holds 1,284. Three
+cohorts of 500 or more produced 58% of all concealed-decision nominations before the rank gate
+landed.
+
+**The claim is arithmetically true and rhetorically false.** *"93× the median complexity of its
+2,909 peers"* presents a global ranking as a peer comparison. The whole argument for
+percentile-within-cohort is that it makes heterogeneous components comparable by asking a local
+question; a cohort that is half the codebase has stopped asking one.
+
+**The rank gate limited the damage without fixing this.** `ConcealedTopRank` admits 2 methods from
+`suffix:Service` where a proportional 5% limit would admit 142, so the *count* is now survivable
+while the *claim* is unchanged. That is worth stating plainly because the volume symptom is gone
+and the correctness defect is not.
+
+This is `ARCHITECTURE.md` §11's thresholds-global-versus-calibrated question arriving at the cohort
+end rather than the threshold end, so it belongs with the decision recorded as X3 in the private
+board rather than being repaired locally. Candidate remedies, none measured: a cohort-size ceiling
+with fallback to a finer basis, or refusing a bare name-suffix basis when the suffix covers more
+than some share of the solution.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.
