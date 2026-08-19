@@ -35,6 +35,18 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:.6rem;padding:.9rem 1rem;margin:.6rem 0}
 .card>h4{margin:0 0 .15rem;font-size:1rem}
 .card.lead{border-left:3px solid var(--accent)}
+.anat,.row{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:.35rem 1rem;align-items:baseline}
+.anat{margin:1.5rem 0 .5rem}
+.lbl{text-align:right;color:var(--accent);font-size:.72rem;line-height:1.3}
+.fld{min-width:0}
+.anat .name{font-size:1.3rem;margin-right:.5rem}
+.name{font-weight:600}
+.rail{margin:1.5rem 0 0;border-top:1px solid var(--line)}
+.row{padding:.9rem 0;border-bottom:1px solid var(--line)}
+.kind{display:block;color:var(--accent);font-size:.76rem;line-height:1.25}
+.rank{display:block;color:var(--muted);font-size:.72rem}
+.big{font-size:1.05rem;line-height:1.45;max-width:52ch}
+@media(max-width:38rem){.anat,.row{grid-template-columns:1fr;gap:.2rem}.lbl{text-align:left}}
 .claim{margin:.15rem 0 .5rem}
 .where{color:var(--muted);font-size:.82rem;font-family:var(--mono)}
 .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0 0}
@@ -48,7 +60,7 @@ summary:hover{color:var(--accent)}
 .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.6rem .85rem;border-radius:0 .4rem .4rem 0;margin:.75rem 0;font-size:.9rem}
 .loop{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:.15rem 0 .6rem}
 footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
-@media print{body{background:#fff}.card,.tile{break-inside:avoid}details{display:none}}
+@media print{body{background:#fff}.card,.tile,.anat,.row{break-inside:avoid}details{display:none}}
 </style>
 </head>
 <body>
@@ -98,71 +110,56 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <p class="sub">Every one of the 145 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding below is about 48 of them, which is the tint; <strong>the 9 outlined in red are where to start</strong>. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
 <p class="sub">Those are one per kind of finding this run made, <em>ordered by how uncommon each kind is in this codebase</em> — which is an ordering and not a severity, because the tool has no way to say a hub is worse than a cycle: ShipmentLedger, ShipmentController, ShipmentLedger, QuoteAssembler, RoutingDepot, NormalizationContext, ShipmentCoordinator, ShipmentController, TariffCalculator, AuthenticationMiddleware, LayeringArchive.</p>
 <p class="sub">2 project(s) are on the picture but too small to hold a name at this size: Data, Tools.</p>
-<h2>Start here</h2>
-<p class="lede">10 claims, one for each kind of risk this run found, <em>ordered by how uncommon each kind is in this codebase</em>. That is an ordering and not a severity — this tool has no way to say a hub is worse than a cycle, and does not pretend to. Each one is the strongest row of its section.</p>
-<div class="card lead">
-<h4>ShipmentLedger</h4>
-<p class="where">Core · Ledgers.cs:36</p>
-<p class="claim">11 distinct callers (11x its peer median) and internally complex. A bug here propagates widely.</p>
-<p class="sub mono">cc 18, fan-out 0, 22 call sites</p>
-<p class="sub"><strong>Bug blast radius</strong> — Widely depended on relative to its peers, and internally complex. A defect here propagates. This is the only one in this codebase.</p>
+<h2>Top finding</h2>
+<p class="lede">The strongest row of the rarest kind this run found. 10 kinds fired and each has one claim below, <em>ordered by how uncommon each kind is in this codebase</em> — an ordering and not a severity, because this tool has no way to say a hub is worse than a cycle.</p>
+<div class="anat">
+<div class="lbl">what it is called<br>and what kind</div>
+<div class="fld"><b class="name">ShipmentLedger</b><span class="tag">Bug blast radius</span><span class="sub">the only one in this codebase</span></div>
+<div class="lbl">where to open it</div>
+<div class="fld where">Core · Ledgers.cs:36</div>
+<div class="lbl">what we think it means</div>
+<div class="fld"><p class="claim big">11 distinct callers (11x its peer median) and internally complex. A bug here propagates widely.</p><p class="sub"><strong>Bug blast radius</strong> — Widely depended on relative to its peers, and internally complex. A defect here propagates.</p></div>
+<div class="lbl">the numbers behind it</div>
+<div class="fld"><p class="sub mono">cc 18, fan-out 0, 22 call sites</p></div>
 </div>
-<div class="card lead">
-<h4>ShipmentController</h4>
-<p class="where">Core · Controllers.cs:52</p>
-<p class="claim">Post is cc 12. Business decisions at an external edge are the hardest kind to change later.</p>
-<p class="sub"><strong>Boundary carries logic</strong> — A boundary type carrying real logic — the place where an outside caller reaches decision-making directly. 2 of these were found; this is the strongest.</p>
+<p class="sub">The other 9, in the same order — one per kind, each the strongest row of its own.</p>
+<div class="rail">
+<div class="row">
+<div class="lbl"><span class="kind">Boundary carries logic</span><span class="rank">1 of 2</span></div>
+<div class="fld"><b class="name">ShipmentController</b><p class="where">Core · Controllers.cs:52</p><p class="claim">Post is cc 12. Business decisions at an external edge are the hardest kind to change later.</p></div>
 </div>
-<div class="card lead">
-<h4>ShipmentLedger</h4>
-<p class="where">Core · Ledgers.cs:36</p>
-<p class="claim">11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.</p>
-<p class="sub"><strong>Load-bearing and intricate</strong> — Much depends on it, it depends on little, and it is intricate enough to hide a bug. 2 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Load-bearing and intricate</span><span class="rank">1 of 2</span></div>
+<div class="fld"><b class="name">ShipmentLedger</b><p class="where">Core · Ledgers.cs:36</p><p class="claim">11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.</p></div>
 </div>
-<div class="card lead">
-<h4>QuoteAssembler</h4>
-<p class="where">Core · QuoteAssembler.cs:9</p>
-<p class="claim">2 writes to static state, and 0 types call into it. Whether these are genuinely contended is a runtime question this analysis cannot answer — but the sharing is certain from the code.</p>
-<p class="sub"><strong>Shared mutable state</strong> — Writes to static mutable state. Every caller on every thread shares it. 2 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Shared mutable state</span><span class="rank">1 of 2</span></div>
+<div class="fld"><b class="name">QuoteAssembler</b><p class="where">Core · QuoteAssembler.cs:9</p><p class="claim">2 writes to static state, and 0 types call into it. Whether these are genuinely contended is a runtime question this analysis cannot answer — but the sharing is certain from the code.</p></div>
 </div>
-<div class="card lead">
-<h4>RoutingDepot</h4>
-<p class="where">Core · Depots.cs:49</p>
-<p class="claim">only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.</p>
-<p class="sub"><strong>Breaks alone</strong> — Structurally isolated and unstable — it can break on its own, without anything else changing. 3 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Breaks alone</span><span class="rank">1 of 3</span></div>
+<div class="fld"><b class="name">RoutingDepot</b><p class="where">Core · Depots.cs:49</p><p class="claim">only 1 type depends on it. Complex inside (cc 12) but isolated — if it breaks, it breaks alone.</p></div>
 </div>
-<div class="card lead">
-<h4>NormalizationContext</h4>
-<p class="where">Core · Contracts.cs:25</p>
-<p class="claim">20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis.</p>
-<p class="sub mono">Contract</p>
-<p class="sub"><strong>Change cost</strong> — Changing this means changing a lot of callers, judged against the whole solution. 3 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Change cost</span><span class="rank">1 of 3</span></div>
+<div class="fld"><b class="name">NormalizationContext</b><p class="where">Core · Contracts.cs:25</p><p class="claim">20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis.</p></div>
 </div>
-<div class="card lead">
-<h4>ShipmentCoordinator [Internal]</h4>
-<p class="where">Core · ShipmentCoordinator.cs:5</p>
-<p class="claim">fan-in 7, fan-out 7. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.</p>
-<p class="sub"><strong>Hub or god object</strong> — Depends on, and is depended on by, much of the system. 3 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Hub or god object</span><span class="rank">1 of 3</span></div>
+<div class="fld"><b class="name">ShipmentCoordinator [Internal]</b><p class="where">Core · ShipmentCoordinator.cs:5</p><p class="claim">fan-in 7, fan-out 7. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (16 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.</p></div>
 </div>
-<div class="card lead">
-<h4>ShipmentController.Post</h4>
-<p class="where">Core · Controllers.cs:52</p>
-<p class="claim">looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.</p>
-<p class="sub mono">top 6%; cc 12, dsm 4, fan-in 0, fan-out 5</p>
-<p class="sub"><strong>Concealed decision</strong> — Looks like plumbing, but is far more complex than its peers — and is probably tested like plumbing. 5 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Concealed decision</span><span class="rank">1 of 5</span></div>
+<div class="fld"><b class="name">ShipmentController.Post</b><p class="where">Core · Controllers.cs:52</p><p class="claim">looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.</p></div>
 </div>
-<div class="card lead">
-<h4>TariffCalculator.Apply</h4>
-<p class="where">Core · TariffCalculator.cs:9</p>
-<p class="claim">22x the median complexity of its 33 peers</p>
-<p class="sub mono">cc 22, dsm 0, nesting 2, 30 lines</p>
-<p class="sub"><strong>Concealed decision, method level</strong> — The same claim about one method. This is the primary level, not a drill-down of the one above. 10 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Concealed decision, method level</span><span class="rank">1 of 10</span></div>
+<div class="fld"><b class="name">TariffCalculator.Apply</b><p class="where">Core · TariffCalculator.cs:9</p><p class="claim">22x the median complexity of its 33 peers</p></div>
 </div>
-<div class="card lead">
-<h4>AuthenticationMiddleware [ApiBoundary]</h4>
-<p class="where">Core · AuthenticationMiddleware.cs:8</p>
-<p class="claim">reaches across 3 kinds</p>
-<p class="sub"><strong>Spans architectural layers</strong> — Named for one concern, reaching across several — it is doing cross-cutting work whatever it is called. 14 of these were found; this is the strongest.</p>
+<div class="row">
+<div class="lbl"><span class="kind">Spans architectural layers</span><span class="rank">1 of 14</span></div>
+<div class="fld"><b class="name">AuthenticationMiddleware [ApiBoundary]</b><p class="where">Core · AuthenticationMiddleware.cs:8</p><p class="claim">reaches across 3 kinds</p></div>
+</div>
 </div>
 <h2>Orientation</h2>
 <h3>The shape of it</h3>
@@ -222,7 +219,23 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <li>Every dependency found had both endpoints in the analysed set.</li>
 </ul>
 <h2>Everything else</h2>
-<p class="lede">This run made 63 findings across 11 kinds, and the page above leads with the strongest of each. <strong>The rest are not hidden and not summarised away</strong> — they are in the exports, which carry every finding, every type, every member and every dependency:</p>
+<p class="lede">This run made 63 findings across 11 kinds, and the page above leads with the strongest of each.</p>
+<h3>What fired, and what each kind means</h3>
+<p class="sub">Every kind this run found, rarest first — the same ordering the claims above use, and for the same reason it is not a severity.</p>
+<ul class="sub">
+<li><strong>1 Bug blast radius</strong> — Widely depended on relative to its peers, and internally complex. A defect here propagates.</li>
+<li><strong>2 Boundary carries logic</strong> — A boundary type carrying real logic — the place where an outside caller reaches decision-making directly.</li>
+<li><strong>2 Load-bearing and intricate</strong> — Much depends on it, it depends on little, and it is intricate enough to hide a bug.</li>
+<li><strong>2 Shared mutable state</strong> — Writes to static mutable state. Every caller on every thread shares it.</li>
+<li><strong>3 Breaks alone</strong> — Structurally isolated and unstable — it can break on its own, without anything else changing.</li>
+<li><strong>3 Change cost</strong> — Changing this means changing a lot of callers, judged against the whole solution.</li>
+<li><strong>3 Hub or god object</strong> — Depends on, and is depended on by, much of the system.</li>
+<li><strong>5 Concealed decision</strong> — Looks like plumbing, but is far more complex than its peers — and is probably tested like plumbing.</li>
+<li><strong>10 Concealed decision, method level</strong> — The same claim about one method. This is the primary level, not a drill-down of the one above.</li>
+<li><strong>14 Spans architectural layers</strong> — Named for one concern, reaching across several — it is doing cross-cutting work whatever it is called.</li>
+<li><strong>18 No peer group</strong> — Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.</li>
+</ul>
+<p class="lede"><strong>None of them is hidden and none is summarised away</strong> — every one is in the exports, which carry every finding, every type, every member and every dependency:</p>
 <ul class="sub">
 <li><span class="mono">--json</span> — the whole model, with a schema version, for anything that reads it back.</li>
 <li><span class="mono">--csv</span> — <span class="mono">types.csv</span>, <span class="mono">members.csv</span> and <span class="mono">edges.csv</span>, which join on identity rather than on a name.</li>

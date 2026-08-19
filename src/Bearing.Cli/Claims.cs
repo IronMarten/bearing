@@ -358,14 +358,44 @@ public static class Claims
     /// headline rather than the whole claim — which is the one place a tier 2 item is deliberately
     /// less than the section it points at, and the reason it points at it.
     /// </remarks>
+    /// <summary>
+    /// The one claim whose evidence is a breakdown rather than a row of measurements.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>TECHREQ-job-b.md</c> §3.1 says the per-kind breakdown <i>is</i> the finding</b>, and
+    /// until A13 tier 3 the record carried none of it: the claim was <i>"reaches across 3
+    /// kinds"</i> and the kinds themselves existed only in the terminal section's own loop. That
+    /// was invisible while the page rendered ten equal cards and became the whole of the lead card
+    /// the day one of them was enlarged — on nopCommerce this is the finding the rarest-first rule
+    /// selects, so the page's screenshot frame carried a claim with no numbers under it.
+    /// <b>Counts here, names in the section</b>: the two are the same breakdown at two
+    /// granularities, ordered the same way, and neither re-derives the other's ordering.
+    /// </remarks>
     private static Claim LayerSpan(SolutionModel model, Finding finding)
     {
         if (model.Find(finding.Subject) is not { } type) return Claim.None;
 
+        var byKind = finding.Participants
+            .Select(model.Find)
+            .Where(t => t is not null)
+            .GroupBy(t => t!.Classification.Kind, StringComparer.Ordinal)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(t => t!.Name).Distinct(StringComparer.Ordinal).Count(),
+                StringComparer.Ordinal);
+
+        var kinds = new SortedSet<string>(byKind.Keys, StringComparer.Ordinal);
+
+        // The type's own role counts toward the span where the span exceeds what its dependencies
+        // reach — the component is cross-cutting partly by being where it is. The section words
+        // that as "itself"; so does this, for the same reason a count of one would be a lie.
+        if ((finding.ValueOf("KindSpan") ?? 0) > byKind.Count) kinds.Add(type.Classification.Kind);
+
         return new Claim(
             $"{type.Name} [{type.Classification.Kind}]",
             $"reaches across {Sentences.Whole(finding.ValueOf("KindSpan") ?? 0)} kinds",
-            "",
+            string.Join(", ", kinds.Select(k =>
+                byKind.TryGetValue(k, out var count) ? $"{count} {k}" : $"{k} itself")),
             "");
     }
 

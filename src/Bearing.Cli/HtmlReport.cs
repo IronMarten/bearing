@@ -206,9 +206,11 @@ public static class HtmlReport
     {
         var leading = Selection.Exemplars(findings)
             .Where(f => Claims.IsRiskClaim(f.Kind))
+            .Select(f => (Finding: f, Claim: Claims.For(model, f)))
+            .Where(x => x.Claim.Exists)
             .ToList();
 
-        page.Append("<h2>Start here</h2>\n");
+        page.Append("<h2>Top finding</h2>\n");
 
         if (leading.Count == 0)
         {
@@ -217,58 +219,122 @@ public static class HtmlReport
             return;
         }
 
-        page.Append($"<p class=\"lede\">{Html.Count(leading.Count)} claims, one for each kind of risk this run found, ");
-        page.Append("<em>ordered by how uncommon each kind is in this codebase</em>. That is an ordering and not a ");
-        page.Append("severity — this tool has no way to say a hub is worse than a cycle, and does not pretend to. ");
-        page.Append("Each one is the strongest row of its section.</p>\n");
+        page.Append("<p class=\"lede\">The strongest row of the rarest kind this run found. ");
+        page.Append($"{Html.Count(leading.Count)} {Sentences.Do(leading.Count, "kind", "kinds")} fired and each has ");
+        page.Append("one claim below, <em>ordered by how uncommon each kind is in this codebase</em> — an ordering ");
+        page.Append("and not a severity, because this tool has no way to say a hub is worse than a cycle.</p>\n");
 
-        foreach (var finding in leading)
-        {
-            var claim = Claims.For(model, finding);
-            if (!claim.Exists) continue;
+        Annotated(page, model, findings, leading[0].Finding, leading[0].Claim);
 
-            var type = model.Find(finding.Subject)
-                       ?? (finding.Subject.DeclaringType is { } d ? model.Find(d) : null);
-            var total = findings.OfKind(finding.Kind).Count;
+        if (leading.Count == 1) return;
 
-            page.Append("<div class=\"card lead\">\n");
-            page.Append($"<h4>{Html.Text(claim.Subject)}</h4>\n");
+        page.Append($"<p class=\"sub\">The other {Html.Count(leading.Count - 1)}, in the same order — one per kind, ");
+        page.Append("each the strongest row of its own.</p>\n");
 
-            // Where it is. The claim's own location wins where it has one — a member-level finding
-            // knows where the member is, and sending a reader to the top of the file instead is
-            // docs/DEFECTS.md §24's mistake in a different element.
-            if (type is not null)
-            {
-                var at = claim.Trailer.Length > 0
-                    ? claim.Trailer
-                    : type.Location.IsKnown
-                        ? $"{Path.GetFileName(type.Location.File)}:{Html.Count(type.Location.Line)}"
-                        : "";
-
-                page.Append($"<p class=\"where\">{Html.Text(type.Project)}");
-                if (at.Length > 0) page.Append($" · {Html.Text(at)}");
-                page.Append("</p>\n");
-            }
-
-            page.Append($"<p class=\"claim\">{Html.Text(claim.Sentence)}</p>\n");
-
-            if (claim.Evidence.Length > 0)
-                page.Append($"<p class=\"sub mono\">{Html.Text(claim.Evidence)}</p>\n");
-
-            // What kind this is, and how many more of it there are. A lead item with no count reads
-            // as the only one of its kind — true of layer span on nopCommerce and false of the
-            // 1,091 concealed decisions, and telling those apart is the whole job of this section.
-            page.Append("<p class=\"sub\">");
-            page.Append($"<strong>{Html.Text(Claims.KindName(finding.Kind))}</strong> — ");
-            page.Append(Html.Text(Claims.KindBlurb(finding.Kind)));
-            page.Append(total == 1
-                ? " This is the only one in this codebase."
-                : $" {Html.Count(total)} of these were found; this is the strongest.");
-            page.Append("</p>\n");
-
-            page.Append("</div>\n");
-        }
+        page.Append("<div class=\"rail\">\n");
+        foreach (var (finding, claim) in leading.Skip(1))
+            Row(page, model, findings, finding, claim);
+        page.Append("</div>\n");
     }
+
+    /// <summary>
+    /// The lead finding, with its own anatomy labelled — A13 tier 3, candidate E.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The gutter teaches the card once, and the card is the screenshot frame.</b> A11 round 1's
+    /// whole feedback was <i>"I don't know what I'm supposed to get out of it"</i> — not that the
+    /// claims were wrong, and not that the components were misplaced: participants navigated
+    /// correctly and did not know why any of it mattered. Four labels naming what each line of one
+    /// card is for cost four short phrases and are the cheapest thing on the page that attacks
+    /// comprehension directly. The brief's B1 puts a single finding card in the frame, so this is
+    /// the part that has to stand alone when it is pasted into a thread with no page around it.
+    /// </para>
+    /// <para>
+    /// <b>The kind's definition sits under the claim on this card and nowhere else in this
+    /// section.</b> It reads as a repetition beside a strong claim — <i>"a defect here
+    /// propagates"</i> under <i>"341 distinct callers and internally complex"</i> — and as the whole
+    /// interpretation beside a terse one: layer span's claim on nopCommerce is <i>"reaches across 3
+    /// kinds"</i>, which is evidence rather than meaning. Once is the cost of the second case; ten
+    /// times was the wall of text.
+    /// </para>
+    /// </remarks>
+    private static void Annotated(
+        StringBuilder page, SolutionModel model, FindingSet findings, Finding finding, Claim claim)
+    {
+        page.Append("<div class=\"anat\">\n");
+
+        Label(page, "what it is called<br>and what kind");
+        page.Append($"<div class=\"fld\"><b class=\"name\">{Html.Text(claim.Subject)}</b>");
+        page.Append($"<span class=\"tag\">{Html.Text(Claims.KindName(finding.Kind))}</span>");
+        page.Append($"<span class=\"sub\">{Html.Text(Rank(findings, finding))}</span></div>\n");
+
+        if (Subjects.Where(model, finding, claim.Trailer) is { Length: > 0 } where)
+        {
+            Label(page, "where to open it");
+            page.Append($"<div class=\"fld where\">{Html.Text(where)}</div>\n");
+        }
+
+        Label(page, "what we think it means");
+        page.Append($"<div class=\"fld\"><p class=\"claim big\">{Html.Text(claim.Sentence)}</p>");
+        page.Append($"<p class=\"sub\"><strong>{Html.Text(Claims.KindName(finding.Kind))}</strong> — ");
+        page.Append($"{Html.Text(Claims.KindBlurb(finding.Kind))}</p></div>\n");
+
+        if (claim.Evidence.Length > 0)
+        {
+            Label(page, "the numbers behind it");
+            page.Append($"<div class=\"fld\"><p class=\"sub mono\">{Html.Text(claim.Evidence)}</p></div>\n");
+        }
+
+        page.Append("</div>\n");
+    }
+
+    /// <summary>
+    /// One claim per remaining kind, against the same gutter the card taught.
+    /// </summary>
+    /// <remarks>
+    /// <b>The teaching column goes back to work as a kind and rank rail.</b> Nine cards of equal
+    /// weight are a list a reader scrolls; nine rows whose left column names the kind and says how
+    /// many more of it there are is a list a reader scans — and it is the same 148 pixels, so the
+    /// page has one grid rather than two layouts. What a row drops against the card is the
+    /// evidence line and the kind's definition, which is the brief's C1: one claim deep, the rest
+    /// listed. Every kind's definition is still on the page, once each, in <c>Everything else</c>.
+    /// </remarks>
+    private static void Row(
+        StringBuilder page, SolutionModel model, FindingSet findings, Finding finding, Claim claim)
+    {
+        page.Append("<div class=\"row\">\n");
+
+        page.Append($"<div class=\"lbl\"><span class=\"kind\">{Html.Text(Claims.KindName(finding.Kind))}</span>");
+        page.Append($"<span class=\"rank\">{Html.Text(Rank(findings, finding))}</span></div>\n");
+
+        page.Append($"<div class=\"fld\"><b class=\"name\">{Html.Text(claim.Subject)}</b>");
+
+        if (Subjects.Where(model, finding, claim.Trailer) is { Length: > 0 } where)
+            page.Append($"<p class=\"where\">{Html.Text(where)}</p>");
+
+        page.Append($"<p class=\"claim\">{Html.Text(claim.Sentence)}</p></div>\n");
+
+        page.Append("</div>\n");
+    }
+
+    private static void Label(StringBuilder page, string what) =>
+        page.Append($"<div class=\"lbl\">{what}</div>\n");
+
+    /// <summary>
+    /// Which of its kind this is, and how many there are.
+    /// </summary>
+    /// <remarks>
+    /// <b>A lead item with no count reads as the only one of its kind</b> — true of layer span on
+    /// nopCommerce and false of the 103 concealed decisions, and telling those apart is the whole
+    /// triage this section performs. The two renderers word it differently on purpose: the terminal
+    /// runs it into a line of prose, and here it is a chip and a rail entry with nothing around it
+    /// to carry the grammar.
+    /// </remarks>
+    private static string Rank(FindingSet findings, Finding finding) =>
+        findings.OfKind(finding.Kind).Count is var total && total == 1
+            ? "the only one in this codebase"
+            : $"1 of {Html.Count(total)}";
 
     /// <summary>
     /// Where the rest is — tier 4, which was already built.
@@ -287,9 +353,33 @@ public static class HtmlReport
         var kinds = findings.All.Select(f => f.Kind).Distinct().Count();
 
         page.Append($"<p class=\"lede\">This run made {Html.Count(findings.Count)} findings across ");
-        page.Append($"{Html.Count(kinds)} kinds, and the page above leads with the strongest of each. ");
-        page.Append("<strong>The rest are not hidden and not summarised away</strong> — they are in the exports, ");
-        page.Append("which carry every finding, every type, every member and every dependency:</p>\n");
+        page.Append($"{Html.Count(kinds)} kinds, and the page above leads with the strongest of each.</p>\n");
+
+        // A13 tier 3's headline: per-kind counts and what each kind means, which is where the
+        // within-solution baseline becomes visible. 103 concealed decisions against 3,209 types is
+        // a different statement from 103 against 300, and until this shipped the page said neither
+        // — the count of a kind was only ever visible beside the one row that led it.
+        //
+        // Rarest first, from the same selection the claims above use, so the page has one ordering
+        // rather than two. Coverage is in this list and not in that one: a census of what fired is
+        // exactly where a disclosure belongs, and Claims.IsRiskClaim carries why it is not a lead.
+        page.Append("<h3>What fired, and what each kind means</h3>\n");
+        page.Append("<p class=\"sub\">Every kind this run found, rarest first — the same ordering the claims ");
+        page.Append("above use, and for the same reason it is not a severity.</p>\n");
+
+        page.Append("<ul class=\"sub\">\n");
+        foreach (var exemplar in Selection.Exemplars(findings))
+        {
+            var total = findings.OfKind(exemplar.Kind).Count;
+
+            page.Append($"<li><strong>{Html.Count(total)} {Html.Text(Claims.KindName(exemplar.Kind))}</strong> — ");
+            page.Append($"{Html.Text(Claims.KindBlurb(exemplar.Kind))}</li>\n");
+        }
+        page.Append("</ul>\n");
+
+        page.Append("<p class=\"lede\"><strong>None of them is hidden and none is summarised away</strong> — every ");
+        page.Append("one is in the exports, which carry every finding, every type, every member and every ");
+        page.Append("dependency:</p>\n");
 
         page.Append("<ul class=\"sub\">\n");
         page.Append("<li><span class=\"mono\">--json</span> — the whole model, with a schema version, ")

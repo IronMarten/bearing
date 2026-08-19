@@ -36,7 +36,11 @@ public sealed class HighlightsTests(CoreWalkFixture core)
             .Distinct()
             .Count();
 
-        Assert.Equal(expected, Regex.Matches(Page, """<div class="card lead">""").Count);
+        // One annotated card and a rail row for every other kind — A13 tier 3. The card and the
+        // rows are counted separately on purpose: a page that rendered two cards, or a rail with a
+        // row for the kind already on the card, would still have the right total.
+        Assert.Single(Regex.Matches(Page, """<div class="anat">"""));
+        Assert.Equal(expected - 1, Regex.Matches(Page, """<div class="row">""").Count);
         Assert.Contains($"{expected} claims, one for each kind of risk this run found", Terminal, StringComparison.Ordinal);
     }
 
@@ -81,13 +85,11 @@ public sealed class HighlightsTests(CoreWalkFixture core)
         {
             var total = findings.OfKind(finding.Kind).Count;
 
-            var terminal = total == 1 ? "and it is the only one" : $"1 of {total}";
-            var page = total == 1
-                ? "This is the only one in this codebase."
-                : $"{total} of these were found; this is the strongest.";
+            var wording = total == 1 ? "the only one in this codebase" : $"1 of {total}";
 
-            Assert.Contains(terminal, Terminal, StringComparison.Ordinal);
-            Assert.Contains(page, Page, StringComparison.Ordinal);
+            Assert.Contains(
+                total == 1 ? "and it is the only one" : $"1 of {total}", Terminal, StringComparison.Ordinal);
+            Assert.Contains(wording, Page, StringComparison.Ordinal);
         }
     }
 
@@ -161,5 +163,71 @@ public sealed class HighlightsTests(CoreWalkFixture core)
 
         Assert.Contains($"{coverage.Count} of this solution's", brief, StringComparison.Ordinal);
         Assert.Contains("too small to compare them against", brief, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The card teaches its own anatomy, and the rail below it does not repeat the lesson.
+    /// </summary>
+    /// <remarks>
+    /// <b>A13 tier 3, candidate E.</b> A11 round 1 failed on comprehension rather than on impact —
+    /// participants placed the components correctly and did not know why any of it mattered — so
+    /// the lead card names what each of its lines is for. Repeating those labels down the rail
+    /// would turn a lesson into a template, which is the version of this design that was not built.
+    /// </remarks>
+    [Fact]
+    public void The_lead_card_labels_its_own_anatomy_once()
+    {
+        var page = Page;
+
+        string[] anatomy =
+        [
+            "what it is called", "and what kind", "where to open it", "what we think it means",
+            "the numbers behind it",
+        ];
+
+        foreach (var label in anatomy)
+            Assert.Single(Regex.Matches(page, Regex.Escape(label)));
+    }
+
+    /// <summary>
+    /// Every kind that fired is counted and defined, once, in one place.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Tier 3's headline, and the point at which the within-solution baseline becomes
+    /// visible.</b> A count of a kind used to exist only beside the one row that led it, so a
+    /// reader could see that 103 concealed decisions were found and never that the solution holds
+    /// 3,209 types. The list is the whole census — coverage included, which the lead list excludes
+    /// for the reason <see cref="Claims.IsRiskClaim"/> gives.
+    /// </para>
+    /// <para>
+    /// <b>Ordered by the same selection the claims use</b>, so a reader meeting the kinds twice
+    /// meets them in one order. That is asserted rather than assumed: two orderings on one page is
+    /// how a stated ordering stops being believed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_kind_that_fired_is_counted_and_defined()
+    {
+        var findings = Findings;
+        var page = Page;
+
+        var census = page[page.IndexOf("What fired, and what each kind means", StringComparison.Ordinal)..];
+
+        var at = -1;
+        foreach (var exemplar in Selection.Exemplars(findings))
+        {
+            var total = findings.OfKind(exemplar.Kind).Count;
+            var entry = $"<strong>{total} {Claims.KindName(exemplar.Kind)}</strong> — {Claims.KindBlurb(exemplar.Kind)}";
+
+            var found = census.IndexOf(entry, StringComparison.Ordinal);
+
+            Assert.True(found >= 0, $"the census does not carry {Claims.KindName(exemplar.Kind)}");
+            Assert.True(found > at, $"{Claims.KindName(exemplar.Kind)} is out of rarest-first order");
+            at = found;
+        }
+
+        Assert.Contains(FindingKind.Coverage, findings.All.Select(f => f.Kind));
+        Assert.Contains(Claims.KindName(FindingKind.Coverage), census, StringComparison.Ordinal);
     }
 }

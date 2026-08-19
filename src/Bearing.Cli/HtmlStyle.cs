@@ -57,6 +57,18 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:.6rem;padding:.9rem 1rem;margin:.6rem 0}
 .card>h4{margin:0 0 .15rem;font-size:1rem}
 .card.lead{border-left:3px solid var(--accent)}
+.anat,.row{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:.35rem 1rem;align-items:baseline}
+.anat{margin:1.5rem 0 .5rem}
+.lbl{text-align:right;color:var(--accent);font-size:.72rem;line-height:1.3}
+.fld{min-width:0}
+.anat .name{font-size:1.3rem;margin-right:.5rem}
+.name{font-weight:600}
+.rail{margin:1.5rem 0 0;border-top:1px solid var(--line)}
+.row{padding:.9rem 0;border-bottom:1px solid var(--line)}
+.kind{display:block;color:var(--accent);font-size:.76rem;line-height:1.25}
+.rank{display:block;color:var(--muted);font-size:.72rem}
+.big{font-size:1.05rem;line-height:1.45;max-width:52ch}
+@media(max-width:38rem){.anat,.row{grid-template-columns:1fr;gap:.2rem}.lbl{text-align:left}}
 .claim{margin:.15rem 0 .5rem}
 .where{color:var(--muted);font-size:.82rem;font-family:var(--mono)}
 .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0 0}
@@ -70,6 +82,6 @@ summary:hover{color:var(--accent)}
 .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.6rem .85rem;border-radius:0 .4rem .4rem 0;margin:.75rem 0;font-size:.9rem}
 .loop{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:.15rem 0 .6rem}
 footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
-@media print{body{background:#fff}.card,.tile{break-inside:avoid}details{display:none}}
+@media print{body{background:#fff}.card,.tile,.anat,.row{break-inside:avoid}details{display:none}}
 """;
 }

@@ -25,6 +25,31 @@ internal static class Subjects
         ?? (finding.Subject.DeclaringType is { } declaring ? model.Find(declaring) : null);
 
     /// <summary>
+    /// Where to open the component a finding is about — <c>project · file:line</c>.
+    /// </summary>
+    /// <remarks>
+    /// <b>The claim's own location wins where it has one, and method level is why.</b> Resolving a
+    /// member subject to its declaring type and printing that type's line sends a reader to the top
+    /// of a 3,000-line file to look for a method 800 lines down — on nopCommerce,
+    /// <c>ProductService.cs:26</c> for a claim about something at <c>:826</c>. A finding that names
+    /// a member knows where the member is; the project has to come from the type either way. The
+    /// line number is unformatted on purpose: this is an address a reader retypes, and
+    /// <c>Program.cs:1,204</c> is not one.
+    /// </remarks>
+    internal static string Where(SolutionModel model, Finding finding, string trailer)
+    {
+        if (Of(model, finding) is not { } type) return "";
+
+        var at = trailer.Length > 0
+            ? trailer
+            : type.Location.IsKnown
+                ? $"{Path.GetFileName(type.Location.File)}:{type.Location.Line}"
+                : "";
+
+        return at.Length > 0 ? $"{type.Project} · {at}" : type.Project;
+    }
+
+    /// <summary>
     /// The identity of every type some finding in the set is about.
     /// </summary>
     /// <remarks>

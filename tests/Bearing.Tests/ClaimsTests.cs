@@ -134,4 +134,44 @@ public sealed class ClaimsTests(CoreWalkFixture core)
         if (findings.OfKind(FindingKind.Coverage).Count > 0)
             Assert.Contains(Selection.Exemplars(findings), f => f.Kind == FindingKind.Coverage);
     }
+
+    /// <summary>
+    /// Layer span's evidence is the per-kind breakdown, and it counts what the section names.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>TECHREQ-job-b.md</c> §3.1 makes the breakdown the finding</b>, and the claim record
+    /// carried none of it until A13 tier 3 enlarged one card and found the numbers missing from
+    /// under it. Asserted against the participants rather than against a literal, so a claim that
+    /// started counting something else — references instead of distinct types, or every
+    /// participant regardless of kind — fails here rather than reading plausibly on a page.
+    /// </remarks>
+    [Fact]
+    public void Layer_span_carries_the_kinds_it_reaches_and_how_many_of_each()
+    {
+        var found = Findings.OfKind(FindingKind.SpansArchitecturalLayers);
+
+        Assert.NotEmpty(found);
+
+        foreach (var finding in found)
+        {
+            var claim = Claims.For(core.Model, finding);
+
+            var byKind = finding.Participants
+                .Select(core.Model.Find)
+                .Where(t => t is not null)
+                .GroupBy(t => t!.Classification.Kind, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.Select(t => t!.Name).Distinct(StringComparer.Ordinal).Count());
+
+            foreach (var (kind, count) in byKind)
+                Assert.Contains($"{count} {kind}", claim.Evidence, StringComparison.Ordinal);
+
+            // The type's own role is stated as itself, never as a count — a component is not one
+            // of its own dependencies, and "1 ApiBoundary" for the type in hand would be a lie a
+            // reader could not check.
+            if ((finding.ValueOf("KindSpan") ?? 0) > byKind.Count)
+                Assert.Contains(
+                    $"{core.Model.Find(finding.Subject)!.Classification.Kind} itself",
+                    claim.Evidence, StringComparison.Ordinal);
+        }
+    }
 }
