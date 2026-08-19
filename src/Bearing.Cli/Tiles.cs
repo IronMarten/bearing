@@ -1,15 +1,46 @@
 namespace IronMarten.Bearing.Cli;
 
 /// <summary>
+/// Which of the four a tile is.
+/// </summary>
+/// <remarks>
+/// <b>So a caller can ask for one without matching on the words it displays.</b> The mosaic's
+/// caption states the same clean share and the same concentration the tiles do — that is the whole
+/// of what the picture knows that the prose does not — and a renderer that found them by label
+/// would break silently the day a label is reworded.
+/// </remarks>
+public enum TileKind
+{
+    /// <summary>What the most of this codebase depends on.</summary>
+    WidestReach,
+
+    /// <summary>The share of types no finding is about.</summary>
+    Clean,
+
+    /// <summary>The project holding more findings than its size accounts for.</summary>
+    Concentration,
+
+    /// <summary>The largest multiple of a group median measured.</summary>
+    SharpestOutlier,
+}
+
+/// <summary>
 /// One headline number, what it is called, and the claim it makes.
 /// </summary>
+/// <param name="Kind">Which of the four this is, for a caller that needs one by name.</param>
 /// <param name="Value">The number, formatted — the biggest glyph on the page.</param>
 /// <param name="Label">Two or three words naming what was measured.</param>
+/// <param name="Subject">
+/// What the number is about — a type, a project, a member — or empty where the tile is about the
+/// whole solution. Carried separately from <paramref name="Note"/> because a second renderer needs
+/// the name without the sentence around it, and slicing it back out of prose is how a caption comes
+/// to say <i>"Nop.Services, against its share of the types carries 1.57x its share"</i>.
+/// </param>
 /// <param name="Note">
 /// The sentence fragment that makes the number a claim about the reader's system rather than a
 /// statistic. A tile without one is a census count, which is what these replaced.
 /// </param>
-public readonly record struct Tile(string Value, string Label, string Note);
+public readonly record struct Tile(TileKind Kind, string Value, string Label, string Subject, string Note);
 
 /// <summary>
 /// The four numbers at the top of the report — A13 tier 3.
@@ -61,6 +92,22 @@ public static class Tiles
         ];
     }
 
+    /// <summary>One tile by name, or null where this run could not support it.</summary>
+    /// <remarks>
+    /// For the mosaic's caption, which states the clean share and the concentration as the two
+    /// things the picture knows and the prose does not. Reading the tile rather than recomputing is
+    /// what stops the caption and the number above it disagreeing — the failure mode is silent,
+    /// because both would be defensible on their own.
+    /// </remarks>
+    public static Tile? Of(SolutionModel model, FindingSet findings, TileKind kind)
+    {
+        foreach (var tile in For(model, findings))
+            if (tile.Kind == kind)
+                return tile;
+
+        return null;
+    }
+
     /// <summary>
     /// What the most of this codebase depends on.
     /// </summary>
@@ -80,8 +127,10 @@ public static class Tiles
         if (widest is null || widest.FanIn == 0) return null;
 
         return new Tile(
+            TileKind.WidestReach,
             Html.Count(widest.FanIn),
             "Widest reach",
+            widest.Name,
             $"{Sentences.Do(widest.FanIn, "type depends", "types depend")} on {widest.Name}");
     }
 
@@ -102,8 +151,10 @@ public static class Tiles
         var clean = model.Types.Count - named.Count;
 
         return new Tile(
+            TileKind.Clean,
             $"{Sentences.Whole(Math.Round(100d * clean / model.Types.Count))}%",
             "Clean",
+            "",
             $"of {Html.Count(model.Types.Count)} types, no finding names them");
     }
 
@@ -142,8 +193,10 @@ public static class Tiles
         if (top.Named == 0 || top.Expected <= 0) return null;
 
         return new Tile(
+            TileKind.Concentration,
             $"{Sentences.Number(top.Named / top.Expected)}x",
             "Concentration",
+            top.Project,
             $"findings in {top.Project}, against its share of the types");
     }
 
@@ -180,8 +233,10 @@ public static class Tiles
         if (sharpest.Finding is null) return null;
 
         return new Tile(
+            TileKind.SharpestOutlier,
             $"{Sentences.Number(sharpest.Times)}x",
             "Sharpest outlier",
+            sharpest.Claim.Subject,
             $"{sharpest.Claim.Subject}'s {sharpest.Quantity}, against the middle of its group");
     }
 

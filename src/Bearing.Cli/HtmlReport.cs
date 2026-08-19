@@ -148,30 +148,41 @@ public static class HtmlReport
 
         page.Append("<div class=\"picture\">\n").Append(Mosaic.Render(model, findings)).Append("</div>\n");
 
+        // A13 tier 3's correction to tier 1, and it came from the first reader outside the build to
+        // look at the mosaic: "a bunch of boxes, some of them red, and a legend that says the red
+        // ones are below." That reading is correct and the caption caused it — it described the
+        // encoding and never said what the picture was for, so a reader looking for the claim found
+        // a key to decode instead. The picture is exempt from PRD-free-tier.md §4 (ARCHITECTURE.md
+        // §10, the tier bar) and its CAPTION never was.
+        //
+        // So the claim leads and the mechanics follow. What the picture knows that the prose does
+        // not is exactly two things — how much of the codebase is pale, and where the tinted cells
+        // clump — and both are tiles now, so the caption states them from the same derivation
+        // rather than inventing a second one. The red outlines are not a third thing: they are the
+        // claims listed below, in the same order, and saying so stops a reader hunting for meaning
+        // in a mark that carries none of its own.
+        var clean = Tiles.Of(model, findings, TileKind.Clean);
+        var concentration = Tiles.Of(model, findings, TileKind.Concentration);
+
+        page.Append("<p class=\"lede\">");
+
+        if (clean is { } share)
+            page.Append($"<strong>{Html.Text(share.Value)} of this codebase has nothing said about it</strong> — ")
+                .Append("that is the pale area, and it is most of the picture. ");
+
+        if (concentration is { } where)
+            page.Append("<strong>What is named clusters rather than spreading</strong>: ")
+                .Append($"{Html.Text(where.Subject)} carries {Html.Text(where.Value)} its share of them. ");
+
+        page.Append("Both are above, as numbers; this is what they look like.</p>\n");
+
         page.Append($"<p class=\"sub\">Every one of the {Html.Count(model.Types.Count)} types this run analysed, ");
         page.Append("one cell each, sized by how many lines it spans and grouped into the project that declares it — ");
         page.Append("biggest project first. ");
         page.Append($"Some finding below is about {Html.Count(marks.Named)} of them, which is the tint; ");
-        page.Append($"<strong>the {Html.Count(marks.Leading)} outlined in red are where to start</strong>. ");
+        page.Append($"the {Html.Count(marks.Leading)} outlined in red are the claims below, in the same order. ");
         page.Append("Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a ");
         page.Append("component is would be a score, and this tool does not have one.</p>\n");
-
-        // The lead is X10's selection and nothing else, so the picture and the findings pane cannot
-        // disagree about which components a reader should open first. Named here as well as drawn,
-        // because a reader who wants to find one has to be able to search for it — the same reason
-        // docs/DEFECTS.md §31 puts the folded project names beside the project map.
-        var leading = Selection.Exemplars(findings)
-            .Select(f => model.Find(f.Subject) ?? (f.Subject.DeclaringType is { } d ? model.Find(d) : null))
-            .Where(t => t is not null)
-            .Select(t => t!.Name)
-            .ToList();
-
-        if (leading.Count > 0)
-            page.Append("<p class=\"sub\">Those are one per kind of finding this run made, ")
-                .Append("<em>ordered by how uncommon each kind is in this codebase</em> — which is an ordering and ")
-                .Append("not a severity, because the tool has no way to say a hub is worse than a cycle: ")
-                .Append(Html.Text(string.Join(", ", leading)))
-                .Append(".</p>\n");
 
         var unlabelled = Mosaic.Unlabelled(model);
         if (unlabelled.Count > 0)

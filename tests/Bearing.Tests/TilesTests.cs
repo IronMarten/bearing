@@ -29,7 +29,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     public void Widest_reach_is_the_type_the_most_of_the_codebase_depends_on()
     {
         var widest = core.Model.Types.OrderByDescending(t => t.FanIn).First();
-        var tile = Single(Tiles.For(core.Model, Findings), "Widest reach");
+        var tile = Single(Tiles.For(core.Model, Findings), TileKind.WidestReach);
 
         Assert.True(widest.FanIn > 0, "the fixture no longer has a type anything depends on");
         Assert.Equal(Html.Count(widest.FanIn), tile.Value);
@@ -51,7 +51,7 @@ public sealed class TilesTests(CoreWalkFixture core)
         var marks = Mosaic.Marked(core.Model, findings);
         var expected = Math.Round(100d * (core.Model.Types.Count - marks.Named) / core.Model.Types.Count);
 
-        var tile = Single(Tiles.For(core.Model, findings), "Clean");
+        var tile = Single(Tiles.For(core.Model, findings), TileKind.Clean);
 
         Assert.Equal($"{expected:0}%", tile.Value);
         Assert.Contains(Html.Count(core.Model.Types.Count), tile.Note, StringComparison.Ordinal);
@@ -71,7 +71,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     public void Concentration_names_a_project_that_carries_more_than_its_share()
     {
         var findings = Findings;
-        var tile = Single(Tiles.For(core.Model, findings), "Concentration");
+        var tile = Single(Tiles.For(core.Model, findings), TileKind.Concentration);
 
         var project = core.Model.Types
             .Select(t => t.Project)
@@ -98,7 +98,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     public void The_sharpest_outlier_is_a_defined_multiple()
     {
         var tiles = Tiles.For(core.Model, Findings);
-        var tile = tiles.SingleOrDefault(t => string.Equals(t.Label, "Sharpest outlier", StringComparison.Ordinal));
+        var tile = tiles.SingleOrDefault(t => t.Kind == TileKind.SharpestOutlier);
 
         if (tile.Value is null or "") return;
 
@@ -122,10 +122,10 @@ public sealed class TilesTests(CoreWalkFixture core)
     {
         var tiles = Tiles.For(core.Model, FindingSet.Empty);
 
-        Assert.Contains(tiles, t => string.Equals(t.Label, "Widest reach", StringComparison.Ordinal));
-        Assert.Equal("100%", Single(tiles, "Clean").Value);
-        Assert.DoesNotContain(tiles, t => string.Equals(t.Label, "Concentration", StringComparison.Ordinal));
-        Assert.DoesNotContain(tiles, t => string.Equals(t.Label, "Sharpest outlier", StringComparison.Ordinal));
+        Assert.Contains(tiles, t => t.Kind == TileKind.WidestReach);
+        Assert.Equal("100%", Single(tiles, TileKind.Clean).Value);
+        Assert.DoesNotContain(tiles, t => t.Kind == TileKind.Concentration);
+        Assert.DoesNotContain(tiles, t => t.Kind == TileKind.SharpestOutlier);
     }
 
     /// <summary>
@@ -148,6 +148,47 @@ public sealed class TilesTests(CoreWalkFixture core)
             t.Label.Contains("finding", StringComparison.OrdinalIgnoreCase));
     }
 
-    private static Tile Single(IReadOnlyList<Tile> tiles, string label) =>
-        tiles.Single(t => string.Equals(t.Label, label, StringComparison.Ordinal));
+    /// <summary>
+    /// The mosaic's caption states the two tiles the picture is evidence for, from the same
+    /// derivation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The correction the first outside reader of the mosaic produced.</b> The caption described
+    /// the encoding — what a cell is, what the marks are — and never said what the picture was for,
+    /// so it read as <i>"a bunch of boxes, some of them red, and a legend saying the red ones are
+    /// below"</i>. That reading is right: the red outlines are X10's exemplars, which are the claims
+    /// listed underneath in the same order, and they carry nothing the prose does not.
+    /// </para>
+    /// <para>
+    /// <b>What the picture does know that the prose does not is exactly two things</b> — how much of
+    /// the codebase is pale, and where the tinted cells clump — and both are tiles. So the caption
+    /// leads with them, and reads them rather than recomputing: a caption saying 83% over a tile
+    /// saying 81% would be two defensible numbers and one silent defect.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_mosaic_caption_states_the_tiles_it_is_a_picture_of()
+    {
+        var findings = Findings;
+        var page = HtmlReport.Render(
+            core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+
+        var caption = page[page.IndexOf("</svg>", StringComparison.Ordinal)..page.IndexOf("<h2>", StringComparison.Ordinal)];
+
+        var clean = Tiles.Of(core.Model, findings, TileKind.Clean)!.Value;
+        Assert.Contains($"{clean.Value} of this codebase has nothing said about it", caption, StringComparison.Ordinal);
+
+        if (Tiles.Of(core.Model, findings, TileKind.Concentration) is { } concentration)
+        {
+            Assert.Contains(concentration.Subject, caption, StringComparison.Ordinal);
+            Assert.Contains($"carries {concentration.Value} its share", caption, StringComparison.Ordinal);
+        }
+
+        // And the red mark is described as what it is rather than as a third thing to decode.
+        Assert.Contains("are the claims below, in the same order", caption, StringComparison.Ordinal);
+    }
+
+    private static Tile Single(IReadOnlyList<Tile> tiles, TileKind kind) =>
+        tiles.Single(t => t.Kind == kind);
 }
