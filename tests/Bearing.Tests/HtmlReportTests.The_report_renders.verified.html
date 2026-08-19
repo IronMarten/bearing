@@ -20,10 +20,11 @@ a{color:var(--accent)}
 code,.mono{font-family:var(--mono);font-size:.87em}
 .sub{color:var(--muted);font-size:.9rem}
 .lede{color:var(--muted);max-width:44rem}
-.tiles{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:.5rem;padding:.6rem .85rem;min-width:7rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:.5rem;margin:1.25rem 0}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:.5rem;padding:.6rem .85rem}
 .tile b{display:block;font-size:1.35rem;font-weight:600;letter-spacing:-.02em}
-.tile span{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+.tile .tl{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.tile .tn{display:block;color:var(--muted);font-size:.78rem;line-height:1.35;margin-top:.35rem}
 table{width:100%;border-collapse:collapse;font-size:.9rem;margin:.5rem 0}
 th,td{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
@@ -54,12 +55,13 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="wrap">
 <h1>TestBed.sln</h1>
 <p class="sub">Bearing 0.0.0 · 2026-01-01 00:00 UTC</p>
+<p class="sub">145 types in 3 projects, 317 dependencies between them.</p>
 <p class="lede">A map of this solution and a short list of the components that are unusual <em>for what they are</em> — measured against their structural peers, never scored. Start with the picture; the findings are further down and they assume it.</p>
 <div class="tiles">
-<div class="tile"><b>145</b><span>types</span></div>
-<div class="tile"><b>3</b><span>projects</span></div>
-<div class="tile"><b>317</b><span>dependencies</span></div>
-<div class="tile"><b>63</b><span>findings</span></div>
+<div class="tile"><b>21</b><span class="tl">Widest reach</span><span class="tn">types depend on NormalizeStep</span></div>
+<div class="tile"><b>67%</b><span class="tl">Clean</span><span class="tn">of 145 types, no finding names them</span></div>
+<div class="tile"><b>3.02x</b><span class="tl">Concentration</span><span class="tn">findings in Data, against its share of the types</span></div>
+<div class="tile"><b>22x</b><span class="tl">Sharpest outlier</span><span class="tn">TariffCalculator.Apply&#39;s internal complexity, against the middle of its group</span></div>
 </div>
 <div class="picture">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 656" width="1000" height="656" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">

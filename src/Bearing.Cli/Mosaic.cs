@@ -261,24 +261,14 @@ public static class Mosaic
         var named = new HashSet<string>(StringComparer.Ordinal);
         var leading = new HashSet<string>(StringComparer.Ordinal);
 
-        foreach (var finding in findings.All)
-            if (Resolve(model, finding) is { } type) named.Add(type.Subject.Canonical);
+        foreach (var canonical in Subjects.Named(model, findings))
+            named.Add(canonical);
 
         foreach (var exemplar in Selection.Exemplars(findings))
-            if (Resolve(model, exemplar) is { } type) leading.Add(type.Subject.Canonical);
+            if (Subjects.Of(model, exemplar) is { } type) leading.Add(type.Subject.Canonical);
 
         return new Marking(named, leading);
     }
-
-    /// <summary>The analysed type a finding is about, or null where its subject is not one.</summary>
-    /// <remarks>
-    /// A coverage finding about the solution and a cycle about a set of namespaces have no cell,
-    /// which is not a gap: the picture draws types, and a claim about something else is not a claim
-    /// about a type that has been lost.
-    /// </remarks>
-    private static TypeNode? Resolve(SolutionModel model, Finding finding) =>
-        model.Find(finding.Subject)
-        ?? (finding.Subject.DeclaringType is { } declaring ? model.Find(declaring) : null);
 
     // ----------------------------------------------------------------------- layout ----
 

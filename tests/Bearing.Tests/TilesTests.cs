@@ -1,0 +1,153 @@
+using IronMarten.Bearing;
+using IronMarten.Bearing.Cli;
+
+namespace Bearing.Tests;
+
+/// <summary>
+/// The tile row — A13 tier 3.
+/// </summary>
+/// <remarks>
+/// <para>
+/// What a test can hold here is that each number is what it says it is, and that a number the run
+/// did not measure is absent rather than zero. Whether four claims at the top of a page make a
+/// reader faster is A11 round 2's question, and no assertion here reaches it.
+/// </para>
+/// <para>
+/// <b>The recomputation is deliberate and is not a copy of the implementation.</b> Widest reach and
+/// clean are derived from the model a second way — off <see cref="TypeNode.FanIn"/> and off the
+/// finding set — so a tile that started reading a different quantity would fail rather than quietly
+/// disagree with the mosaic above it.
+/// </para>
+/// </remarks>
+[Collection(FixtureCollection.Name)]
+public sealed class TilesTests(CoreWalkFixture core)
+{
+    private FindingSet Findings => Analysis.FindingsFor(core.Model);
+
+    /// <summary>The widest reach tile is the most-depended-on type, and it names it.</summary>
+    [Fact]
+    public void Widest_reach_is_the_type_the_most_of_the_codebase_depends_on()
+    {
+        var widest = core.Model.Types.OrderByDescending(t => t.FanIn).First();
+        var tile = Single(Tiles.For(core.Model, Findings), "Widest reach");
+
+        Assert.True(widest.FanIn > 0, "the fixture no longer has a type anything depends on");
+        Assert.Equal(Html.Count(widest.FanIn), tile.Value);
+        Assert.Contains(widest.Name, tile.Note, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The clean tile counts the types no finding is about, against every type analysed.
+    /// </summary>
+    /// <remarks>
+    /// <b>The same population the mosaic tints</b>, which is why both read
+    /// <c>Subjects.Named</c> — a picture saying 72% of the ink is named above a number saying 83% is
+    /// clean would be two claims about one run, and nothing would fail.
+    /// </remarks>
+    [Fact]
+    public void Clean_is_the_share_of_types_no_finding_names()
+    {
+        var findings = Findings;
+        var marks = Mosaic.Marked(core.Model, findings);
+        var expected = Math.Round(100d * (core.Model.Types.Count - marks.Named) / core.Model.Types.Count);
+
+        var tile = Single(Tiles.For(core.Model, findings), "Clean");
+
+        Assert.Equal($"{expected:0}%", tile.Value);
+        Assert.Contains(Html.Count(core.Model.Types.Count), tile.Note, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Concentration names a project that holds more findings than its size accounts for.
+    /// </summary>
+    /// <remarks>
+    /// <b>Chosen by excess rather than by ratio, and this is the assertion that says so.</b> A
+    /// ratio would let a two-type project with two findings beat a large project carrying thirty
+    /// more than it should — the same size-blind mistake <c>MEASURE-concealed-decision.md</c>
+    /// measured one level down. Pinning that the winner holds at least as many named types as any
+    /// other project is weaker than the rule but is the part of it a fixture can observe.
+    /// </remarks>
+    [Fact]
+    public void Concentration_names_a_project_that_carries_more_than_its_share()
+    {
+        var findings = Findings;
+        var tile = Single(Tiles.For(core.Model, findings), "Concentration");
+
+        var project = core.Model.Types
+            .Select(t => t.Project)
+            .Distinct(StringComparer.Ordinal)
+            .Single(p => tile.Note.Contains(p, StringComparison.Ordinal));
+
+        var named = core.Model.Types.Count(t =>
+            string.Equals(t.Project, project, StringComparison.Ordinal)
+            && findings.About(t.Subject).Count > 0);
+
+        Assert.True(named > 0, "the concentration tile named a project holding no finding");
+        Assert.EndsWith("x", tile.Value, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The sharpest outlier is a measured multiple and never an undefined one.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §28. A ratio against a median of zero is undefined rather than
+    /// enormous, so it cannot be the largest anything — and <c>P9</c> is the plant that will make
+    /// this reachable on the fixture rather than only on a real solution.
+    /// </remarks>
+    [Fact]
+    public void The_sharpest_outlier_is_a_defined_multiple()
+    {
+        var tiles = Tiles.For(core.Model, Findings);
+        var tile = tiles.SingleOrDefault(t => string.Equals(t.Label, "Sharpest outlier", StringComparison.Ordinal));
+
+        if (tile.Value is null or "") return;
+
+        Assert.DoesNotContain("undefined", tile.Value, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("∞", tile.Value, StringComparison.Ordinal);
+        Assert.EndsWith("x", tile.Value, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A tile the run cannot support is absent, not zero.
+    /// </summary>
+    /// <remarks>
+    /// <b>Invariant 6, at the top of the page.</b> A run that nominated nothing has no concentration
+    /// and no outlier; rendering <c>0x</c> for either would assert a measurement that was never
+    /// taken, and a dash would assert one that came back empty. What survives is the pair that is
+    /// about the codebase rather than about the findings — and clean reads 100%, which is the
+    /// answer rather than a placeholder.
+    /// </remarks>
+    [Fact]
+    public void A_run_with_no_findings_keeps_only_the_tiles_it_can_support()
+    {
+        var tiles = Tiles.For(core.Model, FindingSet.Empty);
+
+        Assert.Contains(tiles, t => string.Equals(t.Label, "Widest reach", StringComparison.Ordinal));
+        Assert.Equal("100%", Single(tiles, "Clean").Value);
+        Assert.DoesNotContain(tiles, t => string.Equals(t.Label, "Concentration", StringComparison.Ordinal));
+        Assert.DoesNotContain(tiles, t => string.Equals(t.Label, "Sharpest outlier", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// No tile counts the findings.
+    /// </summary>
+    /// <remarks>
+    /// <b>The rejected fifth tile, kept rejected.</b> <i>"Findings worth attention"</i> was cut
+    /// because a count of outstanding work is a lint mental model, and <c>PRD-free-tier.md</c> §7.2
+    /// holds that an anomaly is an observation rather than an item of work. The findings total still
+    /// ships — in prose, in <c>Everything else</c>, where it is a statement about the run rather
+    /// than a headline about the codebase.
+    /// </remarks>
+    [Fact]
+    public void The_row_never_leads_with_a_count_of_findings()
+    {
+        var findings = Findings;
+
+        Assert.True(findings.Count > 0, "the fixture nominates nothing, so this asserts nothing");
+        Assert.DoesNotContain(Tiles.For(core.Model, findings), t =>
+            t.Label.Contains("finding", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static Tile Single(IReadOnlyList<Tile> tiles, string label) =>
+        tiles.Single(t => string.Equals(t.Label, label, StringComparison.Ordinal));
+}

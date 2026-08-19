@@ -96,20 +96,29 @@ public static class HtmlReport
         page.Append($"<p class=\"sub\">Bearing {Html.Text(model.ToolVersion)} · ");
         page.Append($"{Html.Text(at.ToString("yyyy-MM-dd HH:mm 'UTC'", System.Globalization.CultureInfo.InvariantCulture))}</p>\n");
 
+        // The census, demoted to a line of prose — A13 tier 3. These are the three numbers the tile
+        // row used to carry, and they are worth stating once: they are the denominator every claim
+        // below is measured against. What they are not is a headline, because a reader learns
+        // nothing from them they could act on.
+        page.Append($"<p class=\"sub\">{Html.Count(model.Types.Count)} ");
+        page.Append($"{Sentences.Do(model.Types.Count, "type", "types")} in {Html.Count(model.Projects.Count)} ");
+        page.Append($"{Sentences.Do(model.Projects.Count, "project", "projects")}, {Html.Count(model.Edges.Count)} ");
+        page.Append($"{Sentences.Do(model.Edges.Count, "dependency", "dependencies")} between them.</p>\n");
+
         page.Append("<p class=\"lede\">A map of this solution and a short list of the components that are ");
         page.Append("unusual <em>for what they are</em> — measured against their structural peers, never scored. ");
         page.Append("Start with the picture; the findings are further down and they assume it.</p>\n");
 
+        var tiles = Tiles.For(model, findings);
+        if (tiles.Count == 0) return;
+
         page.Append("<div class=\"tiles\">\n");
-        Tile(page, Html.Count(model.Types.Count), "types");
-        Tile(page, Html.Count(model.Projects.Count), "projects");
-        Tile(page, Html.Count(model.Edges.Count), "dependencies");
-        Tile(page, Html.Count(findings.Count), "findings");
+        foreach (var tile in tiles)
+            page.Append($"<div class=\"tile\"><b>{Html.Text(tile.Value)}</b>")
+                .Append($"<span class=\"tl\">{Html.Text(tile.Label)}</span>")
+                .Append($"<span class=\"tn\">{Html.Text(tile.Note)}</span></div>\n");
         page.Append("</div>\n");
     }
-
-    private static void Tile(StringBuilder page, string value, string label) =>
-        page.Append($"<div class=\"tile\"><b>{value}</b><span>{Html.Text(label)}</span></div>\n");
 
     // ---------------------------------------------------------------------- picture ----
 
