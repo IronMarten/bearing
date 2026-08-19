@@ -696,6 +696,30 @@ nopCommerce showed is that the *rule* was wrong, and no fixture could have said 
 > can. It was found by reading bytes, not output — on screen the terminal renders what it is given
 > and nothing looks wrong.
 
+**The fourth real run, at A13 tier 3, and both of its findings needed two solutions rather than
+one.** The tile row and the annotated card were green on the fixture and correct on it. What
+nopCommerce and jellyfin showed is that one number was not the quantity it claimed to be, and that
+the card's strongest position renders a claim the fixture never puts there:
+
+| Found | Why the fixture could not show it |
+|---|---|
+| **The sharpest-outlier tile took its maximum *across quantities*.** It reads 126x on nopCommerce and that is a **fan-in** ratio; 158x on jellyfin, and that is **complexity**; 22x on the fixture, complexity again. Both are *x times the middle of a group* and they are not the same measurement, so a bare *"sharpest"* is an order across kinds by an invented common unit — which is what `X10` refused. The note names what was multiplied | **one population cannot show that the unit moves between populations.** On the fixture the maximum happens to be a complexity ratio and nothing contradicts it; the tile reads correctly, means one thing, and is wrong only in the sense that it would mean something else on the next solution. Two real runs are the smallest thing that can show this, and the second one is where it appeared |
+| **Layer span leads on both real solutions, and its claim carried no evidence at all** — so the enlarged card rendered *"reaches across 3 kinds"* with nothing under it, while `TECHREQ-job-b.md` §3.1 says the per-kind breakdown **is** the finding. `Claims` now carries the counts (`40 ApiBoundary, 2 DataAccess, 3 ExternalCall`) beside the section's names | **the fixture's lead is bug blast radius, which has evidence.** Layer span fires there and never leads, so it never reaches the one position on the page that renders `Claim.Evidence` — and the terminal renders that section with a loop of its own, which is the second reason nothing anywhere printed the field. The gap was invisible while every card was the same size |
+
+> **Neither of these is an input the fixture lacks, and that is what makes them worth recording
+> here.** They are properties of *which* finding lands in the position the design enlarged, and of
+> *what quantity* a maximum happens to select — both decided by the solution rather than by the
+> tool. The tile row's other three numbers reproduced the design's hand-derived figures exactly
+> (`458` on `BaseEntity`, `83%` of 3,209), which is the control: the two that moved, moved for
+> reasons, and one of the two was a defect.
+
+> **One measured disagreement with the design, kept.** The concentration tile was drawn as *1.8x
+> Nop.Web.Framework* and measures *1.57x Nop.Services*, because the candidate was derived by ratio
+> and the tile selects by **excess** — the largest count of findings above a project's proportional
+> share. A ratio lets a two-type project with two findings beat a large project carrying thirty
+> more than it should, which is `MEASURE-concealed-decision.md`'s defect class one level up. The
+> design number was right about the shape and the rule is right about the size.
+
 ### The complete inventory, measured in one pass
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
