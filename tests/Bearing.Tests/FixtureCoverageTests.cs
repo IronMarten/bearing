@@ -241,12 +241,17 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     {
         var policy = core.Model.Policy;
 
-        // 1-3. One nomination, clearing every gate at once, so no gate is the deciding one. Its
-        // cohort is twelve, which is also why the rank repair is invisible: the percentile form
-        // it replaced was satisfiable here.
+        // 1-2 ARE CLOSED, measured by leave-one-out on 2026-08-20. Blast radius' absolute
+        // fan-in floor deletes to `output-moves` and its FanInXMedian gate to `suite-only`, so
+        // both are held — by P7's SpanCaliper, the near miss that sits exactly on the fan-in
+        // multiple and the complexity percentile. This block asserted them as gaps for as long as
+        // they were not, which is why the list is now checked against the tool rather than reread.
+        //
+        // 3. The cohort floor is the one that survives, and leave-one-out agrees: deleting it is
+        // the single DEAD verdict of thirty. ShipmentLedger's cohort is twelve, which is also why
+        // the rank repair is invisible — the percentile form it replaced was satisfiable here.
         var ledger = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
         Assert.Equal(11, ledger.FanIn);
-        Assert.True(ledger.FanIn >= policy.MinFanIn);
         Assert.True(ledger.CohortSize >= 10);
 
         // 4. Neither load-bearing nominee depends on an abstraction, so excluding abstractions

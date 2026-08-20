@@ -241,6 +241,36 @@ confirm a plant disturbed nothing but what it aimed at. What replaces them:
 Accepting a snapshot is a claim that the change was intended — §3. **Read the received diff before
 accepting it**, which is what "line by line" always meant.
 
+### The leave-one-out verdict table
+
+Run 2026-08-20, after P9, against 30 guards. **The previous run was after P6**, and the inventory
+had drifted onto doc comments in the meantime — see `tools/leave-one-out.sh`'s header for what that
+cost and what it is keyed on now.
+
+| verdict | count | what it means |
+|---|---|---|
+| `output-moves` | 25 | deleting the gate changes the report at defaults |
+| `suite-only` | 4 | the report is byte-identical, but a test fails — the gate decides off the default path and is held by a test that deliberately moves a threshold |
+| `DEAD` | **1** | no change at defaults and the whole suite green |
+
+**`suite-only`:** blast radius' `BlastFanInMultiple`, boundary-carries-logic's `HighCc`, the surface
+outlier threshold, and change cost's `MinFanIn` floor.
+
+**`DEAD`, and it is the only one: `BlastRadius`'s `MinCohort` cohort floor.** Already recorded — it
+is item 3 of `FixtureCoverageTests.The_new_findings_have_gates_the_fixture_cannot_observe`, and the
+measurement confirms the record rather than adding to it.
+
+**Two entries that were on the board as owed plants are not owed.** P1 existed to make blast
+radius' absolute fan-in floor observable and P2 its `FanInXMedian` gate; the two verdicts above are
+`output-moves` and `suite-only`, so both are held already. P7's near-miss band did it. Closed on
+this evidence.
+
+**Two gates are not in the table and cannot be**, because they are not `if` lines: boundary
+marking's `IsBoundary` kind filter is a `.Where` on an assignment, and load-bearing's
+effective-versus-raw fan-out is a choice of which property to read. Commenting either out fails the
+build rather than relaxing a gate. The second is item 4 of the same coverage test and still wants
+the controlled pair in `SESSION-NOTES.md` #22 — that is **P3**.
+
 ### One gate the fixture cannot observe, and it is not waiting for a plant
 
 **`GlobalComplexityFloor`.** It gates `NoPeerGroup`: a peerless type needs `MaxMemberCyclomatic > 1`
