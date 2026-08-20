@@ -229,6 +229,15 @@ confirm a plant disturbed nothing but what it aimed at. What replaces them:
    quietly moves an unrelated gate shows up there and nowhere else.
 3. **`tools/leave-one-out.sh`**, with the verdict table pasted into this section. Last run after P6.
 
+   > **Do not touch the working tree while it runs, and that includes `git add`.** It deletes each
+   > gate in turn and restores it with `git checkout --`, which reads the **index** — so staging its
+   > mutation makes the restore put the mutation back instead of removing it, and the run then
+   > carries on through the remaining gates doing the same thing. It refuses to start on a dirty
+   > tree and cannot defend against one appearing underneath it. Start it, leave it alone, and
+   > check `git diff` against the commit you started from when it finishes. If it has to be killed,
+   > kill the `bash.exe` running the script rather than the shell wrapping it, and clear any
+   > orphaned `testhost` still holding `Bearing.Core.dll`.
+
 Accepting a snapshot is a claim that the change was intended — §3. **Read the received diff before
 accepting it**, which is what "line by line" always meant.
 
