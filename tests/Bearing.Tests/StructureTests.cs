@@ -78,18 +78,22 @@ public sealed class StructureTests(CoreWalkFixture core)
         //
         // And P8 again: nine *Node, four *Link, a mutual pair, and the four types of the second
         // identity collision.
-        Assert.Equal(179, core.Model.Types.Count);
+        //
+        // P9 adds six: the *Trait chain, five property bags and one type with a method, planted so
+        // that a cohort's median complexity is zero. Five edges, because the chain has five links
+        // and closes over its own members — no existing type gains fan-in.
+        Assert.Equal(185, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
         // which node an edge lands on without changing how many pairs there are.
-        Assert.Equal(362, core.Model.Edges.Count);
+        Assert.Equal(367, core.Model.Edges.Count);
 
         // Methods are counted per declaration, so unlike Types this was never distorted by the
         // planted collisions: Describe, Score and Weight are all three present. Core holds
         // members on the type rather than in a flat list, and counts constructors as method-like
         // because they carry cyclomatic complexity — three of the 186 are constructors.
-        Assert.Equal(186, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        Assert.Equal(187, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------

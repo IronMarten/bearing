@@ -81,7 +81,15 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
         var byType = findings.OfKind(FindingKind.ConcealedDecisionType)
             .Select(f => f.Subject.Canonical);
 
-        Assert.Empty(byType.Except(byMethod, StringComparer.Ordinal));
+        // **P9 closed this gap.** Until 2026-08-20 every type nominated at type level was also
+        // nominated at method level, so nothing here would have noticed the type-level detector
+        // being reduced to a filter over the method-level one. CustomsTrait is the first subject
+        // type level finds alone: its cohort has six types but only one method between them, so
+        // the method-level population is below MinCohort and never runs.
+        var only = byType.Except(byMethod, StringComparer.Ordinal).ToList();
+
+        Assert.Single(only);
+        Assert.EndsWith("CustomsTrait", only[0], StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -975,17 +983,29 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// </para>
     /// </remarks>
     [Fact]
-    public void No_cohort_has_a_median_of_zero_so_the_undefined_ratio_ranking_never_runs()
+    public void A_cohort_with_a_median_of_zero_exercises_the_undefined_ratio_ranking()
     {
         var findings = Analysis.FindingsFor(core.Model);
+        var typeLevel = findings.OfKind(FindingKind.ConcealedDecisionType);
 
-        var undefined = findings.OfKind(FindingKind.ConcealedDecisionType)
-            .Select(f => f.ValueOf("MaxMemberCyclomaticXMedian"))
-            .Concat(findings.OfKind(FindingKind.ConcealedDecisionMethod)
-                .Select(f => f.ValueOf("CyclomaticXMedian")))
-            .Count(times => double.IsInfinity(times ?? 0));
+        var undefined = typeLevel
+            .Where(f => double.IsInfinity(f.ValueOf("MaxMemberCyclomaticXMedian") ?? 0))
+            .ToList();
 
-        Assert.Equal(0, undefined);
+        // P9's plant. It was zero until 2026-08-20, and the gap this test recorded was that the
+        // ranking rule shipped exercised only by real solutions — 10 of nopCommerce's 79
+        // type-level nominations, and none of TestBed's.
+        var subject = Assert.Single(undefined);
+        Assert.Equal("CustomsTrait", core.Model.Find(subject.Subject)!.Name);
+
+        // And it ranks LAST, which is the rule the plant exists for. Asserted here as well as in
+        // FindingTests' ordering theory because that theory encoded the wrong rule for months and
+        // nothing could catch it: with no undefined case in the fixture, plain rank-descending and
+        // undefined-last are the same sequence.
+        Assert.Equal(typeLevel[^1].Subject, subject.Subject);
+        Assert.True(
+            typeLevel.Count > 1 && double.IsFinite(typeLevel[0].ValueOf("MaxMemberCyclomaticXMedian") ?? 0),
+            "the section needs a measured ratio above it or last place proves nothing");
     }
 
     /// <summary>The hub-or-god-object finding about <paramref name="type"/>.</summary>

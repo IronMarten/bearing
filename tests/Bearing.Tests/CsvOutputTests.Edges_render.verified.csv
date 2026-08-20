@@ -344,6 +344,11 @@ type|Core|global::TestBed.Core.TrackingNormalizer,type|Core|global::TestBed.Core
 type|Core|global::TestBed.Core.TrackingNormalizer,type|Core|global::TestBed.Core.TariffCalculator,2,Field;Invocation,TestBed/Core/TrackingNormalizer.cs,5
 type|Core|global::TestBed.Core.TrackingReconciler,type|Core|global::TestBed.Core.NormalizeStep,2,Field;Invocation,TestBed/Core/Reconcilers.cs,267
 type|Core|global::TestBed.Core.TrackingReconciler,type|Core|global::TestBed.Core.ValidateStep,1,Field,TestBed/Core/Reconcilers.cs,268
+type|Core|global::TestBed.Core.Traits.FragileTrait,type|Core|global::TestBed.Core.Traits.HazmatTrait,1,Field,TestBed/Core/Traits.cs,62
+type|Core|global::TestBed.Core.Traits.HazmatTrait,type|Core|global::TestBed.Core.Traits.PerishableTrait,1,Field,TestBed/Core/Traits.cs,70
+type|Core|global::TestBed.Core.Traits.PerishableTrait,type|Core|global::TestBed.Core.Traits.CustomsTrait,1,Field,TestBed/Core/Traits.cs,78
+type|Core|global::TestBed.Core.Traits.VolumeTrait,type|Core|global::TestBed.Core.Traits.FragileTrait,1,Field,TestBed/Core/Traits.cs,54
+type|Core|global::TestBed.Core.Traits.WeightTrait,type|Core|global::TestBed.Core.Traits.VolumeTrait,1,Field,TestBed/Core/Traits.cs,46
 type|Core|global::TestBed.Core.TransitLedger,type|Core|global::TestBed.Core.ShipmentLedger,2,Field;Invocation,TestBed/Core/Ledgers.cs,84
 type|Core|global::TestBed.Core.TransitNormalizer,type|Core|global::TestBed.Core.AuditClient,2,Field;Invocation,TestBed/Core/TransitNormalizer.cs,6
 type|Core|global::TestBed.Core.TransitNormalizer,type|Core|global::TestBed.Core.IResponseNormalizer,1,InterfaceImplementation,TestBed/Core/TransitNormalizer.cs,3

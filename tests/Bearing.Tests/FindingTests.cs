@@ -423,17 +423,28 @@ public sealed class FindingTests(CoreWalkFixture core)
     /// walk arrived in — which is project load order times Roslyn's symbol order.
     /// <c>docs/TESTING.md</c> §5 and <c>OrderingTests</c> record what that cost the probe.
     /// <para>
-    /// <b>What this proves and what it does not.</b> It proves the emitted sequence satisfies
-    /// rank-descending-then-identity, and it fails if the rank sort is dropped or inverted. It
-    /// does not prove the identity tiebreak is doing the work: the model arrives identity-ordered
-    /// and the sort is stable, so a tie group would be in identity order with or without it. See
-    /// <c>FixtureCoverageTests</c>, which records that and why it will not stay harmless.
+    /// <b>What this proves and what it does not.</b> It proves the emitted sequence satisfies the
+    /// order <c>ConcealedDecision.Ranked</c> specifies, and it fails if any part of that sort is
+    /// dropped or inverted. It does not prove the identity tiebreak is doing the work: the model
+    /// arrives identity-ordered and the sort is stable, so a tie group would be in identity order
+    /// with or without it. See <c>FixtureCoverageTests</c>, which records that and why it will not
+    /// stay harmless.
+    /// </para>
+    /// <para>
+    /// <b>It asserted plain rank-descending until P9, and that was wrong rather than incomplete.</b>
+    /// A ratio against a zero median is undefined, and <c>Ranked</c> puts undefined LAST — behind
+    /// every measured ratio, however large the division came out — because ordering on the ratio
+    /// alone put all ten of nopCommerce's undefined cases at the top of the section, tied, ahead of
+    /// every type whose extremity was measured. No cohort in TestBed had a zero median, so this
+    /// theory never met one and encoded the wrong rule with nothing to catch it. P9's plant is what
+    /// found that: <c>DriftSonde</c> at 3x now correctly precedes <c>CustomsTrait</c> at undefined,
+    /// and the old assertion failed on it.
     /// </para>
     /// </remarks>
     [Theory]
-    [InlineData(FindingKind.ConcealedDecisionMethod, "CyclomaticXMedian")]
-    [InlineData(FindingKind.ConcealedDecisionType, "MaxMemberCyclomaticXMedian")]
-    public void Findings_are_emitted_in_a_total_order(FindingKind kind, string rank)
+    [InlineData(FindingKind.ConcealedDecisionMethod, "CyclomaticXMedian", "Cyclomatic")]
+    [InlineData(FindingKind.ConcealedDecisionType, "MaxMemberCyclomaticXMedian", "MaxMemberCyclomatic")]
+    public void Findings_are_emitted_in_a_total_order(FindingKind kind, string rank, string absolute)
     {
         var findings = Analysis.FindingsFor(core.Model).OfKind(kind);
         Assert.True(findings.Count > 1, "a single finding cannot exercise an ordering");
@@ -443,12 +454,34 @@ public sealed class FindingTests(CoreWalkFixture core)
             var (previous, current) = (findings[i - 1], findings[i]);
             var (before, after) = (previous.ValueOf(rank)!.Value, current.ValueOf(rank)!.Value);
 
-            Assert.True(before >= after, $"{previous} ranks below {current}");
-            if (before != after) continue;
+            // Measured before undefined, never the reverse.
+            Assert.True(
+                double.IsFinite(before) || !double.IsFinite(after),
+                $"{previous} divides by a zero median and ranks above {current}, which does not");
+
+            // One is measured and the other is not: the line above is the whole of the order.
+            if (double.IsFinite(before) != double.IsFinite(after)) continue;
+
+            if (double.IsFinite(before) && before != after)
+            {
+                Assert.True(before >= after, $"{previous} ranks below {current}");
+                continue;
+            }
+
+            // Equal ratios, or two undefined ones: absolute complexity is the only thing left
+            // that was measured, and it decides before identity does.
+            var (beforeAbsolute, afterAbsolute) =
+                (previous.ValueOf(absolute)!.Value, current.ValueOf(absolute)!.Value);
+
+            Assert.True(
+                beforeAbsolute >= afterAbsolute,
+                $"{previous} and {current} rank equally on {rank}, and {current} is the more complex");
+
+            if (beforeAbsolute != afterAbsolute) continue;
 
             Assert.True(
                 string.CompareOrdinal(previous.Subject.Canonical, current.Subject.Canonical) < 0,
-                $"{previous} and {current} tie on {rank} and are not in identity order");
+                $"{previous} and {current} tie on {rank} and {absolute}, and are not in identity order");
         }
     }
 

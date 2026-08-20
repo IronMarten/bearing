@@ -114,9 +114,10 @@ public sealed class ReportTests(CoreWalkFixture core)
         var version = ToolInfo.ReadVersion(typeof(Report).Assembly);
         Assert.Equal($"BEARING {version} — TestBed.sln", Lines[2]);
 
-        // 145, which is Core's count — the probe reports 144, because it merges the two
-        // PayloadTag declarations. docs/DEFECTS.md §1, and the header renders from the model.
-        Assert.Contains("179 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
+        // Keyed on (assembly, FQN), so both PayloadTag declarations are counted — docs/DEFECTS.md
+        // §1. StructureTests.Fixture_shape_is_stable owns this number and its history; the point
+        // here is only that the header renders it from the model rather than recounting.
+        Assert.Contains("185 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
     }
 
     /// <summary>

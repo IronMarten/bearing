@@ -1,7 +1,7 @@
 ﻿
 ================================================================
 BEARING {version} — TestBed.sln
-179 types — classes and interfaces — in 3 projects. Unusual findings first, then structure.
+185 types — classes and interfaces — in 3 projects. Unusual findings first, then structure.
 Every claim shows the numbers behind it.
 ================================================================
 
@@ -26,7 +26,7 @@ Every claim shows the numbers behind it.
    NormalizationContext — 20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis.
      Core · Contracts.cs:25 · change cost, 1 of 4
    ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.
-     Core · Controllers.cs:52 · concealed decision, 1 of 6
+     Core · Controllers.cs:52 · concealed decision, 1 of 7
    TariffCalculator.Apply — the most complex of the 33 methods in the 28 types in TestBed.Core.
      Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 13
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
@@ -43,6 +43,7 @@ Every claim shows the numbers behind it.
    RateReconciler.Reconcile — looks like plumbing but is 4.33x the median internal complexity of the 9 types whose name ends in Reconciler. (top 11%; cc 13, dsm 0, fan-in 1, fan-out 4)
    GuaranteedServiceNormalizer.Normalize — looks like plumbing but is 3.5x the median internal complexity of the 7 implementations of IResponseNormalizer. (top 7%; cc 21, dsm 16, fan-in 1, fan-out 5)
    DriftSonde.Correct — looks like plumbing but is 3x the median internal complexity of the 5 types whose name ends in Sonde. (top 10%; cc 6, dsm 0, fan-in 2, fan-out 0)
+   CustomsTrait.DutyBand — looks like plumbing but is the only complexity among the 6 types whose name ends in Trait. (top 8%; cc 6, dsm 0, fan-in 1, fan-out 0)
 
 -- CONCEALED DECISION, METHOD LEVEL ----------------------------
    TariffCalculator.Apply — the most complex of the 33 methods in the 28 types in TestBed.Core. (cc 22 against a peer median of 1; dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
@@ -182,7 +183,7 @@ Every claim shows the numbers behind it.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.03, D 0.97  (Ca 2 depend on it, Ce 0 reach out, 6/172 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.03, D 0.97  (Ca 2 depend on it, Ce 0 reach out, 6/178 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/5 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -195,7 +196,7 @@ Every claim shows the numbers behind it.
      Skipped this run: Core.Tests.
 
 -- NO PEER GROUP -----------------------------------------------
-   22 of 179 types (12.3%) sit in cohorts below --min-cohort (5).
+   22 of 185 types (11.9%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these, so their percentile and
    multiple-of-median readings are blank rather than zero.
    4 of them do still appear in the nominations above:

@@ -65,7 +65,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
         Assert.Equal(6, analysed.AbstractTypes);
-        Assert.Equal(172, analysed.TotalTypes);          // 128 → P6 140 → P7 155 → P8 172
+        Assert.Equal(178, analysed.TotalTypes);   // 128 → P6 140 → P7 155 → P8 172 → P9 178
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
