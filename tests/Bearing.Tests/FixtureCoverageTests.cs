@@ -1,5 +1,5 @@
-using ArchProbe;
 using IronMarten.Bearing;
+using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
 
@@ -14,8 +14,43 @@ namespace Bearing.Tests;
 /// the assertion here is narrowed.
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
+public sealed class FixtureCoverageTests(CoreWalkFixture core)
 {
+    /// <summary>The one type with this simple name.</summary>
+    private TypeNode Type(string name) => core.Model.Types.Single(t => t.Name == name);
+
+    /// <summary>
+    /// The types nominated under <paramref name="kind"/>, by name, after suppression.
+    /// </summary>
+    /// <remarks>
+    /// <b>Replaces reading the probe's rendered sections</b>, which is how this file used to ask
+    /// "does the fixture reach this finding". Section headers were the only surface the probe had,
+    /// so a question about the fixture had to be asked of a renderer. Core has the finding set, so
+    /// it is asked of the model, and rewording a section can no longer break a test about a plant.
+    /// <para>
+    /// A method-level finding is <i>about</i> a member, so its subject is resolved through the
+    /// declaring type — the same walk <c>SubjectRef</c> carries for suppression row 2. Nothing
+    /// worth naming is dropped by the null filter: a subject that resolves to no type is the
+    /// solution itself, which only <c>Coverage</c> findings take and which has no name to list.
+    /// </para>
+    /// </remarks>
+    private List<string> Nominated(FindingKind kind, SolutionModel? model = null)
+    {
+        var m = model ?? core.Model;
+
+        return [.. Analysis.FindingsFor(m)
+            .OfKind(kind)
+            .Select(f => m.Find(f.Subject.Kind == SubjectKind.Member ? f.Subject.DeclaringType! : f.Subject))
+            .Where(t => t is not null)
+            .Select(t => t!.Name)
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)];
+    }
+
+    /// <summary>The whole terminal report, for the two tests that assert an absence from it.</summary>
+    private string ReportText() =>
+        string.Join("\n", Report.For(core.Model, Analysis.FindingsFor(core.Model)));
+
     /// <summary>
     /// Every type nominated as a concealed decision at type level is also nominated at method
     /// level, so type level adds no subject of its own on this fixture.
@@ -140,26 +175,22 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void The_two_silent_findings_now_have_fixture_cases()
     {
-        var text = NominationText.Render(run.Result, run.Options);
-
-        // Both were empty, and an empty section produces the same bytes whatever its thresholds
+        // Both were empty, and an empty finding produces the same output whatever its thresholds
         // are. Asserted positively so that filling these gaps cannot quietly un-fill itself.
         // SpanCaliper joined ShipmentLedger with P7: it is the near miss that sits exactly on the
         // fan-in multiple and on the complexity percentile, which is what makes those two
-        // constants observable at all. The section is no longer a single-row list and the point of
+        // constants observable at all. The finding is no longer a single-row list and the point of
         // this assertion is that it is not empty rather than that it holds one name.
-        Assert.Equal(
-            ["ShipmentLedger", "SpanCaliper"],
-            NominationText.SubjectsUnder(text, "-- BUG BLAST RADIUS").Order(StringComparer.Ordinal));
-        Assert.Contains("TariffReconciler", NominationText.SubjectsUnder(text, "-- BREAKS ALONE"));
+        Assert.Equal(["ShipmentLedger", "SpanCaliper"], Nominated(FindingKind.BugBlastRadius));
+        Assert.Contains("TariffReconciler", Nominated(FindingKind.BreaksAlone));
 
-        // Asserted alongside so this reads as a gap in two findings rather than a fact about
-        // two arbitrary strings. If these ever empty out, the parser broke, not the tool.
-        Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- CONCEALED DECISION -"));
-        Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- CONCEALED DECISION, METHOD LEVEL"));
-        Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- CHANGE COST"));
-        Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- LOAD-BEARING AND INTRICATE"));
-        Assert.NotEmpty(NominationText.SubjectsUnder(text, "-- SHARED MUTABLE STATE"));
+        // Asserted alongside so this reads as a gap in two findings rather than a fact about two
+        // arbitrary strings. If these ever empty out, the fixture broke, not the tool.
+        Assert.NotEmpty(Nominated(FindingKind.ConcealedDecisionType));
+        Assert.NotEmpty(Nominated(FindingKind.ConcealedDecisionMethod));
+        Assert.NotEmpty(Nominated(FindingKind.ChangeCost));
+        Assert.NotEmpty(Nominated(FindingKind.LoadBearingAndIntricate));
+        Assert.NotEmpty(Nominated(FindingKind.SharedMutableState));
     }
 
     /// <summary>
@@ -399,24 +430,26 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void The_god_object_plant_observes_the_member_count()
     {
-        var registry = run.Type("DispatchRegistry");
+        var registry = Type("DispatchRegistry");
+        var policy = core.Model.Policy;
 
         // Reaches the branch on size, and could not reach it on complexity.
-        Assert.True(registry.MemberCount >= run.Options.GodObjectMembers);
-        Assert.True(registry.MaxMemberCyclomatic < run.Options.HighCc);
-        Assert.True(Math.Min(registry.FanIn, registry.FanOut) >= run.Options.HubMin);
+        Assert.True(registry.MemberCount >= policy.GodObjectMembers);
+        Assert.True(registry.MaxMemberCyclomatic < policy.HighCc);
+        Assert.True(Math.Min(registry.FanIn, registry.FanOut) >= policy.HubMin);
 
-        var atDefaults = NominationText.Render(run.Result, run.Options);
-        Assert.Contains("DispatchRegistry", atDefaults, StringComparison.Ordinal);
-        Assert.Contains("Architectural bottleneck", atDefaults, StringComparison.Ordinal);
+        // The probe said this in prose — "Architectural bottleneck" against "Wiring hub" — and
+        // Core carries it as a qualifier on the finding, which is what makes the arm assertable
+        // rather than greppable.
+        Assert.True(Hub(core.Model, registry).Holds(Qualifiers.TooLargeToHold));
 
         // Raise the floor past 23 and the same type reads as wiring instead. It is still a hub,
-        // so this is the disjunction moving rather than the finding disappearing.
-        var raised = NominationText.Render(
-            run.Result, new Options { GodObjectMembers = registry.MemberCount + 1 });
+        // so this is the disjunction moving rather than the finding disappearing — and it needs a
+        // real second walk, because a finding has to be able to name the policy that produced it.
+        var raised = core.WalkWith(policy with { GodObjectMembers = registry.MemberCount + 1 });
+        var thereToo = raised.Types.Single(t => t.Name == "DispatchRegistry");
 
-        Assert.Contains("DispatchRegistry", raised, StringComparison.Ordinal);
-        Assert.Contains("Wiring hub", raised, StringComparison.Ordinal);
+        Assert.False(Hub(raised, thereToo).Holds(Qualifiers.TooLargeToHold));
     }
 
     /// <summary>
@@ -456,18 +489,17 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void The_change_cost_ApiBoundary_arm_is_observed_on_both_sides_now()
     {
-        var callback = run.Type("DispatchCallbackController");
+        var callback = Type("DispatchCallbackController");
 
-        Assert.Equal("ApiBoundary", callback.Kind);
-        Assert.True(callback.FanIn >= run.Options.MinCohort);
+        Assert.Equal("ApiBoundary", callback.Classification.Kind);
+        Assert.True(callback.FanIn >= core.Model.Policy.MinCohort);
 
-        // DispatchCallbackController is still outside Core's slice, and the reason is still the
-        // share gate rather than the kind or the floor — both of which it clears.
-        var subject = core.Model.Types.Single(t => t.Name == "DispatchCallbackController");
-        Assert.True(subject.FanIn >= core.Model.Policy.MinFanIn);
+        // DispatchCallbackController is outside Core's slice, and the reason is the share gate
+        // rather than the kind or the floor — both of which it clears.
+        Assert.True(callback.FanIn >= core.Model.Policy.MinFanIn);
         Assert.DoesNotContain(
             Analysis.FindingsFor(core.Model).OfKind(FindingKind.ChangeCost),
-            f => f.Subject == subject.Subject);
+            f => f.Subject == callback.Subject);
 
         // But the arm itself is no longer deletable in Core: LayeringEndpoint is an ApiBoundary and
         // Core nominates it, so dropping the kind from ChangeCost now moves the finding set. That
@@ -481,32 +513,37 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
 
         Assert.Equal(["ApiBoundary", "Contract"], kinds);
 
-        // Two of them since P6, whose LayeringEndpoint is reached by eight conduits and clears the
-        // probe's absolute floor without having been built to. It does not rescue the arm in Core
-        // — at solution midrank 9 against a limit of 7.2 it is outside the slice, which is the
-        // assertion above stated for a second type — but it does mean the probe's half of the arm
-        // no longer rests on a single plant.
+        // Two boundaries clear the floor since P6, whose LayeringEndpoint is reached by eight
+        // conduits and got there without having been built to. That is what stops the arm resting
+        // on a single plant — and it is also why the arm survives while this type does not:
+        // LayeringEndpoint is inside the slice and DispatchCallbackController, at solution midrank
+        // 9 against a limit of 7.2, is not.
         Assert.Equal(
             ["DispatchCallbackController", "LayeringEndpoint"],
-            run.Result.Types
-                .Where(t => t.Kind == "ApiBoundary" && t.FanIn >= run.Options.MinCohort)
+            core.Model.Types
+                .Where(t => t.Classification.Kind == "ApiBoundary"
+                            && t.FanIn >= core.Model.Policy.MinCohort)
                 .Select(t => t.Name)
                 .Order(StringComparer.Ordinal));
 
         // And it is inert everywhere else, so the plant adds one claim rather than a cluster of
         // them. Each of these is a gate it deliberately fails.
-        Assert.True(callback.MaxMemberCyclomatic < run.Options.HighCc);        // not load-bearing,
-                                                                              // not a boundary
-                                                                              // carrying logic
-        Assert.True(Math.Min(callback.FanIn, callback.FanOut) < run.Options.HubMin);  // not a hub
-        Assert.Equal("ApiBoundary", callback.KindSpan);                        // one kind, not three
+        Assert.True(callback.MaxMemberCyclomatic < core.Model.Policy.HighCc);   // not load-bearing,
+                                                                               // not a boundary
+                                                                               // carrying logic
+        Assert.True(Math.Min(callback.FanIn, callback.FanOut) < core.Model.Policy.HubMin);  // not a hub
 
-        var text = NominationText.Render(run.Result, run.Options);
-        Assert.Contains(
-            "DispatchCallbackController — 5 internal callers", text, StringComparison.Ordinal);
-        Assert.DoesNotContain("DispatchCallbackController —", text.Replace(
-            "DispatchCallbackController — 5 internal callers", "", StringComparison.Ordinal),
-            StringComparison.Ordinal);
+        // One kind, not three, so it does not span layers either. The probe carried this as a
+        // KindSpan string on the type; Core carries no such column and answers the question the
+        // way a reader would — is there a finding.
+        Assert.DoesNotContain(
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers),
+            f => f.Subject == callback.Subject);
+
+        // The whole of it: Core makes no claim about this type at all. The probe named it once,
+        // under change cost, and that single mention was what the old assertion pinned by string
+        // surgery on the rendered text.
+        Assert.Empty(Analysis.FindingsFor(core.Model).About(callback.Subject));
     }
 
     /// <summary>
@@ -530,15 +567,12 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void The_increment_plant_is_the_only_static_write_that_is_one()
     {
-        Assert.Equal(1, run.Type("DispatchCounter").StaticMutations);
+        Assert.Equal(1, Type("DispatchCounter").StaticMutations);
 
         // The pre-existing case, and why it could not do this job.
-        Assert.Equal(2, run.Type("QuoteAssembler").StaticMutations);
+        Assert.Equal(2, Type("QuoteAssembler").StaticMutations);
 
-        Assert.Contains(
-            "DispatchCounter",
-            NominationText.Render(run.Result, run.Options),
-            StringComparison.Ordinal);
+        Assert.Contains("DispatchCounter", Nominated(FindingKind.SharedMutableState));
     }
 
     /// <summary>
@@ -827,14 +861,17 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [InlineData("FixtureBuilder")]          // used only from a skipped test project
     public void A_dead_code_trap_reads_exactly_like_dead_code(string trap)
     {
-        var planted = run.Result.Types.Single(t => t.Name == trap);
+        var planted = Type(trap);
 
         // Indistinguishable on the only evidence currently collected.
         Assert.Equal(0, planted.FanIn);
 
-        // And nothing in the report mentions it — there is no section for this yet, so silence
-        // here is the absence of a feature rather than a clean bill of health.
-        Assert.DoesNotContain(trap, NominationText.Render(run.Result, run.Options), StringComparison.Ordinal);
+        // No claim is made about it, and nothing in the report names it — there is no section for
+        // this yet, so silence here is the absence of a feature rather than a clean bill of
+        // health. Both halves, because a finding that existed and went unrendered would be a
+        // different failure from a finding that was never made.
+        Assert.Empty(Analysis.FindingsFor(core.Model).About(planted.Subject));
+        Assert.DoesNotContain(trap, ReportText(), StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -858,17 +895,13 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void The_blast_radius_plant_observes_the_fan_in_floor()
     {
-        var atDefaults = NominationText.SubjectsUnder(
-            NominationText.Render(run.Result, run.Options), "-- BUG BLAST RADIUS");
-
-        Assert.Equal(["ShipmentLedger", "SpanCaliper"], atDefaults.Order(StringComparer.Ordinal));
+        Assert.Equal(["ShipmentLedger", "SpanCaliper"], Nominated(FindingKind.BugBlastRadius));
 
         // ShipmentLedger has 11 callers and SpanCaliper 5. Raise the floor past both and the
         // finding goes quiet, which it could not have done before there was anything to silence.
-        var aboveThePlant = NominationText.SubjectsUnder(
-            NominationText.Render(run.Result, new Options { MinFanIn = 12 }), "-- BUG BLAST RADIUS");
+        var aboveThePlant = core.WalkWith(core.Model.Policy with { MinFanIn = 12 });
 
-        Assert.Empty(aboveThePlant);
+        Assert.Empty(Nominated(FindingKind.BugBlastRadius, aboveThePlant));
     }
 
     /// <summary>
@@ -884,8 +917,8 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void A_generic_DI_registration_is_already_a_visible_reference()
     {
-        Assert.Equal(1, run.Result.Types.Single(t => t.Name == "TenantPolicySink").FanIn);
-        Assert.Equal(0, run.Result.Types.Single(t => t.Name == "AuditPolicySink").FanIn);
+        Assert.Equal(1, Type("TenantPolicySink").FanIn);
+        Assert.Equal(0, Type("AuditPolicySink").FanIn);
     }
 
     /// <summary>
@@ -956,4 +989,14 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
 
         Assert.Equal(0, undefined);
     }
+
+    /// <summary>The hub-or-god-object finding about <paramref name="type"/>.</summary>
+    /// <remarks>
+    /// Takes the model explicitly because the god-object test asks the same question of a second
+    /// walk, and a finding belongs to the model whose policy produced it.
+    /// </remarks>
+    private static Finding Hub(SolutionModel model, TypeNode type) =>
+        Assert.Single(
+            Analysis.FindingsFor(model).About(type.Subject),
+            f => f.Kind == FindingKind.HubOrGodObject);
 }
