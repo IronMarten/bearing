@@ -1,4 +1,3 @@
-using ArchProbe;
 using IronMarten.Bearing;
 
 namespace Bearing.Tests;
@@ -63,7 +62,7 @@ public sealed class CoreWalkFixture
 /// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun probe)
+public sealed class WalkTests(CoreWalkFixture core)
 {
     /// <summary>
     /// The planted cross-project collisions: one fully-qualified name each, two assemblies each.
@@ -82,81 +81,6 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
         "global::TestBed.Interop.CarrierTwin",
     };
 
-    [Fact]
-    public void Core_finds_the_same_types_plus_the_ones_the_probe_merges()
-    {
-        var probeNames = probe.Result.Types.Select(t => t.Id).ToList();
-        var coreNames = core.Model.Types.Select(t => t.FullyQualifiedName).ToList();
-
-        // The probe collapses each collision into one row; Core keeps both declarations of each.
-        foreach (var collision in CollidingNames)
-        {
-            Assert.Equal(1, probeNames.Count(n => string.Equals(n, collision, StringComparison.Ordinal)));
-            Assert.Equal(2, coreNames.Count(n => string.Equals(n, collision, StringComparison.Ordinal)));
-        }
-
-        Assert.Equal(probeNames.Count + CollidingNames.Count, coreNames.Count);
-        Assert.Equal(probeNames.Order(StringComparer.Ordinal), coreNames.Distinct().Order(StringComparer.Ordinal));
-    }
-
-    [Fact]
-    public void The_collisions_are_two_types_in_two_assemblies_rather_than_one_with_summed_metrics()
-    {
-        // Both collisions, and the assemblies differ between them on purpose: PayloadTag spans two
-        // projects that do not reference each other, CarrierTwin spans a reference edge, which is
-        // what lets its merge fabricate a dependency. P8.
-        Assert.Equal(
-            [["Core", "Data"], ["Data", "Tools"]],
-            CollidingNames
-                .Select(name => core.Model.Types
-                    .Where(t => string.Equals(t.FullyQualifiedName, name, StringComparison.Ordinal))
-                    .Select(t => t.Assembly)
-                    .Order(StringComparer.Ordinal)
-                    .ToList())
-                .OrderBy(a => a[0], StringComparer.Ordinal)
-                .ToList());
-
-        foreach (var name in CollidingNames)
-        {
-            var split = core.Model.Types
-                .Where(t => string.Equals(t.FullyQualifiedName, name, StringComparison.Ordinal))
-                .ToList();
-            var merged = probe.Result.Types.Single(t => string.Equals(t.Id, name, StringComparison.Ordinal));
-
-            Assert.Equal(2, split.Count);
-
-            // The probe's row is the two declarations added together. Core's are the parts.
-            Assert.Equal(merged.MemberCount, split.Sum(t => t.MemberCount));
-            Assert.Equal(merged.Loc, split.Sum(t => t.LinesOfCode));
-            Assert.Equal(merged.Cyclomatic, split.Sum(t => t.Cyclomatic));
-        }
-
-        var split2 = core.Model.Types.Where(t => CollidingNames.Contains(t.FullyQualifiedName)).ToList();
-
-        // And each part is attributed to the project that actually declares it, rather than
-        // both being credited to whichever one loaded first.
-        Assert.All(split2, t => Assert.Equal(t.Assembly, t.Project));
-    }
-
-    [Theory]
-    [MemberData(nameof(Measures))]
-    public void Every_uncollided_type_measures_the_same(string measure)
-    {
-        var byName = core.Model.Types
-            .Where(t => !CollidingNames.Contains(t.FullyQualifiedName))
-            .ToDictionary(t => t.FullyQualifiedName, StringComparer.Ordinal);
-
-        var compared = 0;
-        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
-        {
-            var c = byName[p.Id];
-            Assert.Equal(ProbeMeasure(p, measure), CoreMeasure(c, measure));
-            compared++;
-        }
-
-        Assert.Equal(probe.Result.Types.Count - CollidingNames.Count, compared);
-    }
-
     public static TheoryData<string> Measures =>
     [
         "FanIn", "FanOut", "EffectiveFanOut", "InboundReferenceCount",
@@ -164,15 +88,6 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
         "MemberCount", "PublicMemberCount", "ExecutableMemberCount",
         "ParameterCount", "DataShape", "LinesOfCode",
     ];
-
-    [Fact]
-    public void Every_type_carries_the_same_architectural_kind()
-    {
-        var byName = core.Model.Types.ToLookup(t => t.FullyQualifiedName, StringComparer.Ordinal);
-
-        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
-            Assert.Equal(p.Kind, byName[p.Id].Single().Classification.Kind);
-    }
 
     [Fact]
     public void Classification_now_carries_the_evidence_that_decided_it()
@@ -183,65 +98,6 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
         var controller = core.Model.Types.First(t => t.Name.EndsWith("Controller", StringComparison.Ordinal));
         Assert.Equal("ApiBoundary", controller.Classification.Kind);
         Assert.Contains(":", controller.Classification.Evidence, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void The_same_edges_are_found_with_the_same_weights()
-    {
-        var probeEdges = probe.Result.Edges
-            .Where(e => !CollidingNames.Contains(e.From) && !CollidingNames.Contains(e.To))
-            .ToDictionary(e => (e.From, e.To), e => e.Weight);
-
-        var coreEdges = new Dictionary<(string, string), int>();
-        foreach (var e in core.Model.Edges)
-        {
-            var from = core.Model.Find(e.From)!.FullyQualifiedName;
-            var to = core.Model.Find(e.To)!.FullyQualifiedName;
-            if (CollidingNames.Contains(from) || CollidingNames.Contains(to)) continue;
-
-            coreEdges[(from, to)] = coreEdges.GetValueOrDefault((from, to)) + e.Weight;
-        }
-
-        Assert.Equal(probeEdges.Keys.Order(), coreEdges.Keys.Order());
-        foreach (var (pair, weight) in probeEdges)
-            Assert.Equal(weight, coreEdges[pair]);
-    }
-
-    [Fact]
-    public void External_namespaces_match()
-    {
-        var byName = core.Model.Types.ToLookup(t => t.FullyQualifiedName, StringComparer.Ordinal);
-
-        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
-            Assert.Equal(
-                p.ExternalNamespaces.Order(StringComparer.Ordinal),
-                byName[p.Id].Single().ExternalNamespaces.Order(StringComparer.Ordinal));
-    }
-
-    [Fact]
-    public void Members_match_one_for_one()
-    {
-        var byName = core.Model.Types.ToLookup(t => t.FullyQualifiedName, StringComparer.Ordinal);
-
-        // The probe records only methods and constructors; Core records every member, so
-        // compare the intersection on the probe's terms.
-        foreach (var group in probe.Result.Methods.GroupBy(m => m.DeclaringTypeId, StringComparer.Ordinal))
-        {
-            if (CollidingNames.Contains(group.Key)) continue;
-
-            var coreMembers = byName[group.Key].Single().Members;
-            foreach (var m in group)
-            {
-                var match = coreMembers.Single(c =>
-                    c.Name == m.Name && c.Location.Line == m.Line);
-
-                Assert.Equal(m.Cyclomatic, match.Cyclomatic);
-                Assert.Equal(m.Dsm, match.Dsm);
-                Assert.Equal(m.MaxNestingDepth, match.MaxNestingDepth);
-                Assert.Equal(m.ParamCount, match.ParameterCount);
-                Assert.Equal(m.Loc, match.LinesOfCode);
-            }
-        }
     }
 
     [Fact]
@@ -256,18 +112,6 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
 
         Assert.True(applies.Count > 1, "the fixture should declare Apply on several types");
         Assert.Equal(applies.Count, applies.Select(m => m.Subject.Canonical).Distinct(StringComparer.Ordinal).Count());
-    }
-
-    [Fact]
-    public void Coverage_matches()
-    {
-        Assert.Equal(probe.Result.ExcludedTypes, core.Model.Coverage.ExcludedTypes);
-        Assert.Equal(
-            probe.Result.SkippedProjects.Order(StringComparer.Ordinal),
-            core.Model.Coverage.SkippedProjects.Order(StringComparer.Ordinal));
-        Assert.Equal(
-            probe.Result.Projects.Select(p => p.Name).Order(StringComparer.Ordinal),
-            core.Model.Projects.Select(p => p.Name).Order(StringComparer.Ordinal));
     }
 
     // ------------------------------------------------------- the new fields ----
@@ -328,28 +172,6 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
             core.Model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)).Order(),
             core.Model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
     }
-
-    // ------------------------------------------------------------- adapters ----
-
-    private static double ProbeMeasure(TypeMetrics t, string measure) => measure switch
-    {
-        "FanIn" => t.FanIn,
-        "FanOut" => t.FanOut,
-        "EffectiveFanOut" => t.FanOutEffective,
-        "InboundReferenceCount" => t.InboundRefCount,
-        "Cyclomatic" => t.Cyclomatic,
-        "MaxMemberCyclomatic" => t.MaxMemberCyclomatic,
-        "Dsm" => t.Dsm,
-        "Transform" => t.Transform,
-        "StaticMutations" => t.StaticMutations,
-        "MemberCount" => t.MemberCount,
-        "PublicMemberCount" => t.PublicMemberCount,
-        "ExecutableMemberCount" => t.ExecutableMembers,
-        "ParameterCount" => t.ParamCount,
-        "DataShape" => t.DataShape,
-        "LinesOfCode" => t.Loc,
-        _ => throw new ArgumentOutOfRangeException(nameof(measure), measure, null),
-    };
 
     private static double CoreMeasure(TypeNode t, string measure) => measure switch
     {

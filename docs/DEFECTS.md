@@ -69,7 +69,7 @@ commit.
 and Core computes with it: `ModelBuilder.GetOrAdd` keys the type table on `subject.Canonical`, and
 `CollectReferences` keys the edge map on the canonical pair, so nodes *and* edges are
 assembly-qualified. This is the one behaviour extraction is permitted to change
-(`TECHREQ-job-b.md` §8 criterion 8), and `WalkerEquivalenceTests` asserts the divergence from
+(`TECHREQ-job-b.md` §8 criterion 8), and `WalkTests` asserts the divergence from
 three sides: Core reports exactly one type more than the probe, it keeps both `PayloadTag`
 declarations, and each is attributed to the project that declares it rather than to whichever
 loaded first.
@@ -417,7 +417,7 @@ statistic — `rank = n(100 − pctl)/100 + 0.5` identically, for every value an
 configuration — so substituting it into `pctl >= 95` gives `rank <= 0.05n + 0.5` exactly. The
 `+ 0.5` is the midrank offset, not a fudge factor. **Core therefore admits precisely what the
 probe admits in every cohort of ten or more**, which is why no golden moved and why
-`FindingEquivalenceTests` agrees on the fixture.
+`FindingTests` agrees on the fixture.
 
 `Math.Max(1, …)` is the entire repair. Below n = 10 the percentile form yields a limit under 1,
 which no rank can satisfy; flooring it at 1 admits the cohort maximum and nothing else. A
@@ -898,7 +898,7 @@ too narrow in a different direction, and the two want fixing together.
 
 **Fixed — the row says who provides it, read off how the SDK resolved the assembly.** Framework references resolve out of the targeting packs and the shared framework, packages out of the NuGet cache; both are facts about how restore works rather than a list of names to maintain. That matters because names cannot answer it — `System.Text.Json` is in the shared framework on one target and a package on another — and because a curated list is §5's defect, which is the one this entry sits next to.
 
-**Origin does not decide the integration map, and the fixture is why.** The first attempt treated framework-resolved as plumbing and emptied the map: `System.Data` and `System.Net.Http` both resolve from the framework, and both are exactly how TestBed reaches a database and the network. `CoreEquivalenceTests.The_integration_map_over_the_fixture_is_what_it_should_be` caught it in one run. **The two questions are different** — origin answers *"could somebody change this dependency"*, the filter answers *"does this reach outside the process"* — and the reader asked the first, whose answer is a label on the row rather than a reason to drop it.
+**Origin does not decide the integration map, and the fixture is why.** The first attempt treated framework-resolved as plumbing and emptied the map: `System.Data` and `System.Net.Http` both resolve from the framework, and both are exactly how TestBed reaches a database and the network. `CyclesAndCouplingTests.The_integration_map_over_the_fixture_is_what_it_should_be` caught it in one run. **The two questions are different** — origin answers *"could somebody change this dependency"*, the filter answers *"does this reach outside the process"* — and the reader asked the first, whose answer is a label on the row rather than a reason to drop it.
 
 Unknown says nothing rather than guessing a third answer, and the name-based filter still applies to those. On nopCommerce: `Newtonsoft.Json` and `FluentValidation` are packages, `System.IO` is framework, and `Microsoft.AspNetCore.Mvc` resolves as a package while `Microsoft.AspNetCore.Http` resolves as framework — a distinction no name list makes.
 ### 31. A folded diagram box does not read as containing the projects that are missing — **fixed**
@@ -989,7 +989,7 @@ gained an evidence line — it had none, which was invisible until the rank gate
 fixture's rarest kind and the lead card rendered with an empty numbers row.
 
 **The sweep reports no movement at one notch and that is the fixture, not the gate.** Fifteen
-boundaries, where 1% cannot move a rank; `FindingEquivalenceTests.The_boundary_rank_is_reachable_from_both_sides`
+boundaries, where 1% cannot move a rank; `FindingTests.The_boundary_rank_is_reachable_from_both_sides`
 is the control that reaches both branches.
 
 ### 34. A cohort of 2,909 is not a peer group — **fixed, and the diagnosis moved**

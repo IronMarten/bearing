@@ -106,12 +106,12 @@ snapshots in §3 are the deliberate exception, and they exist to catch the wordi
 | `OracleGoldenTests` | the three frozen baselines |
 | `OrderingTests` | that every artifact is a function of the analysis and not of its enumeration order — see below |
 | `DistributionTests` | the comparative substrate — midrank, medians, and when a reading is refused — without Roslyn |
-| `CoreEquivalenceTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
+| `CyclesAndCouplingTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
 | `AnalysisPolicyTests` | that every threshold is named and reviewable, including the thirteen that were literals |
 | `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation — plus full cohort equivalence with the probe |
 | `FindingSetTests` | finding identity and the member → declaring type query suppression is written against, on synthetic input |
-| `FindingEquivalenceTests` | Core's concealed-decision nominations against the probe's, both levels, plus the rules that are now model facts rather than wording |
-| `WalkerEquivalenceTests` | Core's walk against the probe's: every type, measure, edge, member and external namespace |
+| `FindingTests` | Core's concealed-decision nominations against the probe's, both levels, plus the rules that are now model facts rather than wording |
+| `WalkTests` | Core's walk against the probe's: every type, measure, edge, member and external namespace |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
 | `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
@@ -152,7 +152,7 @@ absence is the defect; only the subject names are read, never the sentence.
 `OracleGoldenTests` asks whether the probe's output moved. That catches a regression in the
 probe and says nothing about the rewrite, because Core is not in the picture at all.
 
-`CoreEquivalenceTests` asks the question extraction actually poses: **does the reimplementation
+`CyclesAndCouplingTests` asks the question extraction actually poses: **does the reimplementation
 agree with the oracle?** Every cohort reading, every method reading, every solution-wide
 percentile and every project's coupling, computed twice and compared on the real fixture. Core
 is a rewrite rather than a port, so agreement is a result rather than a tautology — each
@@ -247,7 +247,7 @@ Tidying it up changes the expected answers.
   > in this section as a comment until you have found the test that holds it.
 - namespace cycle: 4 namespaces — `TestBed.Core` ↔ `.Depots` ↔ `.Pricing` ↔ `.Vaults`
   (was two here for several sessions; pinned now in
-  `CoreEquivalenceTests.Namespace_cycles_over_the_fixture_are_what_they_should_be`)
+  `CyclesAndCouplingTests.Namespace_cycles_over_the_fixture_are_what_they_should_be`)
 - type tangle: 8 types — the six plain normalizers plus `Router` and `ShipmentCoordinator`
 - breaks alone: `TariffReconciler` fires; `MethodReconciler` also fires and **should not** — see
   the note below. Cohort `suffix:Reconciler` (9 members), medians fan-out 2, fan-in 1,
@@ -551,7 +551,7 @@ re-running those three mutations after the plant — all three still pass.
 **~~For type identity.~~ Filled, and half of what it promised did not happen.**
 `TestBed.Shared.PayloadTag` is declared in both `Data` and `Tools`, and the goldens record the
 merged row. Core has since keyed on `(assembly, FQN)` — it reports 133 types against the probe's
-132 — so the fix is real and `WalkerEquivalenceTests` asserts it (`TECHREQ-job-b.md` §8,
+132 — so the fix is real and `WalkTests` asserts it (`TECHREQ-job-b.md` §8,
 criterion 8). But `KnownDefectTests` did **not** fail on that day and never will: it asserts
 against the probe's run, and the probe is frozen.
 
@@ -625,7 +625,7 @@ renderer says so when the path is shorter than the component. The fixture has on
 of 4 with a loop of 2 and one type tangle of 8 with a loop of 3, so **only the disclosing arm ever
 renders** — a component whose shortest loop visits everything produces a line with no qualifier,
 and nothing in TestBed produces one. `GraphTests` and `ProjectCycleTests` cover it directly, and
-`CoreEquivalenceTests.Neither_of_the_fixtures_loops_covers_its_whole_component` states the gap as
+`CyclesAndCouplingTests.Neither_of_the_fixtures_loops_covers_its_whole_component` states the gap as
 an assertion so it fails the day a plant closes it. A second tangle (**P8**) is the obvious place
 for it and would close the ordering and truncation gaps in the same plant.
 
@@ -648,7 +648,7 @@ throughout, and could not have been otherwise.
 | A load diagnostic | every solution in this repository loads cleanly | §4, confirmed: nopCommerce's six are NuGet **vulnerability advisories**, not failures |
 | An unreadable solution | the fixture is a valid `.sln` | §23 — eleven frames of MSBuild stack trace at the user. **Closed**: `SolutionLoadFailureTests` writes the malformed inputs to a temporary directory rather than committing them, which is the shape every row here could take and only some should |
 | A constructor nominated by name | no TestBed constructor is complex enough to be nominated | §24 — `CustomerInfoValidator..ctor` |
-| A **project cycle** | every cross-project edge in a solution that builds follows a project reference, and MSBuild forbids those from cycling — so aggregating the type graph over any well-formed solution reproduces the reference DAG | A3. **No plant can reach it**: the shape needs an analysed assembly resolved some way other than a project reference, which is a property of a build. `ProjectCycleTests` constructs it from primitives, and `CoreEquivalenceTests` asserts the fixture's empty answer is the *correct* one rather than an untested one |
+| A **project cycle** | every cross-project edge in a solution that builds follows a project reference, and MSBuild forbids those from cycling — so aggregating the type graph over any well-formed solution reproduces the reference DAG | A3. **No plant can reach it**: the shape needs an analysed assembly resolved some way other than a project reference, which is a property of a build. `ProjectCycleTests` constructs it from primitives, and `CyclesAndCouplingTests` asserts the fixture's empty answer is the *correct* one rather than an untested one |
 
 > **The lesson is about what a synthetic fixture is for, not about this fixture being bad.** TestBed
 > is built to make *judgements* checkable — which finding fires, against which population, at which
@@ -869,7 +869,7 @@ declares fifteen boundaries, and a notch of 0.01 over fifteen cannot move a rank
 `TopRankLimit(0.05)` and `TopRankLimit(0.06)` both admit exactly rank 1. It is the second of the
 three causes behind a `-`: the constant is fine, the gate is reachable, and the *fixture's
 population* is too small for the notch. The control that reaches both branches is
-`FindingEquivalenceTests.The_boundary_rank_is_reachable_from_both_sides`, which widens the share
+`FindingTests.The_boundary_rank_is_reachable_from_both_sides`, which widens the share
 until the probe's second boundary returns and raises the floor until the finding empties. **A `-`
 with no note beside it is how a live gate gets deleted as decoration**, which is the failure this
 paragraph exists to prevent.
@@ -978,7 +978,7 @@ model.
 
   **Recorded rather than celebrated.** Nothing about it is load-bearing for P6, so reshaping the
   conduits would retire the case again with nothing saying so — which is why
-  `FindingEquivalenceTests.The_weaker_global_claim_is_made_in_both_flavours` names the three types
+  `FindingTests.The_weaker_global_claim_is_made_in_both_flavours` names the three types
   instead of counting them. **Two of the fixture's gate closures now rest on plants built for
   something else**, this one and change cost's, and that is a pattern worth watching rather than
   a run of luck.

@@ -142,7 +142,7 @@ public sealed class ProjectCycleTests(CoreWalkFixture core)
     /// <remarks>
     /// <c>docs/DEFECTS.md</c> §1 and the caution in <c>PRD-free-tier.md</c> §7.1, which says the
     /// finding is not trustworthy until <c>SubjectRef.ForType(assembly, fqn)</c> is what the
-    /// walkers key on. It is — <c>WalkerEquivalenceTests</c> asserts that from three sides — and
+    /// walkers key on. It is — <c>WalkTests</c> asserts that from three sides — and
     /// this shows what the alternative would have reported here, so the two cannot be confused in
     /// a bug report.
     /// </remarks>

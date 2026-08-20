@@ -1,4 +1,4 @@
-using ArchProbe;
+using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -8,309 +8,296 @@ namespace Bearing.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Suppression is the part of Job B most likely to be lost in extraction and least likely to
-/// fail loudly when it is. A suppression that stops working produces <b>more</b> output, and
-/// more output reads as a working tool. Until the fixture had cases that fire, removing any of
-/// these rules turned empty output into empty output and nothing failed.
+/// Suppression is the part of Job B most likely to be lost in extraction and least likely to fail
+/// loudly when it is. <b>A suppression that stops working produces more output, and more output
+/// reads as a working tool.</b> Until the fixture had cases that fire, removing any of these rules
+/// turned empty output into empty output and nothing failed.
 /// </para>
 /// <para>
-/// Each test below names a companion that satisfies <b>every other condition</b> of the finding,
-/// and asserts both that it is absent and that the conditions it does meet are met. Without the
-/// second half, a companion that quietly stopped qualifying for an unrelated reason would still
-/// pass, and the suppression would be untested again without anyone noticing.
+/// <b>This file was rewritten at R2 rather than ported, and the reason is the whole point of the
+/// exercise.</b> Every one of its twelve tests read the probe, and eleven of them read its
+/// <i>rendered text</i> — the section a subject appeared under — because the probe's matrix
+/// existed only as ordering and inline <c>Where</c> clauses inside a 997-line renderer, so there
+/// was nothing else to ask. The old file said so in as many words: §4 requires suppression to
+/// become a declared relationship between findings, evaluated before rendering, and
+/// <c>FindingKey</c> is what it will be expressed against.
 /// </para>
 /// <para>
-/// Ordering is currently load-bearing in the implementation: breaks alone captures the
-/// concealed-decision nominations from earlier in the same method and tests membership. These
-/// tests are what makes that safe to change — §4 requires suppression to become a declared
-/// relationship between findings, evaluated before rendering, and <c>FindingKey</c> is what it
-/// will be expressed against.
+/// That happened. <c>Suppression.Rules</c> is the matrix as data, <c>Suppression.Silencing</c>
+/// names the row that removed a finding, and rows 4 and 6 are qualifiers on the finding because
+/// each silences a <i>sentence</i> rather than a claim. The tests written against that model grew
+/// up inside <c>FindingTests</c>, under a heading that read "the rules, on the model",
+/// while this file was still the one named after them. R2 moved them here, which is where a reader
+/// looking for the suppression matrix will look.
+/// </para>
+/// <para>
+/// <b>What is asserted has changed with them.</b> The old tests named a companion satisfying every
+/// other condition of a finding and asserted its absence from a section; these assert which row
+/// silenced it, by name. A finding removed for the wrong reason and a finding removed for the
+/// right one are indistinguishable from the surviving set, and only one of them is a working
+/// suppression.
+/// </para>
+/// <para>
+/// Row 4's collapse and its threshold control live in <c>FixtureCoverageTests</c> beside the plant
+/// that makes them reachable — <c>The_roll_call_collapse_fires_for_the_pattern_and_spares_the_pair</c>
+/// and <c>The_roll_call_threshold_decides_in_both_directions</c>.
 /// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class SuppressionTests(FixtureRun run)
+public sealed class SuppressionTests(CoreWalkFixture core)
 {
-    /// <summary>Row 1: never imply safety at a boundary. Invariant 4.</summary>
+    /// <summary>
+    /// Every implemented suppression row silences something, and each one has a case of its own.
+    /// </summary>
     /// <remarks>
-    /// The probe cannot see external consumers, so "if it breaks, it breaks alone" is the one
-    /// claim it must not make about a type on the outside edge. A tool that says "safe to
-    /// remove" about something six customers depend on has caused the burn it claimed to
-    /// prevent.
+    /// <para>
+    /// <c>TECHREQ-job-b.md</c> §4's second structural requirement: a suppression that stops
+    /// working produces <i>more</i> output, which reads as a working tool, so a row that silences
+    /// nothing is a row nothing can fail on.
+    /// </para>
+    /// <para>
+    /// <b>Row 3 was exactly that until the Evaluator cohort was planted.</b> Both types that
+    /// reached breaks alone with no callers were taken first — <c>ShipmentController</c> by the
+    /// boundary row, <c>AuditReconciler</c> by the concealed-decision row — so
+    /// <c>breaks-alone-is-unreferenced</c> could be deleted outright with the suite green.
+    /// <c>DetentionEvaluator</c> is unreferenced, is not a boundary, and is not a concealed
+    /// decision, so it is the first type only row 3 can reach.
+    /// </para>
+    /// <para>
+    /// The matrix order decides which reason is reported when rows overlap, and it is §4's order
+    /// rather than a convenience. Reordering to change an attribution would be choosing the
+    /// answer to suit the suite.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void Breaks_alone_is_suppressed_at_a_boundary()
+    public void Every_suppression_row_silences_something()
     {
-        var boundary = Type("ReconciliationController");
+        var detected = Analysis.Detected(core.Model);
 
-        // Everything except Kind says it qualifies.
-        Assert.Equal("ApiBoundary", boundary.Kind);
-        Assert.True(boundary.FanIn >= 1);
-        Assert.True(boundary.Instability >= 0.8);
-        Assert.True(boundary.MaxMemberCyclomatic >= run.Options.HighCc);
+        var silenced = detected.All
+            .Select(f => Suppression.Silencing(f, detected, core.Model))
+            .Where(rule => rule is not null)
+            .Select(rule => rule!.Name)
+            .ToHashSet(StringComparer.Ordinal);
 
-        Assert.DoesNotContain("ReconciliationController", BreaksAlone());
+        Assert.Equal(
+            Suppression.Rules.Select(r => r.Name).ToHashSet(StringComparer.Ordinal),
+            silenced);
+
+        // And row 3 has a case no earlier row would have taken, which is what makes it a gate
+        // rather than a comment. Without this the set above is satisfied by overlap alone.
+        Assert.Equal("breaks-alone-is-unreferenced", SilencingRuleFor("DetentionEvaluator"));
+
+        // Detection and suppression are separate passes, so every silenced finding was really
+        // made and then withdrawn. If a detector ever absorbs one of these rules the two sets
+        // become equal and this fails.
+        Assert.True(detected.Count > Analysis.FindingsFor(core.Model).Count);
     }
 
-    /// <summary>Row 2: never contradict yourself about one component. Invariant 3.</summary>
+    /// <summary>
+    /// Row 1 does not depend on fan-in, and row 3 does not depend on the architectural role.
+    /// </summary>
     /// <remarks>
-    /// Structural isolation is not safety when a component <i>decides</i> something — a
-    /// normalizer that picks the wrong option propagates into the data going out the door, not
-    /// through the call graph. Saying "breaks alone" and "this is making business judgements"
-    /// about one type discredits both.
+    /// The two rows overlap on <c>ShipmentController</c> — a boundary that is also unreferenced —
+    /// and an overlap is where a redundant rule hides. Each therefore needs a case only it
+    /// catches: <c>ReconciliationController</c> is a boundary with a caller, and
+    /// <c>AuditReconciler</c> is unreferenced and not a boundary. Without these two, either row
+    /// could be deleted and the surviving set would not move.
+    /// <para>
+    /// <c>AuditReconciler</c> only became row 3's case when
+    /// <see cref="AnalysisPolicy.ConcealedTopRank"/> landed. It ranks fourth in its cohort, so it
+    /// is no longer a concealed decision, so row 2 no longer reaches it first — and the row-3-only
+    /// case this test previously recorded as *missing* now exists. The rows did not change; the
+    /// finding one of them keys on did.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void Breaks_alone_is_suppressed_for_a_concealed_decision()
+    public void The_boundary_and_unreferenced_rows_are_not_the_same_rule()
     {
-        var concealed = Type("RateReconciler");
+        var boundaryWithCallers = core.Model.Types.Single(t => t.Name == "ReconciliationController");
+        Assert.Equal("ApiBoundary", boundaryWithCallers.Classification.Kind);
+        Assert.True(boundaryWithCallers.FanIn >= core.Model.Policy.BreaksAloneMinFanIn);
+        Assert.Equal("breaks-alone-at-a-boundary", SilencingRuleFor(boundaryWithCallers.Name));
 
-        Assert.Equal("Internal", concealed.Kind);
-        Assert.True(concealed.FanIn >= 1);
-        Assert.True(concealed.Instability >= 0.8);
-        Assert.True(concealed.MaxMemberCyclomatic >= run.Options.HighCc);
-
-        // It is genuinely nominated as a concealed decision, which is the reason for the
-        // suppression rather than a coincidence.
-        Assert.Contains("RateReconciler", ConcealedDecisions());
-        Assert.DoesNotContain("RateReconciler", BreaksAlone());
+        // And row 3 has a case it catches alone: AuditReconciler is unreferenced, not a boundary,
+        // and no longer a concealed decision, so no earlier row reaches it.
+        var unreferencedNonBoundary = core.Model.Types.Single(t => t.Name == "AuditReconciler");
+        Assert.NotEqual("ApiBoundary", unreferencedNonBoundary.Classification.Kind);
+        Assert.Equal(0, unreferencedNonBoundary.FanIn);
+        Assert.Equal("breaks-alone-is-unreferenced", SilencingRuleFor(unreferencedNonBoundary.Name));
     }
 
-    /// <summary>Row 3: fan-in of zero is unreferenced code, not reassurance.</summary>
-    [Fact]
-    public void Breaks_alone_is_suppressed_when_nothing_references_it()
-    {
-        var orphan = Type("AuditReconciler");
-
-        Assert.Equal("Internal", orphan.Kind);
-        Assert.Equal(0, orphan.FanIn);
-        Assert.True(orphan.Instability >= 0.8);
-        Assert.True(orphan.MaxMemberCyclomatic >= run.Options.HighCc);
-
-        // And it is not suppressed by row 2 instead — that would make this test pass for the
-        // wrong reason.
-        Assert.DoesNotContain("AuditReconciler", ConcealedDecisions());
-        Assert.DoesNotContain("AuditReconciler", BreaksAlone());
-    }
-
-    /// <summary>Row 4: a signature shared by many types is a layering pattern. Invariant 2.</summary>
+    /// <summary>
+    /// The control for §15 exists only because <c>DEFECTS.md</c> §10 is still live.
+    /// </summary>
     /// <remarks>
-    /// The roll-call discipline, applied to layer spans: six near-identical blocks teach nothing
-    /// and cost the section its readers, so past <c>--top / 3</c> the group collapses to one line.
-    /// Before this plant the fixture had a single spanning type and the branch had never run —
-    /// it could have been deleted with the goldens staying byte-identical.
+    /// <para>
+    /// <c>RoutingDepot</c> is the type that survives breaks alone, and it survives because its
+    /// cohort is three. §10: breaks alone runs over all types while its concealed-decision
+    /// exclusion reads a cohort-gated population, so a small peer group drops a type out of
+    /// concealed decision and straight into breaks alone. Core inherits that — the exclusion is a
+    /// suppression row now, but the nomination it searches for is still never made.
+    /// </para>
+    /// <para>
+    /// <b>This is worth pinning because fixing §10 costs the §15 control.</b> The day a
+    /// below-floor type can be nominated as a concealed decision, <c>RoutingDepot</c> leaves
+    /// breaks alone, the finding empties on this fixture, and the divergence test above starts
+    /// asserting an absence rather than a difference. A replacement control has to be planted in
+    /// the same change, not discovered afterwards.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void Spans_layers_collapses_a_signature_shared_by_too_many_types()
+    public void The_surviving_control_survives_because_of_a_different_live_defect()
     {
-        var text = Render();
+        var depot = core.Model.Types.Single(t => t.Name == "RoutingDepot");
+        var policy = core.Model.Policy;
 
-        // Fourteen since P6, and all fourteen in one group: the probe keys a pattern on the kind
-        // signature alone, so its count is every spanning type in the solution. Core partitions
-        // the same fourteen into 6 + 4 + 2 + 1 + 1 — DEFECTS.md §11 — which is why the collapse is
-        // a qualifier there and a Count() here.
-        Assert.Contains(
-            "14 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern",
-            text, StringComparison.Ordinal);
+        Assert.True(depot.CohortSize < policy.MinCohort);
+        Assert.True(depot.MaxMemberCyclomatic >= policy.MinDecisionCc);
 
-        // And the per-type detail is genuinely gone, rather than the summary being printed
-        // alongside it.
+        // Every condition for a concealed decision except a viable peer group, so the suppression
+        // finds nothing to suppress with.
+        var detected = Analysis.Detected(core.Model);
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionType, depot.Subject));
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, depot.Subject));
+        Assert.Null(SilencingRuleFor("RoutingDepot"));
+    }
+
+    /// <summary>
+    /// Row 6 of the suppression matrix, asserted against the model rather than against wording.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the row that suppresses a <i>sentence</i> rather than a finding, and until now the
+    /// only thing that could be tested was the probe's prose — <c>SuppressionTests</c> says so in
+    /// as many words. That absence was itself part of what extraction had to fix: a rule enforced
+    /// in a renderer is a rule that does not exist, and the JSON and HTML renderers would each
+    /// have had to remember it.
+    /// </para>
+    /// <para>
+    /// ThroughputGauge is the case: fan-in 5, which is also its cohort median. Relative says
+    /// unremarkable, absolute says five callers depend on it, and only one of those two readings
+    /// can be put in front of a developer without being laughed at.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_plumbing_claim_is_decided_on_the_model()
+    {
+        var gauge = TypeLevel("ThroughputGauge");
+        var reconciler = TypeLevel("RateReconciler");
+
+        // Both are nominated — the qualifier decides the sentence, not the finding.
+        Assert.False(gauge.Holds(Qualifiers.LowAbsoluteConnectivity));
+        Assert.True(reconciler.Holds(Qualifiers.LowAbsoluteConnectivity));
+
+        // And it is the absolute floor that separates them, not the relative one they share.
+        Assert.True(gauge.ValueOf("FanIn") >= core.Model.Policy.MinFanIn);
+        Assert.True(reconciler.ValueOf("FanIn") < core.Model.Policy.MinFanIn);
+        Assert.True(gauge.ValueOf("FanInXMedian") <= core.Model.Policy.ConcealedFanInCeiling);
+        Assert.True(reconciler.ValueOf("FanInXMedian") <= core.Model.Policy.ConcealedFanInCeiling);
+    }
+
+    /// <summary>
+    /// Row 7: no peer group, no relative claim. Invariants 6 and 8.
+    /// </summary>
+    /// <remarks>
+    /// PricingVault is planted so the cohort floor is the only thing between it and a nomination.
+    /// Every other condition is asserted here from Core's own numbers, so absence can only be the
+    /// gate — without that half, a type that quietly stopped qualifying for an unrelated reason
+    /// would keep this test passing.
+    /// <para>
+    /// The probe's companion test moves the floor and watches the finding come back. That control
+    /// cannot be run against Core here, because cohort <i>assignment</i> reads
+    /// <c>MinCohort</c> during the walk: a different floor is a different set of peer groups, so
+    /// it needs a second walk rather than a second render. <c>SuppressionTests</c> holds the
+    /// moving-threshold half on the oracle until that walk is cheap enough to run twice.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_type_below_the_cohort_floor_makes_no_relative_claim()
+    {
+        var vault = core.Model.Types.Single(t => t.Name == "PricingVault");
+        var policy = core.Model.Policy;
+
+        Assert.True(vault.CohortSize < policy.MinCohort);
+        Assert.True(vault.MaxMemberCyclomatic >= policy.MinDecisionCc);
+
         Assert.DoesNotContain(
-            "AuthenticationMiddleware [ApiBoundary] — reaches across",
-            text, StringComparison.Ordinal);
+            Analysis.FindingsFor(core.Model).OfKind(FindingKind.ConcealedDecisionType),
+            f => f.Subject == vault.Subject);
     }
 
     /// <summary>
-    /// Row 4's control. The floor is <c>--top / 3</c>, so lifting <c>--top</c> to 42 puts it at
-    /// exactly 14 and the fourteen-member group stops exceeding it.
+    /// The ceiling is a gate in both directions, which the proportional form could never be.
     /// </summary>
     /// <remarks>
-    /// The control has to move a threshold rather than build a second group, and that is a
-    /// statement about <b>the probe</b> rather than about the finding: it keys a pattern on the
-    /// kind signature, and with exactly three <c>SignificantKinds</c> and <c>--min-kind-span</c>
-    /// at 3 every spanning type necessarily carries the same one. Core can do better and does —
-    /// P6's plant produces five groups there, and <c>FixtureCoverageTests</c> moves the divisor
-    /// rather than <c>--top</c> because a second group is something Core can actually have.
+    /// Raising it past the qualifying set brings all seven back. That control is the whole
+    /// difference between this and what it replaced: <c>KnownDefectTests</c> proves the old gate
+    /// cannot fire at any boundary count or distribution, so it had no reachable other branch to
+    /// test against.
     /// </remarks>
     [Fact]
-    public void Raising_top_restores_the_per_type_layer_span_detail()
+    public void The_named_surface_ceiling_is_reachable_from_both_sides()
     {
-        var text = Render(new Options { Top = 42 });
+        var raised = SurfacesUnder(core.Model.Policy with { MaxNamedSurfaces = 7 });
+        Assert.Equal(7, raised.Count);
+        Assert.Contains("ShipmentController", raised);
 
-        Assert.Contains(
-            "AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds",
-            text, StringComparison.Ordinal);
-        Assert.DoesNotContain("a layering pattern rather than an", text, StringComparison.Ordinal);
+        // And one below the set is still suppression, so the boundary of the gate is the count
+        // rather than anything about the types.
+        Assert.Empty(SurfacesUnder(core.Model.Policy with { MaxNamedSurfaces = 6 }));
+    }
+
+    private static List<string> SurfacesUnder(AnalysisPolicy policy)
+    {
+        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        return Analysis.FindingsFor(model)
+            .OfKind(FindingKind.WidestContractSurface)
+            .Select(f => model.Find(f.Subject)!.Name)
+            .Order(StringComparer.Ordinal)
+            .ToList();
     }
 
     /// <summary>
-    /// Row 5 has no behavioural test, and this records why rather than leaving a gap that looks
-    /// like an oversight.
+    /// The row that silenced this type's breaks-alone claim, or null if the claim stands.
     /// </summary>
-    /// <remarks>
-    /// The widest-contract-surface suppression cannot fire at any boundary count: its filter is
-    /// median-relative and therefore already caps the qualifying set at half the boundaries,
-    /// which is the same number the suppression asks it to exceed. Proof and the general case
-    /// are in <c>KnownDefectTests</c>. All that can be asserted here is the unsuppressed state —
-    /// which is the only state there is.
-    /// </remarks>
-    [Fact]
-    public void Widest_contract_surface_is_the_row_that_only_ever_fires()
+    private string? SilencingRuleFor(string typeName)
     {
-        Assert.Contains("WIDEST CONTRACT SURFACE", Render(), StringComparison.Ordinal);
+        var detected = Analysis.Detected(core.Model);
+        var subject = core.Model.Types.Single(t => t.Name == typeName).Subject;
+        var finding = Assert.Single(detected.About(subject), f => f.Kind == FindingKind.BreaksAlone);
+
+        return Suppression.Silencing(finding, detected, core.Model)?.Name;
     }
 
-    /// <summary>Row 6: "plumbing" is an absolute claim, so an absolute floor decides it.</summary>
-    /// <remarks>
-    /// <para>
-    /// The only row of the seven that suppresses a <i>claim inside</i> a finding rather than the
-    /// finding itself. The nomination fires either way; what the floor decides is whether the
-    /// sentence is allowed to say "looks like plumbing".
-    /// </para>
-    /// <para>
-    /// It has to, because the selection filter is relative — <c>FanInXMedian &lt;= 2.0</c> — and in
-    /// a cohort where everything is heavily used, ordinary for its peers still means widely
-    /// depended on. ThroughputGauge is exactly that: fan-in 5, and fan-in 5 is also the cohort
-    /// median. Relative says unremarkable, absolute says five callers, and only one of those two
-    /// readings can be put in front of a developer without being laughed at.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    public void The_plumbing_wording_is_suppressed_above_the_fan_in_floor()
+    private Finding TypeLevel(string typeName)
     {
-        var gauge = Type("ThroughputGauge");
-
-        Assert.True(gauge.FanIn >= run.Options.MinFanIn);
-        Assert.True(gauge.FanInXMedian <= 2.0);
-
-        // The finding itself is not suppressed — asserting only the absence below would pass
-        // just as well if the nomination had stopped firing altogether.
-        Assert.Contains("ThroughputGauge", ConcealedDecisions());
-
-        Assert.Contains(
-            "ThroughputGauge.Sample — connectivity is unremarkable for its peers",
-            Render(), StringComparison.Ordinal);
-        Assert.DoesNotContain(
-            "ThroughputGauge.Sample — looks like plumbing",
-            Render(), StringComparison.Ordinal);
+        var type = core.Model.Types.Single(t => t.Name == typeName);
+        return Assert.Single(
+            Analysis.FindingsFor(core.Model).About(type.Subject),
+            f => f.Kind == FindingKind.ConcealedDecisionType);
     }
 
     /// <summary>
-    /// Row 6's control. Raise the floor past the same type and the plumbing wording comes back,
-    /// which is what proves the branch is live rather than merely unvisited.
-    /// </summary>
-    [Fact]
-    public void Raising_the_fan_in_floor_restores_the_plumbing_wording()
-    {
-        Assert.Contains(
-            "ThroughputGauge.Sample — looks like plumbing",
-            Render(new Options { MinFanIn = 6 }), StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// And the contrast: below the floor the plumbing wording is accurate, and still used. Both
-    /// branches are reachable on one fixture at one setting.
-    /// </summary>
-    [Fact]
-    public void Below_the_fan_in_floor_the_plumbing_wording_still_applies()
-    {
-        Assert.True(Type("RateReconciler").FanIn < run.Options.MinFanIn);
-
-        Assert.Contains(
-            "RateReconciler.Reconcile — looks like plumbing",
-            Render(), StringComparison.Ordinal);
-    }
-
-    /// <summary>Row 7: no peer group means no relative claim. Invariants 6 and 8.</summary>
-    /// <remarks>
-    /// <para>
-    /// PricingVault is planted so the cohort floor is the only thing between it and a
-    /// concealed-decision nomination — every other condition is asserted below, so absence here
-    /// can only be the gate. Nothing already in the fixture could do this job: OrderRepository
-    /// sits in a cohort of two, but its outlier factor is 1.8 against a floor of 3.0, so it is
-    /// excluded twice over and a test written on it would have passed for the wrong reason.
-    /// </para>
-    /// <para>
-    /// The claim being suppressed is <i>comparative</i> — "far above its peers" — and three peers
-    /// is not a distribution. The type is not silently dropped: it surfaces under NO PEER GROUP
-    /// with a solution-wide reading and that weaker basis stated, which is invariant 8.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    public void A_cohort_relative_finding_is_suppressed_below_the_cohort_floor()
-    {
-        var vault = Type("PricingVault");
-
-        // Every other condition of CONCEALED DECISION is met.
-        Assert.True(vault.MaxMemberCyclomatic >= run.Options.MinDecisionCc);
-        Assert.True(vault.MaxMemberCyclomaticXMedian >= run.Options.OutlierFactor);
-        Assert.True(vault.FanInXMedian <= 2.0);
-        Assert.True(vault.FanOutXMedian <= 2.0);
-
-        // And this one is not.
-        Assert.True(vault.CohortSize < run.Options.MinCohort);
-
-        Assert.DoesNotContain("PricingVault", ConcealedDecisions());
-    }
-
-    /// <summary>
-    /// Row 7's control, and the reason the test above is about the gate rather than about
-    /// absence: move the floor under the cohort and the finding comes back.
+    /// Row 7's control: move the floor under the cohort and the finding comes back.
     /// </summary>
     /// <remarks>
-    /// Nothing else changes — the metrics were computed once, at defaults, and only the
-    /// eligibility filter differs. A suppression that stopped working would show up here as the
-    /// finding appearing at both settings; one that started over-firing would show up as neither.
+    /// <b>Carried over from the probe's suite, which is the one assertion in it that Core had no
+    /// equivalent of.</b> The test above states that PricingVault is not nominated and that its
+    /// cohort is below the floor; on its own that is an absence, and an absence is satisfied just
+    /// as well by a detector that has stopped working. Lowering the floor and watching the same
+    /// type come back is what makes it a statement about the gate.
     /// </remarks>
     [Fact]
     public void Lowering_the_cohort_floor_restores_the_suppressed_finding()
     {
-        Assert.Contains("PricingVault", ConcealedDecisions(new Options { MinCohort = 3 }));
+        var lowered = core.WalkWith(core.Model.Policy with { MinCohort = 3 });
+        var vault = lowered.Types.Single(t => t.Name == "PricingVault");
+
+        Assert.Contains(
+            Analysis.FindingsFor(lowered).OfKind(FindingKind.ConcealedDecisionType),
+            f => f.Subject == vault.Subject);
     }
-
-    /// <summary>
-    /// The control: with the three suppressions accounted for, the finding still fires on the
-    /// type it should.
-    /// </summary>
-    /// <remarks>
-    /// A suppression suite that only asserts absence would pass just as happily if the finding
-    /// were deleted outright.
-    /// </remarks>
-    [Fact]
-    public void Breaks_alone_still_fires_on_the_type_that_earns_it()
-    {
-        Assert.Contains("TariffReconciler", BreaksAlone());
-    }
-
-    private TypeMetrics Type(string name) =>
-        run.Result.Types.Single(t => t.Name == name);
-
-    /// <summary>
-    /// The rendered nominations. Row 6 is the one row that has to be asserted against wording,
-    /// because wording is what it suppresses — there is no model surface carrying the distinction
-    /// between "plumbing" and "unremarkable for its peers", and that absence is itself part of
-    /// what extraction has to fix.
-    /// </summary>
-    private string Render() => Render(run.Options);
-
-    private string Render(Options policy) => NominationText.Render(run.Result, policy);
-
-    private string[] BreaksAlone() =>
-        NominationText.SubjectsUnder(
-            NominationText.Render(run.Result, run.Options), "-- BREAKS ALONE");
-
-    /// <summary>
-    /// Type-level concealed-decision subjects. The section renders <c>Type.Member</c>, so the
-    /// subject is trimmed back to the type.
-    /// </summary>
-    private string[] ConcealedDecisions() => ConcealedDecisions(run.Options);
-
-    /// <summary>
-    /// The same, under a different threshold policy. The metrics were computed once at defaults;
-    /// only the eligibility filter inside <c>PrintNominations</c> differs, which is what lets a
-    /// gate be tested by moving it rather than by asserting an absence.
-    /// </summary>
-    private string[] ConcealedDecisions(Options policy) =>
-        NominationText.SubjectsUnder(
-                NominationText.Render(run.Result, policy), "-- CONCEALED DECISION -")
-            .Select(s => s.Split('.')[0])
-            .ToArray();
 }

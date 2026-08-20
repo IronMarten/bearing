@@ -57,7 +57,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The interesting direction is covered — <c>FindingEquivalenceTests</c> asserts that seven
+    /// The interesting direction is covered — <c>FindingTests</c> asserts that seven
     /// types are found at method level and nowhere else, which is the reason §3.3 is the primary
     /// of the two. This is the direction that is not: nothing here would notice if the type-level
     /// nomination were reduced to a filter over the method-level one, because on this fixture
@@ -218,7 +218,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// percentile floors are pinned because changing them changes
     /// <c>golden/nominations.verified.txt</c>. That is true of the literals <i>in the probe</i>,
     /// which renders the golden. Core renders nothing yet, so its re-implementation of the same
-    /// gate is held only by <c>FindingEquivalenceTests</c> — and a gate that is redundant on this
+    /// gate is held only by <c>FindingTests</c> — and a gate that is redundant on this
     /// fixture can be dropped from Core without moving Core's nomination set. The two
     /// implementations are protected by different things, and only one of them is protected here.
     /// </para>
@@ -804,7 +804,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// <b>Worth being uneasy about, and recorded rather than celebrated.</b> The case is a
     /// by-product of a plant built for layer span, so nothing about it is load-bearing for P6 and
     /// a future reshape of the conduits would retire it without anything saying so. That is why
-    /// <c>FindingEquivalenceTests</c> names the three types rather than counting them.
+    /// <c>FindingTests</c> names the three types rather than counting them.
     /// </para>
     /// </remarks>
     [Fact]
@@ -950,9 +950,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
 
         Assert.Equal(0, constructors);
 
-        // Qualified: this file's `using ArchProbe` puts the probe's Report in scope first.
-        var text = string.Join(
-            Environment.NewLine, IronMarten.Bearing.Cli.Report.For(core.Model, findings));
+        var text = string.Join(Environment.NewLine, Report.For(core.Model, findings));
         Assert.DoesNotContain("..ctor", text, StringComparison.Ordinal);
     }
 

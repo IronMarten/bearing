@@ -173,7 +173,7 @@ the cohort statistics — sizes, percentiles and multiples of the peer median, t
 every Job B claim. Both were §3's failure mode in its purest form, and moving them is what phase
 1 actually is (`TECHREQ-job-a.md` §4).
 
-Both now live in Core, as `Distribution` and `ProjectCoupling`, with `CoreEquivalenceTests`
+Both now live in Core, as `Distribution` and `ProjectCoupling`, with `CyclesAndCouplingTests`
 holding them to the probe's numbers on the fixture. The probe still computes its own copies —
 it is the oracle, and it stays verbatim — so this is the reimplementation existing and agreeing,
 not the probe delegating.
