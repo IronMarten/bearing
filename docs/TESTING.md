@@ -214,6 +214,25 @@ project that does not load understates fan-in everywhere it is referenced.
 
 ## 6. The fixture is the specification
 
+### Landing a plant — what to read, now that the goldens are gone
+
+**A plant is not landed until all of this is read.** Until R2 the rule was *"read the golden diff
+line by line"*, and the goldens went with the probe — along with the equivalence suite that used to
+confirm a plant disturbed nothing but what it aimed at. What replaces them:
+
+1. **`StructureTests.Fixture_shape_is_stable`** — types, edges and method-like members, currently
+   **179 / 362 / 186**. It fails first, and its numbers must be updated deliberately, with the
+   plant's own contribution stated in the comment the way P6, P7 and P8 each did.
+2. **The ten Verify snapshots** — three CSVs, the JSON, two HTML reports, the terminal report, the
+   diagram, the mosaic, and `PolicySweepTests`. **`PolicySweepTests` is the one that matters most**:
+   it fingerprints the finding set under all 28 policy values one notch each way, so a plant that
+   quietly moves an unrelated gate shows up there and nowhere else.
+3. **`tools/leave-one-out.sh`**, with the verdict table pasted into this section. Last run after P6.
+
+Accepting a snapshot is a claim that the change was intended — §3. **Read the received diff before
+accepting it**, which is what "line by line" always meant.
+
+
 `tests/TestBed/` is a synthetic solution with **known answers**, and its defects are
 deliberate: a god object, a concealed decision hidden in plumbing, seven near-identical
 normalizers with one planted outlier, a DIP contrast pair, a layer-spanning auth
