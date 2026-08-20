@@ -1075,3 +1075,29 @@ mode is a *rendering* one, so the suite cannot see it: both artifacts stay well-
 every element, and the picture is simply wrong on the page and right when written standalone with
 `--mosaic` or `--diagram`.
 
+### 36. The plot's y-axis title overlaps its own subtitle
+
+`ReachPlot` writes two texts into the strip above the plot area and places them independently:
+
+- the subtitle, at `x = Left (96), y = 46` — *"One dot per project, sized by how many types it
+  declares. Bearing 0.0.1-preview.1"*
+- the y-axis title, at `x = Left - 78 (18), y = Top - 14 (50)` — *"↑ how much of it a finding
+  names"*
+
+Four pixels of baseline separation and an axis title about 200px wide starting 78px to the left of
+a subtitle that starts at 96. **They collide from x ≈ 96 to x ≈ 216 on every run**, whatever the
+solution — it is fixed geometry, not data-dependent.
+
+**The lesson is the part worth keeping.** This file's labels *are* collision-checked: `Labels`
+tries four offsets per project and drops a name that fits nowhere, and `Unlabelled` discloses it.
+That discipline was applied to the data and not to the furniture, which was placed by hand at
+constants that looked right in isolation. **The suite cannot see it** — the SVG is well-formed,
+every element is present, and no assertion in `ReachPlotTests` is about where two pieces of chrome
+sit relative to each other.
+
+**Cheap to fix and deliberately not fixed yet** (2026-08-20): move the axis title into its own row
+above the plot area, or rotate it up the axis where it belongs, and give the strip enough height for
+both. The reason it is recorded rather than repaired is that it arrived at the end of a long
+presentation pass, and the next change to this file should carry it rather than a session of its
+own.
+
