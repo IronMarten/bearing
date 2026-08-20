@@ -1,108 +1,95 @@
 namespace Bearing.Tests;
 
 /// <summary>
-/// Tarjan's SCC over synthetic graphs, run against <b>both</b> implementations. Fast, no Roslyn,
-/// no workspace load — and it pins the behaviour circular-reference detection depends on.
+/// Tarjan's SCC over synthetic graphs. Fast, no Roslyn, no workspace load — and it pins the
+/// behaviour circular-reference detection depends on.
 ///
-/// Every case runs twice because Core's copy is a port and a port is where a subtle difference
-/// hides: the fixture's cycles are one namespace component and one type tangle, so the fixture
-/// alone would not notice a min-size that was off by one, a self-loop that started counting, or
-/// a dangling edge that threw. At R2 the probe row comes out of the theory data and the cases
-/// stay exactly as they are.
+/// Every case here earns its place from the fixture, not from the probe. The fixture's cycles
+/// are one namespace component and one type tangle, so the fixture alone would not notice a
+/// min-size that was off by one, a self-loop that started counting, or a dangling edge that
+/// threw. Each of those is a case below.
 ///
-/// The traversable PATH — A to B to C to A, which is what a user can act on, where component
-/// membership is not — is Core's alone and shipped at A3. The probe row is deliberately absent
-/// from those cases: it is not a port and there is nothing to diff it against.
+/// R2 took the second row out of the theory data. These ran twice — once against the probe,
+/// once against Core — for as long as Core's copy was a port being diffed against its
+/// original; the cases are unchanged, and what has gone is the comparison, not the coverage.
+/// The traversable PATH cases below never had a probe row at all: A to B to C to A is what a
+/// user can act on where component membership is not, and it is Core's alone, shipped at A3.
 /// </summary>
 public sealed class GraphTests
 {
-    public static TheoryData<string> Implementations => ["probe", "core"];
-
     private static Dictionary<string, List<string>> Graph(params (string From, string[] To)[] edges) =>
         edges.ToDictionary(e => e.From, e => e.To.ToList(), StringComparer.Ordinal);
 
     private static IReadOnlyList<IReadOnlyList<string>> StronglyConnected(
-        string implementation, Dictionary<string, List<string>> graph, int minSize) =>
-        implementation switch
-        {
-            "probe" => ArchProbe.Graphs.StronglyConnected(graph, minSize),
-            "core" => IronMarten.Bearing.Graphs.StronglyConnected(
-                graph.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<string>)kv.Value, StringComparer.Ordinal),
-                minSize),
-            _ => throw new ArgumentOutOfRangeException(nameof(implementation), implementation, null),
-        };
+        Dictionary<string, List<string>> graph, int minSize) =>
+        IronMarten.Bearing.Graphs.StronglyConnected(
+            graph.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<string>)kv.Value, StringComparer.Ordinal),
+            minSize);
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void A_simple_chain_has_no_components(string implementation)
+    [Fact]
+    public void A_simple_chain_has_no_components()
     {
         var g = Graph(("a", ["b"]), ("b", ["c"]), ("c", []));
-        Assert.Empty(StronglyConnected(implementation, g, 2));
+        Assert.Empty(StronglyConnected(g, 2));
     }
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void A_mutual_pair_is_found_at_min_size_two(string implementation)
+    [Fact]
+    public void A_mutual_pair_is_found_at_min_size_two()
     {
         var g = Graph(("a", ["b"]), ("b", ["a"]));
 
-        var component = Assert.Single(StronglyConnected(implementation, g, 2));
+        var component = Assert.Single(StronglyConnected(g, 2));
 
         Assert.Equal(["a", "b"], component.Order());
     }
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void Min_size_suppresses_smaller_components(string implementation)
+    [Fact]
+    public void Min_size_suppresses_smaller_components()
     {
         // Mutual pairs and triples are ordinary C# — parent/child, visitor/visited. Listing
         // them buries the signal under things nobody will act on, which is why type tangles
         // are gated at 4 and namespace cycles at 2.
         var g = Graph(("a", ["b"]), ("b", ["a"]), ("c", ["d"]), ("d", ["c"]));
 
-        Assert.Equal(2, StronglyConnected(implementation, g, 2).Count);
-        Assert.Empty(StronglyConnected(implementation, g, 3));
+        Assert.Equal(2, StronglyConnected(g, 2).Count);
+        Assert.Empty(StronglyConnected(g, 3));
     }
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void Two_independent_cycles_are_reported_separately(string implementation)
+    [Fact]
+    public void Two_independent_cycles_are_reported_separately()
     {
         var g = Graph(
             ("a", ["b"]), ("b", ["c"]), ("c", ["a"]),
             ("x", ["y"]), ("y", ["x"]));
 
-        var found = StronglyConnected(implementation, g, 2);
+        var found = StronglyConnected(g, 2);
 
         Assert.Equal(2, found.Count);
         Assert.Contains(found, c => c.Count == 3);
         Assert.Contains(found, c => c.Count == 2);
     }
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void A_self_loop_alone_is_not_a_component(string implementation)
+    [Fact]
+    public void A_self_loop_alone_is_not_a_component()
     {
         // A type referencing itself is not a circular dependency worth reporting.
         var g = Graph(("a", ["a"]));
-        Assert.Empty(StronglyConnected(implementation, g, 2));
+        Assert.Empty(StronglyConnected(g, 2));
     }
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void Edges_to_unknown_nodes_do_not_throw(string implementation)
+    [Fact]
+    public void Edges_to_unknown_nodes_do_not_throw()
     {
         // Real input has dangling targets: an edge into an excluded or unloaded type.
         var g = Graph(("a", ["b", "missing"]), ("b", ["a"]));
 
-        var component = Assert.Single(StronglyConnected(implementation, g, 2));
+        var component = Assert.Single(StronglyConnected(g, 2));
 
         Assert.Equal(["a", "b"], component.Order());
     }
 
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void Deep_chains_do_not_overflow_the_stack(string implementation)
+    [Fact]
+    public void Deep_chains_do_not_overflow_the_stack()
     {
         // Iterative on purpose: recursion depth is bounded by the longest dependency path,
         // and a large solution can exceed the stack long before anything else.
@@ -111,7 +98,7 @@ public sealed class GraphTests
         for (var i = 0; i < depth; i++) g[$"n{i}"] = [$"n{i + 1}"];
         g[$"n{depth}"] = ["n0"];
 
-        var component = Assert.Single(StronglyConnected(implementation, g, 2));
+        var component = Assert.Single(StronglyConnected(g, 2));
 
         Assert.Equal(depth + 1, component.Count);
     }
@@ -120,19 +107,18 @@ public sealed class GraphTests
     /// The partition is a property of the graph; the order it is discovered in is not.
     /// </summary>
     /// <remarks>
-    /// Both implementations sort their output for this reason, and neither is exercised by the
-    /// fixture's single component. Reversing the insertion order changes which root the outer
-    /// loop reaches first, which is the whole of what the canonical form defends against.
+    /// Core sorts its output for this reason, and the fixture's single component cannot exercise
+    /// it. Reversing the insertion order changes which root the outer loop reaches first, which
+    /// is the whole of what the canonical form defends against.
     /// </remarks>
-    [Theory]
-    [MemberData(nameof(Implementations))]
-    public void The_result_does_not_depend_on_insertion_order(string implementation)
+    [Fact]
+    public void The_result_does_not_depend_on_insertion_order()
     {
         (string, string[])[] edges =
             [("a", ["b"]), ("b", ["a"]), ("m", ["n"]), ("n", ["m"]), ("x", ["y"]), ("y", ["x"])];
 
-        var forward = StronglyConnected(implementation, Graph(edges), 2);
-        var backward = StronglyConnected(implementation, Graph([.. edges.Reverse()]), 2);
+        var forward = StronglyConnected(Graph(edges), 2);
+        var backward = StronglyConnected(Graph([.. edges.Reverse()]), 2);
 
         Assert.Equal(forward, backward);
     }
