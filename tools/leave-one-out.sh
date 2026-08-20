@@ -19,13 +19,29 @@
 #
 # Usage:  bash tools/leave-one-out.sh [output-dir]
 #
-# It mutates files under src/Bearing.Core and restores each with `git checkout --`
+# It mutates files under src/Bearing.Core and restores each with `git checkout HEAD --`
 # before moving on, so it needs a clean tree and leaves one. Roughly 30 builds and
 # a handful of full test runs; budget half an hour.
+#
+# DO NOT TOUCH THE WORKING TREE WHILE IT RUNS, AND THAT INCLUDES `git add`. It
+# refuses to start dirty and cannot defend against a tree that becomes dirty
+# underneath it. Restores are from HEAD rather than the index for that reason —
+# staging a mutation used to make the restore reinstate it.
 #
 # GUARDS is the inventory, and it is hand-maintained on purpose: which `if` is a
 # gate and which is a null-extraction is a judgement, and a regex that guessed
 # would quietly drop a gate and report a smaller, healthier-looking number.
+#
+# IT IS KEYED ON THE LINE'S TEXT, NOT ITS NUMBER, AND THAT IS THE WHOLE REPAIR.
+# It was keyed on file:line until 2026-08-20, and by the time it was next run the
+# detectors had been rewritten under it — b5cc69a's rank conversion, D33's boundary
+# fix. Eight of twenty-nine entries had drifted onto doc comments and blank lines,
+# and commenting out `/// </para>` changes nothing, so they came back **DEAD**.
+# Three BoundaryMarking gates and five ConcealedDecision ones were reported dead
+# without ever having been tested. Keyed on text, drift is an abort with the line
+# it could not find, which is the failure this file is supposed to be immune to.
+#
+# Format:  file @@ which-occurrence @@ exact line text @@ what it gates
 set -u
 
 cd "$(dirname "$0")/.."
@@ -41,38 +57,68 @@ if [ -n "$(git status --short)" ]; then
   exit 1
 fi
 
-# file:line:what the condition gates
+# Two entries are deliberately absent. BoundaryMarking's kind filter is
+# `model.Types.Where(IsBoundary)` in both detectors, and commenting an assignment
+# out does not relax a gate, it fails the build — the script's own note for
+# build-fails says such a line is a null-extraction and the inventory should drop
+# it. Whether that filter discriminates wants a different instrument.
 GUARDS="
-BlastRadius.cs:41:MinCohort cohort floor
-BlastRadius.cs:54:MinFanIn absolute floor
-BlastRadius.cs:59:BlastFanInMultiple x-median
-BlastRadius.cs:64:BlastTopFraction rank gate
-BlastRadius.cs:66:BlastComplexityPercentile
-BoundaryMarking.cs:49:IsBoundary kind filter
-BoundaryMarking.cs:50:HighCc boundary-carries-logic
-BoundaryMarking.cs:109:SurfaceOutlier threshold
-BreaksAlone.cs:41:IsolatedThreshold
-BreaksAlone.cs:42:HighCc
-ChangeCost.cs:69:Contract-or-ApiBoundary kind filter
-ChangeCost.cs:73:MinFanIn floor
-ChangeCost.cs:76:ChangeCostTopFraction rank gate
-ConcealedDecision.cs:56:MinCohort (method level)
-ConcealedDecision.cs:66:MinDecisionCc (method level)
-ConcealedDecision.cs:69:OutlierFactor (method level)
-ConcealedDecision.cs:108:MinCohort (type level)
-ConcealedDecision.cs:116:MinDecisionCc (type level)
-ConcealedDecision.cs:119:OutlierFactor (type level)
-ConcealedDecision.cs:123:ConcealedFanInCeiling
-ConcealedDecision.cs:124:ConcealedFanOutCeiling
-HubOrGodObject.cs:53:HubMin coupling floor
-LoadBearing.cs:46:StableThreshold
-LoadBearing.cs:50:MinFanIn floor
-LoadBearing.cs:52:HighCc
-NoPeerGroup.cs:50:MinCohort (inverted)
-SharedMutableState.cs:43:StaticMutations > 0
-SpansArchitecturalLayers.cs:86:IsSignificant dependency filter
-SpansArchitecturalLayers.cs:92:MinKindSpan floor
+BlastRadius.cs@@1@@if (peers.Count < policy.MinCohort) continue;@@MinCohort cohort floor
+BlastRadius.cs@@1@@if (type.FanIn < policy.MinFanIn) continue;@@MinFanIn absolute floor
+BlastRadius.cs@@1@@if (inbound.TimesMedian < policy.BlastFanInMultiple) continue;@@BlastFanInMultiple x-median
+BlastRadius.cs@@1@@if (inbound.Rank > topRank) continue;@@BlastTopFraction rank gate
+BlastRadius.cs@@1@@if (cc.Percentile < policy.BlastComplexityPercentile) continue;@@BlastComplexityPercentile
+BoundaryMarking.cs@@1@@if (type.MaxMemberCyclomatic < policy.HighCc) continue;@@HighCc boundary-carries-logic
+BoundaryMarking.cs@@1@@if (rank > topRank) continue;@@boundary rank gate
+BoundaryMarking.cs@@1@@if (type.DataShape < threshold) continue;@@SurfaceOutlier threshold
+BreaksAlone.cs@@1@@if (instability < policy.IsolatedThreshold) continue;@@IsolatedThreshold
+BreaksAlone.cs@@1@@if (type.MaxMemberCyclomatic < policy.HighCc) continue;@@HighCc
+ChangeCost.cs@@1@@if (!Eligible.Contains(type.Classification.Kind, StringComparer.Ordinal)) continue;@@Contract-or-ApiBoundary kind filter
+ChangeCost.cs@@1@@if (type.FanIn < policy.MinFanIn) continue;@@MinFanIn floor
+ChangeCost.cs@@1@@if (reading.Rank > limit) continue;@@ChangeCostTopFraction rank gate
+ConcealedDecision.cs@@1@@if (peers.Count < policy.MinCohort) continue;@@MinCohort (method level)
+ConcealedDecision.cs@@1@@if (member.Cyclomatic < policy.MinDecisionCc) continue;@@MinDecisionCc (method level)
+ConcealedDecision.cs@@1@@if (reading.TimesMedian < policy.OutlierFactor) continue;@@OutlierFactor (method level)
+ConcealedDecision.cs@@1@@if (reading.Rank > policy.ConcealedTopRank) continue;@@ConcealedTopRank (method level)
+ConcealedDecision.cs@@2@@if (peers.Count < policy.MinCohort) continue;@@MinCohort (type level)
+ConcealedDecision.cs@@1@@if (type.MaxMemberCyclomatic < policy.MinDecisionCc) continue;@@MinDecisionCc (type level)
+ConcealedDecision.cs@@1@@if (cc.TimesMedian < policy.OutlierFactor) continue;@@OutlierFactor (type level)
+ConcealedDecision.cs@@1@@if (inbound.TimesMedian > policy.ConcealedFanInCeiling) continue;@@ConcealedFanInCeiling
+ConcealedDecision.cs@@1@@if (outbound.TimesMedian > policy.ConcealedFanOutCeiling) continue;@@ConcealedFanOutCeiling
+HubOrGodObject.cs@@1@@if (coupling < policy.HubMin) continue;@@HubMin coupling floor
+LoadBearing.cs@@1@@if (instability > policy.StableThreshold) continue;@@StableThreshold
+LoadBearing.cs@@1@@if (type.FanIn < policy.MinFanIn) continue;@@MinFanIn floor
+LoadBearing.cs@@1@@if (type.MaxMemberCyclomatic < policy.HighCc) continue;@@HighCc
+NoPeerGroup.cs@@1@@if (type.CohortSize >= policy.MinCohort) continue;@@MinCohort (inverted)
+SharedMutableState.cs@@1@@if (type.StaticMutations <= 0) continue;@@StaticMutations > 0
+SpansArchitecturalLayers.cs@@1@@if (!IsSignificant(dependency)) continue;@@IsSignificant dependency filter
+SpansArchitecturalLayers.cs@@1@@if (kinds.Count < policy.MinKindSpan) continue;@@MinKindSpan floor
 "
+
+# Locate every guard BEFORE mutating anything. A stale inventory should abort with
+# the line it cannot find rather than spend half an hour reporting comments as dead.
+stale=0
+while IFS= read -r entry; do
+  [ -z "$entry" ] && continue
+  file="${entry%%@@*}"; rest="${entry#*@@}"
+  nth="${rest%%@@*}"; rest="${rest#*@@}"
+  snippet="${rest%%@@*}"; label="${rest##*@@}"
+  path="src/Bearing.Core/$file"
+
+  found=$(grep -c -F -- "$snippet" "$path" 2>/dev/null || echo 0)
+  if [ "$found" -lt "$nth" ]; then
+    echo "INVENTORY STALE: $file has $found occurrence(s) of, and needs $nth:" >&2
+    echo "    $snippet" >&2
+    echo "    ($label)" >&2
+    stale=$((stale + 1))
+  fi
+done <<<"$GUARDS"
+
+if [ "$stale" -gt 0 ]; then
+  echo >&2
+  echo "$stale inventory entr(y|ies) no longer match the source. Fix GUARDS and re-run." >&2
+  exit 1
+fi
 
 echo "baseline..."
 dotnet build -v q --nologo >/dev/null 2>&1 || { echo "baseline build failed" >&2; exit 1; }
@@ -82,15 +128,18 @@ dotnet run --project src/Bearing.Cli --no-build -- "$SLN" >"$OUT/baseline.txt" 2
 
 while IFS= read -r entry; do
   [ -z "$entry" ] && continue
-  file="${entry%%:*}"; rest="${entry#*:}"
-  line="${rest%%:*}"; label="${rest#*:}"
+  file="${entry%%@@*}"; rest="${entry#*@@}"
+  nth="${rest%%@@*}"; rest="${rest#*@@}"
+  snippet="${rest%%@@*}"; label="${rest##*@@}"
   path="src/Bearing.Core/$file"
+
+  line=$(grep -n -F -- "$snippet" "$path" | sed -n "${nth}p" | cut -d: -f1)
 
   sed -i "${line}s|^|// LEAVE-ONE-OUT |" "$path"
 
   if ! dotnet build -v q --nologo >/dev/null 2>&1; then
-    # Not a verdict: it means the line was a null-extraction rather than a gate,
-    # and the inventory above should drop it.
+    # Not a verdict: the line is a null-extraction rather than a gate, and the
+    # inventory above should drop it.
     verdict="build-fails"
   else
     dotnet run --project src/Bearing.Cli --no-build -- "$SLN" >"$OUT/mutant.txt" 2>/dev/null
@@ -106,11 +155,17 @@ while IFS= read -r entry; do
   printf '%s\t%s\t%s\t%s\n' "$file" "$line" "$label" "$verdict" >>"$OUT/results.tsv"
   echo "$file:$line  $label  -> $verdict"
 
-  git checkout -- "$path"
+  git checkout HEAD -- "$path"
 done <<<"$GUARDS"
 
 echo
 echo "dead gates:"
-grep -P '\tDEAD$' "$OUT/results.tsv" || echo "  (none)"
+# awk rather than `grep -P`, which needs a unibyte or UTF-8 locale and silently
+# printed "(none)" on a run with six DEAD rows in it.
+awk -F'\t' '$4 == "DEAD" { print "  " $1 ":" $2 "  " $3; n++ } END { if (!n) print "  (none)" }' \
+  "$OUT/results.tsv"
+
+echo
+awk -F'\t' '{ n[$4]++ } END { for (v in n) printf "%-14s %d\n", v, n[v] }' "$OUT/results.tsv"
 echo
 echo "results: $OUT/results.tsv"
