@@ -805,6 +805,17 @@ is why both halves are run.
 value in `AnalysisPolicy.Values`, moved one notch each way, with the finding set compared at each.
 Read it there.
 
+**One row of that table needs its reason written down, because the table cannot carry it.**
+`BoundaryTopFraction` reports `-` in both directions and it is **not** a dead gate: the fixture
+declares fifteen boundaries, and a notch of 0.01 over fifteen cannot move a rank —
+`TopRankLimit(0.05)` and `TopRankLimit(0.06)` both admit exactly rank 1. It is the second of the
+three causes behind a `-`: the constant is fine, the gate is reachable, and the *fixture's
+population* is too small for the notch. The control that reaches both branches is
+`FindingEquivalenceTests.The_boundary_rank_is_reachable_from_both_sides`, which widens the share
+until the probe's second boundary returns and raises the floor until the finding empties. **A `-`
+with no note beside it is how a live gate gets deleted as decoration**, which is the failure this
+paragraph exists to prevent.
+
 > **Why it moved out of this document.** The hand-run version went stale twice and nothing said so.
 > It was measured once over 23 values while the policy had grown to 26, and **which three were
 > missing was recorded nowhere** — "23" counted what was nudged rather than the policy at the time,

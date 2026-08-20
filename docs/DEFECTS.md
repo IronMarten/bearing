@@ -949,7 +949,7 @@ where each had looked fine in its own section. **The fixture cannot show any of 
 no shared-mutable-state type with one caller and no contract with a one-field surface — so this
 ships asserted against a real run and named here as a hole, the way §24 was.
 
-### 33. A boundary finding fires on a third of the boundaries it filters
+### 33. A boundary finding fires on a third of the boundaries it filters — **fixed**
 
 `BoundaryMarking.CarryingRealLogic` gates on `maxMemberCyclomatic >= HighCc (10)`, absolute, with
 no cohort and no distribution behind it. Measured 2026-08-18: it fires on **19.5% of nopCommerce's
@@ -976,7 +976,23 @@ than on an absolute constant. Rank forms measured at the same time — top 5% ad
 nopCommerce and 9 on jellyfin; top 10% admits 68 and 17. The private `MEASURE-concealed-decision.md`
 §10 carries the sensitivity tables.
 
-### 34. A cohort of 2,909 is not a peer group
+
+**Fixed: it also requires rank within the boundary population.** `BoundaryTopFraction = 0.05` — the
+same reading `BlastTopFraction` and `ChangeCostTopFraction` take, because the population here is the
+boundaries and a proportion of them is the claim. Measured: **131 → 34 on nopCommerce (5.1% of its
+672 boundaries), 58 → 9 on jellyfin**, both what §10's sensitivity table predicted.
+
+**The floor stays, and it is what lets this find nothing.** Rank on its own nominates the top 5% of
+boundaries however tame they all are, which is `ARCHITECTURE.md` §9's gate that cannot fail. Both
+conditions are gated receipts, so a reader can see which one a boundary cleared. The claim also
+gained an evidence line — it had none, which was invisible until the rank gate made this the
+fixture's rarest kind and the lead card rendered with an empty numbers row.
+
+**The sweep reports no movement at one notch and that is the fixture, not the gate.** Fifteen
+boundaries, where 1% cannot move a rank; `FindingEquivalenceTests.The_boundary_rank_is_reachable_from_both_sides`
+is the control that reaches both branches.
+
+### 34. A cohort of 2,909 is not a peer group — **fixed, and the diagnosis moved**
 
 Cohorts are assigned by name suffix, base type, namespace or kind, and at the top end they swallow
 the solution. `suffix:Service` holds **2,909 of nopCommerce's 9,219 method-like members — 53% of
@@ -1053,6 +1069,36 @@ could answer the acceptance question in `TECHREQ-job-a.md` §5.5 — was graded 
 down before anyone was booked, including what each outcome would mean for the work. Without that
 the temptation to re-read the result as *"they needed more time"* is close to irresistible, and the
 same session yields nothing.
+
+
+**Fixed — and measuring it moved the diagnosis, which is the part worth keeping.** This entry said
+the cohort was too big to be a peer group. It is not what breaks the claim:
+
+| cohort | methods | median | max | ratio |
+|---|---:|---:|---:|---:|
+| `suffix:Service` | 2,909 | **1** | 93 | 93x |
+| `suffix:Factory` | 1,307 | **1** | 46 | 46x |
+| `base:…BaseAdminController` | 1,022 | 3 | 60 | **20x** |
+
+**58 of nopCommerce's 70 usable cohorts have a method median of 1 or 0**, so the ratio is the
+subject's own complexity divided by one — and the largest cohort, the one with a real median,
+produces the *smallest* ratio. Size was never the mechanism; a median on the floor was.
+
+**So the sentence says what the gate measured.** `b5cc69a` made this a rank gate and the wording
+kept leading with the ratio, which is §28's mistake one level up. It reads *"the most complex of the
+2,909 methods in the 193 types whose name ends in Service"* now, and the evidence line states
+*"cc 93 against a peer median of 1"* rather than their ratio — so a median of 1 is visible instead
+of hidden inside a multiplication.
+
+**A units error went with it.** The old sentence read *"its 2,909 peers"* off `CohortSize`, which
+counts **methods**; the group is 193 types. Both numbers are stated now.
+
+**Type-level concealed decision keeps the ratio wording deliberately**: its gate is still the
+multiple, so leading on it is honest there. The two sentences differ because the two gates do.
+
+**What this does not close is `X3`.** Whether a 193-type cohort is the right population at all is
+`ARCHITECTURE.md` §11's calibration question, and it is untouched: this entry was about the claim,
+and the claim is now true.
 
 ### 35. Three inline SVGs share one stylesheet, and two of them share class names
 
