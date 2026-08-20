@@ -96,7 +96,7 @@ so it can never fire. It retires with the oracle at R2.
 > is that the fix is no longer only *asserted*: the thing it was supposed to prevent is measured as
 > absent, on the codebase where it was measured as present.
 
-### 2. Absolute gates saturate; percentile gates do not — **one of three converted**
+### 2. Absolute gates do not travel between codebases — **two converted; the rest is X13**
 
 Change cost fires on 7.9% of nopCommerce, hubs on 6.9% of Jellyfin, both truncated to 15 by
 `--top`. Blast radius — the only percentile-gated finding — held at 1.0% and 0.9% across both.
@@ -121,8 +121,55 @@ cohort **basis** to be the measure that swung hardest between the two solutions 
 55.4% → 33.9%, base type 14.3% → 44.8% — so a within-cohort gate inherits that instability, while
 a share of the solution is that share at any size.
 
-**Hubs (6.9%) and breaks alone (2.8%) are not converted**, and neither should be until there is a
-fixture case that can observe the difference: `TASKS.md` P7.
+**Hubs and breaks alone are not converted.** The reason recorded here was *"not until there is a
+fixture case that can observe the difference: `TASKS.md` P7"*. **P7 landed and they still did not
+move**, which is what prompted rereading this entry rather than working it.
+
+---
+
+**Re-measured 2026-08-20, on both reference solutions, and rewritten.** The diagnosis in the title
+holds and is the durable part:
+
+| `HubMin = 5` | findings | share | equivalent rank cut |
+|---|---|---|---|
+| nopCommerce (3,209 types) | 117 | **3.6%** | ≈ top 3% |
+| jellyfin (1,545 types) | 106 | **6.9%** | ≈ top 5% |
+
+One threshold, two codebases, nearly double the share. That is the whole claim and it reproduces.
+
+**What does not hold is the remedy this entry prescribes, and that is why it has never finished.**
+*"Convert to percentiles"* is not what either conversion actually did:
+
+- **Change cost** uses `ChangeCostTopFraction`, a share of the whole solution **beside the absolute
+  floor rather than instead of it** — this entry says so itself, four paragraphs up.
+- **Blast radius**, under defect 14, replaced a percentile threshold with a **midrank rank
+  position**, `rank <= max(1, fraction × n + 0.5)`, and kept its absolute floor. Defect 14 states
+  outright that it *"needs its own answer rather than falling out of defect 2's
+  absolute-to-percentile conversion, because that conversion runs toward this hazard."*
+
+**So the proven form is a top-fraction midrank position kept beside the absolute floor**, and this
+entry has been asking for something else the whole time.
+
+**And the remaining conversion is under-determined, which the numbers show.** The deciding value is
+`min(fan-in, fan-out)`, a small integer with enormous tie groups: 117 types sit at ≥ 5 on
+nopCommerce, and relaxing by one integer to ≥ 4 admits 186 — **59% more for one step**. Where a
+rank gate lands is therefore decided by tie handling and by which population it ranks over, neither
+of which "convert to percentiles" specifies. That is defect 14's territory, and it is a choice
+rather than a repair.
+
+**What is left of this entry is one job and one decision, and they are now filed apart.**
+
+- **The decision is `TASKS.md` X13** — thresholds global or calibrated per codebase, which
+  `ARCHITECTURE.md` §11 has carried as an open question all along while citing this entry to narrow
+  it. A defect register is for behaviour that is wrong with a remedy already understood; this half
+  never met that condition, and filing it here is what let it be deferred five times instead of
+  decided once.
+- **The job**, once X13 is answered, is applying the proven form to hubs and breaks alone. It is an
+  hour against a known pattern rather than an open question.
+
+**Do not quote the old percentages.** Hubs 6.9% and breaks alone 2.8% predate the
+concealed-decision fix; breaks alone was `(none)` on nopCommerce and is now 27. The table above is
+current as of 2026-08-20 and was taken after defect 5, which does not touch fan-in or fan-out.
 
 ### 3. Truncation is never disclosed
 

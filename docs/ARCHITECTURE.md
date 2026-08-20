@@ -478,7 +478,10 @@ already understood. These are questions with no answer yet.
   `PrintLayerSpan` is written for a generality that cannot occur. Ties into the edge-kind
   taxonomy, and into `DEFECTS.md` §11 — a richer taxonomy would separate the anomaly from the
   boilerplate that currently hides it.
-- **Thresholds global, or calibrated per codebase.** `DEFECTS.md` §2 narrows it: percentile
-  gates travel between codebases, absolute ones do not.
+- **Thresholds global, or calibrated per codebase.** `DEFECTS.md` §2 narrows it and now carries
+  the measurement: one absolute threshold, `HubMin = 5`, is 3.6% of nopCommerce and 6.9% of
+  jellyfin. **This is `TASKS.md` X13**, lifted out of §2 on 2026-08-20 — it had sat on the defect
+  register, whose entry condition is a remedy already understood, and was deferred five times
+  because it does not have one.
 - **Dead code at member level or types only.** Far more useful, far more false-positive
   prone.
