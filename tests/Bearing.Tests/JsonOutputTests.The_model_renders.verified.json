@@ -72,10 +72,10 @@
         "ca": 2,
         "ce": 0,
         "abstractTypes": 6,
-        "totalTypes": 140,
-        "abstractness": 0.04285714285714286,
+        "totalTypes": 155,
+        "abstractness": 0.03870967741935484,
         "instability": 0,
-        "distanceFromMainSequence": 0.9571428571428572,
+        "distanceFromMainSequence": 0.9612903225806452,
         "zone": "Pain"
       }
     },
@@ -1208,6 +1208,1354 @@
           "maxNestingDepth": 0,
           "parameterCount": 1,
           "linesOfCode": 3
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.BoreCaliper",
+      "name": "BoreCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.BoreCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 69
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 4,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 8,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.BoreCaliper|global::TestBed.Core.Calibration.BoreCaliper.Read()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 1,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 0,
+      "dataShape": 1,
+      "linesOfCode": 4,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.BoreCaliper|global::TestBed.Core.Calibration.BoreCaliper.Read()",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 71
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.DriftSonde",
+      "name": "DriftSonde",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.DriftSonde",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 52
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Sonde",
+      "cohortBasis": "name suffix",
+      "cohortSize": 5,
+      "fanIn": 2,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 4,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 6,
+      "maxMemberCyclomatic": 6,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.DriftSonde|global::TestBed.Core.Calibration.DriftSonde.Correct(int, string, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 1,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 3,
+      "dataShape": 4,
+      "linesOfCode": 16,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.DriftSonde|global::TestBed.Core.Calibration.DriftSonde.Correct(int, string, bool)",
+          "name": "Correct",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 54
+          },
+          "cyclomatic": 6,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 3,
+          "linesOfCode": 13
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.EchoSonde",
+      "name": "EchoSonde",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.EchoSonde",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 73
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Sonde",
+      "cohortBasis": "name suffix",
+      "cohortSize": 5,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 2,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.EchoSonde|global::TestBed.Core.Calibration.EchoSonde.Sample(int, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 2,
+      "dataShape": 3,
+      "linesOfCode": 10,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.EchoSonde|_drift",
+          "name": "_drift",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 75
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.EchoSonde|global::TestBed.Core.Calibration.EchoSonde.Sample(int, bool)",
+          "name": "Sample",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 77
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 2,
+          "linesOfCode": 5
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.EdgeCaliper",
+      "name": "EdgeCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.EdgeCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 75
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 3,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 6,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.EdgeCaliper|global::TestBed.Core.Calibration.EdgeCaliper.Read()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 1,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 0,
+      "dataShape": 1,
+      "linesOfCode": 4,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.EdgeCaliper|global::TestBed.Core.Calibration.EdgeCaliper.Read()",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 77
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.FaceCaliper",
+      "name": "FaceCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.FaceCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 81
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 3,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 6,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.FaceCaliper|global::TestBed.Core.Calibration.FaceCaliper.Read()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 1,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 0,
+      "dataShape": 1,
+      "linesOfCode": 4,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.FaceCaliper|global::TestBed.Core.Calibration.FaceCaliper.Read()",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 83
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.GapCaliper",
+      "name": "GapCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.GapCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 87
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 3,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 6,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.GapCaliper|global::TestBed.Core.Calibration.GapCaliper.Read()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 1,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 0,
+      "dataShape": 1,
+      "linesOfCode": 4,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.GapCaliper|global::TestBed.Core.Calibration.GapCaliper.Read()",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 89
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.HeightCaliper",
+      "name": "HeightCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.HeightCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 93
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 2,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 4,
+      "instability": 0.3333333333333333,
+      "instabilityRaw": 0.3333333333333333,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.HeightCaliper|global::TestBed.Core.Calibration.HeightCaliper.Read()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 0,
+      "dataShape": 1,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.HeightCaliper|_span",
+          "name": "_span",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 95
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.HeightCaliper|global::TestBed.Core.Calibration.HeightCaliper.Read()",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 97
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.JawCaliper",
+      "name": "JawCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.JawCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 101
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 2,
+      "fanOut": 2,
+      "effectiveFanOut": 2,
+      "inboundReferences": 4,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.JawCaliper|global::TestBed.Core.Calibration.JawCaliper.Read()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 3,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 0,
+      "dataShape": 1,
+      "linesOfCode": 7,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.JawCaliper|_span",
+          "name": "_span",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 103
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.JawCaliper|_bore",
+          "name": "_bore",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 104
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.JawCaliper|global::TestBed.Core.Calibration.JawCaliper.Read()",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 106
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "name": "KerfCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.KerfCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 110
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 2,
+      "fanOut": 5,
+      "effectiveFanOut": 5,
+      "inboundReferences": 4,
+      "instability": 0.7142857142857143,
+      "instabilityRaw": 0.7142857142857143,
+      "cyclomatic": 4,
+      "maxMemberCyclomatic": 4,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|global::TestBed.Core.Calibration.KerfCaliper.Read(int, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 6,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 2,
+      "dataShape": 3,
+      "linesOfCode": 19,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|_span",
+          "name": "_span",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 112
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|_bore",
+          "name": "_bore",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 113
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|_edge",
+          "name": "_edge",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 114
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|_face",
+          "name": "_face",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 115
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|_gap",
+          "name": "_gap",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 116
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.KerfCaliper|global::TestBed.Core.Calibration.KerfCaliper.Read(int, bool)",
+          "name": "Read",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 118
+          },
+          "cyclomatic": 4,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 2,
+          "linesOfCode": 10
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "name": "LandCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.LandCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 131
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 0,
+      "fanOut": 8,
+      "effectiveFanOut": 8,
+      "inboundReferences": 0,
+      "instability": 1,
+      "instabilityRaw": 1,
+      "cyclomatic": 5,
+      "maxMemberCyclomatic": 5,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.LandCaliper|global::TestBed.Core.Calibration.LandCaliper.Sweep(int, bool, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 9,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 3,
+      "dataShape": 4,
+      "linesOfCode": 23,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_span",
+          "name": "_span",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 133
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_bore",
+          "name": "_bore",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 134
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_edge",
+          "name": "_edge",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 135
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_face",
+          "name": "_face",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 136
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_gap",
+          "name": "_gap",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 137
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_height",
+          "name": "_height",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 138
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_jaw",
+          "name": "_jaw",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 139
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|_kerf",
+          "name": "_kerf",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 140
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.LandCaliper|global::TestBed.Core.Calibration.LandCaliper.Sweep(int, bool, bool)",
+          "name": "Sweep",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 142
+          },
+          "cyclomatic": 5,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 3,
+          "linesOfCode": 11
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "name": "MarkCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.MarkCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 156
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 0,
+      "fanOut": 8,
+      "effectiveFanOut": 8,
+      "inboundReferences": 0,
+      "instability": 1,
+      "instabilityRaw": 1,
+      "cyclomatic": 6,
+      "maxMemberCyclomatic": 6,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|global::TestBed.Core.Calibration.MarkCaliper.Sweep(int, bool, bool, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 9,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 4,
+      "dataShape": 5,
+      "linesOfCode": 24,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_span",
+          "name": "_span",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 158
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_bore",
+          "name": "_bore",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 159
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_edge",
+          "name": "_edge",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 160
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_face",
+          "name": "_face",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 161
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_gap",
+          "name": "_gap",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 162
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_height",
+          "name": "_height",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 163
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_jaw",
+          "name": "_jaw",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 164
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|_kerf",
+          "name": "_kerf",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 165
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|global::TestBed.Core.Calibration.MarkCaliper.Sweep(int, bool, bool, bool)",
+          "name": "Sweep",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 167
+          },
+          "cyclomatic": 6,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 4,
+          "linesOfCode": 12
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.PulseSonde",
+      "name": "PulseSonde",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.PulseSonde",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 85
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Sonde",
+      "cohortBasis": "name suffix",
+      "cohortSize": 5,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 2,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.PulseSonde|global::TestBed.Core.Calibration.PulseSonde.Sample(int, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 2,
+      "dataShape": 3,
+      "linesOfCode": 10,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.PulseSonde|_drift",
+          "name": "_drift",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 87
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.PulseSonde|global::TestBed.Core.Calibration.PulseSonde.Sample(int, bool)",
+          "name": "Sample",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 89
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 2,
+          "linesOfCode": 5
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
+      "name": "SpanCaliper",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.SpanCaliper",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 49
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Caliper",
+      "cohortBasis": "name suffix",
+      "cohortSize": 10,
+      "fanIn": 5,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 10,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 4,
+      "maxMemberCyclomatic": 3,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.SpanCaliper|global::TestBed.Core.Calibration.SpanCaliper.Measure(int, bool)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 2,
+      "executableMemberCount": 2,
+      "parameterCount": 2,
+      "dataShape": 4,
+      "linesOfCode": 14,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.SpanCaliper|global::TestBed.Core.Calibration.SpanCaliper.Measure(int, bool)",
+          "name": "Measure",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 51
+          },
+          "cyclomatic": 3,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 2,
+          "linesOfCode": 9
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.SpanCaliper|global::TestBed.Core.Calibration.SpanCaliper.Zero()",
+          "name": "Zero",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Calipers.cs",
+            "line": 61
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.TraceSonde",
+      "name": "TraceSonde",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.TraceSonde",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 97
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Sonde",
+      "cohortBasis": "name suffix",
+      "cohortSize": 5,
+      "fanIn": 0,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 0,
+      "instability": 1,
+      "instabilityRaw": 1,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.TraceSonde|global::TestBed.Core.Calibration.TraceSonde.Sample(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.TraceSonde|_echo",
+          "name": "_echo",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 99
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.TraceSonde|global::TestBed.Core.Calibration.TraceSonde.Sample(int)",
+          "name": "Sample",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 101
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Calibration.WakeSonde",
+      "name": "WakeSonde",
+      "fullyQualifiedName": "global::TestBed.Core.Calibration.WakeSonde",
+      "namespace": "TestBed.Core.Calibration",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 105
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Sonde",
+      "cohortBasis": "name suffix",
+      "cohortSize": 5,
+      "fanIn": 0,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 0,
+      "instability": 1,
+      "instabilityRaw": 1,
+      "cyclomatic": 3,
+      "maxMemberCyclomatic": 3,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Calibration.WakeSonde|global::TestBed.Core.Calibration.WakeSonde.Sample(int, string)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 2,
+      "dataShape": 3,
+      "linesOfCode": 14,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.WakeSonde|_pulse",
+          "name": "_pulse",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 107
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Calibration.WakeSonde|global::TestBed.Core.Calibration.WakeSonde.Sample(int, string)",
+          "name": "Sample",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Calibration/Sondes.cs",
+            "line": 109
+          },
+          "cyclomatic": 3,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 2,
+          "linesOfCode": 9
         }
       ]
     },
@@ -13797,6 +15145,370 @@
       "site": {
         "file": "TestBed/Core/Gauges.cs",
         "line": 148
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.EchoSonde",
+      "to": "type|Core|global::TestBed.Core.Calibration.DriftSonde",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 75
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.HeightCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 95
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.JawCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.BoreCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 104
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.JawCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 103
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.BoreCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 113
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.EdgeCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 114
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.FaceCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 115
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.GapCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 116
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 112
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.BoreCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 134
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.EdgeCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 135
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.FaceCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 136
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.GapCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 137
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.HeightCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 138
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.JawCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 139
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 140
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.LandCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 133
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.BoreCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 159
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.EdgeCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 160
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.FaceCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 161
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.GapCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 162
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.HeightCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 163
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.JawCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 164
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.KerfCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 165
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.MarkCaliper",
+      "to": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Calipers.cs",
+        "line": 158
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.PulseSonde",
+      "to": "type|Core|global::TestBed.Core.Calibration.DriftSonde",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 87
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.TraceSonde",
+      "to": "type|Core|global::TestBed.Core.Calibration.EchoSonde",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 99
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Calibration.WakeSonde",
+      "to": "type|Core|global::TestBed.Core.Calibration.PulseSonde",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Calibration/Sondes.cs",
+        "line": 107
       }
     },
     {

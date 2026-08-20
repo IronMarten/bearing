@@ -116,7 +116,7 @@ public sealed class ReportTests(CoreWalkFixture core)
 
         // 145, which is Core's count — the probe reports 144, because it merges the two
         // PayloadTag declarations. docs/DEFECTS.md §1, and the header renders from the model.
-        Assert.Contains("145 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
+        Assert.Contains("160 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
     }
 
     /// <summary>

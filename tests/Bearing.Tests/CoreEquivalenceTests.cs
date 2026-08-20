@@ -216,7 +216,7 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
         Assert.Equal(6, analysed.AbstractTypes);
-        Assert.Equal(140, analysed.TotalTypes);          // 128 before P6's twelve
+        Assert.Equal(155, analysed.TotalTypes);          // 128 before P6's twelve, 140 before P7's fifteen
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 

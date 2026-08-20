@@ -44,11 +44,16 @@ public sealed class StructureTests(FixtureRun run)
         // P6 moved all three: twelve types (the eight *Conduit types, their three shared
         // dependency targets and RouteAttribute) and twenty-seven edges — 8 × 3 dependency
         // fields, plus the three [Route] usages, which are references like any other.
-        Assert.Equal(144, run.Result.Types.Count);
-        Assert.Equal(317, run.Result.Edges.Count);
+        //
+        // P7 moved them again: fifteen types in two near-miss families — five *Sonde and ten
+        // *Caliper — and twenty-eight edges, which are the references that hold each family's
+        // fan-in median where its gate needs it. Sixteen methods, not fifteen: SpanCaliper carries
+        // a second one so its cyclomatic total lands on the tie that fixes its percentile.
+        Assert.Equal(159, run.Result.Types.Count);
+        Assert.Equal(345, run.Result.Edges.Count);
         // Methods are counted per declaration, so unlike Types this is not distorted by the
         // planted collision: Describe, Score and Weight are all three present.
-        Assert.Equal(149, run.Result.Methods.Count);
+        Assert.Equal(165, run.Result.Methods.Count);
     }
 
     // ---- Generated code exclusion -------------------------------------------------

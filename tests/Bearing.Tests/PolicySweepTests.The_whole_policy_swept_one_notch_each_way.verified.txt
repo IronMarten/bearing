@@ -4,11 +4,11 @@
 value                          default   notch   down       up
 ------------------------------------------------------------------------
 MinCohort                            5       1   moves      moves
-OutlierFactor                        3     0.1   -          -
+OutlierFactor                        3     0.1   -          moves
 MinFanIn                             5       1   -          moves
 Top                                 15       1   -          -
 HighCc                              10       1   moves      -
-MinDecisionCc                        5       1   -          moves
+MinDecisionCc                        5       1   moves      moves
 ConcealedTopRank                     3       1   moves      moves
 HubMin                               5       1   -          moves
 GodObjectMembers                    20       1   moves      -
@@ -16,12 +16,12 @@ MinKindSpan                          3       1   -          moves
 StableThreshold                    0.2     0.1   moves      moves
 IsolatedThreshold                  0.8     0.1   -          moves
 BreaksAloneMinFanIn                  1       1   moves      moves
-ConcealedFanInCeiling                2     0.1   -          -
+ConcealedFanInCeiling                2     0.1   moves      -
 ConcealedFanOutCeiling               2     0.1   moves      -
-BlastFanInMultiple                   2     0.1   -          -
+BlastFanInMultiple                   2     0.1   -          moves
 BoundaryTopFraction               0.05    0.01   -          -
 BlastTopFraction                  0.05    0.01   -          -
-BlastComplexityPercentile           70       1   -          -
+BlastComplexityPercentile           70       1   -          moves
 ChangeCostTopFraction             0.05    0.01   -          moves
 RollCallDivisor                      3       1   moves      moves
 SurfaceOutlierMultiple             1.5     0.1   -          -

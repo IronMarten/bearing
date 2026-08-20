@@ -101,7 +101,10 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
             .Select(f => f.Subject.Canonical)
             .ToHashSet(StringComparer.Ordinal);
 
-        Assert.Equal(5, byMethod.Except(byType, StringComparer.Ordinal).Count());
+        // Seven since P7: the near-miss families reach method level with methods their types do
+        // not reach type level with, which widens the margin this test measures rather than
+        // changing what it claims.
+        Assert.Equal(7, byMethod.Except(byType, StringComparer.Ordinal).Count());
     }
 
     /// <summary>
@@ -525,10 +528,20 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
 
         // Loosening it admits the boundary the probe's absolute floor always accepted, which is
         // the arm §3.5 has and Core has never exercised at its default.
-        foreach (var fraction in (double[])[0.10, 0.15])
-            Assert.Equal(
-                ["LayeringEndpoint", "NormalizationContext", "NormalizedResponse", "RawResponse"],
-                ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = fraction }));
+        Assert.Equal(
+            ["LayeringEndpoint", "NormalizationContext", "NormalizedResponse", "RawResponse"],
+            ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = 0.10 }));
+
+        // And a wider slice admits more, which is the half of X2's decision this pins: change cost
+        // is gated SOLUTION-WIDE, so the set it admits is a function of how many types the solution
+        // has. P7 added fifteen and 15% went from six ranks to seven — the two extra names are that
+        // arithmetic and not a change in the finding.
+        Assert.Equal(
+            [
+                "DispatchCallbackController", "LayeringEndpoint", "ModelDescription",
+                "NormalizationContext", "NormalizedResponse", "RawResponse",
+            ],
+            ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = 0.15 }));
 
         // And tightening it past the third survivor narrows the finding.
         Assert.Equal(
@@ -1162,7 +1175,10 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
             .Select(f => f.ValueOf("CyclomaticXMedian"))
             .ToList();
 
-        Assert.Equal(1, ranks.Count - ranks.Distinct().Count());
+        // Two pairs since P7, which is the margin going back up. The remark above records that it
+        // had fallen to one and that losing the last one would leave the tiebreak unexercised; the
+        // near-miss families put a second pair back without being built for it.
+        Assert.Equal(2, ranks.Count - ranks.Distinct().Count());
     }
 
     // --------------------------------------------------------------------- adapters ----

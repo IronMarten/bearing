@@ -805,7 +805,7 @@ is why both halves are run.
 value in `AnalysisPolicy.Values`, moved one notch each way, with the finding set compared at each.
 Read it there.
 
-**P7's near-miss band, first two.** Every plant before it answered *"does this finding fire?"*; none
+**P7's near-miss band.** Every plant before it answered *"does this finding fire?"*; none
 answered *"is this the number at which it stops firing?"*, so the fixture was all clear-cut cases
 with nothing sitting just outside a gate — and the sweep reported `-` in both directions for nine
 constants that are not dead.
@@ -814,6 +814,11 @@ constants that are not dead.
 |---|---|---|
 | `HighCc` (10) | `ThroughputGauge.Sample` moved from cc 8 to **cc 9**. Everything about that type already qualifies for `LOAD-BEARING AND INTRICATE` — instability 0.167, fan-in 5 — except one point of complexity | `-` `-` → **`moves`** `-` |
 | `GodObjectMembers` (20) | `ShipmentCoordinator` moved from 16 members to **19**. It is already a hub on both axes; only the size arm's floor keeps `TooLargeToHold` from holding | `-` `-` → **`moves`** `-` |
+| `OutlierFactor` (3.0) | `DriftSonde`: cc 6 against a cohort median of 2 — **a ratio of exactly 3.0** | `-` `-` → `-` **`moves`** |
+| `ConcealedFanInCeiling` (2.0) | the same type: fan-in 2 against a cohort median of 1 — **exactly 2.0** | `-` `-` → **`moves`** `-` |
+| `BlastFanInMultiple` (2.0) | `SpanCaliper`: fan-in 5 against a cohort median of 2.5 — **exactly 2.0** | `-` `-` → `-` **`moves`** |
+| `BlastComplexityPercentile` (70) | the same type, at **exactly the 70th percentile** of its ten peers | `-` `-` → `-` **`moves`** |
+| `MinDecisionCc` (5) | not aimed at, and it moved anyway: a Caliper method sits at cc 4 | `-` `moves` → **`moves`** `moves` |
 
 > **The three auto-properties are the plant, and the first draft of them was wrong.** Written as
 > expression-bodied properties they carry a cyclomatic point each, which took the type's total from
@@ -822,7 +827,23 @@ constants that are not dead.
 > decision point and are not method-like, so the count moves and nothing else does. **That is what
 > reading the golden diff line by line is for**, and it is the only reason the swap was noticed.
 
-**And one of P7's nine is not reachable from this fixture at all, for a reason worth writing down.**
+**Two families, and the shape of each is the plant.** `Sondes.cs` is five types whose only job is
+to put a cohort median on 2 and a fan-in median on 1, so one member's two ratios land on 3.0 and
+2.0. `Calipers.cs` is ten, because the two blast gates want different cohort shapes and ten is the
+smallest number that gives both — a fan-in ratio of exactly 2.0 at the fan-in floor needs an even
+cohort (the median is the middle pair's average), and a midrank percentile of exactly 70.0 needs
+`(below + ties/2) / n = 0.7`, which only a multiple of five satisfies. **Both files carry their
+arithmetic in a header comment, and every number in them was read off a run rather than counted by
+eye** — the first draft of each was wrong by one, once from a ternary that is a decision point and
+once from a missing tie.
+
+**What the band cost, read line by line.** Fifteen types and twenty-eight edges, and four pinned
+answers moved with them: the Core project's type count, the blast-radius subject list, the
+method-level margin, and the 15% change-cost slice — which widened because change cost is gated
+**solution-wide** by X2's decision, so the set it admits is a function of how many types the
+solution has. Each was updated deliberately and none of them is a finding changing its mind.
+
+**And two of P7's nine are not reachable from this fixture at all, for reasons worth writing down.**
 `GlobalComplexityFloor` is 1, and it is ANDed with `GlobalComplexityPercentile` (90). On TestBed the
 smallest `maxMemberCyclomatic` that reaches the 90th percentile is **12** — eleven points above the
 floor — so the floor cannot decide anything at any notch. It is not dead by construction: on a
@@ -830,6 +851,17 @@ solution where 90% of types have cc 0 and the top decile has cc 2, the floor is 
 property bag qualifying. **That solution is `P9`'s plant**, not P7's, and this is the second of the
 three causes behind a `-`: the constant is live, the gate is reachable, and this fixture's
 *distribution* cannot get near it.
+
+**`GlobalFanInPercentile` is the other, and its reason is different and more useful.** To make it
+observable a type has to sit in the window `[90, 91)` of the **solution-wide** fan-in distribution.
+That window is one percent of 160 types — 1.6 ranks — and its position is a function of every type
+in the fixture, so no plant owns it: the two families P7 added moved fan-in 7 from 91.9 to 91.88,
+and the next plant will move it again. **A near miss can be pinned against a cohort median because
+the plant owns the cohort; it cannot be pinned against a solution-wide percentile, because the plant
+owns none of the population.** The place to assert that gate's edge is a unit test over
+`Distribution` with a constructed population — which is what `KnownDefectTests` already does for the
+surface ceiling, "over arbitrary distributions rather than over this fixture". Building it into the
+fixture would produce a `moves` that silently becomes a `-` the next time anything is planted.
 
 **One row of that table needs its reason written down, because the table cannot carry it.**
 `BoundaryTopFraction` reports `-` in both directions and it is **not** a dead gate: the fixture

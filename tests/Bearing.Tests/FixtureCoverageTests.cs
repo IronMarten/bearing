@@ -144,7 +144,13 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
 
         // Both were empty, and an empty section produces the same bytes whatever its thresholds
         // are. Asserted positively so that filling these gaps cannot quietly un-fill itself.
-        Assert.Equal(["ShipmentLedger"], NominationText.SubjectsUnder(text, "-- BUG BLAST RADIUS"));
+        // SpanCaliper joined ShipmentLedger with P7: it is the near miss that sits exactly on the
+        // fan-in multiple and on the complexity percentile, which is what makes those two
+        // constants observable at all. The section is no longer a single-row list and the point of
+        // this assertion is that it is not empty rather than that it holds one name.
+        Assert.Equal(
+            ["ShipmentLedger", "SpanCaliper"],
+            NominationText.SubjectsUnder(text, "-- BUG BLAST RADIUS").Order(StringComparer.Ordinal));
         Assert.Contains("TariffReconciler", NominationText.SubjectsUnder(text, "-- BREAKS ALONE"));
 
         // Asserted alongside so this reads as a gap in two findings rather than a fact about
@@ -850,10 +856,10 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
         var atDefaults = NominationText.SubjectsUnder(
             NominationText.Render(run.Result, run.Options), "-- BUG BLAST RADIUS");
 
-        Assert.Equal(["ShipmentLedger"], atDefaults);
+        Assert.Equal(["ShipmentLedger", "SpanCaliper"], atDefaults.Order(StringComparer.Ordinal));
 
-        // ShipmentLedger has 11 callers. Raise the floor past it and the finding goes quiet,
-        // which it could not have done before there was anything to silence.
+        // ShipmentLedger has 11 callers and SpanCaliper 5. Raise the floor past both and the
+        // finding goes quiet, which it could not have done before there was anything to silence.
         var aboveThePlant = NominationText.SubjectsUnder(
             NominationText.Render(run.Result, new Options { MinFanIn = 12 }), "-- BUG BLAST RADIUS");
 
