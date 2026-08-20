@@ -38,7 +38,7 @@ public static class BlastRadius
         foreach (var group in model.Types.GroupBy(t => t.Cohort.Key, StringComparer.Ordinal))
         {
             var peers = group.ToList();
-// LEAVE-ONE-OUT             if (peers.Count < policy.MinCohort) continue;
+            if (peers.Count < policy.MinCohort) continue;
 
             var fanIn = Distribution.Of(peers.Select(t => (double)t.FanIn));
             var complexity = Distribution.Of(peers.Select(t => (double)t.Cyclomatic));
