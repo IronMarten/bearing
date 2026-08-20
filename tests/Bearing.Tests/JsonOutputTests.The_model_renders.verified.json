@@ -80,22 +80,6 @@
       }
     },
     {
-      "name": "Tools",
-      "hasEntryPoint": false,
-      "isLibrary": true,
-      "unreferenced": true,
-      "coupling": {
-        "ca": 0,
-        "ce": 1,
-        "abstractTypes": 0,
-        "totalTypes": 2,
-        "abstractness": 0,
-        "instability": 1,
-        "distanceFromMainSequence": 0,
-        "zone": "NearMainSequence"
-      }
-    },
-    {
       "name": "Data",
       "hasEntryPoint": false,
       "isLibrary": true,
@@ -105,6 +89,22 @@
         "ce": 1,
         "abstractTypes": 0,
         "totalTypes": 5,
+        "abstractness": 0,
+        "instability": 1,
+        "distanceFromMainSequence": 0,
+        "zone": "NearMainSequence"
+      }
+    },
+    {
+      "name": "Tools",
+      "hasEntryPoint": false,
+      "isLibrary": true,
+      "unreferenced": true,
+      "coupling": {
+        "ca": 0,
+        "ce": 1,
+        "abstractTypes": 0,
+        "totalTypes": 2,
         "abstractness": 0,
         "instability": 1,
         "distanceFromMainSequence": 0,

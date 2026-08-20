@@ -491,7 +491,7 @@ public sealed class SolutionModel
     /// </remarks>
     public string ToolVersion { get; }
 
-    /// <summary>Every project analysed.</summary>
+    /// <summary>Every project analysed, ordered by name.</summary>
     public IReadOnlyList<ProjectNode> Projects { get; }
 
     /// <summary>Every type analysed, ordered by identity.</summary>

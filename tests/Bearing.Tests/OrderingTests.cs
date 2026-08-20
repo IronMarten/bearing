@@ -1,4 +1,5 @@
-using ArchProbe;
+using IronMarten.Bearing;
+using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
 
@@ -8,121 +9,171 @@ namespace Bearing.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The goldens reproduced perfectly long before this test existed — six separate processes,
-/// byte-identical every time. That proved nothing. Every writer sorted on a non-total key, so
-/// most rows were positioned by the enumeration order of a <c>Dictionary</c>, which is
+/// The probe's goldens reproduced perfectly long before this test existed — six separate
+/// processes, byte-identical every time. That proved nothing. Every writer sorted on a non-total
+/// key, so most rows were positioned by the enumeration order of a <c>Dictionary</c>, which is
 /// insertion order, which is project load order times Roslyn's symbol order. 98.5% of
 /// <c>edges.csv</c> and 82.4% of <c>types.csv</c> sat in a tie group. It reproduced because
-/// nothing had perturbed it yet, and reversing the project declaration order in
-/// <c>TestBed.sln</c> — an edit with no semantic content — was enough to move all of it.
+/// nothing had perturbed it yet, and <b>reversing the project declaration order in
+/// <c>TestBed.sln</c> — an edit with no semantic content — was enough to move all of it.</b>
 /// </para>
 /// <para>
-/// This matters for phase 1 specifically. <c>Bearing.Core</c> is a reimplementation, not a
-/// port, and it will not reproduce this probe's incidental insertion order however correct its
-/// numbers are. Without a total order the oracle diff would have gone red on ordering the
-/// moment Core computed anything, and a real regression would have been invisible underneath
-/// the noise. The oracle only separates "I broke it" from "I changed it on purpose" if its
-/// output is stable for reasons that survive being rewritten.
+/// <b>R2 turned that sentence into the test.</b> Until the probe was retired this shuffled the
+/// probe's <c>AnalysisResult</c> in memory and re-rendered, which worked because that model was a
+/// bag of public lists anyone could permute. Core's is not: its constructor is internal and
+/// <c>ModelBuilder</c> canonicalises as it builds, so an in-memory shuffle would have had to
+/// reach past the very defence it was meant to test. The perturbation moved to where the remark
+/// above always described it — the solution file — and TestBed is now walked twice, once as
+/// declared and once with its four project lines reversed.
 /// </para>
 /// <para>
-/// So the test is not "does it reproduce" — it is "would a correct implementation that
-/// enumerated differently produce the same bytes". Shuffling the result and re-rendering
-/// answers exactly that question, and it is the control: remove any <c>ThenBy</c> in
-/// <c>Report.cs</c> and this fails while the goldens stay green.
+/// <b>It is a stronger test than the one it replaces, and it found something on its first run.</b>
+/// A shuffle could only perturb what the renderer was handed; this perturbs the workspace load,
+/// so it covers the walk, the model and the renderers together. <c>types.csv</c>,
+/// <c>edges.csv</c>, <c>members.csv</c> and the terminal report were already stable. The JSON
+/// export was not — its <c>projects</c> array came out in declaration order, because
+/// <c>SolutionModel.Projects</c> was the one collection <c>ModelBuilder</c> did not sort. That is
+/// <c>docs/DEFECTS.md</c> §37, fixed in the commit that brought this file across.
+/// </para>
+/// <para>
+/// The control is unchanged: remove an <c>OrderBy</c> that a renderer or the builder relies on
+/// and this fails while the snapshots stay green, because a snapshot only ever sees one order.
 /// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
-public sealed class OrderingTests(FixtureRun run)
+public sealed class OrderingTests(CoreWalkFixture core)
 {
-    [Fact]
-    public void Types_csv_does_not_depend_on_enumeration_order() =>
-        AssertStable(r => WriteAndRead(p => Report.WriteTypesCsv(p, r.Types)));
+    /// <summary>
+    /// TestBed, walked from a solution file that declares its projects in the opposite order.
+    /// </summary>
+    /// <remarks>
+    /// <b>Static, and that is load-bearing.</b> xunit builds a fresh instance of a test class for
+    /// every test method, so an instance field here would mean five <c>MSBuildWorkspace</c> loads
+    /// — and the workspace load is the whole cost of this suite. One <c>Lazy</c> shared by the
+    /// class buys every assertion in it.
+    /// </remarks>
+    private static readonly Lazy<SolutionModel> ReversedWalk = new(WalkReversed);
+
+    private static SolutionModel Reversed => ReversedWalk.Value;
 
     [Fact]
-    public void Edges_csv_does_not_depend_on_enumeration_order() =>
-        AssertStable(r => WriteAndRead(p => Report.WriteEdgesCsv(p, r.Edges)));
+    public void Types_csv_does_not_depend_on_declaration_order() =>
+        AssertStable(CsvOutput.Types);
 
     [Fact]
-    public void Methods_csv_does_not_depend_on_enumeration_order() =>
-        AssertStable(r => WriteAndRead(p => Report.WriteMethodsCsv(p, r.Methods)));
+    public void Edges_csv_does_not_depend_on_declaration_order() =>
+        AssertStable(CsvOutput.Edges);
 
     [Fact]
-    public void Prediction_sheet_does_not_depend_on_enumeration_order() =>
-        AssertStable(r => WriteAndRead(p => Report.WritePredictionSheet(p, r.Types, run.Options)));
+    public void Members_csv_does_not_depend_on_declaration_order() =>
+        AssertStable(CsvOutput.Members);
 
     /// <summary>
-    /// The one that matters most: nominations is the interpretation layer, and it is the
-    /// artifact phase 1 is rewriting.
+    /// The JSON export — the one that was not stable.
     /// </summary>
+    /// <remarks>
+    /// <c>generatedAt</c> is a clock reading, so both renders are stamped with the same instant;
+    /// it is an argument to the renderer and not a product of the analysis.
+    /// </remarks>
     [Fact]
-    public void Nominations_do_not_depend_on_enumeration_order() =>
-        AssertStable(r =>
-        {
-            using var writer = new StringWriter();
-            Report.PrintNominations(r, run.Options, writer);
-            return writer.ToString();
-        });
-
-    /// <summary>
-    /// Renders once from the real result and once from a shuffled view of it, and requires the
-    /// two to be byte-identical. The shuffle permutes the collections only — every
-    /// <see cref="TypeMetrics"/> instance is shared, so nothing is recomputed and any
-    /// difference is attributable to ordering alone.
-    /// </summary>
-    private void AssertStable(Func<AnalysisResult, string> render)
+    public void Json_does_not_depend_on_declaration_order()
     {
-        var straight = render(run.Result);
-        var shuffled = render(Shuffled(run.Result));
+        var stamp = new DateTimeOffset(2026, 8, 20, 0, 0, 0, TimeSpan.Zero);
 
-        Assert.Equal(straight, shuffled);
+        AssertStable(model => JsonOutput.Render(model, stamp));
+    }
+
+    /// <summary>
+    /// The one that matters most: the report is the interpretation layer, and it is what a reader
+    /// actually sees.
+    /// </summary>
+    [Fact]
+    public void The_report_does_not_depend_on_declaration_order() =>
+        AssertStable(model => string.Join("\n", Report.For(model, Analysis.FindingsFor(model))));
+
+    /// <summary>
+    /// Renders both walks and requires the two to be byte-identical.
+    /// </summary>
+    /// <remarks>
+    /// The solution's file name is normalised out of the reversed render first. The two walks were
+    /// handed different files on purpose, and a renderer that prints the path it was given is
+    /// reporting an argument rather than an ordering — <c>JsonOutput</c> and the report header
+    /// both do.
+    /// </remarks>
+    private void AssertStable(Func<SolutionModel, string> render)
+    {
+        var straight = render(core.Model);
+
+        var reversed = render(Reversed).Replace(
+            Path.GetFileName(Reversed.SolutionPath),
+            Path.GetFileName(core.Model.SolutionPath),
+            StringComparison.Ordinal);
+
+        Assert.Equal(straight, reversed);
 
         // Guard against the assertion passing vacuously — an empty render would satisfy it.
         Assert.NotEmpty(straight);
     }
 
     /// <summary>
-    /// A fixed-seed permutation. Seeded so a failure is reproducible: an ordering bug that
-    /// only appeared on some runs would be worse than the one this replaces.
+    /// Writes the reversed solution, walks it, and removes it again.
     /// </summary>
-    private static AnalysisResult Shuffled(AnalysisResult source)
+    /// <remarks>
+    /// Written beside the real one rather than into a temp directory, because a <c>.sln</c>
+    /// addresses its projects by relative path and a copy anywhere else names nothing. Deleted as
+    /// soon as the walk returns — the model holds the path as a string and never reopens it — so
+    /// the only window in which a stray file exists is one workspace load wide.
+    /// </remarks>
+    private static SolutionModel WalkReversed()
     {
-        var rng = new Random(20260811);
+        var path = Path.Combine(
+            Path.GetDirectoryName(RepoPaths.TestBedSolution)!, "TestBed.ordering-probe.sln");
 
-        List<T> Permute<T>(List<T> items)
-        {
-            var copy = new List<T>(items);
-            for (var i = copy.Count - 1; i > 0; i--)
-            {
-                var j = rng.Next(i + 1);
-                (copy[i], copy[j]) = (copy[j], copy[i]);
-            }
-            return copy;
-        }
+        File.WriteAllText(path, ReverseProjectDeclarations(File.ReadAllText(RepoPaths.TestBedSolution)));
 
-        return new AnalysisResult
-        {
-            Types = Permute(source.Types),
-            Methods = Permute(source.Methods),
-            Edges = Permute(source.Edges),
-            Projects = Permute(source.Projects),
-            SkippedProjects = Permute(source.SkippedProjects),
-            LoadWarnings = new List<string>(source.LoadWarnings),
-            ExcludedTypes = source.ExcludedTypes,
-            BaselineRows = source.BaselineRows,
-        };
-    }
-
-    private static string WriteAndRead(Action<string> write)
-    {
-        var path = Path.Combine(Path.GetTempPath(), $"bearing-ordering-{Guid.NewGuid():N}.csv");
         try
         {
-            write(path);
-            return File.ReadAllText(path);
+            return new SolutionWalker(new WalkOptions
+            {
+                SolutionPath = path,
+                Policy = AnalysisPolicy.Default,
+            }).WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
         finally
         {
             File.Delete(path);
         }
+    }
+
+    /// <summary>
+    /// The <c>Project(...) ... EndProject</c> blocks in the opposite order, everything else
+    /// untouched.
+    /// </summary>
+    /// <remarks>
+    /// A deliberately literal edit. Rewriting the file through a solution-file library would put a
+    /// second implementation of the format in the test, and the point is to make the edit a
+    /// maintainer might plausibly make by hand — moving a project up the list — not to prove
+    /// anything about parsing.
+    /// </remarks>
+    private static string ReverseProjectDeclarations(string solution)
+    {
+        const string end = "EndProject\r\n";
+
+        var first = solution.IndexOf("Project(\"", StringComparison.Ordinal);
+        var last = solution.LastIndexOf(end, StringComparison.Ordinal) + end.Length;
+
+        Assert.True(first > 0 && last > first, "TestBed.sln has no project declarations to reverse.");
+
+        var blocks = solution[first..last]
+            .Split(end, StringSplitOptions.RemoveEmptyEntries)
+            .Select(block => block + end)
+            .Reverse()
+            .ToList();
+
+        // Four of them. Fewer would let this whole file pass by having nothing to reorder, which
+        // is the one way a test like this fails silently.
+        Assert.Equal(4, blocks.Count);
+
+        return solution[..first] + string.Concat(blocks) + solution[last..];
     }
 }

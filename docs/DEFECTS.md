@@ -1147,3 +1147,35 @@ both. The reason it is recorded rather than repaired is that it arrived at the e
 presentation pass, and the next change to this file should carry it rather than a session of its
 own.
 
+
+### 37. The JSON export's `projects` array is positioned by solution declaration order — **fixed at R2**
+
+`ModelBuilder.Build` canonicalised two of the three collections it returns. Types were sorted by
+`Subject.Canonical`, edges by `From` then `To`, and **projects were passed through in the order
+the workspace handed them back** — which is the order `.sln` declares them in. `JsonOutput.Projects`
+enumerates `model.Projects` directly, so reversing four lines of a solution file, an edit with no
+semantic content, reordered the `projects` array in `bearing.json`.
+
+**Nothing was wrong with the data and that is why it survived.** Every project carried its own
+metrics with it; only the rows moved. A consumer diffing two runs of the same solution would see
+the array change and have no way to tell an edit from a reorder.
+
+**One renderer out of three was affected, which is the part worth keeping.** The terminal report
+and the HTML report both sort projects for themselves, and `types.csv`, `edges.csv` and
+`members.csv` inherit the model's own canonical order. So the tool looked stable from every angle
+anyone had checked from: the goldens reproduced, the snapshots reproduced, and the one export that
+read the order the model never promised was the newest one. **A guarantee that two of three
+consumers re-implement is not a guarantee**, and `SolutionModel.Projects` said "every project
+analysed" where its neighbours said "ordered by identity" and "ordered by endpoint".
+
+**Found by porting `OrderingTests` off the probe**, and it is the reason that port is worth more
+than the test it replaces. The old test shuffled the probe's model in memory and re-rendered,
+which can only perturb what the renderer is handed. The new one reverses the project declarations
+in `TestBed.sln` and walks it a second time, which perturbs the load — and that is the exact
+perturbation the old test's own remarks described as the thing that had moved 98.5% of `edges.csv`
+during phase 0, written down and never automated.
+
+**Fixed in `ModelBuilder.Build`** rather than in `JsonOutput`, beside the sorts it sits between:
+one guarantee on the model is worth three correct renderers, and the next export would have had
+the same coin-flip. `SolutionModel.Projects` now says "ordered by name". The JSON snapshot moved
+`Data` above `Tools` and nothing else changed.

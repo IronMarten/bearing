@@ -302,8 +302,18 @@ internal sealed class ModelBuilder
             .OrderBy(t => t.Subject.Canonical, StringComparer.Ordinal)
             .ToList();
 
+        // Projects are canonicalised for the same reason types and edges above them are, and were
+        // not until R2 — docs/DEFECTS.md §37. They arrive in workspace load order, which is the
+        // order the .sln declares them in, so reversing four lines of a solution file with no
+        // semantic content reordered the projects array in the JSON export. The terminal and HTML
+        // reports sorted for themselves and were never affected, which is exactly why nothing
+        // noticed: one renderer out of three was reading an order the model never promised.
+        var ordered = projects
+            .OrderBy(p => p.Name, StringComparer.Ordinal)
+            .ToList();
+
         return new SolutionModel(
-            solutionPath, _options.Policy, _options.ToolVersion, projects, types, edges, coverage,
+            solutionPath, _options.Policy, _options.ToolVersion, ordered, types, edges, coverage,
             _externalOrigins);
     }
 
