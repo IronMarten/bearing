@@ -1050,5 +1050,16 @@ and watching exactly one of its five tests fail. That is what caught the port th
 test can be moved to a new model, compile, pass, and assert something weaker, and nothing about a
 green run distinguishes that from a correct port.
 
+**The same rule applies to a claim about the tool, and the structural review broke it once.** The
+review found that Bearing's own five-type tangle was a star — four two-cycles through one hub,
+with no edge at all between any two of the spokes — and concluded from that that the product
+reports a star as a mesh, recording it as a defect-to-be. **A run against nopCommerce withdrew
+it.** The report already prints the shortest traversable loop under every component and says how
+much of it that loop covers: *"loop: Nop.Services -> Nop.Services.Localization ->
+Nop.Services.ExportImport -> Nop.Services — 3 of the 30; all 30 reach each other."* Both halves
+are true and both are needed — the component really is mutually reachable, and the actionable
+loop really is three long. The finding about **Bearing's own code** stood; the inference about
+**the product** did not survive one real solution, and it was made from the fixture.
+
 `SeamTests.The_seam_test_is_actually_looking_at_something` exists for this reason: every
 other assertion in that file passes trivially against an assembly that is missing or empty.
