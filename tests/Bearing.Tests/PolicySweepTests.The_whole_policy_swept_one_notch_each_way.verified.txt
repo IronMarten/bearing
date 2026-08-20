@@ -7,10 +7,10 @@ MinCohort                            5       1   moves      moves
 OutlierFactor                        3     0.1   -          moves
 MinFanIn                             5       1   -          moves
 Top                                 15       1   -          -
-HighCc                              10       1   moves      -
+HighCc                              10       1   moves      moves
 MinDecisionCc                        5       1   moves      moves
 ConcealedTopRank                     3       1   moves      moves
-HubMin                               5       1   -          moves
+HubMin                               5       1   moves      moves
 GodObjectMembers                    20       1   moves      -
 MinKindSpan                          3       1   -          moves
 StableThreshold                    0.2     0.1   moves      moves

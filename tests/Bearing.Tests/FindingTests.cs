@@ -57,7 +57,7 @@ public sealed class FindingTests(CoreWalkFixture core)
         // Seven since P7: the near-miss families reach method level with methods their types do
         // not reach type level with, which widens the margin this test measures rather than
         // changing what it claims.
-        Assert.Equal(7, byMethod.Except(byType, StringComparer.Ordinal).Count());
+        Assert.Equal(8, byMethod.Except(byType, StringComparer.Ordinal).Count());
     }
 
     /// <summary>

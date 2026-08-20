@@ -82,18 +82,23 @@ public sealed class StructureTests(CoreWalkFixture core)
         // P9 adds six: the *Trait chain, five property bags and one type with a method, planted so
         // that a cohort's median complexity is zero. Five edges, because the chain has five links
         // and closes over its own members — no existing type gains fan-in.
-        Assert.Equal(185, core.Model.Types.Count);
+        //
+        // P3 adds ten: four *Facet interfaces, SettlementProjection which depends only on them,
+        // and five *Roster property bags which depend only on it. Nine edges — four out of the
+        // projection and five into it — which is what makes its effective fan-out zero against a
+        // raw four, and the dependency-inversion exclusion the thing that decides its nomination.
+        Assert.Equal(195, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
         // which node an edge lands on without changing how many pairs there are.
-        Assert.Equal(367, core.Model.Edges.Count);
+        Assert.Equal(376, core.Model.Edges.Count);
 
         // Methods are counted per declaration, so unlike Types this was never distorted by the
         // planted collisions: Describe, Score and Weight are all three present. Core holds
         // members on the type rather than in a flat list, and counts constructors as method-like
         // because they carry cyclomatic complexity — three of the 186 are constructors.
-        Assert.Equal(187, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        Assert.Equal(193, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------

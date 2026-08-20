@@ -195,6 +195,15 @@ type|Core|global::TestBed.Core.PolicyBridge,type|Core|global::TestBed.Core.Carri
 type|Core|global::TestBed.Core.PolicyBridge,type|Core|global::TestBed.Core.QuoteController,1,Field,TestBed/Core/Bridges.cs,51
 type|Core|global::TestBed.Core.PolicyBridge,type|Core|global::TestBed.Core.TenantStore,1,Field,TestBed/Core/Bridges.cs,52
 type|Core|global::TestBed.Core.Pricing.SurchargeTable,type|Core|global::TestBed.Core.NormalizationContext,2,Other;Parameter,TestBed/Core/Pricing/SurchargeTable.cs,8
+type|Core|global::TestBed.Core.Projections.AnnualRoster,type|Core|global::TestBed.Core.Projections.SettlementProjection,1,Field,TestBed/Core/Projections.cs,150
+type|Core|global::TestBed.Core.Projections.DailyRoster,type|Core|global::TestBed.Core.Projections.SettlementProjection,1,Field,TestBed/Core/Projections.cs,118
+type|Core|global::TestBed.Core.Projections.MonthlyRoster,type|Core|global::TestBed.Core.Projections.SettlementProjection,1,Field,TestBed/Core/Projections.cs,134
+type|Core|global::TestBed.Core.Projections.QuarterlyRoster,type|Core|global::TestBed.Core.Projections.SettlementProjection,1,Field,TestBed/Core/Projections.cs,142
+type|Core|global::TestBed.Core.Projections.SettlementProjection,type|Core|global::TestBed.Core.Projections.IAuditFacet,3,Field;Parameter;Invocation,TestBed/Core/Projections.cs,81
+type|Core|global::TestBed.Core.Projections.SettlementProjection,type|Core|global::TestBed.Core.Projections.IPostingFacet,3,Field;Parameter;Invocation,TestBed/Core/Projections.cs,80
+type|Core|global::TestBed.Core.Projections.SettlementProjection,type|Core|global::TestBed.Core.Projections.IPricingFacet,3,Field;Parameter;Invocation,TestBed/Core/Projections.cs,79
+type|Core|global::TestBed.Core.Projections.SettlementProjection,type|Core|global::TestBed.Core.Projections.ITimingFacet,3,Field;Parameter;Invocation,TestBed/Core/Projections.cs,82
+type|Core|global::TestBed.Core.Projections.WeeklyRoster,type|Core|global::TestBed.Core.Projections.SettlementProjection,1,Field,TestBed/Core/Projections.cs,126
 type|Core|global::TestBed.Core.QueueGauge,type|Core|global::TestBed.Core.NormalizeStep,1,Field,TestBed/Core/Gauges.cs,112
 type|Core|global::TestBed.Core.QuoteAssembler,type|Core|global::TestBed.Core.QuoteLine,10,Other;ReturnType;Construction;GenericArgument,TestBed/Core/QuoteAssembler.cs,12
 type|Core|global::TestBed.Core.QuoteController,type|Core|global::TestBed.Core.CarrierGateway,1,Field,TestBed/Core/Controllers.cs,20

@@ -189,7 +189,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
         // fan-in multiple and on the complexity percentile, which is what makes those two
         // constants observable at all. The finding is no longer a single-row list and the point of
         // this assertion is that it is not empty rather than that it holds one name.
-        Assert.Equal(["ShipmentLedger", "SpanCaliper"], Nominated(FindingKind.BugBlastRadius));
+        Assert.Equal(["SettlementProjection", "ShipmentLedger", "SpanCaliper"], Nominated(FindingKind.BugBlastRadius));
         Assert.Contains("TariffReconciler", Nominated(FindingKind.BreaksAlone));
 
         // Asserted alongside so this reads as a gap in two findings rather than a fact about two
@@ -386,7 +386,8 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
         Assert.Equal(
             [
                 "FuelEvaluator", "GuaranteedServiceNormalizer", "LaneEvaluator", "PolicyEvaluator",
-                "ShipmentCoordinator", "ShipmentLedger", "TariffCalculator", "TransitEvaluator",
+                "SettlementProjection", "ShipmentCoordinator", "ShipmentLedger", "TariffCalculator",
+                "TransitEvaluator",
             ],
             heldBack.Select(t => t.Name).Order(StringComparer.Ordinal));
 
@@ -908,7 +909,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     [Fact]
     public void The_blast_radius_plant_observes_the_fan_in_floor()
     {
-        Assert.Equal(["ShipmentLedger", "SpanCaliper"], Nominated(FindingKind.BugBlastRadius));
+        Assert.Equal(["SettlementProjection", "ShipmentLedger", "SpanCaliper"], Nominated(FindingKind.BugBlastRadius));
 
         // ShipmentLedger has 11 callers and SpanCaliper 5. Raise the floor past both and the
         // finding goes quiet, which it could not have done before there was anything to silence.
