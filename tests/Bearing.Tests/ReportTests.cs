@@ -188,30 +188,66 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// <para>
     /// The wording is the assertion. <c>docs/DEFECTS.md</c> §4 is load success judged by
     /// diagnostic rather than by outcome — six spurious failures on nopCommerce — so the section
-    /// may not call a diagnostic a failure. What it may say is what is certain: a project that did
-    /// not load understates fan-in everywhere it is referenced.
+    /// may not call a diagnostic a failure. **Fixed 2026-08-20**: the warning moved onto
+    /// <c>Coverage.ProjectsNotLoaded</c>, which is the only fact that supports it, and the two
+    /// halves are asserted separately here and below.
     /// </para>
     /// </remarks>
     [Fact]
-    public void A_load_diagnostic_is_reported_as_a_reason_to_distrust_the_numbers()
+    public void A_load_diagnostic_is_shown_without_being_called_a_failure()
     {
-        var lines = Report.NotAnalysed(new Coverage
+        var text = string.Join(Environment.NewLine, Report.NotAnalysed(new Coverage
         {
             ExclusionsApplied = ["/obj/"],
             SkippedProjects = [],
             LoadDiagnostics = ["Project 'A.csproj' failed to restore.", "SDK 'X' not found."],
+            ProjectsNotLoaded = [],
             ExcludedTypes = 0,
-        }).ToList();
-
-        var text = string.Join(Environment.NewLine, lines);
+        }));
 
         Assert.Contains("2 diagnostics while loading", text, StringComparison.Ordinal);
-        Assert.Contains("not necessarily", text, StringComparison.Ordinal);
-        Assert.Contains("understates fan-in EVERYWHERE", text, StringComparison.Ordinal);
         Assert.Contains("Project 'A.csproj' failed to restore.", text, StringComparison.Ordinal);
 
-        // And the clean-run line is not also printed, which would contradict the block above it.
+        // The lower-bound warning is NOT attached to them. This is the whole of §4: every project
+        // compiled, so there is nothing to read as a lower bound, however alarming the diagnostics
+        // sound. On nopCommerce this block is six NuGet advisories and 3,209 types loaded.
+        Assert.DoesNotContain("lower bound", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("understates fan-in", text, StringComparison.Ordinal);
+
+        // And the outcome is stated positively rather than left to the absence of a warning.
+        Assert.Contains("Every project selected for analysis produced a compilation", text, StringComparison.Ordinal);
+
+        // The clean-run line is not also printed, which would contradict the block above it.
         Assert.DoesNotContain("Load diagnostics: none", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A project that did not load is what carries the lower-bound warning.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §4, the other half. The claim has to be made by something, and this
+    /// is the only fact that supports it: a project that produced no compilation declares no
+    /// types, so every type it referenced is short an inbound edge. It is named, because "one
+    /// project did not load" is not actionable and "Nop.Data did not load" is.
+    /// </remarks>
+    [Fact]
+    public void A_project_that_did_not_load_is_what_bounds_the_numbers()
+    {
+        var text = string.Join(Environment.NewLine, Report.NotAnalysed(new Coverage
+        {
+            ExclusionsApplied = [],
+            SkippedProjects = [],
+            LoadDiagnostics = ["No compilation for Widgets"],
+            ProjectsNotLoaded = ["Widgets"],
+            ExcludedTypes = 0,
+        }));
+
+        Assert.Contains("1 project did not load: Widgets.", text, StringComparison.Ordinal);
+        Assert.Contains("understates fan-in EVERYWHERE", text, StringComparison.Ordinal);
+        Assert.Contains("lower bound", text, StringComparison.Ordinal);
+
+        // And the reassurance is absent, because it would be false.
+        Assert.DoesNotContain("Every project selected for analysis produced a compilation", text, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -232,6 +268,7 @@ public sealed class ReportTests(CoreWalkFixture core)
             ExclusionsApplied = [],
             SkippedProjects = [],
             LoadDiagnostics = many,
+            ProjectsNotLoaded = [],
             ExcludedTypes = 0,
         }));
 

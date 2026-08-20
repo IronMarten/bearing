@@ -424,7 +424,26 @@ public sealed class Coverage
     public required IReadOnlyList<string> SkippedProjects { get; init; }
 
     /// <summary>Diagnostics emitted while loading. Not necessarily failures.</summary>
+    /// <remarks>
+    /// <b>These are not evidence that anything failed to load, and reading them as if they were is
+    /// <c>docs/DEFECTS.md</c> §4.</b> MSBuild raises a NuGet vulnerability advisory as a
+    /// <c>Failure</c>-kind workspace diagnostic: on nopCommerce that is six of them, every project
+    /// compiles, and a tool that judged coverage from this list would refuse a major .NET codebase
+    /// over unrelated CVEs. <see cref="ProjectsNotLoaded"/> is the outcome; this is the commentary.
+    /// </remarks>
     public required IReadOnlyList<string> LoadDiagnostics { get; init; }
+
+    /// <summary>
+    /// Projects that were selected for analysis and did not produce a compilation.
+    /// </summary>
+    /// <remarks>
+    /// <b>The one that actually bounds the numbers.</b> A project that did not load declares no
+    /// types, so every type it referenced is missing an inbound edge and fan-in understates
+    /// everywhere it reached — which is the warning <see cref="LoadDiagnostics"/> used to carry on
+    /// its behalf and could not justify. Empty is the ordinary case and is worth stating as such:
+    /// invariant 8, silence is not a clean bill of health.
+    /// </remarks>
+    public required IReadOnlyList<string> ProjectsNotLoaded { get; init; }
 
     /// <summary>Types dropped because they matched an exclusion.</summary>
     public required int ExcludedTypes { get; init; }

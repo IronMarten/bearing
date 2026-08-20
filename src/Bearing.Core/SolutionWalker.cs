@@ -171,7 +171,7 @@ public sealed class SolutionWalker
         var solution = await OpenAsync(workspace, cancellationToken).ConfigureAwait(false);
         var projects = SelectProjects(solution, skipped);
 
-        var (compilations, projectNodes) =
+        var (compilations, projectNodes, notLoaded) =
             await CompileAsync(projects, diagnostics, cancellationToken).ConfigureAwait(false);
 
         var builder = new ModelBuilder(
@@ -184,6 +184,7 @@ public sealed class SolutionWalker
             ExclusionsApplied = _options.ExcludedPathFragments,
             SkippedProjects = skipped,
             LoadDiagnostics = diagnostics,
+            ProjectsNotLoaded = notLoaded,
             ExcludedTypes = builder.ExcludedTypes,
         });
     }
@@ -225,11 +226,13 @@ public sealed class SolutionWalker
     /// the graph is complete.
     /// </remarks>
     private static async Task<(List<(Project Project, Compilation Compilation)> Compilations,
-                              List<ProjectNode> Nodes)> CompileAsync(
+                              List<ProjectNode> Nodes,
+                              List<string> NotLoaded)> CompileAsync(
         List<Project> projects, List<string> diagnostics, CancellationToken cancellationToken)
     {
         var compilations = new List<(Project Project, Compilation Compilation)>();
         var nodes = new List<ProjectNode>();
+        var notLoaded = new List<string>();
 
         foreach (var project in projects)
         {
@@ -238,7 +241,10 @@ public sealed class SolutionWalker
             var compilation = await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
             if (compilation is null)
             {
+                // Both, deliberately: the diagnostic is the detail and the name is the outcome.
+                // Only the second bounds the numbers — docs/DEFECTS.md §4.
                 diagnostics.Add($"No compilation for {project.Name}");
+                notLoaded.Add(project.Name);
                 continue;
             }
 
@@ -249,7 +255,7 @@ public sealed class SolutionWalker
                 compilation.Options.OutputKind == OutputKind.DynamicallyLinkedLibrary));
         }
 
-        return (compilations, nodes);
+        return (compilations, nodes, notLoaded);
     }
 
     /// <summary>Whether a symbol is declared by one of the assemblies being analysed.</summary>

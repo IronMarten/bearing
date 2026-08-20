@@ -688,11 +688,20 @@ public static class HtmlReport
             : $"<li><strong>{Html.Count(coverage.EdgesToUnanalysedTypes)} dependency reference(s)</strong> pointed at "
               + "types the walk never analysed and were dropped. Read fan-in as a lower bound.</li>\n");
 
+        // docs/DEFECTS.md §4. This used to justify itself with an anecdote about another
+        // solution; it states the outcome of this run instead.
+        page.Append(coverage.ProjectsNotLoaded.Count == 0
+            ? "<li>Every project selected for analysis produced a compilation.</li>\n"
+            : $"<li><strong>{Html.Count(coverage.ProjectsNotLoaded.Count)} project(s) did not load</strong> — "
+              + Html.Text(string.Join(", ", coverage.ProjectsNotLoaded))
+              + ". Fan-in understates everywhere they are referenced, so read every number as a "
+              + "lower bound.</li>\n");
+
         if (coverage.LoadDiagnostics.Count > 0)
         {
             page.Append($"<li>{Html.Count(coverage.LoadDiagnostics.Count)} diagnostic(s) while loading. ");
-            page.Append("These are <em>not</em> reliably failures — on one reference solution every one of them ");
-            page.Append("was a NuGet vulnerability advisory, and 3,209 types loaded anyway.</li>\n");
+            page.Append("MSBuild raises a package vulnerability advisory this way, so these are usually not ");
+            page.Append("failures — the line above is what says whether anything was missed.</li>\n");
         }
 
         page.Append("</ul>\n");

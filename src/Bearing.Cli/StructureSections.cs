@@ -354,20 +354,41 @@ internal static class StructureSections
         yield return "-- WHAT WAS NOT ANALYSED ---------------------------------------";
         yield return "   Every number above is relative to what was read. This is the rest.";
 
+        // The warning belongs to the outcome, not to the diagnostics — docs/DEFECTS.md §4. It
+        // used to hang off LoadDiagnostics, which on nopCommerce meant telling a reader to rule
+        // out six NuGet advisories before trusting any number on the page, when all 27 projects
+        // had compiled. What bounds fan-in is a project that did not load, and now that is what
+        // says so.
+        if (coverage.ProjectsNotLoaded.Count > 0)
+        {
+            yield return "";
+            yield return $"   {Sentences.Plural(coverage.ProjectsNotLoaded.Count, "project")} did not load: "
+                         + string.Join(", ", coverage.ProjectsNotLoaded) + ".";
+            yield return "   A project that did not load understates fan-in EVERYWHERE it is";
+            yield return "   referenced, so read every number above as a lower bound.";
+        }
+
         if (coverage.LoadDiagnostics.Count > 0)
         {
             yield return "";
             yield return $"   {Sentences.Plural(coverage.LoadDiagnostics.Count, "diagnostic")} while loading. "
-                         + "These are not necessarily";
-            yield return "   failures — but a project that did not load understates fan-in EVERYWHERE";
-            yield return "   it is referenced, so read the numbers above as lower bounds until you";
-            yield return "   have ruled these out:";
+                         + "MSBuild raises a package";
+            yield return "   vulnerability advisory this way, so these are usually not failures:";
 
             var (shown, disclosure) = Sentences.Cap(
                 coverage.LoadDiagnostics, DiagnosticsShown, "diagnostic", "     ");
 
             foreach (var diagnostic in shown) yield return $"     {diagnostic}";
             foreach (var line in disclosure) yield return line;
+        }
+
+        // Directly under the diagnostics when there are any, which is the only place it answers
+        // the question they raise. Stated either way: "every project loaded" is the reassurance a
+        // reader needs before trusting a fan-in, and the absence of a warning is not that.
+        if (coverage.ProjectsNotLoaded.Count == 0)
+        {
+            if (coverage.LoadDiagnostics.Count > 0) yield return "";
+            yield return "   Every project selected for analysis produced a compilation.";
         }
 
         yield return "";

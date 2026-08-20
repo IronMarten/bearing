@@ -128,10 +128,33 @@ fixture case that can observe the difference: `TASKS.md` P7.
 
 15 of 106 shown, and nothing says so. `ARCHITECTURE.md` invariant 8.
 
-### 4. Load success is judged by diagnostic, not outcome
+### 4. Load success is judged by diagnostic, not outcome — **fixed**
 
 All six nopCommerce "load failures" were NuGet vulnerability advisories; every project loaded. A
 hard-fail rule would refuse a major .NET codebase over unrelated CVEs.
+
+**MSBuild raises a package advisory as a `Failure`-kind workspace diagnostic**, so the list the
+walk collected could never support the claim hung on it. The wording had already retreated to
+*"these are not necessarily failures"* while still telling a reader to treat every number on the
+page as a lower bound until they had ruled six CVEs out — a hedge in front of a claim, which is
+the shape of a judgement made from the wrong evidence.
+
+**Fixed 2026-08-20 by recording the outcome.** `Coverage.ProjectsNotLoaded` names the projects
+that were selected and produced no compilation; the walk already knew this and threw it away. The
+lower-bound warning now hangs on that list, which is the only fact that supports it, and the
+diagnostics are shown as diagnostics. Both renderers state the outcome either way — invariant 8:
+*"every project loaded"* is the reassurance a reader needs before trusting a fan-in, and the
+absence of a warning is not that.
+
+**On nopCommerce the section now lists the six advisories and then says every project compiled.**
+The HTML used to justify the hedge with an anecdote about a different solution — *"on one
+reference solution every one of them was a NuGet vulnerability advisory, and 3,209 types loaded
+anyway"* — and now states the outcome of the run in front of the reader.
+
+Two tests, because the defect is a pair: `A_load_diagnostic_is_shown_without_being_called_a_failure`
+asserts the lower-bound wording is *absent* when nothing failed, and
+`A_project_that_did_not_load_is_what_bounds_the_numbers` asserts it is present, and names the
+project, when something did.
 
 ### 5. `DataAccess` classification is a hardcoded list of four ORMs
 

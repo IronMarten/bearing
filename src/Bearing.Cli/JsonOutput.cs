@@ -100,6 +100,7 @@ public static class JsonOutput
             coverage.ExclusionsApplied,
             coverage.SkippedProjects,
             coverage.LoadDiagnostics,
+            coverage.ProjectsNotLoaded,
             coverage.ExcludedTypes,
             coverage.EdgesToUnanalysedTypes);
 
@@ -300,6 +301,7 @@ public static class JsonOutput
         IReadOnlyList<string> ExclusionsApplied,
         IReadOnlyList<string> SkippedProjects,
         IReadOnlyList<string> LoadDiagnostics,
+        IReadOnlyList<string> ProjectsNotLoaded,
         int ExcludedTypes,
         int EdgesToUnanalysedTypes);
 

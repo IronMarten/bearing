@@ -234,6 +234,7 @@ Every claim shows the numbers behind it.
 
 -- WHAT WAS NOT ANALYSED ---------------------------------------
    Every number above is relative to what was read. This is the rest.
+   Every project selected for analysis produced a compilation.
 
    Skipped as test projects: Core.Tests
    Excluded by path: 2 types, under 16 patterns (--exclude-path, --no-default-excludes)

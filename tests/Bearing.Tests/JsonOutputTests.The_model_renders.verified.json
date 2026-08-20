@@ -59,6 +59,7 @@
       "Core.Tests"
     ],
     "loadDiagnostics": [],
+    "projectsNotLoaded": [],
     "excludedTypes": 2,
     "edgesToUnanalysedTypes": 0
   },
