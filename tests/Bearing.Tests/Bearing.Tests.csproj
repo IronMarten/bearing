@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    One test project, deliberately. It references BOTH Bearing.Core and the ArchProbe
-    oracle, because the central regression technique for phase 1 is running the two against
-    the same fixture and diffing (oracle/README.md). Splitting them into separate projects
-    would put a project boundary through the middle of that comparison.
+    One test project. It referenced the ArchProbe oracle as well as Bearing.Core until R2,
+    because the central regression technique for phase 1 was running the two against the same
+    fixture and diffing; splitting them would have put a project boundary through the middle of
+    that comparison. Phase 1 is over, the probe is gone, and what the diff proved is recorded in
+    docs/TESTING.md rather than re-derivable.
 
     Common settings — TFM, nullable, analyzers, warnings-as-errors — come from the repo-root
     Directory.Build.props. Test-specific analyzer relaxations are in .editorconfig under
@@ -30,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\oracle\ArchProbe\ArchProbe.csproj" />
     <ProjectReference Include="..\..\src\Bearing.Core\Bearing.Core.csproj" />
   </ItemGroup>
 

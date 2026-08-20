@@ -1,56 +1,43 @@
 # Known defects
 
-Behaviour that is wrong today, recorded rather than fixed. Every entry names what supersedes
-it, and most are pinned as tests in `KnownDefectTests` so that neither carrying one forward nor
-fixing one can happen quietly.
+Behaviour that is wrong today, recorded rather than fixed. Every entry names what supersedes it.
 
-This is also the work order for extraction. None is a patch to `oracle/ArchProbe`. Most are fixed
-in `Bearing.Core` — **18, 19 and 20 are fixed in `Bearing.Cli`**, and they are a different class:
-not defects carried through the port, but ones the port made visible by producing a report a user
-could read. All three were found by running the shipped binary on a real solution, and none of
-them can be caught by the suite. See *How these were found*.
+This was also the work order for extraction. Most are fixed in `Bearing.Core` — **18, 19 and 20
+are fixed in `Bearing.Cli`**, and they are a different class: not defects carried through the
+port, but ones the port made visible by producing a report a user could read. All three were
+found by running the shipped binary on a real solution, and none of them can be caught by the
+suite. See *How these were found*.
 
 ## Why a defect gets recorded instead of fixed
 
-`oracle/ArchProbe` is frozen. The freeze is not a compatibility promise — nothing has shipped
-that could depend on it — it is the fixed point of an in-flight refactor. Extraction moves ~997
-lines of computation out of `Report.cs`, and the oracle is what separates *"I broke it"* from
-*"I changed it on purpose."*
+**Historically, because the probe was frozen.** `oracle/ArchProbe` was the fixed point of an
+in-flight refactor: extraction moved ~997 lines of computation out of its `Report.cs`, and the
+probe was what separated *"I broke it"* from *"I changed it on purpose."* Stillness was the
+property it provided, not correctness — an oracle wrong in a known way discharges that job
+perfectly — so a correctness defect never justified editing it, and only defect 6, which stopped
+it functioning as an oracle at all, was ever fixed in place.
 
-Stillness is the property it provides, not correctness. An oracle that is wrong in a known,
-pinned way discharges that job perfectly. Editing it costs every fix twice, because Core is a
-reimplementation rather than a port, and spends the safety net on code that is being deleted.
+**That regime ended at `TASKS.md` R2, and with it the two things that enforced it.**
+`KnownDefectTests` pinned each defect by asserting the probe's wrong behaviour as current; it is
+gone, because every assertion in it was a statement about an implementation that no longer
+exists. Defect 1 is why that is no loss rather than a gap: Core had keyed type identity on
+`(assembly, FQN)` since `ModelBuilder` adopted `SubjectRef`, and the pin stayed green throughout,
+so it could not tell you whether the defect was live. **A pin against a frozen implementation
+cannot fail when the live one starts doing the right thing.** The equivalence suite — which ran
+both implementations and compared them — is gone with it.
 
-**The rule.** A correctness defect never justifies editing the oracle, because the oracle does
-not claim to be correct. Only a defect that stops it *functioning as an oracle* does —
-nondeterminism, or an inability to produce a baseline at all. Defect 6 was the one that had to
-be tested against that bar; it is the only entry here that was fixed in place.
-
-**The freeze is not absolute.** `KnownDefectTests` is the register of golden rows *expected* to
-move, each naming the requirement that supersedes it. The regime is "frozen except for a
-registered list of intended changes" — not "frozen".
-
-**The probe is still the only implementation that *renders*.** Core computes every finding and
-every structure section, and several of these defects are fixed there — but nothing a user runs
-reads Core yet, so the shipped tool carries the register until `TASKS.md` R1. That is an argument
-for R1 being the only thing on the agenda, not for unfreezing.
-
-**Read each entry's own status line, not this one.** "Fixed in Core" and "fixed" are different
-claims here: the first means the defect is gone from the model and still present in anything the
-probe renders.
+**So an entry here is now a claim about the shipped tool, and nothing else pins it.** What
+replaced the pins is that each fixed defect has an ordinary test naming the behaviour it
+requires, in the suite that owns that behaviour. A defect that is still live and still wants
+watching needs one of those, not a pin; see D37, whose fix is asserted by `OrderingTests` and
+whose absence would fail there.
 
 ## The register
 
-Roughly severity-ordered. **"Pinned" means `KnownDefectTests` asserts the wrong behaviour as
-current — the *probe's* behaviour, and nothing more.** Every assertion in that class runs against
-the probe's run, and the probe is frozen, so a pin cannot fail when Core starts doing the right
-thing and cannot be relied on to announce it. Defect 1 is the proof: Core has keyed type identity
-on `(assembly, FQN)` since `ModelBuilder` adopted `SubjectRef`, and the pin is still green. Pins
-retire with the oracle at `TASKS.md` R2.
-
-What catches a fix — or a fix that quietly does the wrong thing — is the equivalence suite, which
-runs both implementations and compares them. A defect Core is expected to fix needs an entry
-there, stated as an intended divergence, as well as a pin here.
+Roughly severity-ordered. Read each entry's own status line: **"fixed in Core" and "fixed" meant
+different things while the probe was still rendering**, and every entry that says the former was
+written when the shipped tool still carried the defect. R1 moved rendering to `Bearing.Cli` and
+R2 removed the other implementation, so both now mean the same thing.
 
 ### 1. Type identity is keyed on fully-qualified name alone
 

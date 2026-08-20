@@ -42,20 +42,24 @@ Apache-2.0 repository with a paid tier planned downstream. Not a fight worth hav
 This is the distinction most likely to be got wrong, because Verify treats both identically
 and the difference is entirely one of intent.
 
-### Frozen — `tests/Bearing.Tests/golden/`
+### Frozen — retired at R2
 
-`nominations.verified.txt`, `types.verified.csv`, `edges.verified.csv`: the output of the
-pristine probe against `tests/TestBed`.
+`tests/Bearing.Tests/golden/` held `nominations.verified.txt`, `types.verified.csv` and
+`edges.verified.csv`: the output of the pristine probe against `tests/TestBed`, regenerated and
+compared by `OracleGoldenTests` on every run. They were **evidence, not output** — the record of
+what the tool did before extraction started — and accepting a change to one was a claim, made in
+the commit message in those words, that behaviour had changed on purpose.
 
-These are **evidence, not output**. They record what the tool did before the extraction
-started. `OracleGoldenTests` regenerates them from the probe on every run and compares.
+They went with the probe that produced them, because a baseline nothing can regenerate is a file
+rather than a test. **What they were defending is now defended directly**: the numbers they froze
+are asserted by name in `StructureTests` and `FixtureCoverageTests`, and the property that made
+them reproducible at all — that no artifact depends on the order the analysis arrived in — is
+`OrderingTests`, which perturbs the solution and re-walks rather than trusting that six runs of
+one process agree.
 
-> Accepting a change here is a claim that the tool's behaviour changed on purpose. It goes
-> in the commit message, in those words, with the reason. If you cannot write that sentence,
-> you have found a bug rather than an improvement.
-
-This was a shell command in `oracle/README.md` that somebody had to remember to run. It is
-a test now for the reason in §1.
+**The distinction below still matters**, because it is about intent rather than about the probe:
+a snapshot that records a decision is not the same thing as a snapshot that records a design in
+progress, and Verify treats both identically.
 
 ### Accept-workflow — everywhere else
 
@@ -95,84 +99,82 @@ were normalised — same bytes, same findings, nothing behavioural changed.
 
 ## 5. What is asserted
 
-**Against the model, never against report wording.** `Report.cs` is the layer being
-replaced; tests coupled to its sentences would die exactly when they are needed. The
-snapshots in §3 are the deliberate exception, and they exist to catch the wording moving.
+**Against the model, never against report wording.** A renderer is the layer most likely to
+move; tests coupled to its sentences die exactly when they are needed. The snapshots in §3 are
+the deliberate exception, and they exist to catch the wording moving.
+
+**R2 made that rule affordable everywhere, which it had not been.** Several suites read rendered
+text because the probe had no other surface to ask — the suppression matrix existed as ordering
+inside a 997-line method, a percentile lived only in a CSV writer, and "does the fixture reach
+this gate" could only be answered by grepping a section. Each of those is now a model surface,
+and the tests that used to parse prose ask the model instead.
 
 | File | Covers |
 |---|---|
 | `GraphTests` | Tarjan over synthetic input, no Roslyn. Includes a 50,000-deep chain, which pins the iterative implementation against a well-meaning recursive rewrite. |
 | `StructureTests` | load health, fixture shape, generated-code exclusion, `Kind` classification, namespace truncation, cohort discovery, contract fan-in, hub magnitudes |
-| `OracleGoldenTests` | the three frozen baselines |
-| `OrderingTests` | that every artifact is a function of the analysis and not of its enumeration order — see below |
+| `OrderingTests` | that every artifact is a function of the analysis and not of the order the solution declares its projects in — see below |
 | `DistributionTests` | the comparative substrate — midrank, medians, and when a reading is refused — without Roslyn |
-| `CyclesAndCouplingTests` | that Core computes the same numbers as the probe on the fixture. **The extraction gate** — see below |
+| `CyclesAndCouplingTests` | namespace cycles, type tangles, project coupling, unreferenced projects, contact points and the integration map, over the fixture |
 | `AnalysisPolicyTests` | that every threshold is named and reviewable, including the thirteen that were literals |
-| `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation — plus full cohort equivalence with the probe |
+| `CohortTests` | peer-group assignment and candidate derivation — stranding, starvation, reconciliation |
 | `FindingSetTests` | finding identity and the member → declaring type query suppression is written against, on synthetic input |
-| `FindingTests` | Core's concealed-decision nominations against the probe's, both levels, plus the rules that are now model facts rather than wording |
-| `WalkTests` | Core's walk against the probe's: every type, measure, edge, member and external namespace |
+| `FindingTests` | what each finding claims and what decides it — both concealed-decision levels, the change-cost share, the hub disjunction's two arms, layer-span patterns, and that every gate a finding cites is a named policy value |
+| `SuppressionTests` | the suppression matrix, row by row, asserted by **which rule silenced a finding** rather than by its absence — see below |
+| `WalkTests` | what the walk records beyond a number: classification evidence, member identity, edge kind and site, canonical order |
 | `SeamTests` | Core references no console; Core does not depend on Cli |
 | `ToolInfoTests` | the first logic in Core |
-| `KnownDefectTests` | defects found after the freeze, pinned as current behaviour — see below |
 | `FixtureCoverageTests` | what the fixture does *not* cover, asserted so it stays visible |
 | `SelectionTests` | X10's rule — one exemplar per kind that fired, rarest first — asserted **as derived** rather than as an answer, which is what X10 asks for |
 | `ClaimsTests` | that every finding can be worded, that every kind is named in a reader's words, and **that the terminal and the page cannot say different things about one finding** |
 | `HighlightsTests` | that the lead is the selection and not a re-pick, that every item says how many more of its kind there are, that the ordering is stated, and that moving the enumeration behind `--full` did not take invariant 8's disclosure with it |
 | `MosaicTests` | that every analysed type is one cell, that the two marks are the findings and the selection, and that no measurement reaches the drawing as text |
 
-### Pinning a defect you are not allowed to fix
+### Pinning a defect, and why that regime is over
 
-The oracle is frozen, so a defect found after the freeze cannot be fixed where it lives. It
-gets a test asserting the **wrong** behaviour instead, naming the requirement that supersedes
-it. Extraction then cannot carry it forward silently, because the requirement is written down
-beside the behaviour.
+While the probe was frozen, a defect found after the freeze could not be fixed where it lived. It
+got a test asserting the **wrong** behaviour instead, in `KnownDefectTests`, naming the
+requirement that superseded it.
 
-> **It does not stop extraction fixing one silently, and this section claimed for months that it
-> did.** Every assertion in `KnownDefectTests` runs against the probe's run, and the probe cannot
-> change — so no pin there can fail on the day Core does the right thing. Defect 1 is the proof:
-> Core has keyed type identity on `(assembly, FQN)` since `ModelBuilder` adopted `SubjectRef`, and
-> the pin is still green. Pins record the oracle's behaviour and retire with it at R2. What
-> catches a silent fix is the equivalence suite below, which runs both implementations and
-> compares them — a defect Core is expected to fix needs an intended-divergence assertion there
-> as well as a pin here.
+> **That did not stop extraction fixing one silently, and this section claimed for months that it
+> did.** Every assertion in `KnownDefectTests` ran against the probe's run, and the probe could
+> not change — so no pin there could fail on the day Core did the right thing. Defect 1 is the
+> proof: Core had keyed type identity on `(assembly, FQN)` since `ModelBuilder` adopted
+> `SubjectRef`, and the pin was still green when it was deleted.
 
-Each pinned test has an entry in [`DEFECTS.md`](DEFECTS.md), which carries the evidence and the
-remedy; the test names the requirement and asserts the behaviour. Add to both or neither — a
-pinned test with no entry is a defect nobody can act on, and an entry with no test is one that
-can be carried forward silently.
+**`KnownDefectTests` went with the probe at R2, by construction**: every assertion in it stated
+the probe's behaviour, so there was nothing to port. What replaces a pin is an ordinary test in
+the suite that owns the behaviour, naming the requirement and asserting what the tool does now.
+[`DEFECTS.md`](DEFECTS.md) still carries the evidence and the remedy for each entry, and an entry
+that describes live behaviour still needs a test somewhere — D37 is the model: its fix is
+asserted by `OrderingTests`, and removing the fix fails there.
 
-`Change_cost_is_gated_by_min_cohort_where_it_means_min_fan_in` is the first. It is also the
-one place the suite reads report text rather than the model, because the threshold is a
-literal inside `PrintNominations` and there is no model surface to assert against. That
-absence is the defect; only the subject names are read, never the sentence.
+### What the equivalence suite proved, and what replaced it
 
-### The extraction gate is agreement, not byte-identity
+`CyclesAndCouplingTests`, `FindingTests` and `WalkTests` are what is left of three suites that
+ran Core against the probe and compared them, type for type, edge for edge, reading for reading.
+That was the question extraction actually posed — **does the reimplementation agree with the
+implementation it replaces?** — and because Core was a rewrite rather than a port, agreement was
+a result rather than a tautology.
 
-`OracleGoldenTests` asks whether the probe's output moved. That catches a regression in the
-probe and says nothing about the rewrite, because Core is not in the picture at all.
+It answered yes, including on the day it was retired: the suite verified P7 and P8, the last two
+fixture changes before R2. What each file keeps is the half that was never a comparison, and the
+files are renamed to say so.
 
-`CyclesAndCouplingTests` asks the question extraction actually poses: **does the reimplementation
-agree with the oracle?** Every cohort reading, every method reading, every solution-wide
-percentile and every project's coupling, computed twice and compared on the real fixture. Core
-is a rewrite rather than a port, so agreement is a result rather than a tautology — each
-assertion is a place the two could differ and do not.
+**An equivalence check has a shelf life, and knowing when it expires is the reusable part.** Two
+of them expired before the suite did. The project-metrics check had no model surface on either
+side, so it read the probe's sentence and parsed the numbers back out; once Core walked the
+solution itself it became redundant rather than merely ugly, because walk equivalence establishes
+that Core's types and edges are the probe's, coupling is a pure function of those two, and the
+function has its own tests — composing the three proves what the parser proved. The whole suite
+expired the same way, one level up: **an end-to-end comparison earns its place while the pieces
+underneath are unverified, and becomes a liability once they are.**
 
-As each piece of `Report.cs` moves, its equivalence check lands here first and the probe's
-version becomes the expectation.
-
-**An equivalence check has a shelf life, and knowing when it expires matters.** The project
-metrics had no model surface on either side, so the test read the probe's sentence and parsed
-the numbers back out — the same licence `KnownDefectTests` takes, because the absence of a model
-surface *was* the defect. Once Core walked the solution itself, that check became redundant
-rather than merely ugly: the walk equivalence establishes that Core's types and edges are the
-probe's, coupling is a pure function of those two, and the function has its own tests. Composing
-those three proves what the parser proved. It was deleted and replaced with the fixture's known
-answers, stated rather than parsed.
-
-The general shape: an end-to-end comparison earns its place while the pieces underneath are
-unverified, and becomes a liability once they are — at which point it is a regex over prose that
-can break for reasons that have nothing to do with correctness.
+The liability was not hypothetical. Ports of the probe-reading tests found two things a
+comparison could not: the JSON export's project ordering (`DEFECTS.md` §37), which both
+implementations got from the same enumeration and therefore agreed about, and the fact that 45
+tests asserting Core alone were sitting inside files named for the comparison, one deletion away
+from going with it.
 
 **Deliberate divergences are asserted, not described.** Core refuses to state a number with no
 basis: a peer group of one has no reading, a project with no cross-project coupling has no
@@ -328,8 +330,9 @@ Tidying it up changes the expected answers.
   `Tools`, which do not reference each other. The probe reports **one** row: `Project=Tools`,
   `MemberCount 6` (Data's 2 plus Tools' 4), `Loc 42` across both files, `cc 16` while its
   largest member is `cc 13`. Data's declaration is invisible and its project under-counted.
-  Pinned by `KnownDefectTests`; `partial` is deliberate, so a fix that stops merging partials
-  *within* one compilation is also wrong
+  This was pinned by `KnownDefectTests` and is asserted directly since R2: Core reports the two
+  declarations as two rows, and `StructureTests.Fixture_shape_is_stable` counts them. `partial`
+  is deliberate, so a fix that stops merging partials *within* one compilation is also wrong
 
 ### The fixture's known gaps
 
@@ -388,8 +391,9 @@ suppression would be untested again with nobody noticing.
 > both levels and correctly suppressed. The two differ only in whether the type-level nomination
 > happened to fire, which is not a difference a user would accept as meaningful.
 >
-> Pinned by `KnownDefectTests.A_method_level_concealed_decision_does_not_suppress_breaks_alone`.
-> §4 row 2 is amended at source to read "at type level (§3.2) or on any of its methods (§3.3)".
+> Pinned by `KnownDefectTests` until R2 retired it, and fixed rather than carried: §4 row 2 is
+> amended at source to read "at type level (§3.2) or on any of its methods (§3.3)", and
+> `Suppression`'s second row asks `ContainsAbout` at both levels. `SuppressionTests` asserts it.
 
 > **Filling blast radius found the reason it was empty, and it was not the fixture.**
 > `Percentile` is midrank — `100 * (below + 0.5 * equal) / n` — so a unique maximum scores
@@ -398,9 +402,8 @@ suppression would be untested again with nobody noticing.
 > members look like, while `--min-cohort` admits cohorts of five.
 >
 > The ceiling is arithmetic, not tuning, and it is why the plant needed a twelve-member cohort
-> rather than a more extreme type. Pinned by
-> `KnownDefectTests.Blast_radius_is_unreachable_in_a_cohort_below_ten`, and it needs an answer
-> in its own right: `TECHREQ-job-b.md` §5 converts absolute gates to percentiles, and this is
+> rather than a more extreme type. It was pinned by `KnownDefectTests` until R2; it is still live
+> and still needs an answer in its own right: `TECHREQ-job-b.md` §5 converts absolute gates to percentiles, and this is
 > the hazard in that direction — a percentile floor above `(n-0.5)/n` is unsatisfiable rather
 > than merely strict.
 >
@@ -552,8 +555,9 @@ re-running those three mutations after the plant — all three still pass.
 `TestBed.Shared.PayloadTag` is declared in both `Data` and `Tools`, and the goldens record the
 merged row. Core has since keyed on `(assembly, FQN)` — it reports 133 types against the probe's
 132 — so the fix is real and `WalkTests` asserts it (`TECHREQ-job-b.md` §8,
-criterion 8). But `KnownDefectTests` did **not** fail on that day and never will: it asserts
-against the probe's run, and the probe is frozen.
+criterion 8). But `KnownDefectTests` did **not** fail on that day and never could: it asserted
+against the probe's run, and the probe was frozen. That is the argument that retired it at R2 —
+and the count is 179 against 177 now, because P8 planted a second collision.
 
 The plant makes the *defect* visible and not its consequence. Both declarations have fan-in 0, so
 the merged type is in no cycle and no nomination that depends on inbound edges — merged and split
@@ -859,8 +863,8 @@ in the fixture, so no plant owns it: the two families P7 added moved fan-in 7 fr
 and the next plant will move it again. **A near miss can be pinned against a cohort median because
 the plant owns the cohort; it cannot be pinned against a solution-wide percentile, because the plant
 owns none of the population.** The place to assert that gate's edge is a unit test over
-`Distribution` with a constructed population — which is what `KnownDefectTests` already does for the
-surface ceiling, "over arbitrary distributions rather than over this fixture". Building it into the
+`Distribution` with a constructed population — which is what `DistributionTests` does, "over
+arbitrary distributions rather than over this fixture". Building it into the
 fixture would produce a `moves` that silently becomes a `-` the next time anything is planted.
 
 **One row of that table needs its reason written down, because the table cannot carry it.**
@@ -1035,9 +1039,16 @@ Each is a recurring defect class from the probe build, turned into a question:
 ## 9. A gate that cannot fail is worse than no gate
 
 Both new gates were mutation-tested when they were written: a `Console.WriteLine` added to
-`Bearing.Core` fails `SeamTests`, and moving one threshold fails `OracleGoldenTests`. Do the
+`Bearing.Core` fails `SeamTests`, and moving one threshold failed `OracleGoldenTests`. Do the
 same for the next one — a snapshot suite that silently stopped covering anything looks
 exactly like a passing suite.
+
+**R2 is the worked example.** Every port off the probe was checked by measurement rather than by
+reading: the numbers came from a real run of the tool against the fixture, not from the
+assertions being replaced, and `OrderingTests` was verified by reverting the fix it depends on
+and watching exactly one of its five tests fail. That is what caught the port that mattered — a
+test can be moved to a new model, compile, pass, and assert something weaker, and nothing about a
+green run distinguishes that from a correct port.
 
 `SeamTests.The_seam_test_is_actually_looking_at_something` exists for this reason: every
 other assertion in that file passes trivially against an assembly that is missing or empty.

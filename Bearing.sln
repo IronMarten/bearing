@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "oracle", "oracle", "{8170795A-64EE-40F1-8EB2-751E2B931550}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchProbe", "oracle\ArchProbe\ArchProbe.csproj", "{F15C46AE-17F3-4646-BD92-2C187E1293CC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A9AE00B-A7A9-4097-B5E1-FB08D61A7537}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bearing.Tests", "tests\Bearing.Tests\Bearing.Tests.csproj", "{8E619DDF-64C2-4B32-8CFD-769EC68A7DB8}"
@@ -26,10 +22,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F15C46AE-17F3-4646-BD92-2C187E1293CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F15C46AE-17F3-4646-BD92-2C187E1293CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F15C46AE-17F3-4646-BD92-2C187E1293CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F15C46AE-17F3-4646-BD92-2C187E1293CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8E619DDF-64C2-4B32-8CFD-769EC68A7DB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E619DDF-64C2-4B32-8CFD-769EC68A7DB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E619DDF-64C2-4B32-8CFD-769EC68A7DB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,7 +36,6 @@ Global
 		{6A4CD024-3D24-4F11-9415-550FAAC9D0A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{F15C46AE-17F3-4646-BD92-2C187E1293CC} = {8170795A-64EE-40F1-8EB2-751E2B931550}
 		{8E619DDF-64C2-4B32-8CFD-769EC68A7DB8} = {6A9AE00B-A7A9-4097-B5E1-FB08D61A7537}
 		{B7ED33EE-4C2C-49BE-B51C-2687CBB779EF} = {3B0D897C-9EB0-4C60-AC93-35DDF251FD93}
 		{6A4CD024-3D24-4F11-9415-550FAAC9D0A9} = {3B0D897C-9EB0-4C60-AC93-35DDF251FD93}

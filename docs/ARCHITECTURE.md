@@ -17,12 +17,16 @@ src/Bearing.Core/     analysis      workspace load, walkers, the structure model
                                     graph algorithms, classification, policy
 src/Bearing.Cli/      presentation  argument parsing, terminal output, HTML report,
                                     CSV and JSON writers.  The only project that packs.
-oracle/ArchProbe/     evidence      the original probe, frozen verbatim.  Not shipped.
-tests/Bearing.Tests/  verification  one project, referencing both Core and the oracle
+tests/Bearing.Tests/  verification  one project, over Core and Cli
 tests/TestBed/        fixture       a synthetic solution with known answers
 ```
 
-Dependencies run one way: `Cli → Core`. Nothing depends on the oracle except the tests.
+Dependencies run one way: `Cli → Core`.
+
+**There was a fourth entry here until `TASKS.md` R2.** `oracle/ArchProbe/` held the original
+probe, frozen verbatim, and the test project referenced it so that every number Core computed
+could be diffed against the implementation it replaced. It is gone, and §9 records what it was
+for and what replaced each job it did.
 
 **The product is two jobs, and they pull in different directions** (`PRD-free-tier.md` §3).
 Job A — dependency graph, architecture diagram, integration map, dead code, dead projects,
@@ -36,15 +40,15 @@ will have said what that is, which beats guessing now. That deferral is **contes
 renderer exists, since a suppression is a relationship between findings about one component
 and cannot be expressed against output that has already been written.
 
-**What exists today, stated plainly.** `Bearing.Core` holds one file, `ToolInfo.cs`. The
-analysis is built and validated, but it is built in `oracle/ArchProbe/`, which is frozen and
-cannot be edited — the baselines in `tests/Bearing.Tests/golden/` are the record of its exact
-output. Extraction is the next work (`TECHREQ-job-a.md` §4, phase 1).
+**What exists today, stated plainly.** Extraction is done. `Bearing.Core` holds the walk, the
+structure model, the finding layer and the suppression matrix; `Bearing.Cli` holds every
+renderer. This document specified what Core must be before Core was anything, and it is now
+mostly a description rather than a specification — where the two disagree, read `src/` and fix
+this file.
 
-So this document specifies **what Core must be, not what Core is.** Where the oracle diverges
-from it, the oracle is the thing that changes. Do not read requirements back out of
-`ArchProbe` — it is a throwaway probe whose accumulators are one evening's convenience, and
-§4 is a different and larger shape on purpose.
+**The probe is retired and nothing should be read back out of it.** It was a throwaway whose
+accumulators were one evening's convenience, and §4 was a different and larger shape on
+purpose.
 
 ## 2. The invariants
 
@@ -417,7 +421,7 @@ decision from whether it is versioned.
 | Licence is Apache-2.0 | patent grant, plus the trademark clause over the Bearing / Iron Marten names |
 | Core and Cli are separate projects | this document, §3 |
 | Core is not published as a library | `Bearing.Core.csproj` — its API has no stable shape yet |
-| The probe is kept verbatim as a diff oracle | `oracle/README.md` |
+| The probe was kept verbatim as a diff oracle, then retired at R2 | this document, §1 — it had verified P7 and P8 on the day it went, and what it proved is recorded in `docs/TESTING.md` rather than left to be re-derived |
 | Conventions are build errors, not warnings | `Directory.Build.props` |
 | A finding is identified by `(kind, subject)` and nothing else | §4, `FindingKey` |
 | A type is identified by `(assembly, FQN)`, never by name alone | §4, `SubjectRef` — .NET permits one FQN in two assemblies and plugin architectures use it deliberately; keying on the name merges the rows and sums their metrics |

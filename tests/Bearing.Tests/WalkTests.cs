@@ -3,91 +3,30 @@ using IronMarten.Bearing;
 namespace Bearing.Tests;
 
 /// <summary>
-/// Runs Core's walker against TestBed once for the whole suite, alongside the probe's.
-/// </summary>
-public sealed class CoreWalkFixture
-{
-    private readonly Dictionary<string, SolutionModel> _byPolicy = new(StringComparer.Ordinal);
-
-    public CoreWalkFixture()
-    {
-        Model = Walk(AnalysisPolicy.Default);
-    }
-
-    public SolutionModel Model { get; }
-
-    /// <summary>
-    /// The same fixture under a different policy, walked once per distinct policy.
-    /// </summary>
-    /// <remarks>
-    /// The workspace load is the suite's cost centre, which is why everything shares one model.
-    /// Some questions cannot be asked of that model: the policy is fixed at construction because
-    /// a finding has to be able to name the policy that produced it, so a test about what happens
-    /// at a different threshold needs a real second walk. Memoised so that asking twice is free,
-    /// and used sparingly — at the time of writing, only by the truncation tests, which need a
-    /// --top low enough to bite.
-    /// </remarks>
-    public SolutionModel WalkWith(AnalysisPolicy policy)
-    {
-        ArgumentNullException.ThrowIfNull(policy);
-
-        var key = string.Join(";", policy.Values.Select(v => $"{v.Name}={v.Value}"));
-        if (_byPolicy.TryGetValue(key, out var cached)) return cached;
-
-        return _byPolicy[key] = Walk(policy);
-    }
-
-    private static SolutionModel Walk(AnalysisPolicy policy) =>
-        new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
-            .WalkAsync(CancellationToken.None)
-            .GetAwaiter().GetResult();
-}
-
-/// <summary>
-/// Core's walk against the probe's, type for type and edge for edge.
+/// What the walk records that a metric alone does not: evidence, identity, edge kind and site.
 /// </summary>
 /// <remarks>
 /// <para>
-/// The probe is still the oracle and stays verbatim; this is the reimplementation existing and
-/// agreeing with it. Core is a rewrite — different model, different identity, different edge
-/// collection — so every assertion here is a place the two could differ and do not.
+/// <b>What is left of the equivalence suite, and it is the half that was never a comparison.</b>
+/// This file ran Core's walk against the probe's, type for type and edge for edge, for as long as
+/// Core was a reimplementation whose agreement was a result rather than a tautology. Those
+/// assertions went at R2 with the thing they compared against. These six did not, because each
+/// asserts something the probe had no surface for — a classification that carries the reason it
+/// was reached, a member identity that survives an overload, an edge that knows what kind of
+/// reference it is and where, a canonical order that does not depend on discovery.
 /// </para>
 /// <para>
-/// <b>One divergence is intended and is the point.</b> Core keys a type by
-/// <c>(assembly, fully-qualified name)</c>; the probe keys on the name alone. Where a solution
-/// declares one FQN in two assemblies, the probe merges the rows and sums their metrics, and
-/// Core does not. That is <c>docs/DEFECTS.md</c> §1, the one behaviour extraction is permitted
-/// to change, and TestBed plants the case deliberately so the fix is observable rather than
-/// asserted.
+/// <b>Identity is the one place Core was allowed to differ, and TestBed still plants the case.</b>
+/// Core keys a type by <c>(assembly, fully-qualified name)</c>; the probe keyed on the name alone,
+/// so where a solution declared one FQN in two assemblies it merged the rows and summed their
+/// metrics. That is <c>docs/DEFECTS.md</c> §1. The fix outlives its witness: the two declarations
+/// are two rows in <c>StructureTests.Fixture_shape_is_stable</c>, and the dependency the merge
+/// used to fabricate is <c>ProjectCycleTests</c>.
 /// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
 public sealed class WalkTests(CoreWalkFixture core)
 {
-    /// <summary>
-    /// The planted cross-project collisions: one fully-qualified name each, two assemblies each.
-    /// </summary>
-    /// <remarks>
-    /// <b>Two since P8, and the plural is the point.</b> <c>PayloadTag</c> proves the ROW is kept
-    /// apart and cannot prove more, because it has no edges in either declaration.
-    /// <c>CarrierTwin</c> carries an inbound edge in one assembly and an outbound edge in the
-    /// other, which is what makes the merge fabricate a dependency — <c>ProjectCycleTests</c>.
-    /// Everything here excludes both, because everything here is about what the two walkers agree
-    /// on.
-    /// </remarks>
-    private static readonly HashSet<string> CollidingNames = new(StringComparer.Ordinal)
-    {
-        "global::TestBed.Shared.PayloadTag",
-        "global::TestBed.Interop.CarrierTwin",
-    };
-
-    public static TheoryData<string> Measures =>
-    [
-        "FanIn", "FanOut", "EffectiveFanOut", "InboundReferenceCount",
-        "Cyclomatic", "MaxMemberCyclomatic", "Dsm", "Transform", "StaticMutations",
-        "MemberCount", "PublicMemberCount", "ExecutableMemberCount",
-        "ParameterCount", "DataShape", "LinesOfCode",
-    ];
 
     [Fact]
     public void Classification_now_carries_the_evidence_that_decided_it()
@@ -172,24 +111,4 @@ public sealed class WalkTests(CoreWalkFixture core)
             core.Model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)).Order(),
             core.Model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
     }
-
-    private static double CoreMeasure(TypeNode t, string measure) => measure switch
-    {
-        "FanIn" => t.FanIn,
-        "FanOut" => t.FanOut,
-        "EffectiveFanOut" => t.EffectiveFanOut,
-        "InboundReferenceCount" => t.InboundReferenceCount,
-        "Cyclomatic" => t.Cyclomatic,
-        "MaxMemberCyclomatic" => t.MaxMemberCyclomatic,
-        "Dsm" => t.Dsm,
-        "Transform" => t.Transform,
-        "StaticMutations" => t.StaticMutations,
-        "MemberCount" => t.MemberCount,
-        "PublicMemberCount" => t.PublicMemberCount,
-        "ExecutableMemberCount" => t.ExecutableMemberCount,
-        "ParameterCount" => t.ParameterCount,
-        "DataShape" => t.DataShape,
-        "LinesOfCode" => t.LinesOfCode,
-        _ => throw new ArgumentOutOfRangeException(nameof(measure), measure, null),
-    };
 }

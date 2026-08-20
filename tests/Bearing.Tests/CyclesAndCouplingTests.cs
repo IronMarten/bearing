@@ -30,9 +30,6 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
 {
     // ------------------------------------------------------------ type cohorts ----
 
-    public static TheoryData<string> TypeDimensions =>
-        ["FanIn", "FanOut", "Cyclomatic", "MaxMemberCyclomatic", "Dsm", "DataShape"];
-
     // ------------------------------------------------- the deliberate divergence ----
 
     // --------------------------------------------------------- project coupling ----

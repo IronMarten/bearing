@@ -539,16 +539,6 @@ public sealed class FindingTests(CoreWalkFixture core)
             .ToList();
     }
 
-    /// <summary>How many subjects share this one's layering pattern, itself included.</summary>
-    private double? PatternSize(string typeName) => Spanning(typeName).ValueOf("PatternGroupSize");
-
-    /// <summary>The named dependencies a spanning finding rests on.</summary>
-    private List<string> ParticipantNames(string typeName) =>
-        Spanning(typeName).Participants
-            .Select(p => core.Model.Find(p)!.Name)
-            .Order(StringComparer.Ordinal)
-            .ToList();
-
     private Finding Spanning(string typeName) =>
         Assert.Single(
             Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers),
@@ -578,13 +568,6 @@ public sealed class FindingTests(CoreWalkFixture core)
         Analysis.FindingsFor(core.Model)
             .OfKind(kind)
             .Select(f => core.Model.Find(f.Subject)!.Name)
-            .Order(StringComparer.Ordinal)
-            .ToList();
-
-    private List<string> CoreNominations(FindingKind kind) =>
-        Analysis.FindingsFor(core.Model)
-            .OfKind(kind)
-            .Select(Label)
             .Order(StringComparer.Ordinal)
             .ToList();
 
