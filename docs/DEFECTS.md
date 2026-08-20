@@ -1129,7 +1129,7 @@ mode is a *rendering* one, so the suite cannot see it: both artifacts stay well-
 every element, and the picture is simply wrong on the page and right when written standalone with
 `--mosaic` or `--diagram`.
 
-### 36. The plot's y-axis title overlaps its own subtitle
+### 36. The plot's y-axis title overlaps its own subtitle — **fixed**
 
 `ReachPlot` writes two texts into the strip above the plot area and places them independently:
 
@@ -1149,11 +1149,23 @@ constants that looked right in isolation. **The suite cannot see it** — the SV
 every element is present, and no assertion in `ReachPlotTests` is about where two pieces of chrome
 sit relative to each other.
 
-**Cheap to fix and deliberately not fixed yet** (2026-08-20): move the axis title into its own row
-above the plot area, or rotate it up the axis where it belongs, and give the strip enough height for
-both. The reason it is recorded rather than repaired is that it arrived at the end of a long
-presentation pass, and the next change to this file should carry it rather than a session of its
-own.
+**Fixed 2026-08-20 by rotating it up its own axis**, which is the second of the two remedies
+recorded here and the better one: it removes the collision by construction rather than by re-tuning
+the constant that caused it, and a y-axis title running up its axis is where a reader looks for it.
+The arrow rotates with the text — a right-pointing arrow turned -90° points up, and it sits at the
+end of the string, which after rotation is the top of the axis — so both axis titles still state
+their own direction.
+
+**The measurement in this entry was slightly optimistic.** The collision runs from x = 96 to
+**x = 233**, not 216: the title is 32 characters at 12px, and the estimate here used a narrower
+one.
+
+**It has a test now, and that is the part that outlives the fix.**
+`ReachPlotTests.No_two_pieces_of_header_furniture_overlap` estimates a box for every unrotated
+`<text>` in the strip above the plot area, using the same width constant the layout itself uses,
+and fails if any two intersect. Verified by putting the old geometry back: it fails naming both
+texts and their exact spans. **The lesson this entry recorded — that the collision discipline was
+applied to the data and not to the furniture — is now enforced rather than written down.**
 
 
 ### 37. The JSON export's `projects` array is positioned by solution declaration order — **fixed at R2**

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using IronMarten.Bearing;
@@ -27,6 +28,87 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     private FindingSet Findings => Analysis.FindingsFor(core.Model);
 
     private string Svg => ReachPlot.Render(core.Model, Findings);
+
+    /// <summary>
+    /// Nothing in the header strip overlaps anything else in it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §36, and the reason it needs a test rather than a corrected
+    /// constant. The y-axis title was placed by hand at <c>x = Left - 78</c>, which put it at
+    /// x = 18 running about 215px — straight through the subtitle at x = 96, four pixels of
+    /// baseline apart. It collided on **every run whatever the data**, and the suite could not see
+    /// it: the SVG stayed well-formed, every element was present, and no assertion here was about
+    /// where two pieces of chrome sat relative to each other.
+    /// </para>
+    /// <para>
+    /// <b>The lesson is that the collision discipline was applied to the data and not to the
+    /// furniture.</b> <see cref="ReachPlot.Unlabelled"/> exists because a project label that fits
+    /// nowhere must be disclosed rather than drawn over something; the title, subtitle and axis
+    /// titles got no such treatment. This asserts the same rule for the furniture, using the same
+    /// width estimate the layout itself uses — so a title that grows, or a constant that moves,
+    /// fails here rather than on a screenshot.
+    /// </para>
+    /// <para>
+    /// Rotated text is excluded rather than measured. The y-axis title runs up its own axis now,
+    /// which is what took it out of this strip, and estimating a rotated box would be asserting
+    /// against a second implementation of the layout rather than against the layout.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_two_pieces_of_header_furniture_overlap()
+    {
+        // The same estimate ReachPlot lays out with. Over-estimating spreads text and
+        // under-estimating overlaps it, so a test that guessed narrower would pass on a collision.
+        const double CharWidth = 0.56;
+
+        var boxes = XDocument.Parse(Svg).Root!
+            .Descendants()
+            .Where(e => e.Name.LocalName == "text")
+            .Where(e => e.Attribute("transform") is null)
+            .Select(e => new
+            {
+                Text = e.Value,
+                X = double.Parse(e.Attribute("x")!.Value, CultureInfo.InvariantCulture),
+                Y = double.Parse(e.Attribute("y")!.Value, CultureInfo.InvariantCulture),
+                Size = e.Attribute("class")?.Value switch
+                {
+                    "ti" => 15.0,
+                    "ax" => 12.0,
+                    _ => 11.0,
+                },
+                Anchor = e.Attribute("text-anchor")?.Value ?? "start",
+            })
+            // The strip above the plot area, which is where the two collided.
+            .Where(t => t.Y < 64)
+            .Select(t =>
+            {
+                var w = t.Text.Length * t.Size * CharWidth;
+                var left = t.Anchor switch
+                {
+                    "end" => t.X - w,
+                    "middle" => t.X - w / 2,
+                    _ => t.X,
+                };
+                return (t.Text, L: left, R: left + w, T: t.Y - t.Size, B: t.Y + 4);
+            })
+            .ToList();
+
+        Assert.NotEmpty(boxes);
+
+        foreach (var a in boxes)
+            foreach (var b in boxes)
+            {
+                if (ReferenceEquals(a.Text, b.Text) && a.L == b.L && a.T == b.T) continue;
+
+                var overlaps = a.L < b.R && b.L < a.R && a.T < b.B && b.T < a.B;
+
+                Assert.False(
+                    overlaps,
+                    $"Header furniture overlaps: \"{a.Text}\" at x {a.L:F0}-{a.R:F0} y {a.T:F0}-{a.B:F0} "
+                    + $"and \"{b.Text}\" at x {b.L:F0}-{b.R:F0} y {b.T:F0}-{b.B:F0}.");
+            }
+    }
 
     /// <summary>The drawing is well-formed XML.</summary>
     [Fact]

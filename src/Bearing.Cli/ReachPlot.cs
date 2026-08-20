@@ -77,6 +77,14 @@ public static class ReachPlot
 
     private const double SubSize = 11.5;
 
+    /// <summary>Where the y-axis title sits in the left gutter, rotated up its own axis.</summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §36. The gutter is <see cref="Left"/> wide; the tick labels are
+    /// anchored at <c>Left - 10</c> and the widest is three characters, so nothing else claims the
+    /// space to the left of about x = 68.
+    /// </remarks>
+    private const int AxisTitleX = 30;
+
     /// <summary>
     /// Estimated width of one character at one point size.
     /// </summary>
@@ -151,8 +159,18 @@ public static class ReachPlot
 
         svg.Append(CultureInfo.InvariantCulture,
             $"<text class=\"ax\" x=\"{Left}\" y=\"{Height - 18}\">how much of the rest of the codebase reaches into it →</text>\n");
+        // The y-axis title runs up its own axis — docs/DEFECTS.md §36. Laid out horizontally
+        // at x = Left - 78 it began at x = 18 and ran about 215px, straight through the subtitle
+        // at x = 96, four pixels of baseline apart: fixed geometry, so it collided on every run
+        // whatever the data. Rotating it removes the collision by construction rather than by
+        // re-tuning the constant that caused it, and it is where a y-axis title belongs.
+        //
+        // The arrow rotates with the text. A right-pointing arrow turned -90° points up, and it
+        // sits at the end of the string, which after rotation is the top of the axis — so the
+        // two axis titles stay symmetric and each still states its own direction.
+        var axisMiddle = (Top + Height - Bottom) / 2;
         svg.Append(CultureInfo.InvariantCulture,
-            $"<text class=\"ax\" x=\"{Left - 78}\" y=\"{Top - 14}\">↑ how much of it a finding names</text>\n");
+            $"<text class=\"ax\" transform=\"rotate(-90 {AxisTitleX} {axisMiddle})\" x=\"{AxisTitleX}\" y=\"{axisMiddle}\" text-anchor=\"middle\">how much of it a finding names →</text>\n");
 
         // Context first, so a leaf never sits on top of the projects the report is about.
         foreach (var p in points.Where(p => p.Dependents == 0))
