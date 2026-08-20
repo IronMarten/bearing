@@ -528,6 +528,18 @@ public sealed class SolutionModel
             Types.Select(t => (t.Subject.Canonical, t.Project, t.IsAbstractOrInterface)),
             Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
+    /// <summary>
+    /// Where each type sits in its peer group and in the solution — X9, keyed by
+    /// <see cref="SubjectRef.Canonical"/>.
+    /// </summary>
+    /// <remarks>
+    /// The model's own reading, for the reason <see cref="ProjectCouplings"/> is: it is a
+    /// projection over <see cref="Distribution"/> rather than new analysis, and a renderer deriving
+    /// it would be computing. <see cref="CohortStatisticsSet"/> carries what is blank and why.
+    /// </remarks>
+    public IReadOnlyDictionary<string, CohortStatistics> Statistics =>
+        _statistics ??= CohortStatisticsSet.ForSolution(this);
+
     /// <summary>Mutually dependent namespaces, largest cycle first.</summary>
     public IReadOnlyList<Cycle> NamespaceCycles => _namespaceCycles ??= Cycles.AmongNamespaces(this);
 
@@ -653,6 +665,7 @@ public sealed class SolutionModel
     // parallelises across sections, this is the note to revisit.
     private Dictionary<string, TypeNode>? _byId;
     private IReadOnlyList<ProjectCoupling>? _projectCouplings;
+    private IReadOnlyDictionary<string, CohortStatistics>? _statistics;
     private IReadOnlyList<Cycle>? _namespaceCycles;
     private IReadOnlyList<Cycle>? _projectCycles;
     private ProjectGraph? _projectGraph;

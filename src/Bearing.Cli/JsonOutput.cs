@@ -34,10 +34,19 @@ public static class JsonOutput
     /// The schema's version, moved when a consumer would have to change to keep reading.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Independent of the tool's version: the tool ships far more often than this shape moves,
     /// and a consumer pinning against a tool version would re-pin on every release for nothing.
+    /// </para>
+    /// <para>
+    /// <b>1.1 adds <c>statistics</c> to every type — X9.</b> A reader of 1.0 keeps working, since
+    /// an unknown field is ignorable and nothing was removed or renamed; what moved the minor is
+    /// that a consumer <i>wanting</i> those readings has to know a 1.0 file cannot have them. That
+    /// is the case the version exists to answer, and the paid service is the consumer that will
+    /// ask it, of files produced by tool versions it never saw.
+    /// </para>
     /// </remarks>
-    public const string SchemaVersion = "1.0";
+    public const string SchemaVersion = "1.1";
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -80,7 +89,7 @@ public static class JsonOutput
             model.Policy.Values.ToDictionary(v => v.Name, v => v.Value, StringComparer.Ordinal),
             Coverage(model.Coverage),
             Projects(model),
-            [.. model.Types.Select(Type)],
+            [.. model.Types.Select(t => Type(t, model.Statistics[t.Subject.Canonical]))],
             [.. model.Edges.Select(Edge)],
             Cycles(model),
             [.. model.ExternalDependencies.Select(d => new External(d.Namespace, d.TypesTouching))],
@@ -130,7 +139,7 @@ public static class JsonOutput
         ];
     }
 
-    private static TypeBlock Type(TypeNode type) =>
+    private static TypeBlock Type(TypeNode type, CohortStatistics statistics) =>
         new(
             type.Subject.Canonical,
             type.Name,
@@ -146,6 +155,7 @@ public static class JsonOutput
             type.Cohort.Key,
             type.Cohort.Basis,
             type.CohortSize,
+            Statistics(statistics),
             type.FanIn,
             type.FanOut,
             type.EffectiveFanOut,
@@ -253,6 +263,39 @@ public static class JsonOutput
 
     private sealed record Tool(string Name, string Version);
 
+    /// <summary>
+    /// The thirteen — X9, and the shape a consumer reads a run's comparability from.
+    /// </summary>
+    /// <remarks>
+    /// Every cohort-relative reading is nullable and they are absent together: a type whose cohort
+    /// is below the floor has no comparison to report, and one whose peers all measure zero has no
+    /// multiple. The two solution-wide readings are not nullable, because the solution is always a
+    /// population — they are what a peerless type still has.
+    /// </remarks>
+    private sealed record StatisticsBlock(
+        double? FanInPercentile,
+        double? FanInTimesMedian,
+        double? FanOutPercentile,
+        double? FanOutTimesMedian,
+        double? CyclomaticPercentile,
+        double? CyclomaticTimesMedian,
+        double? MaxMemberCyclomaticPercentile,
+        double? MaxMemberCyclomaticTimesMedian,
+        double? DsmPercentile,
+        double? DsmTimesMedian,
+        double? DataShapePercentile,
+        double SolutionFanInPercentile,
+        double SolutionMaxMemberCyclomaticPercentile);
+
+    private static StatisticsBlock Statistics(CohortStatistics s) => new(
+        s.FanInPercentile, s.FanInTimesMedian,
+        s.FanOutPercentile, s.FanOutTimesMedian,
+        s.CyclomaticPercentile, s.CyclomaticTimesMedian,
+        s.MaxMemberCyclomaticPercentile, s.MaxMemberCyclomaticTimesMedian,
+        s.DsmPercentile, s.DsmTimesMedian,
+        s.DataShapePercentile,
+        s.SolutionFanInPercentile, s.SolutionMaxMemberCyclomaticPercentile);
+
     private sealed record CoverageBlock(
         IReadOnlyList<string> ExclusionsApplied,
         IReadOnlyList<string> SkippedProjects,
@@ -292,6 +335,16 @@ public static class JsonOutput
         string Cohort,
         string CohortBasis,
         int CohortSize,
+
+        /// <summary>
+        /// Where this type sits in its cohort and in the solution — X9.
+        /// </summary>
+        /// <remarks>
+        /// Nested rather than thirteen more fields on a record that already has thirty, and because
+        /// they are one thing: the readings, which are absent together when the cohort cannot
+        /// support them. <c>CohortStatisticsSet</c> carries what is null and why.
+        /// </remarks>
+        StatisticsBlock Statistics,
         int FanIn,
         int FanOut,
         int EffectiveFanOut,

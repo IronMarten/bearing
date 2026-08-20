@@ -99,28 +99,49 @@ public static class CsvOutput
         Row(rows,
             "Id", "Name", "FullyQualifiedName", "Namespace", "Assembly", "Project", "Keyword",
             "IsAbstract", "Kind", "KindEvidence", "Cohort", "CohortBasis", "CohortSize",
-            "FanIn", "FanOut", "EffectiveFanOut", "InboundReferences",
+            "FanIn", "FanInPctl", "FanInXMedian",
+            "FanOut", "FanOutPctl", "FanOutXMedian",
+            "EffectiveFanOut", "InboundReferences",
             "Instability", "InstabilityRaw",
-            "Cyclomatic", "MaxMemberCyclomatic", "MostComplexMember",
-            "Dsm", "Transform", "StaticMutations",
+            "Cyclomatic", "CyclomaticPctl", "CyclomaticXMedian",
+            "MaxMemberCyclomatic", "MaxMemberCyclomaticPctl", "MaxMemberCyclomaticXMedian",
+            "MostComplexMember",
+            "Dsm", "DsmPctl", "DsmXMedian",
+            "Transform", "StaticMutations",
             "MemberCount", "PublicMemberCount", "ExecutableMemberCount",
-            "ParameterCount", "DataShape", "LinesOfCode", "ExternalNamespaces", "File", "Line");
+            "ParameterCount", "DataShape", "DataShapePctl",
+            "GlobalFanInPctl", "GlobalMaxCcPctl",
+            "LinesOfCode", "ExternalNamespaces", "File", "Line");
+
+        // X9. The statistics are the model's — a projection over Distribution rather than anything
+        // this renderer computes, which is the half of the probe's design that had to change: its
+        // thirteen were worked out at print time, so nothing but the printer could see them.
+        var statistics = model.Statistics;
 
         foreach (var type in model.Types)
         {
+            var stats = statistics[type.Subject.Canonical];
+
             Row(rows,
                 type.Subject.Canonical, type.Name, type.FullyQualifiedName, type.Namespace,
                 type.Assembly, type.Project, type.TypeKeyword,
                 Bool(type.IsAbstract), type.Classification.Kind, type.Classification.Evidence,
                 type.Cohort.Key, type.Cohort.Basis, Num(type.CohortSize),
-                Num(type.FanIn), Num(type.FanOut), Num(type.EffectiveFanOut),
+                Num(type.FanIn), Num(stats.FanInPercentile), Num(stats.FanInTimesMedian),
+                Num(type.FanOut), Num(stats.FanOutPercentile), Num(stats.FanOutTimesMedian),
+                Num(type.EffectiveFanOut),
                 Num(type.InboundReferenceCount),
                 Num(type.Instability), Num(type.InstabilityRaw),
-                Num(type.Cyclomatic), Num(type.MaxMemberCyclomatic),
+                Num(type.Cyclomatic), Num(stats.CyclomaticPercentile), Num(stats.CyclomaticTimesMedian),
+                Num(type.MaxMemberCyclomatic),
+                Num(stats.MaxMemberCyclomaticPercentile), Num(stats.MaxMemberCyclomaticTimesMedian),
                 type.MostComplexMember?.Subject.Canonical ?? "",
-                Num(type.Dsm), Num(type.Transform), Num(type.StaticMutations),
+                Num(type.Dsm), Num(stats.DsmPercentile), Num(stats.DsmTimesMedian),
+                Num(type.Transform), Num(type.StaticMutations),
                 Num(type.MemberCount), Num(type.PublicMemberCount), Num(type.ExecutableMemberCount),
-                Num(type.ParameterCount), Num(type.DataShape), Num(type.LinesOfCode),
+                Num(type.ParameterCount), Num(type.DataShape), Num(stats.DataShapePercentile),
+                Num(stats.SolutionFanInPercentile), Num(stats.SolutionMaxMemberCyclomaticPercentile),
+                Num(type.LinesOfCode),
 
                 // Semicolons, because the separator is a comma. The list is already sorted —
                 // ExternalNamespaces is a SortedSet — so this stays a total key.
