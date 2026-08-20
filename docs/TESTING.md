@@ -232,6 +232,20 @@ confirm a plant disturbed nothing but what it aimed at. What replaces them:
 Accepting a snapshot is a claim that the change was intended — §3. **Read the received diff before
 accepting it**, which is what "line by line" always meant.
 
+### One gate the fixture cannot observe, and it is not waiting for a plant
+
+**`GlobalComplexityFloor`.** It gates `NoPeerGroup`: a peerless type needs `MaxMemberCyclomatic > 1`
+*and* a solution-wide complexity percentile at or above 90. For the floor to be the condition that
+decides, a type at cc 1 has to reach that percentile — and on TestBed the smallest complexity
+reaching it is **11**. Measured at P9: lifting cc 1 to the 90th percentile takes **940 additional
+property bags**, turning a 179-type fixture into 1,119 with five sixths of it empty.
+
+`TASKS.md` recorded this as P9's second job for some months. It is not one. **A `-` against this
+constant in the sweep table is the second kind — the fixture's distribution cannot reach it — and
+it will stay that way at any fixture size worth maintaining.** Its edge belongs in a unit test over
+`Distribution` with a constructed population, the way the surface ceiling's does, not in the
+fixture.
+
 
 `tests/TestBed/` is a synthetic solution with **known answers**, and its defects are
 deliberate: a god object, a concealed decision hidden in plumbing, seven near-identical
