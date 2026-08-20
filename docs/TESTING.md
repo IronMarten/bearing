@@ -805,6 +805,32 @@ is why both halves are run.
 value in `AnalysisPolicy.Values`, moved one notch each way, with the finding set compared at each.
 Read it there.
 
+**P7's near-miss band, first two.** Every plant before it answered *"does this finding fire?"*; none
+answered *"is this the number at which it stops firing?"*, so the fixture was all clear-cut cases
+with nothing sitting just outside a gate — and the sweep reported `-` in both directions for nine
+constants that are not dead.
+
+| Constant | The near miss | Verdict before → after |
+|---|---|---|
+| `HighCc` (10) | `ThroughputGauge.Sample` moved from cc 8 to **cc 9**. Everything about that type already qualifies for `LOAD-BEARING AND INTRICATE` — instability 0.167, fan-in 5 — except one point of complexity | `-` `-` → **`moves`** `-` |
+| `GodObjectMembers` (20) | `ShipmentCoordinator` moved from 16 members to **19**. It is already a hub on both axes; only the size arm's floor keeps `TooLargeToHold` from holding | `-` `-` → **`moves`** `-` |
+
+> **The three auto-properties are the plant, and the first draft of them was wrong.** Written as
+> expression-bodied properties they carry a cyclomatic point each, which took the type's total from
+> 20 to 23, overtook `TariffCalculator` at 22, and moved four percentiles in the golden — collateral
+> in a plant that is supposed to be about member *count*. Auto-properties are members with no
+> decision point and are not method-like, so the count moves and nothing else does. **That is what
+> reading the golden diff line by line is for**, and it is the only reason the swap was noticed.
+
+**And one of P7's nine is not reachable from this fixture at all, for a reason worth writing down.**
+`GlobalComplexityFloor` is 1, and it is ANDed with `GlobalComplexityPercentile` (90). On TestBed the
+smallest `maxMemberCyclomatic` that reaches the 90th percentile is **12** — eleven points above the
+floor — so the floor cannot decide anything at any notch. It is not dead by construction: on a
+solution where 90% of types have cc 0 and the top decile has cc 2, the floor is what stops every
+property bag qualifying. **That solution is `P9`'s plant**, not P7's, and this is the second of the
+three causes behind a `-`: the constant is live, the gate is reachable, and this fixture's
+*distribution* cannot get near it.
+
 **One row of that table needs its reason written down, because the table cannot carry it.**
 `BoundaryTopFraction` reports `-` in both directions and it is **not** a dead gate: the fixture
 declares fifteen boundaries, and a notch of 0.01 over fifteen cannot move a rank —

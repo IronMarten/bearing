@@ -1080,7 +1080,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 134
+        "line": 146
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -1114,7 +1114,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 136
+            "line": 148
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -1131,7 +1131,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 137
+            "line": 149
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -1148,7 +1148,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 138
+            "line": 150
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -1165,7 +1165,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 139
+            "line": 151
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -1182,7 +1182,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 140
+            "line": 152
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -1199,7 +1199,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 142
+            "line": 154
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -2145,7 +2145,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 84
+        "line": 96
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -2179,7 +2179,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 86
+            "line": 98
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -2196,7 +2196,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 88
+            "line": 100
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -3896,7 +3896,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 121
+        "line": 133
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -3930,7 +3930,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 123
+            "line": 135
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -3947,7 +3947,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 124
+            "line": 136
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -3964,7 +3964,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 125
+            "line": 137
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -3981,7 +3981,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 126
+            "line": 138
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -3998,7 +3998,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 127
+            "line": 139
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4015,7 +4015,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 129
+            "line": 141
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -4134,7 +4134,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 91
+        "line": 103
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -4168,7 +4168,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 93
+            "line": 105
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4185,7 +4185,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 95
+            "line": 107
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -4322,7 +4322,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 177
+        "line": 189
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -4356,7 +4356,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 179
+            "line": 191
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4373,7 +4373,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 180
+            "line": 192
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4390,7 +4390,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 181
+            "line": 193
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4407,7 +4407,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 182
+            "line": 194
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4424,7 +4424,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 183
+            "line": 195
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -4441,7 +4441,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 185
+            "line": 197
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -5030,7 +5030,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 108
+        "line": 120
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -5064,7 +5064,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 110
+            "line": 122
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -5081,7 +5081,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 111
+            "line": 123
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -5098,7 +5098,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 112
+            "line": 124
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -5115,7 +5115,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 113
+            "line": 125
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -5132,7 +5132,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 114
+            "line": 126
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -5149,7 +5149,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 116
+            "line": 128
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -5211,7 +5211,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 77
+        "line": 89
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -5245,7 +5245,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 79
+            "line": 91
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -5262,7 +5262,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 81
+            "line": 93
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -7542,7 +7542,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 98
+        "line": 110
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -7576,7 +7576,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 100
+            "line": 112
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -7593,7 +7593,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 102
+            "line": 114
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -9687,7 +9687,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 147
+        "line": 159
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -9721,7 +9721,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 149
+            "line": 161
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -9738,7 +9738,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 150
+            "line": 162
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -9755,7 +9755,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 151
+            "line": 163
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -9772,7 +9772,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 152
+            "line": 164
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -9789,7 +9789,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 153
+            "line": 165
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -9806,7 +9806,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 155
+            "line": 167
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -10019,7 +10019,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 160
+        "line": 172
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -10053,7 +10053,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 162
+            "line": 174
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -10070,7 +10070,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 163
+            "line": 175
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -10087,7 +10087,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 164
+            "line": 176
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -10104,7 +10104,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 165
+            "line": 177
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -10121,7 +10121,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 166
+            "line": 178
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -10138,7 +10138,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 168
+            "line": 180
           },
           "cyclomatic": 1,
           "dsm": 0,
@@ -10235,7 +10235,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/ShipmentCoordinator.cs",
-        "line": 53
+        "line": 70
       },
       "kind": "Contract",
       "kindEvidence": "shape:no executable members",
@@ -10269,7 +10269,7 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/ShipmentCoordinator.cs",
-            "line": 55
+            "line": 72
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -10496,12 +10496,12 @@
       "dsm": 15,
       "transform": 1,
       "staticMutations": 0,
-      "memberCount": 16,
-      "publicMemberCount": 7,
+      "memberCount": 19,
+      "publicMemberCount": 10,
       "executableMemberCount": 7,
-      "parameterCount": 8,
-      "dataShape": 27,
-      "linesOfCode": 47,
+      "parameterCount": 11,
+      "dataShape": 30,
+      "linesOfCode": 64,
       "externalNamespaces": [],
       "members": [
         {
@@ -10769,6 +10769,57 @@
             "line": 50
           },
           "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Ready",
+          "name": "Ready",
+          "kind": "Property",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/ShipmentCoordinator.cs",
+            "line": 65
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Draining",
+          "name": "Draining",
+          "kind": "Property",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/ShipmentCoordinator.cs",
+            "line": 66
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Quiesced",
+          "name": "Quiesced",
+          "kind": "Property",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/ShipmentCoordinator.cs",
+            "line": 67
+          },
+          "cyclomatic": 0,
           "dsm": 0,
           "transform": 0,
           "staticMutations": 0,
@@ -11869,7 +11920,7 @@
       "isAbstract": false,
       "location": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 51
+        "line": 58
       },
       "kind": "Internal",
       "kindEvidence": "no classifying evidence",
@@ -11882,8 +11933,8 @@
       "inboundReferences": 10,
       "instability": 0.16666666666666666,
       "instabilityRaw": 0.16666666666666666,
-      "cyclomatic": 8,
-      "maxMemberCyclomatic": 8,
+      "cyclomatic": 9,
+      "maxMemberCyclomatic": 9,
       "mostComplexMember": "member|Core|global::TestBed.Core.ThroughputGauge|global::TestBed.Core.ThroughputGauge.Sample(int, string, bool)",
       "dsm": 0,
       "transform": 0,
@@ -11893,7 +11944,7 @@
       "executableMemberCount": 1,
       "parameterCount": 3,
       "dataShape": 4,
-      "linesOfCode": 20,
+      "linesOfCode": 25,
       "externalNamespaces": [],
       "members": [
         {
@@ -11903,7 +11954,7 @@
           "accessibility": "",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 53
+            "line": 60
           },
           "cyclomatic": 0,
           "dsm": 0,
@@ -11920,15 +11971,15 @@
           "accessibility": "Public",
           "location": {
             "file": "TestBed/Core/Gauges.cs",
-            "line": 55
+            "line": 62
           },
-          "cyclomatic": 8,
+          "cyclomatic": 9,
           "dsm": 0,
           "transform": 0,
           "staticMutations": 0,
           "maxNestingDepth": 1,
           "parameterCount": 3,
-          "linesOfCode": 15
+          "linesOfCode": 20
         }
       ]
     },
@@ -13693,7 +13744,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 138
+        "line": 150
       }
     },
     {
@@ -13706,7 +13757,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 139
+        "line": 151
       }
     },
     {
@@ -13719,7 +13770,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 137
+        "line": 149
       }
     },
     {
@@ -13732,7 +13783,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 140
+        "line": 152
       }
     },
     {
@@ -13745,7 +13796,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 136
+        "line": 148
       }
     },
     {
@@ -14034,7 +14085,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 86
+        "line": 98
       }
     },
     {
@@ -14438,7 +14489,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 125
+        "line": 137
       }
     },
     {
@@ -14451,7 +14502,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 126
+        "line": 138
       }
     },
     {
@@ -14464,7 +14515,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 124
+        "line": 136
       }
     },
     {
@@ -14477,7 +14528,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 127
+        "line": 139
       }
     },
     {
@@ -14490,7 +14541,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 123
+        "line": 135
       }
     },
     {
@@ -14514,7 +14565,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 93
+        "line": 105
       }
     },
     {
@@ -14552,7 +14603,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 181
+        "line": 193
       }
     },
     {
@@ -14565,7 +14616,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 180
+        "line": 192
       }
     },
     {
@@ -14578,7 +14629,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 179
+        "line": 191
       }
     },
     {
@@ -14591,7 +14642,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 182
+        "line": 194
       }
     },
     {
@@ -14604,7 +14655,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 183
+        "line": 195
       }
     },
     {
@@ -14720,7 +14771,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 112
+        "line": 124
       }
     },
     {
@@ -14733,7 +14784,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 113
+        "line": 125
       }
     },
     {
@@ -14746,7 +14797,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 111
+        "line": 123
       }
     },
     {
@@ -14759,7 +14810,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 114
+        "line": 126
       }
     },
     {
@@ -14772,7 +14823,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 110
+        "line": 122
       }
     },
     {
@@ -14796,7 +14847,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 79
+        "line": 91
       }
     },
     {
@@ -15397,7 +15448,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 100
+        "line": 112
       }
     },
     {
@@ -16186,7 +16237,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 151
+        "line": 163
       }
     },
     {
@@ -16199,7 +16250,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 152
+        "line": 164
       }
     },
     {
@@ -16212,7 +16263,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 150
+        "line": 162
       }
     },
     {
@@ -16225,7 +16276,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 153
+        "line": 165
       }
     },
     {
@@ -16238,7 +16289,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 149
+        "line": 161
       }
     },
     {
@@ -16398,7 +16449,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 164
+        "line": 176
       }
     },
     {
@@ -16411,7 +16462,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 165
+        "line": 177
       }
     },
     {
@@ -16424,7 +16475,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 163
+        "line": 175
       }
     },
     {
@@ -16437,7 +16488,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 166
+        "line": 178
       }
     },
     {
@@ -16450,7 +16501,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 162
+        "line": 174
       }
     },
     {
@@ -16875,7 +16926,7 @@
       ],
       "site": {
         "file": "TestBed/Core/Gauges.cs",
-        "line": 53
+        "line": 60
       }
     },
     {

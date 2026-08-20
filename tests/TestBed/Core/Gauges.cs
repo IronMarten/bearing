@@ -30,10 +30,17 @@
 // MinFanIn = 6 and asserts the same type reverts to "looks like plumbing" — same metrics, one
 // threshold, both branches proven live. RateReconciler is the standing contrast at fan-in 1.
 //
-// WHY cc 8 AND NOT MORE. LOAD-BEARING AND INTRICATE fires at instability <= 0.2, fan-in >=
-// --min-fan-in and a method at or above --high-cc (10). ThroughputGauge already satisfies the
-// first two — fan-in 5 against fan-out 1 is instability 0.167 — so cc 10 would nominate it twice
-// and this plant would stop being about one thing.
+// WHY cc 9 AND NOT MORE — AND WHY NOT 8, WHICH IS WHAT IT WAS. LOAD-BEARING AND INTRICATE fires
+// at instability <= 0.2, fan-in >= --min-fan-in and a method at or above --high-cc (10).
+// ThroughputGauge already satisfies the first two — fan-in 5 against fan-out 1 is instability
+// 0.167 — so cc 10 would nominate it twice and this plant would stop being about one thing.
+//
+// P7 moved it from 8 to 9, which is the near-miss band: everything about this type qualifies for
+// LOAD-BEARING except one point of cyclomatic complexity. At the default it is still one finding,
+// so row 6 is untouched; at --high-cc 9 it becomes two, which is what makes the constant
+// observable. Before this, moving --high-cc a notch either way changed nothing in the entire
+// fixture and the sweep reported `-` in both directions — a gate the suite could not see.
+// docs/TESTING.md §6, and it is the first of P7's band.
 //
 // WHY FIVE METERS. Fan-in counts distinct referencing types, so a fan-in of 5 needs five of them
 // and there is no cheaper construction. They are new rather than borrowed because every existing
@@ -65,12 +72,17 @@ public class ThroughputGauge
         if (value < 0) value = 0;
         if (_normalize.Apply(value) > 500) value += 1;
 
+        // P7's near miss. This line is the ninth decision point and its only job is to sit one
+        // below --high-cc, so lowering that constant by a notch nominates this type as
+        // LOAD-BEARING AND INTRICATE and the sweep can see the gate at all.
+        if (value % 2 == 1) value -= 1;
+
         return value;
     }
 }
 
 // The four thin gauges. Max-member cc 1 holds the cohort's complexity median at 1 so
-// ThroughputGauge reaches 8x it; fan-out 1 apiece holds the fan-out median at 1. All five carry
+// ThroughputGauge reaches 9x it; fan-out 1 apiece holds the fan-out median at 1. All five carry
 // the same fan-in, which is what makes ThroughputGauge ordinary for its peers and extreme in
 // absolute terms at the same time — the exact shape the wording branch exists for.
 

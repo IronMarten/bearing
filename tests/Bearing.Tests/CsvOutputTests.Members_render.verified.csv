@@ -29,12 +29,12 @@ member|Core|global::TestBed.Core.AuditStep|global::TestBed.Core.AuditStep.Apply(
 member|Core|global::TestBed.Core.AuthenticationMiddleware|_audit,_audit,Field,,type|Core|global::TestBed.Core.AuthenticationMiddleware,Core,0,0,0,0,0,0,1,TestBed/Core/AuthenticationMiddleware.cs,11
 member|Core|global::TestBed.Core.AuthenticationMiddleware|_tenants,_tenants,Field,,type|Core|global::TestBed.Core.AuthenticationMiddleware,Core,0,0,0,0,0,0,1,TestBed/Core/AuthenticationMiddleware.cs,10
 "member|Core|global::TestBed.Core.AuthenticationMiddleware|global::TestBed.Core.AuthenticationMiddleware.Authenticate(global::TestBed.Core.RawResponse, global::TestBed.Core.NormalizationContext, string)",Authenticate,Method,Public,type|Core|global::TestBed.Core.AuthenticationMiddleware,Core,5,2,0,0,1,3,12,TestBed/Core/AuthenticationMiddleware.cs,13
-member|Core|global::TestBed.Core.BacklogMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,138
-member|Core|global::TestBed.Core.BacklogMeter|_error,_error,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,139
-member|Core|global::TestBed.Core.BacklogMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,137
-member|Core|global::TestBed.Core.BacklogMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,140
-member|Core|global::TestBed.Core.BacklogMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,136
-member|Core|global::TestBed.Core.BacklogMeter|global::TestBed.Core.BacklogMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.BacklogMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,142
+member|Core|global::TestBed.Core.BacklogMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,150
+member|Core|global::TestBed.Core.BacklogMeter|_error,_error,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,151
+member|Core|global::TestBed.Core.BacklogMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,149
+member|Core|global::TestBed.Core.BacklogMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,152
+member|Core|global::TestBed.Core.BacklogMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.BacklogMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,148
+member|Core|global::TestBed.Core.BacklogMeter|global::TestBed.Core.BacklogMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.BacklogMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,154
 member|Core|global::TestBed.Core.CarrierGateway|_http,_http,Field,,type|Core|global::TestBed.Core.CarrierGateway,Core,0,0,0,0,0,0,1,TestBed/Core/CarrierGateway.cs,8
 "member|Core|global::TestBed.Core.CarrierGateway|global::TestBed.Core.CarrierGateway.FetchAsync(global::TestBed.Core.NormalizationContext, string)",FetchAsync,Method,Public,type|Core|global::TestBed.Core.CarrierGateway,Core,1,0,3,0,1,2,10,TestBed/Core/CarrierGateway.cs,10
 member|Core|global::TestBed.Core.CarrierLedger|_ledger,_ledger,Field,,type|Core|global::TestBed.Core.CarrierLedger,Core,0,0,0,0,0,0,1,TestBed/Core/Ledgers.cs,138
@@ -63,8 +63,8 @@ member|Core|global::TestBed.Core.Depots.RoutingDepot|_normalize,_normalize,Field
 member|Core|global::TestBed.Core.Depots.RoutingDepot|_price,_price,Field,,type|Core|global::TestBed.Core.Depots.RoutingDepot,Core,0,0,0,0,0,0,1,TestBed/Core/Depots/Depots.cs,54
 member|Core|global::TestBed.Core.Depots.RoutingDepot|_validate,_validate,Field,,type|Core|global::TestBed.Core.Depots.RoutingDepot,Core,0,0,0,0,0,0,1,TestBed/Core/Depots/Depots.cs,52
 "member|Core|global::TestBed.Core.Depots.RoutingDepot|global::TestBed.Core.Depots.RoutingDepot.Route(int, string, bool, bool)",Route,Method,Public,type|Core|global::TestBed.Core.Depots.RoutingDepot,Core,12,0,0,0,1,4,19,TestBed/Core/Depots/Depots.cs,56
-member|Core|global::TestBed.Core.DepthGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.DepthGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,86
-member|Core|global::TestBed.Core.DepthGauge|global::TestBed.Core.DepthGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.DepthGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,88
+member|Core|global::TestBed.Core.DepthGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.DepthGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,98
+member|Core|global::TestBed.Core.DepthGauge|global::TestBed.Core.DepthGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.DepthGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,100
 member|Core|global::TestBed.Core.Dispatch.AirDispatcher|_callback,_callback,Field,,type|Core|global::TestBed.Core.Dispatch.AirDispatcher,Core,0,0,0,0,0,0,1,TestBed/Core/Dispatch/Dispatch.cs,148
 member|Core|global::TestBed.Core.Dispatch.AirDispatcher|_counter,_counter,Field,,type|Core|global::TestBed.Core.Dispatch.AirDispatcher,Core,0,0,0,0,0,0,1,TestBed/Core/Dispatch/Dispatch.cs,147
 member|Core|global::TestBed.Core.Dispatch.AirDispatcher|_registry,_registry,Field,,type|Core|global::TestBed.Core.Dispatch.AirDispatcher,Core,0,0,0,0,0,0,1,TestBed/Core/Dispatch/Dispatch.cs,146
@@ -126,23 +126,23 @@ member|Core|global::TestBed.Core.DocumentLedger|global::TestBed.Core.DocumentLed
 member|Core|global::TestBed.Core.DocumentReconciler|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.DocumentReconciler,Core,0,0,0,0,0,0,1,TestBed/Core/Reconcilers.cs,254
 member|Core|global::TestBed.Core.DocumentReconciler|_validate,_validate,Field,,type|Core|global::TestBed.Core.DocumentReconciler,Core,0,0,0,0,0,0,1,TestBed/Core/Reconcilers.cs,255
 member|Core|global::TestBed.Core.DocumentReconciler|global::TestBed.Core.DocumentReconciler.Reconcile(int),Reconcile,Method,Public,type|Core|global::TestBed.Core.DocumentReconciler,Core,3,0,0,0,1,1,6,TestBed/Core/Reconcilers.cs,257
-member|Core|global::TestBed.Core.EgressMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,125
-member|Core|global::TestBed.Core.EgressMeter|_error,_error,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,126
-member|Core|global::TestBed.Core.EgressMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,124
-member|Core|global::TestBed.Core.EgressMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,127
-member|Core|global::TestBed.Core.EgressMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,123
-member|Core|global::TestBed.Core.EgressMeter|global::TestBed.Core.EgressMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.EgressMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,129
+member|Core|global::TestBed.Core.EgressMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,137
+member|Core|global::TestBed.Core.EgressMeter|_error,_error,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,138
+member|Core|global::TestBed.Core.EgressMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,136
+member|Core|global::TestBed.Core.EgressMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,139
+member|Core|global::TestBed.Core.EgressMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.EgressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,135
+member|Core|global::TestBed.Core.EgressMeter|global::TestBed.Core.EgressMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.EgressMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,141
 member|Core|global::TestBed.Core.EnrichStep|global::TestBed.Core.EnrichStep.Apply(int),Apply,Method,Public,type|Core|global::TestBed.Core.EnrichStep,Core,1,0,0,0,0,1,1,TestBed/Core/Reconcilers.cs,60
-member|Core|global::TestBed.Core.ErrorGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.ErrorGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,93
-member|Core|global::TestBed.Core.ErrorGauge|global::TestBed.Core.ErrorGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.ErrorGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,95
+member|Core|global::TestBed.Core.ErrorGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.ErrorGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,105
+member|Core|global::TestBed.Core.ErrorGauge|global::TestBed.Core.ErrorGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.ErrorGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,107
 member|Core|global::TestBed.Core.FeatureGate|global::TestBed.Core.FeatureGate.IsEnabled(string),IsEnabled,Method,Public,type|Core|global::TestBed.Core.FeatureGate,Core,1,0,0,0,0,1,1,TestBed/Core/DipContrast.cs,14
 member|Core|global::TestBed.Core.FixtureBuilder|global::TestBed.Core.FixtureBuilder.WithStatus(int),WithStatus,Method,Public,type|Core|global::TestBed.Core.FixtureBuilder,Core,1,0,1,0,1,1,4,TestBed/Core/DeadCodeTraps.cs,86
-member|Core|global::TestBed.Core.GaugeCatalog|_backlog,_backlog,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,181
-member|Core|global::TestBed.Core.GaugeCatalog|_egress,_egress,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,180
-member|Core|global::TestBed.Core.GaugeCatalog|_ingress,_ingress,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,179
-member|Core|global::TestBed.Core.GaugeCatalog|_retry,_retry,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,182
-member|Core|global::TestBed.Core.GaugeCatalog|_saturation,_saturation,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,183
-member|Core|global::TestBed.Core.GaugeCatalog|global::TestBed.Core.GaugeCatalog.ReadAll(int),ReadAll,Method,Public,type|Core|global::TestBed.Core.GaugeCatalog,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,185
+member|Core|global::TestBed.Core.GaugeCatalog|_backlog,_backlog,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,193
+member|Core|global::TestBed.Core.GaugeCatalog|_egress,_egress,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,192
+member|Core|global::TestBed.Core.GaugeCatalog|_ingress,_ingress,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,191
+member|Core|global::TestBed.Core.GaugeCatalog|_retry,_retry,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,194
+member|Core|global::TestBed.Core.GaugeCatalog|_saturation,_saturation,Field,,type|Core|global::TestBed.Core.GaugeCatalog,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,195
+member|Core|global::TestBed.Core.GaugeCatalog|global::TestBed.Core.GaugeCatalog.ReadAll(int),ReadAll,Method,Public,type|Core|global::TestBed.Core.GaugeCatalog,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,197
 "member|Core|global::TestBed.Core.GuaranteedServiceNormalizer|global::TestBed.Core.GuaranteedServiceNormalizer.Normalize(global::TestBed.Core.RawResponse, global::TestBed.Core.NormalizationContext)",Normalize,Method,Public,type|Core|global::TestBed.Core.GuaranteedServiceNormalizer,Core,21,15,0,0,4,2,57,TestBed/Core/GuaranteedServiceNormalizer.cs,6
 member|Core|global::TestBed.Core.GuaranteedServiceNormalizer|global::TestBed.Core.GuaranteedServiceNormalizer.ParseOptions(string),ParseOptions,Method,Private,type|Core|global::TestBed.Core.GuaranteedServiceNormalizer,Core,6,1,3,0,2,1,14,TestBed/Core/GuaranteedServiceNormalizer.cs,64
 member|Core|global::TestBed.Core.GuaranteedServiceNormalizer.ServiceOption|global::TestBed.Core.GuaranteedServiceNormalizer.ServiceOption.Code,Code,Property,Public,type|Core|global::TestBed.Core.GuaranteedServiceNormalizer.ServiceOption,Core,0,0,0,0,0,0,1,TestBed/Core/GuaranteedServiceNormalizer.cs,81
@@ -155,14 +155,14 @@ member|Core|global::TestBed.Core.IFeatureGate|global::TestBed.Core.IFeatureGate.
 "member|Core|global::TestBed.Core.IPolicySink|global::TestBed.Core.IPolicySink.Apply(string, string)",Apply,Method,Public,type|Core|global::TestBed.Core.IPolicySink,Core,0,0,0,0,0,2,1,TestBed/Core/DeadCodeTraps.cs,43
 "member|Core|global::TestBed.Core.IResponseNormalizer|global::TestBed.Core.IResponseNormalizer.Normalize(global::TestBed.Core.RawResponse, global::TestBed.Core.NormalizationContext)",Normalize,Method,Public,type|Core|global::TestBed.Core.IResponseNormalizer,Core,0,0,0,0,0,2,1,TestBed/Core/Contracts.cs,5
 member|Core|global::TestBed.Core.IRetryPolicy|global::TestBed.Core.IRetryPolicy.ShouldRetry(int),ShouldRetry,Method,Public,type|Core|global::TestBed.Core.IRetryPolicy,Core,0,0,0,0,0,1,1,TestBed/Core/DipContrast.cs,8
-member|Core|global::TestBed.Core.IngressMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,112
-member|Core|global::TestBed.Core.IngressMeter|_error,_error,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,113
-member|Core|global::TestBed.Core.IngressMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,111
-member|Core|global::TestBed.Core.IngressMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,114
-member|Core|global::TestBed.Core.IngressMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,110
-member|Core|global::TestBed.Core.IngressMeter|global::TestBed.Core.IngressMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.IngressMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,116
-member|Core|global::TestBed.Core.LatencyGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.LatencyGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,79
-member|Core|global::TestBed.Core.LatencyGauge|global::TestBed.Core.LatencyGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.LatencyGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,81
+member|Core|global::TestBed.Core.IngressMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,124
+member|Core|global::TestBed.Core.IngressMeter|_error,_error,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,125
+member|Core|global::TestBed.Core.IngressMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,123
+member|Core|global::TestBed.Core.IngressMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,126
+member|Core|global::TestBed.Core.IngressMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.IngressMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,122
+member|Core|global::TestBed.Core.IngressMeter|global::TestBed.Core.IngressMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.IngressMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,128
+member|Core|global::TestBed.Core.LatencyGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.LatencyGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,91
+member|Core|global::TestBed.Core.LatencyGauge|global::TestBed.Core.LatencyGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.LatencyGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,93
 member|Core|global::TestBed.Core.Layering.EgressConduit|_archive,_archive,Field,,type|Core|global::TestBed.Core.Layering.EgressConduit,Core,0,0,0,0,0,0,1,TestBed/Core/Layering/Layering.cs,167
 member|Core|global::TestBed.Core.Layering.EgressConduit|_beacon,_beacon,Field,,type|Core|global::TestBed.Core.Layering.EgressConduit,Core,0,0,0,0,0,0,1,TestBed/Core/Layering/Layering.cs,168
 member|Core|global::TestBed.Core.Layering.EgressConduit|_endpoint,_endpoint,Field,,type|Core|global::TestBed.Core.Layering.EgressConduit,Core,0,0,0,0,0,0,1,TestBed/Core/Layering/Layering.cs,166
@@ -239,8 +239,8 @@ member|Core|global::TestBed.Core.PolicyBridge|_tenants,_tenants,Field,,type|Core
 member|Core|global::TestBed.Core.PolicyBridge|global::TestBed.Core.PolicyBridge.Apply(int),Apply,Method,Public,type|Core|global::TestBed.Core.PolicyBridge,Core,1,0,0,0,0,1,1,TestBed/Core/Bridges.cs,59
 member|Core|global::TestBed.Core.PriceStep|global::TestBed.Core.PriceStep.Apply(int),Apply,Method,Public,type|Core|global::TestBed.Core.PriceStep,Core,1,0,0,0,0,1,1,TestBed/Core/Reconcilers.cs,65
 "member|Core|global::TestBed.Core.Pricing.SurchargeTable|global::TestBed.Core.Pricing.SurchargeTable.Lookup(global::TestBed.Core.NormalizationContext, string)",Lookup,Method,Public,type|Core|global::TestBed.Core.Pricing.SurchargeTable,Core,4,0,0,0,1,2,5,TestBed/Core/Pricing/SurchargeTable.cs,8
-member|Core|global::TestBed.Core.QueueGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.QueueGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,100
-member|Core|global::TestBed.Core.QueueGauge|global::TestBed.Core.QueueGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.QueueGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,102
+member|Core|global::TestBed.Core.QueueGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.QueueGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,112
+member|Core|global::TestBed.Core.QueueGauge|global::TestBed.Core.QueueGauge.Sample(int),Sample,Method,Public,type|Core|global::TestBed.Core.QueueGauge,Core,1,0,0,0,0,1,1,TestBed/Core/Gauges.cs,114
 member|Core|global::TestBed.Core.QuoteAssembler|_lines,_lines,Field,,type|Core|global::TestBed.Core.QuoteAssembler,Core,0,0,0,0,0,0,1,TestBed/Core/QuoteAssembler.cs,12
 member|Core|global::TestBed.Core.QuoteAssembler|_totalAssembled,_totalAssembled,Field,,type|Core|global::TestBed.Core.QuoteAssembler,Core,0,0,0,0,0,0,1,TestBed/Core/QuoteAssembler.cs,11
 member|Core|global::TestBed.Core.QuoteAssembler|global::TestBed.Core.QuoteAssembler.Build(decimal),Build,Method,Public,type|Core|global::TestBed.Core.QuoteAssembler,Core,1,2,3,1,1,1,15,TestBed/Core/QuoteAssembler.cs,14
@@ -313,25 +313,25 @@ member|Core|global::TestBed.Core.ReferenceLedger|global::TestBed.Core.ReferenceL
 member|Core|global::TestBed.Core.ReferenceNormalizer|_audit,_audit,Field,,type|Core|global::TestBed.Core.ReferenceNormalizer,Core,0,0,0,0,0,0,1,TestBed/Core/ReferenceNormalizer.cs,6
 member|Core|global::TestBed.Core.ReferenceNormalizer|_tariff,_tariff,Field,,type|Core|global::TestBed.Core.ReferenceNormalizer,Core,0,0,0,0,0,0,1,TestBed/Core/ReferenceNormalizer.cs,5
 "member|Core|global::TestBed.Core.ReferenceNormalizer|global::TestBed.Core.ReferenceNormalizer.Normalize(global::TestBed.Core.RawResponse, global::TestBed.Core.NormalizationContext)",Normalize,Method,Public,type|Core|global::TestBed.Core.ReferenceNormalizer,Core,6,0,2,0,1,2,11,TestBed/Core/ReferenceNormalizer.cs,8
-member|Core|global::TestBed.Core.RetryMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,151
-member|Core|global::TestBed.Core.RetryMeter|_error,_error,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,152
-member|Core|global::TestBed.Core.RetryMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,150
-member|Core|global::TestBed.Core.RetryMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,153
-member|Core|global::TestBed.Core.RetryMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,149
-member|Core|global::TestBed.Core.RetryMeter|global::TestBed.Core.RetryMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.RetryMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,155
+member|Core|global::TestBed.Core.RetryMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,163
+member|Core|global::TestBed.Core.RetryMeter|_error,_error,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,164
+member|Core|global::TestBed.Core.RetryMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,162
+member|Core|global::TestBed.Core.RetryMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,165
+member|Core|global::TestBed.Core.RetryMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.RetryMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,161
+member|Core|global::TestBed.Core.RetryMeter|global::TestBed.Core.RetryMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.RetryMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,167
 member|Core|global::TestBed.Core.RetryPolicy|global::TestBed.Core.RetryPolicy.ShouldRetry(int),ShouldRetry,Method,Public,type|Core|global::TestBed.Core.RetryPolicy,Core,1,0,0,0,0,1,1,TestBed/Core/DipContrast.cs,13
 member|Core|global::TestBed.Core.RouteStep|global::TestBed.Core.RouteStep.Apply(int),Apply,Method,Public,type|Core|global::TestBed.Core.RouteStep,Core,1,0,0,0,0,1,1,TestBed/Core/Reconcilers.cs,70
 member|Core|global::TestBed.Core.Router|_normalizers,_normalizers,Field,,type|Core|global::TestBed.Core.Router,Core,0,0,0,0,0,0,6,TestBed/Core/Router.cs,5
 "member|Core|global::TestBed.Core.Router|global::TestBed.Core.Router.Route(global::TestBed.Core.RawResponse, global::TestBed.Core.NormalizationContext)",Route,Method,Public,type|Core|global::TestBed.Core.Router,Core,2,0,0,0,1,2,6,TestBed/Core/Router.cs,12
-member|Core|global::TestBed.Core.SaturationMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,164
-member|Core|global::TestBed.Core.SaturationMeter|_error,_error,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,165
-member|Core|global::TestBed.Core.SaturationMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,163
-member|Core|global::TestBed.Core.SaturationMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,166
-member|Core|global::TestBed.Core.SaturationMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,162
-member|Core|global::TestBed.Core.SaturationMeter|global::TestBed.Core.SaturationMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.SaturationMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,168
+member|Core|global::TestBed.Core.SaturationMeter|_depth,_depth,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,176
+member|Core|global::TestBed.Core.SaturationMeter|_error,_error,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,177
+member|Core|global::TestBed.Core.SaturationMeter|_latency,_latency,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,175
+member|Core|global::TestBed.Core.SaturationMeter|_queue,_queue,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,178
+member|Core|global::TestBed.Core.SaturationMeter|_throughput,_throughput,Field,,type|Core|global::TestBed.Core.SaturationMeter,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,174
+member|Core|global::TestBed.Core.SaturationMeter|global::TestBed.Core.SaturationMeter.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.SaturationMeter,Core,1,0,0,0,0,1,3,TestBed/Core/Gauges.cs,180
 member|Core|global::TestBed.Core.SchemaMigrationHandler|global::TestBed.Core.SchemaMigrationHandler.Describe(),Describe,Method,Public,type|Core|global::TestBed.Core.SchemaMigrationHandler,Core,3,0,0,0,1,0,6,TestBed/Core/DeadCodeTraps.cs,72
 member|Core|global::TestBed.Core.SchemaMigrationHandler|global::TestBed.Core.SchemaMigrationHandler.Version,Version,Property,Public,type|Core|global::TestBed.Core.SchemaMigrationHandler,Core,0,0,0,0,0,0,1,TestBed/Core/DeadCodeTraps.cs,70
-member|Core|global::TestBed.Core.ServiceLevelPolicy|global::TestBed.Core.ServiceLevelPolicy.Tier,Tier,Property,Public,type|Core|global::TestBed.Core.ServiceLevelPolicy,Core,0,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,55
+member|Core|global::TestBed.Core.ServiceLevelPolicy|global::TestBed.Core.ServiceLevelPolicy.Tier,Tier,Property,Public,type|Core|global::TestBed.Core.ServiceLevelPolicy,Core,0,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,72
 member|Core|global::TestBed.Core.ServiceRegistry|_registered,_registered,Field,,type|Core|global::TestBed.Core.ServiceRegistry,Core,0,0,0,0,0,0,1,TestBed/Core/Composition.cs,11
 member|Core|global::TestBed.Core.ServiceRegistry|global::TestBed.Core.ServiceRegistry.AddAllImplementing(string),AddAllImplementing,Method,Public,type|Core|global::TestBed.Core.ServiceRegistry,Core,1,1,0,0,1,1,5,TestBed/Core/Composition.cs,21
 member|Core|global::TestBed.Core.ServiceRegistry|global::TestBed.Core.ServiceRegistry.AddSingleton<TService>(),AddSingleton,Method,Public,type|Core|global::TestBed.Core.ServiceRegistry,Core,1,1,0,0,1,0,5,TestBed/Core/Composition.cs,13
@@ -350,9 +350,12 @@ member|Core|global::TestBed.Core.ShipmentCoordinator|_tariff,_tariff,Field,,type
 member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Attempts,Attempts,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,1,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,47
 member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Context,Context,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,1,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,50
 "member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Coordinate(global::TestBed.Core.RawResponse, global::TestBed.Core.NormalizationContext, string)",Coordinate,Method,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,13,11,1,0,1,3,25,TestBed/Core/ShipmentCoordinator.cs,18
+member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Draining,Draining,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,0,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,66
 member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.IsTerminal(global::TestBed.Core.NormalizedResponse),IsTerminal,Method,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,2,0,0,0,0,1,1,TestBed/Core/ShipmentCoordinator.cs,44
 member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.LastCarrier,LastCarrier,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,1,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,48
 member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.LastResult,LastResult,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,1,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,49
+member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Quiesced,Quiesced,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,0,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,67
+member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Ready,Ready,Property,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,0,0,0,0,0,0,1,TestBed/Core/ShipmentCoordinator.cs,65
 member|Core|global::TestBed.Core.ShipmentCoordinator|global::TestBed.Core.ShipmentCoordinator.Reset(),Reset,Method,Public,type|Core|global::TestBed.Core.ShipmentCoordinator,Core,1,4,0,0,1,0,1,TestBed/Core/ShipmentCoordinator.cs,46
 member|Core|global::TestBed.Core.ShipmentLedger|_posted,_posted,Field,,type|Core|global::TestBed.Core.ShipmentLedger,Core,0,0,0,0,0,0,1,TestBed/Core/Ledgers.cs,38
 member|Core|global::TestBed.Core.ShipmentLedger|global::TestBed.Core.ShipmentLedger.Balance(string),Balance,Method,Public,type|Core|global::TestBed.Core.ShipmentLedger,Core,2,0,0,0,1,1,4,TestBed/Core/Ledgers.cs,67
@@ -389,8 +392,8 @@ member|Core|global::TestBed.Core.TenantStore|_connection,_connection,Field,,type
 member|Core|global::TestBed.Core.TenantStore|global::TestBed.Core.TenantStore.IsStrict(string),IsStrict,Method,Public,type|Core|global::TestBed.Core.TenantStore,Core,1,0,0,0,0,1,1,TestBed/Core/AuthenticationMiddleware.cs,41
 member|Core|global::TestBed.Core.TenantStore|global::TestBed.Core.TenantStore.LookupByApiKey(string),LookupByApiKey,Method,Public,type|Core|global::TestBed.Core.TenantStore,Core,3,1,0,0,1,1,7,TestBed/Core/AuthenticationMiddleware.cs,33
 member|Core|global::TestBed.Core.TenantStore|global::TestBed.Core.TenantStore.TenantStore(),.ctor,Constructor,Public,type|Core|global::TestBed.Core.TenantStore,Core,1,0,1,0,1,0,1,TestBed/Core/AuthenticationMiddleware.cs,31
-member|Core|global::TestBed.Core.ThroughputGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.ThroughputGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,53
-"member|Core|global::TestBed.Core.ThroughputGauge|global::TestBed.Core.ThroughputGauge.Sample(int, string, bool)",Sample,Method,Public,type|Core|global::TestBed.Core.ThroughputGauge,Core,8,0,0,0,1,3,15,TestBed/Core/Gauges.cs,55
+member|Core|global::TestBed.Core.ThroughputGauge|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.ThroughputGauge,Core,0,0,0,0,0,0,1,TestBed/Core/Gauges.cs,60
+"member|Core|global::TestBed.Core.ThroughputGauge|global::TestBed.Core.ThroughputGauge.Sample(int, string, bool)",Sample,Method,Public,type|Core|global::TestBed.Core.ThroughputGauge,Core,9,0,0,0,1,3,20,TestBed/Core/Gauges.cs,62
 member|Core|global::TestBed.Core.TrackingController|_carrier,_carrier,Field,,type|Core|global::TestBed.Core.TrackingController,Core,0,0,0,0,0,0,1,TestBed/Core/Controllers.cs,38
 member|Core|global::TestBed.Core.TrackingController|_router,_router,Field,,type|Core|global::TestBed.Core.TrackingController,Core,0,0,0,0,0,0,1,TestBed/Core/Controllers.cs,36
 member|Core|global::TestBed.Core.TrackingController|_tenants,_tenants,Field,,type|Core|global::TestBed.Core.TrackingController,Core,0,0,0,0,0,0,1,TestBed/Core/Controllers.cs,37
