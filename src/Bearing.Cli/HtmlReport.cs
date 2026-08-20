@@ -57,7 +57,7 @@ public static class HtmlReport
         Header(page, model, solution, findings, generatedAt);
         Picture(page, model, findings);
         Risks(page, model, findings);
-        Orientation(page, model);
+        Orientation(page, model, findings);
 
         // Tier 4. The enumeration is the artifact A11 round 1 called "a wall of text", and every
         // row of it is still reachable — in --json, in --csv, and here behind a flag for CI and for
@@ -100,8 +100,13 @@ public static class HtmlReport
         // row used to carry, and they are worth stating once: they are the denominator every claim
         // below is measured against. What they are not is a headline, because a reader learns
         // nothing from them they could act on.
+        // "Type" is said once with its meaning attached, because the word has two readings and a
+        // reader outside the build took the wrong one — a category of thing, rather than the C#
+        // declaration every count here is made of. Sentences.TypeKinds derives the list from the
+        // run, so it cannot claim records on a solution that has none.
         page.Append($"<p class=\"sub\">{Html.Count(model.Types.Count)} ");
-        page.Append($"{Sentences.Do(model.Types.Count, "type", "types")} in {Html.Count(model.Projects.Count)} ");
+        page.Append($"{Sentences.Do(model.Types.Count, "type", "types")} — {Html.Text(Sentences.TypeKinds(model))} — ");
+        page.Append($"in {Html.Count(model.Projects.Count)} ");
         page.Append($"{Sentences.Do(model.Projects.Count, "project", "projects")}, {Html.Count(model.Edges.Count)} ");
         page.Append($"{Sentences.Do(model.Edges.Count, "dependency", "dependencies")} between them.</p>\n");
 
@@ -127,85 +132,107 @@ public static class HtmlReport
     // ---------------------------------------------------------------------- picture ----
 
     /// <summary>
-    /// The mosaic — A13 tier 1, and the first thing on the page.
+    /// The plot — X11, candidate A, and the first thing on the page.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>First because of what it is for, which is not what the rest of the page is for.</b> The
-    /// tiers below it answer to <c>PRD-free-tier.md</c> §4 — a number that does not end in a
-    /// sentence somebody changes their behaviour over does not ship. This one answers to §9's third
-    /// metric instead, and the difference is stated here rather than left for a reader to infer
-    /// from the fact that it makes no claim.
+    /// <b>It is here because the mosaic was measured in this position and it misled.</b> A reader
+    /// assembling the claim the page exists for — <i>which project is dense with findings <b>and</b>
+    /// holds everything else up</i> — had to combine the mosaic, the project graph and a table, and
+    /// still got it wrong three times. <see cref="ReachPlot"/> carries the measurement and the
+    /// three misreads; <c>BRIEF-job-a-picture.md</c> carries the candidates this one beat.
     /// </para>
     /// <para>
-    /// <b>The caption does the work §4 would otherwise do.</b> An area encoding is read badly by
-    /// eye, so what a cell is, what its size means, what the mark means and how many cells carry it
-    /// are all said in words underneath — and the projects too small to hold a name are listed,
-    /// which is <c>docs/DEFECTS.md</c> §31's lesson applied before a reader has to find it again.
+    /// <b>The caption states the same three numbers the tiles do, from the same derivations.</b>
+    /// Nothing here recomputes: a caption that says 83% over a tile that says 81% is two defensible
+    /// numbers and one silent defect.
     /// </para>
     /// </remarks>
     private static void Picture(StringBuilder page, SolutionModel model, FindingSet findings)
     {
         if (model.Types.Count == 0) return;
 
-        var marks = Mosaic.Marked(model, findings);
-
-        page.Append("<div class=\"picture\">\n").Append(Mosaic.Render(model, findings)).Append("</div>\n");
-
-        // A13 tier 3's correction to tier 1, and it came from the first reader outside the build to
-        // look at the mosaic: "a bunch of boxes, some of them red, and a legend that says the red
-        // ones are below." That reading is correct and the caption caused it — it described the
-        // encoding and never said what the picture was for, so a reader looking for the claim found
-        // a key to decode instead. The picture is exempt from PRD-free-tier.md §4 (ARCHITECTURE.md
-        // §10, the tier bar) and its CAPTION never was.
-        //
-        // So the claim leads and the mechanics follow. What the picture knows that the prose does
-        // not is exactly two things — how much of the codebase is pale, and where the tinted cells
-        // clump — and both are tiles now, so the caption states them from the same derivation
-        // rather than inventing a second one. The red outlines are not a third thing: they are the
-        // claims listed below, in the same order, and saying so stops a reader hunting for meaning
-        // in a mark that carries none of its own.
-        var clean = Tiles.Of(model, findings, TileKind.Clean);
-        var concentration = Tiles.Of(model, findings, TileKind.Concentration);
+        page.Append("<div class=\"picture\">\n").Append(ReachPlot.Render(model, findings)).Append("</div>\n");
 
         page.Append("<p class=\"lede\">");
 
-        // And the count is said as a count, because the picture is not drawn in counts. Claiming
-        // 83% is "the pale area" is a claim the reader can see is false — the pale area is 42% —
-        // so the gap is stated instead of asserted away. It is the same measurement the mark rule
-        // needed at tier 1, one level up: findings select large components, so a tint that is true
-        // cell by cell covers more of the drawing than of the codebase.
-        if (clean is { } share)
-            page.Append($"<strong>{Html.Text(share.Value)} of this codebase has nothing said about it</strong>, ")
-                .Append("counting types. ")
-                .Append($"The pale area is smaller than that — cells are sized by lines of code and the components ")
-                .Append($"a finding names are the large ones, so they cover {Html.Text(Percent(marks.NamedInk))} of ")
-                .Append("the picture. ");
+        if (Tiles.Of(model, findings, TileKind.Clean) is { } clean)
+            page.Append($"<strong>{Html.Text(clean.Value)} of this codebase has nothing said about it</strong> — ")
+                .Append("the pale dots, and most of the picture. ");
 
-        if (concentration is { } where)
+        if (Tiles.Of(model, findings, TileKind.Concentration) is { } where)
             page.Append("<strong>What is named clusters rather than spreading</strong>: ")
                 .Append($"{Html.Text(where.Subject)} carries {Html.Text(where.Value)} its share of them. ");
 
-        // The third sentence, and the one the picture cannot draw — see Foundations. A reader
-        // assembling this by eye reads tinted AREA, which is lines of code, and area is not the
-        // quantity any claim on this page is about. So the two numbers that decide "where will this
-        // hurt me" are stated: what the most of the codebase rests on, and how much of that is
-        // named. Never their product, which would be a severity model with no unit.
+        // The sentence the old picture could not draw and this one can: it is the top-right of the
+        // plot. Two measured facts and never their product, which would be a severity model with
+        // no unit — see Foundations.
         if (Foundations.Of(model, findings) is { } rests)
             page.Append($"<strong>{Html.Text(rests.Project)} is what the most of it rests on</strong> — ")
                 .Append($"{Html.Count(rests.Dependents)} types outside it reach in, and ")
-                .Append($"{Html.Text(rests.Share)} of its own {Html.Count(rests.Types)} are named. ");
+                .Append($"{Html.Text(rests.Share)} of its own {Html.Count(rests.Types)} are named, ")
+                .Append("which is the dot furthest right and how high it sits. ");
 
-        page.Append("Those are above as numbers, or beside the picture; this is what they look ")
-            .Append("like.</p>\n");
+        page.Append("</p>\n");
+
+        page.Append("<p class=\"sub\">One dot per project. Across, how much of the rest of the solution ");
+        page.Append("reaches into it; up, how much of it some finding below names; the area of the dot is how ");
+        page.Append("many types it declares. <strong>There is no bad corner and nothing is shaded</strong> — ");
+        page.Append("both axes are measurements, and which trade-off matters is the reader's call, because the ");
+        page.Append("tool has no severity model to make it with.</p>\n");
+
+        // docs/DEFECTS.md §31 again, in a second picture: a name that is not on the drawing reads
+        // as an omission rather than as a shortage of pixels.
+        var unlabelled = ReachPlot.Unlabelled(model, findings);
+        if (unlabelled.Count > 0)
+            page.Append($"<p class=\"sub\">{Html.Count(unlabelled.Count)} ")
+                .Append(Sentences.Do(unlabelled.Count, "project has", "projects have"))
+                .Append(" a dot but no room for a name: ")
+                .Append(Html.Text(string.Join(", ", unlabelled)))
+                .Append(".</p>\n");
+    }
+
+    /// <summary>
+    /// The mosaic, below the project graph — A13 tier 1, in the position X11 left it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>What survives is the claim no number makes as well: every type is on this page.</b> It
+    /// led the report until the plot replaced it, and the reason is recorded on
+    /// <see cref="ReachPlot"/> — area here is lines of code, every claim on the page is a count of
+    /// types, and on nopCommerce the named 17% hold 58% of the ink. That gap is stated rather than
+    /// left for a reader to walk into, and it is why the caption no longer asks this picture to
+    /// answer <i>where is the risk</i>.
+    /// </para>
+    /// <para>
+    /// <b>It is still judged by <c>PRD-free-tier.md</c> §9's third metric</b> and still ships
+    /// standalone as <c>--mosaic</c>, which is where the share-me artifact actually lives.
+    /// </para>
+    /// </remarks>
+    private static void Census(StringBuilder page, SolutionModel model, FindingSet findings)
+    {
+        if (model.Types.Count == 0) return;
+
+        var marks = Mosaic.Marked(model, findings);
+
+        page.Append("<h3>All of it, at once</h3>\n");
 
         page.Append($"<p class=\"sub\">Every one of the {Html.Count(model.Types.Count)} types this run analysed, ");
-        page.Append("one cell each, sized by how many lines it spans and grouped into the project that declares it — ");
-        page.Append("biggest project first. ");
-        page.Append($"Some finding below is about {Html.Count(marks.Named)} of them, which is the tint; ");
-        page.Append($"the {Html.Count(marks.Leading)} outlined in red are the claims below, in the same order. ");
-        page.Append("Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a ");
-        page.Append("component is would be a score, and this tool does not have one.</p>\n");
+        page.Append("one cell each, sized by how many lines it spans and grouped into the project that declares ");
+        page.Append($"it — biggest project first. Some finding is about {Html.Count(marks.Named)} of them, which ");
+        page.Append($"is the tint; the {Html.Count(marks.Leading)} outlined in red are the claims above, in the ");
+        page.Append("same order. Both marks are a yes or a no and never a degree — a mosaic shaded by ");
+        page.Append("<em>how</em> unusual a component is would be a score, and this tool does not have one.</p>\n");
+
+        page.Append("<div class=\"picture\">\n").Append(Mosaic.Render(model, findings)).Append("</div>\n");
+
+        // Said plainly, because a reader who compares this picture with the plot above it will
+        // otherwise find them disagreeing and have no way to tell which one is lying.
+        page.Append($"<p class=\"sub\"><strong>Read it by count and not by area.</strong> Cells are sized by lines ");
+        page.Append("of code and the components a finding names are the large ones, so the tinted cells are ");
+        page.Append($"{Html.Text(Percent(marks.NamedInk))} of this drawing and ");
+        page.Append($"{Html.Text(Percent(marks.Named / (double)model.Types.Count))} of the types. The plot at the ");
+        page.Append("top of this page is drawn in counts, which is what every claim here is measured in.</p>\n");
 
         var unlabelled = Mosaic.Unlabelled(model);
         if (unlabelled.Count > 0)
@@ -439,11 +466,19 @@ public static class HtmlReport
 
     // ------------------------------------------------------------------- orientation ----
 
-    private static void Orientation(StringBuilder page, SolutionModel model)
+    private static void Orientation(StringBuilder page, SolutionModel model, FindingSet findings)
     {
         page.Append("<h2>Orientation</h2>\n");
 
         Diagram(page, model);
+
+        // The mosaic, below the graph — X11. It stopped being the report's argument the moment the
+        // plot took that job, and what is left is the one claim it makes better than any number:
+        // every type this run analysed is on the page, and most of it is pale. It sits under the
+        // project graph because both are pictures of the whole solution, and the graph is the one
+        // people ask for.
+        Census(page, model, findings);
+
         Projects(page, model);
         Integrations(page, model);
         Cycles(page, model);

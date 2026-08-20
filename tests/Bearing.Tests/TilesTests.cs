@@ -149,8 +149,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// The mosaic's caption states the two tiles the picture is evidence for, from the same
-    /// derivation.
+    /// The picture's caption states the tiles it is evidence for, from the same derivations.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -168,7 +167,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_mosaic_caption_states_the_tiles_it_is_a_picture_of()
+    public void The_pictures_caption_states_the_tiles_it_is_a_picture_of()
     {
         var findings = Findings;
         var page = HtmlReport.Render(
@@ -185,8 +184,13 @@ public sealed class TilesTests(CoreWalkFixture core)
             Assert.Contains($"carries {concentration.Value} its share", caption, StringComparison.Ordinal);
         }
 
-        // And the red mark is described as what it is rather than as a third thing to decode.
-        Assert.Contains("are the claims below, in the same order", caption, StringComparison.Ordinal);
+        // And the sentence the old picture could not draw at all: what the codebase rests on, which
+        // on this plot is a position rather than a synthesis — X11.
+        if (Foundations.Of(core.Model, findings) is { } rests)
+        {
+            Assert.Contains($"{rests.Project} is what the most of it rests on", caption, StringComparison.Ordinal);
+            Assert.Contains($"{rests.Share} of its own", caption, StringComparison.Ordinal);
+        }
     }
 
     private static Tile Single(IReadOnlyList<Tile> tiles, TileKind kind) =>

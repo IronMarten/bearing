@@ -1053,3 +1053,25 @@ could answer the acceptance question in `TECHREQ-job-a.md` §5.5 — was graded 
 down before anyone was booked, including what each outcome would mean for the work. Without that
 the temptation to re-read the result as *"they needed more time"* is close to irresistible, and the
 same session yields nothing.
+
+### 35. Three inline SVGs share one stylesheet, and two of them share class names
+
+The report inlines three drawings — `ReachPlot`, `Mosaic` and `ArchitectureDiagram` —
+and an SVG `<style>` block inside an HTML document is **not scoped to that SVG**. Every rule is
+page-wide, and the last block wins.
+
+**Found while building the plot**: its label class was `nm`, which is also the project map's, so the
+two silently restyled each other's text — 13px against 14px, which is exactly the kind of difference
+nobody reports as a bug. The plot's rules are all scoped to `.rp` now.
+
+**The other two still collide and are getting away with it.** `Mosaic` and `ArchitectureDiagram` both
+define `.bg`, `.ti` and `.lg`, and it is harmless *only because the definitions happen to agree*.
+Changing either one changes both drawings, and nothing fails: the mosaic's title would silently take
+the diagram's size, or the reverse, depending on which section renders last.
+
+**Not urgent and not invisible either.** Scoping both is mechanical — a class on each root and a
+prefix on each rule — and it moves two snapshots. What makes it worth an entry is that the failure
+mode is a *rendering* one, so the suite cannot see it: both artifacts stay well-formed, both keep
+every element, and the picture is simply wrong on the page and right when written standalone with
+`--mosaic` or `--diagram`.
+

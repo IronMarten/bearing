@@ -64,6 +64,65 @@ public static class Sentences
         count == 1 ? singular : plural;
 
     /// <summary>
+    /// What this run means by <i>type</i>, in the reader's words — <c>classes, interfaces and
+    /// enums</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The word has two readings and a reader outside the build hit the wrong one</b>: <i>type</i>
+    /// as a category of thing, against <i>type</i> as the C# declaration. Every count in this report
+    /// is the second, and nothing said so — the report opened on <i>"3,209 types"</i> and left the
+    /// reader to guess which. It is the same defect class as <c>docs/DEFECTS.md</c> §26: a phrase
+    /// that is perfectly clear once you know what job it is doing.
+    /// </para>
+    /// <para>
+    /// <b>Derived from the run rather than written down, so it cannot be wrong.</b> A fixed list
+    /// would say <i>records</i> on a solution that has none and omit <i>enums</i>, which are 91 of
+    /// nopCommerce's 3,209 and the third-largest group. Largest group first, so the list opens on
+    /// the kind that carries the count. Said once, at the first mention in each renderer; after
+    /// that the word is defined and <i>type</i> stands on its own.
+    /// </para>
+    /// </remarks>
+    public static string TypeKinds(SolutionModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        var kinds = model.Types
+            .GroupBy(t => t.TypeKeyword, StringComparer.Ordinal)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key, StringComparer.Ordinal)
+            .Select(g => Kinds(g.Key.ToLowerInvariant()))
+            .ToList();
+
+        return List(kinds);
+    }
+
+    /// <summary>
+    /// A type keyword, pluralised — <c>class</c> takes <c>es</c> and <see cref="Plural"/> would
+    /// have written <c>classs</c>.
+    /// </summary>
+    private static string Kinds(string keyword) =>
+        keyword.EndsWith('s') || keyword.EndsWith('x') || keyword.EndsWith("ch", StringComparison.Ordinal)
+            ? $"{keyword}es"
+            : $"{keyword}s";
+
+    /// <summary>
+    /// A list, as English writes one — <c>a</c>, <c>a and b</c>, <c>a, b and c</c>.
+    /// </summary>
+    public static string List(IReadOnlyList<string> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+
+        return items.Count switch
+        {
+            0 => "",
+            1 => items[0],
+            2 => $"{items[0]} and {items[1]}",
+            _ => $"{string.Join(", ", items.Take(items.Count - 1))} and {items[^1]}",
+        };
+    }
+
+    /// <summary>
     /// A count of the shapes crossing a public surface, agreeing with itself.
     /// </summary>
     /// <remarks>

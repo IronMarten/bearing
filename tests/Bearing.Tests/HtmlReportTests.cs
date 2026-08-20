@@ -209,10 +209,11 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
             "h4", "p", "b", "em", "strong", "span", "table", "tr", "td", "th", "ul", "li",
             "details", "summary", "footer", "br", "a", "code",
 
-            // The embedded project map — A7. Inline SVG, so its elements are part of this
-            // document rather than a separate one, and they belong on this list for the same
-            // reason the rest do: anything here that is not one of these came out of a name.
-            "svg", "rect", "text", "path",
+            // The embedded project map — A7 — and the plot and mosaic, X11 and A13 tier 1. Inline
+            // SVG, so their elements are part of this document rather than a separate one, and they
+            // belong on this list for the same reason the rest do: anything here that is not one of
+            // these came out of a name.
+            "svg", "rect", "text", "path", "line", "circle",
         ];
 
         Assert.Empty(tags.Except(known, StringComparer.Ordinal));

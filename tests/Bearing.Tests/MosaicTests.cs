@@ -251,10 +251,11 @@ public sealed class MosaicTests(CoreWalkFixture core)
     /// at 26% read as <i>"almost all of it"</i>.
     /// </para>
     /// <para>
-    /// <b>This pins the disclosure, not the encoding.</b> Whether area should mean lines of code at
-    /// all is A11 round 2's question — <c>PROTOCOL-a11-newcomer.md</c> §12 pre-registers the three
-    /// misreads and what each outcome decides. Until then the page says what it is doing rather
-    /// than hoping the reader compensates.
+    /// <b>The encoding question was answered by X11 and this pins what is left.</b> The mosaic no
+    /// longer opens the report — <see cref="ReachPlot"/> does, in counts — and what the mosaic
+    /// keeps is the claim that every analysed type is on the page. It still has to say that its
+    /// area means lines, because a reader comparing it with the plot above would otherwise find
+    /// them disagreeing with no way to tell which one was lying.
     /// </para>
     /// </remarks>
     [Fact]
@@ -272,8 +273,11 @@ public sealed class MosaicTests(CoreWalkFixture core)
         var page = HtmlReport.Render(
             core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
-        Assert.Contains("counting types", page, StringComparison.Ordinal);
+        Assert.Contains("Read it by count and not by area", page, StringComparison.Ordinal);
         Assert.Contains(
-            $"they cover {Math.Round(100 * marks.NamedInk):0}% of the picture", page, StringComparison.Ordinal);
+            $"{Math.Round(100 * marks.NamedInk):0}% of this drawing", page, StringComparison.Ordinal);
+        Assert.Contains(
+            $"{Math.Round(100.0 * marks.Named / core.Model.Types.Count):0}% of the types",
+            page, StringComparison.Ordinal);
     }
 }

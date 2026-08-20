@@ -13,6 +13,7 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="HtmlPath">Where to write the HTML report, or null for not at all.</param>
 /// <param name="DiagramPath">Where to write the architecture diagram as SVG, or null.</param>
 /// <param name="MosaicPath">Where to write the mosaic as SVG, or null.</param>
+/// <param name="PlotPath">Where to write the plot as SVG, or null.</param>
 /// <param name="Full">Whether the report enumerates every finding rather than leading with one per kind.</param>
 /// <remarks>
 /// The file outputs are <b>additions</b> to the terminal report rather than alternatives to it.
@@ -29,6 +30,7 @@ public sealed record Invocation(
     string? HtmlPath = null,
     string? DiagramPath = null,
     string? MosaicPath = null,
+    string? PlotPath = null,
     bool Full = false);
 
 /// <summary>
@@ -145,6 +147,7 @@ public static class CommandLine
         string? htmlPath = null;
         string? diagramPath = null;
         string? mosaicPath = null;
+        string? plotPath = null;
         var full = false;
 
         for (var i = 0; i < args.Count; i++)
@@ -195,6 +198,10 @@ public static class CommandLine
                 case "--mosaic":
                     mosaicPath = Path.GetFullPath(Next(args, ref i, arg));
                     continue;
+
+                case "--plot":
+                    plotPath = Path.GetFullPath(Next(args, ref i, arg));
+                    continue;
             }
 
             if (PropertyBehind(arg) is not null)
@@ -240,6 +247,7 @@ public static class CommandLine
             HtmlPath: htmlPath,
             DiagramPath: diagramPath,
             MosaicPath: mosaicPath,
+            PlotPath: plotPath,
             Full: full);
     }
 
@@ -264,6 +272,7 @@ public static class CommandLine
         yield return "  --html <file>              also write the shareable single-file report";
         yield return "  --diagram <file.svg>       also write the project map, for pasting into chat";
         yield return "  --mosaic <file.svg>        also write the mosaic: every type as one cell";
+        yield return "  --plot <file.svg>          also write the plot: projects by reach and density";
         yield return "  --full                     enumerate every finding instead of one per kind";
         yield return "  --version                  print the version and exit";
         yield return "";

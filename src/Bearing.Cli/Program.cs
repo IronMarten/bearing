@@ -136,6 +136,12 @@ internal static class Program
             Console.Error.WriteLine($"Wrote {mosaic}");
         }
 
+        if (invocation.PlotPath is { } plot)
+        {
+            ReachPlot.Write(plot, model, findings);
+            Console.Error.WriteLine($"Wrote {plot}");
+        }
+
         return 0;
     }
 

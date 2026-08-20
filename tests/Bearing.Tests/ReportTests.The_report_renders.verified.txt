@@ -1,7 +1,7 @@
 ﻿
 ================================================================
 BEARING {version} — TestBed.sln
-145 types in 3 projects. Unusual findings first, then structure.
+145 types — classes and interfaces — in 3 projects. Unusual findings first, then structure.
 Every claim shows the numbers behind it.
 ================================================================
 

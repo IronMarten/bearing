@@ -114,7 +114,9 @@ public static class Report
         yield return "================================================================";
         yield return $"BEARING {ToolInfo.ReadVersion(typeof(Report).Assembly)} — "
                      + Path.GetFileName(model.SolutionPath);
-        yield return $"{Sentences.Plural(model.Types.Count, "type")} in "
+        // Said once, with what it means — see Sentences.TypeKinds. Every count in this report is
+        // C# declarations, and the word on its own also reads as "kind of thing".
+        yield return $"{Sentences.Plural(model.Types.Count, "type")} — {Sentences.TypeKinds(model)} — in "
                      + $"{Sentences.Plural(model.Projects.Count, "project")}. "
                      + "Unusual findings first, then structure.";
         yield return "Every claim shows the numbers behind it.";
