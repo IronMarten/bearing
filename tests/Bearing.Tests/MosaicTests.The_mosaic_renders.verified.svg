@@ -1,14 +1,14 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 656" width="1000" height="656" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+﻿<svg xmlns="http://www.w3.org/2000/svg" class="mo" viewBox="0 0 1000 656" width="1000" height="656" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 <style>
-.bg{fill:#f4f3f0}
-.bl{fill:#e9e7e2}
-.c{fill:#c3c4c1}
-.n{fill:#c6bba4}
-.f{fill:#b4483c;stroke:#6f2820;stroke-width:1.5}
-.pn{font-size:11px;font-weight:600;fill:#4a4844}
-.ti{font-size:15px;font-weight:600;fill:#1a1a1a}
-.lg{font-size:11px;fill:#6b6b6b}
-@media(prefers-color-scheme:dark){.bg{fill:#16171a}.bl{fill:#212329}.c{fill:#42454b}.n{fill:#4d4738}.f{fill:#d9615a;stroke:#f2b3ae}.pn{fill:#a9a7a2}.ti{fill:#e9e8e6}.lg{fill:#9a9a97}}
+.mo .bg{fill:#f4f3f0}
+.mo .bl{fill:#e9e7e2}
+.mo .c{fill:#c3c4c1}
+.mo .n{fill:#c6bba4}
+.mo .f{fill:#b4483c;stroke:#6f2820;stroke-width:1.5}
+.mo .pn{font-size:11px;font-weight:600;fill:#4a4844}
+.mo .ti{font-size:15px;font-weight:600;fill:#1a1a1a}
+.mo .lg{font-size:11px;fill:#6b6b6b}
+@media(prefers-color-scheme:dark){.mo .bg{fill:#16171a}.mo .bl{fill:#212329}.mo .c{fill:#42454b}.mo .n{fill:#4d4738}.mo .f{fill:#d9615a;stroke:#f2b3ae}.mo .pn{fill:#a9a7a2}.mo .ti{fill:#e9e8e6}.mo .lg{fill:#9a9a97}}
 </style>
 <rect class="bg" width="1000" height="656"/>
 <text class="ti" x="2" y="18">TestBed</text>

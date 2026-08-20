@@ -29,6 +29,79 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     private string Page => HtmlReport.Render(core.Model, Analysis.FindingsFor(core.Model), Instant);
 
     /// <summary>
+    /// Every rule an inlined drawing brings with it is scoped to that drawing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §35. <b>An SVG <c>&lt;style&gt;</c> block inlined into HTML is
+    /// page-wide, not local to its drawing</b>, and the last one wins. The page inlines three —
+    /// the plot, the project map and the mosaic — so a class name used by two of them is one
+    /// silently restyling the other. It happened: the plot's label class was <c>nm</c>, which is
+    /// also the diagram's, and the two fought over font-size and weight.
+    /// </para>
+    /// <para>
+    /// <b>This is the assertion the defect existed for want of.</b> Each drawing was well-formed,
+    /// kept every element, and looked right when written standalone with <c>--mosaic</c> or
+    /// <c>--diagram</c> — so nothing in the suite could see it, and the only symptom was on the
+    /// composed page. Asserted here rather than in each drawing's own tests for the same reason:
+    /// the fault is a property of the page, and a drawing on its own cannot have it.
+    /// </para>
+    /// <para>
+    /// The rule is mechanical and so is the check: an inline <c>&lt;svg&gt;</c> carries a class on
+    /// its root, and every selector in its stylesheet begins with it. That also makes the next
+    /// drawing safe by construction rather than by everyone remembering.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Each_inlined_drawing_scopes_its_own_stylesheet()
+    {
+        var page = Page;
+        var drawings = Regex.Matches(page, @"<svg\b[^>]*>.*?</svg>", RegexOptions.Singleline);
+
+        Assert.True(drawings.Count >= 3, $"expected the page to inline three drawings, found {drawings.Count}");
+
+        var checkedAny = false;
+
+        foreach (Match drawing in drawings)
+        {
+            var style = Regex.Match(drawing.Value, @"<style>(.*?)</style>", RegexOptions.Singleline);
+            if (!style.Success) continue;
+
+            var root = Regex.Match(drawing.Value, @"<svg\b[^>]*\bclass=""([\w-]+)""");
+            Assert.True(
+                root.Success,
+                "An inlined drawing carries a stylesheet but no class on its root, so every rule in "
+                + "it applies to the whole page: " + Head(drawing.Value));
+
+            var prefix = "." + root.Groups[1].Value + " ";
+
+            // Selectors are what precede a declaration block; @media wrappers are stepped over.
+            var body = style.Groups[1].Value.Replace("@media(prefers-color-scheme:dark){", string.Empty);
+
+            foreach (Match rule in Regex.Matches(body, @"([^{}]+)\{"))
+            {
+                foreach (var selector in rule.Groups[1].Value.Split(','))
+                {
+                    var s = selector.Trim();
+                    if (s.Length == 0 || s.StartsWith('@')) continue;
+
+                    Assert.True(
+                        s.StartsWith(prefix, StringComparison.Ordinal),
+                        $"Rule \"{s}\" in the {root.Groups[1].Value} drawing is not scoped to \"{prefix.Trim()}\", "
+                        + "so it applies to the whole page and to the other drawings on it.");
+                    checkedAny = true;
+                }
+            }
+        }
+
+        // Guard against the loop passing by never running — every drawing having no stylesheet
+        // would satisfy every assertion above.
+        Assert.True(checkedAny, "no inlined drawing carried a stylesheet, so nothing was checked");
+    }
+
+    private static string Head(string svg) => svg.Length <= 120 ? svg : svg[..120] + "...";
+
+    /// <summary>
     /// The page with every section enumerated — <c>--full</c>.
     /// </summary>
     /// <remarks>

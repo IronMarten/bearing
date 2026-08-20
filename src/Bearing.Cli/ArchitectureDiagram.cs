@@ -71,17 +71,17 @@ public static class ArchitectureDiagram
         var height = placed.Max(p => p.Y + BoxHeight) + Margin;
 
         var svg = new StringBuilder();
-        svg.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" width=\"{width}\" height=\"{height}\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,sans-serif\">\n");
+        svg.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ad\" viewBox=\"0 0 {width} {height}\" width=\"{width}\" height=\"{height}\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,sans-serif\">\n");
         svg.Append("<style>\n");
-        svg.Append(".bx{fill:#fff;stroke:#c9c7c2;stroke-width:1.5}\n");
-        svg.Append(".bx.pain{fill:#fdf1e7;stroke:#c88a4a}\n");
-        svg.Append(".bx.useless{fill:#f2f1f6;stroke:#9a95b5}\n");
-        svg.Append(".bx.cycle{stroke:#b4483c;stroke-dasharray:5 3}\n");
-        svg.Append(".nm{font-size:13px;font-weight:600;fill:#1a1a1a}\n");
-        svg.Append(".sm{font-size:10.5px;fill:#6b6b6b}\n");
-        svg.Append(".ed{stroke:#c2c0bb;stroke-width:1.2;fill:none}\n");
-        svg.Append("@media(prefers-color-scheme:dark){.bx{fill:#1d1e22;stroke:#3c3f47}.bx.pain{fill:#2c2219;stroke:#c88a4a}");
-        svg.Append(".bx.useless{fill:#232230;stroke:#9a95b5}.nm{fill:#e9e8e6}.sm{fill:#9a9a97}.ed{stroke:#4a4d55}}\n");
+        svg.Append(".ad .bx{fill:#fff;stroke:#c9c7c2;stroke-width:1.5}\n");
+        svg.Append(".ad .bx.pain{fill:#fdf1e7;stroke:#c88a4a}\n");
+        svg.Append(".ad .bx.useless{fill:#f2f1f6;stroke:#9a95b5}\n");
+        svg.Append(".ad .bx.cycle{stroke:#b4483c;stroke-dasharray:5 3}\n");
+        svg.Append(".ad .nm{font-size:13px;font-weight:600;fill:#1a1a1a}\n");
+        svg.Append(".ad .sm{font-size:10.5px;fill:#6b6b6b}\n");
+        svg.Append(".ad .ed{stroke:#c2c0bb;stroke-width:1.2;fill:none}\n");
+        svg.Append("@media(prefers-color-scheme:dark){.ad .bx{fill:#1d1e22;stroke:#3c3f47}.ad .bx.pain{fill:#2c2219;stroke:#c88a4a}");
+        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .ed{stroke:#4a4d55}}\n");
         svg.Append("</style>\n");
 
         Edges(svg, placed);

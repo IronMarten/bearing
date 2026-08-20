@@ -103,24 +103,24 @@ public static class Mosaic
 
         var svg = new StringBuilder();
         svg.Append(CultureInfo.InvariantCulture,
-            $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {Width} {height}\" width=\"{Width}\" height=\"{height}\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,sans-serif\">\n");
+            $"<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"mo\" viewBox=\"0 0 {Width} {height}\" width=\"{Width}\" height=\"{height}\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,sans-serif\">\n");
         svg.Append("<style>\n");
         // The tint separates from the plain cell by HUE and not by weight, and that is the whole
         // repair. Findings cover 72% of the ink on a real solution, so a tint that is darker or
         // stronger becomes the foreground and the picture asserts what the one-mark version
         // asserted. Equal lightness, cool against warm: one texture at a glance, two populations on
         // inspection, and the only thing with contrast against both is the ten cells that matter.
-        svg.Append(".bg{fill:#f4f3f0}\n");
-        svg.Append(".bl{fill:#e9e7e2}\n");
-        svg.Append(".c{fill:#c3c4c1}\n");
-        svg.Append(".n{fill:#c6bba4}\n");
-        svg.Append(".f{fill:#b4483c;stroke:#6f2820;stroke-width:1.5}\n");
-        svg.Append(".pn{font-size:11px;font-weight:600;fill:#4a4844}\n");
-        svg.Append(".ti{font-size:15px;font-weight:600;fill:#1a1a1a}\n");
-        svg.Append(".lg{font-size:11px;fill:#6b6b6b}\n");
-        svg.Append("@media(prefers-color-scheme:dark){.bg{fill:#16171a}.bl{fill:#212329}");
-        svg.Append(".c{fill:#42454b}.n{fill:#4d4738}.f{fill:#d9615a;stroke:#f2b3ae}");
-        svg.Append(".pn{fill:#a9a7a2}.ti{fill:#e9e8e6}.lg{fill:#9a9a97}}\n");
+        svg.Append(".mo .bg{fill:#f4f3f0}\n");
+        svg.Append(".mo .bl{fill:#e9e7e2}\n");
+        svg.Append(".mo .c{fill:#c3c4c1}\n");
+        svg.Append(".mo .n{fill:#c6bba4}\n");
+        svg.Append(".mo .f{fill:#b4483c;stroke:#6f2820;stroke-width:1.5}\n");
+        svg.Append(".mo .pn{font-size:11px;font-weight:600;fill:#4a4844}\n");
+        svg.Append(".mo .ti{font-size:15px;font-weight:600;fill:#1a1a1a}\n");
+        svg.Append(".mo .lg{font-size:11px;fill:#6b6b6b}\n");
+        svg.Append("@media(prefers-color-scheme:dark){.mo .bg{fill:#16171a}.mo .bl{fill:#212329}");
+        svg.Append(".mo .c{fill:#42454b}.mo .n{fill:#4d4738}.mo .f{fill:#d9615a;stroke:#f2b3ae}");
+        svg.Append(".mo .pn{fill:#a9a7a2}.mo .ti{fill:#e9e8e6}.mo .lg{fill:#9a9a97}}\n");
         svg.Append("</style>\n");
 
         svg.Append(CultureInfo.InvariantCulture, $"<rect class=\"bg\" width=\"{Width}\" height=\"{height}\"/>\n");
