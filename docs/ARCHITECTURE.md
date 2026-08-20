@@ -424,6 +424,8 @@ decision from whether it is versioned.
 | The probe was kept verbatim as a diff oracle, then retired at R2 | this document, §1 — it had verified P7 and P8 on the day it went, and what it proved is recorded in `docs/TESTING.md` rather than left to be re-derived |
 | Conventions are build errors, not warnings | `Directory.Build.props` |
 | A finding is identified by `(kind, subject)` and nothing else | §4, `FindingKey` |
+| The layer-span floor stays at 3 | X4, taken 2026-08-20 — §11 carries the distribution. At 2 the finding is 2.9% of nopCommerce against 0.2%, and the 57 types it would admit are mostly controller-to-repository. Rarest-first selection needs it rare |
+| Comparative gates rank; absolute gates stay absolute and say why | X13, taken 2026-08-20. A rank gate always fires — every codebase has a top 5% — so it can never report a healthy codebase. jellyfin has 1.5x fewer types than nopCommerce and nearly as many hubs; the absolute gate says so and a percentile gate would erase it |
 | A projection takes what it reads, never the whole model | the structural review after R2. `SolutionModel` memoises seven projections and calls each one; four of them took the model back, which made `SolutionModel` <-> projection a two-cycle each and the four of them one five-type tangle through the hub. `ProjectCoupling` and `ProjectReachability` had already chosen the other way, for testability — a projection that takes a model cannot be tested without a workspace load, because the model's constructor is internal |
 | A type is identified by `(assembly, FQN)`, never by name alone | §4, `SubjectRef` — .NET permits one FQN in two assemblies and plugin architectures use it deliberately; keying on the name merges the rows and sums their metrics |
 | The SDK is pinned | `global.json` — an unpinned toolchain picks the newest SDK on the machine, which made CI build a net8.0 project with .NET 10 and fail on rules no developer machine had |
@@ -473,7 +475,8 @@ the private `TECHREQ-job-a.md` §10.
 Distinct from [`DEFECTS.md`](DEFECTS.md): that is behaviour known to be wrong, with a remedy
 already understood. These are questions with no answer yet.
 
-- **Whether `SignificantKinds` stays at three.** There are exactly three and `--min-kind-span`
+- **~~Whether `SignificantKinds` stays at three.~~ Answered — X4, and the floor stays at 3.** Kept
+  here because the measurement is the reusable part. There are exactly three and `--min-kind-span`
   is 3, so every spanning type necessarily carries the same signature: the `GroupBy` in
   `PrintLayerSpan` is written for a generality that cannot occur. Ties into the edge-kind
   taxonomy, and into `DEFECTS.md` §11 — a richer taxonomy would separate the anomaly from the
@@ -504,10 +507,5 @@ already understood. These are questions with no answer yet.
 
   **A plant cannot settle this and a measurement did**, which is `TASKS.md`'s X4 entry being wrong
   about its own blocker rather than about its subject.
-- **Thresholds global, or calibrated per codebase.** `DEFECTS.md` §2 narrows it and now carries
-  the measurement: one absolute threshold, `HubMin = 5`, is 3.6% of nopCommerce and 6.9% of
-  jellyfin. **This is `TASKS.md` X13**, lifted out of §2 on 2026-08-20 — it had sat on the defect
-  register, whose entry condition is a remedy already understood, and was deferred five times
-  because it does not have one.
 - **Dead code at member level or types only.** Far more useful, far more false-positive
   prone.
