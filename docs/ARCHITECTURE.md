@@ -478,6 +478,32 @@ already understood. These are questions with no answer yet.
   `PrintLayerSpan` is written for a generality that cannot occur. Ties into the edge-kind
   taxonomy, and into `DEFECTS.md` §11 — a richer taxonomy would separate the anomaly from the
   boilerplate that currently hides it.
+
+  **Measured 2026-08-20, on both reference solutions, and it separates two claims that had been
+  travelling as one.** Kinds reached counting the type's own role, after `DEFECTS.md` §5:
+
+  | kinds reached | nopCommerce (3,209) | jellyfin (1,545) |
+  |---|---|---|
+  | 3 — the current floor | **5** (0.2%) | **2** (0.1%) |
+  | 2 | 88 | 12 |
+  | signatures at 2+ | `ApiBoundary+DataAccess` 57, `ApiBoundary+ExternalCall` 31, all three 5 | `ApiBoundary+ExternalCall` 7, `ApiBoundary+DataAccess` 5, all three 2 |
+
+  Reproduces the tool's own counts at the current floor exactly, which is what makes the other
+  rows credible — one parameter moved, same method.
+
+  **The signature claim above holds**: every firing type spans all three, on both solutions, so
+  nothing can distinguish them by signature. **The claim that the floor cannot discriminate does
+  not.** Dropping it to 2 takes nopCommerce from 5 findings to 93 and jellyfin from 2 to 14. It is
+  the most consequential filter in the finding, not decoration.
+
+  **So the choice is not "a fourth kind or admit the floor is decoration".** It is whether the
+  finding means *"reaches all three layers"* — rare, 0.1–0.2%, and what ships — or *"reaches across
+  layers at all"*, which at 2 admits `ApiBoundary+DataAccess`: a boundary reaching straight into
+  the database, which is the layering violation most developers would name first. At 2 the
+  `GroupBy` also has three real signatures rather than one.
+
+  **A plant cannot settle this and a measurement did**, which is `TASKS.md`'s X4 entry being wrong
+  about its own blocker rather than about its subject.
 - **Thresholds global, or calibrated per codebase.** `DEFECTS.md` §2 narrows it and now carries
   the measurement: one absolute threshold, `HubMin = 5`, is 3.6% of nopCommerce and 6.9% of
   jellyfin. **This is `TASKS.md` X13**, lifted out of §2 on 2026-08-20 — it had sat on the defect
