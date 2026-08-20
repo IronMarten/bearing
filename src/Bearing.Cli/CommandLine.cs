@@ -92,6 +92,7 @@ public static class CommandLine
         (nameof(AnalysisPolicy.ConcealedFanOutCeiling), (p, v) => p with { ConcealedFanOutCeiling = v }),
         (nameof(AnalysisPolicy.BlastFanInMultiple), (p, v) => p with { BlastFanInMultiple = v }),
         (nameof(AnalysisPolicy.BlastTopFraction), (p, v) => p with { BlastTopFraction = v }),
+        (nameof(AnalysisPolicy.BoundaryTopFraction), (p, v) => p with { BoundaryTopFraction = v }),
         (nameof(AnalysisPolicy.BlastComplexityPercentile), (p, v) => p with { BlastComplexityPercentile = v }),
         (nameof(AnalysisPolicy.ChangeCostTopFraction), (p, v) => p with { ChangeCostTopFraction = v }),
         (nameof(AnalysisPolicy.RollCallDivisor), (p, v) => p with { RollCallDivisor = (int)v }),

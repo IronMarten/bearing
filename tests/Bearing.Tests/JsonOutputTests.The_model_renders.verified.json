@@ -23,6 +23,7 @@
     "concealedFanInCeiling": 2,
     "concealedFanOutCeiling": 2,
     "blastFanInMultiple": 2,
+    "boundaryTopFraction": 0.05,
     "blastTopFraction": 0.05,
     "blastComplexityPercentile": 70,
     "changeCostTopFraction": 0.05,

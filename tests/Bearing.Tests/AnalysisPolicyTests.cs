@@ -30,6 +30,7 @@ public sealed class AnalysisPolicyTests
         // docs/DEFECTS.md §14 was decided, because the gate it names is no longer a percentile.
         // The literal it replaced is still one of the thirteen.
         "BlastTopFraction",
+        "BoundaryTopFraction",
         "BlastComplexityPercentile",
         "IsolatedThreshold",
         "BreaksAloneMinFanIn",
@@ -56,7 +57,7 @@ public sealed class AnalysisPolicyTests
     /// </remarks>
     [Fact]
     public void The_policy_carries_the_number_of_values_the_inventory_was_run_over() =>
-        Assert.Equal(27, AnalysisPolicy.Default.Values.Count);
+        Assert.Equal(28, AnalysisPolicy.Default.Values.Count);
 
     /// <summary>
     /// Every named threshold can be moved from the command line.

@@ -84,6 +84,42 @@ public sealed record AnalysisPolicy
     /// </remarks>
     public int ConcealedTopRank { get; init; } = 3;
 
+    /// <summary>
+    /// How far down the boundary population a type may sit and still be said to carry real logic.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The gate this joined was absolute and did not discriminate.</b> <c>MaxMemberCyclomatic
+    /// &gt;= HighCc</c> on its own fires on <b>19.5% of nopCommerce's 672 boundaries and 33.3% of
+    /// jellyfin's 174</b> — and a claim made about a third of the population it filters is
+    /// describing that population rather than finding an anomaly in it. The same constant also
+    /// means different things per solution: <c>HighCc = 10</c> is 5x the boundary median on
+    /// nopCommerce and 2x on jellyfin, and nothing in the output said so.
+    /// <c>MEASURE-concealed-decision.md</c> §10.
+    /// </para>
+    /// <para>
+    /// <b>The rule it broke is written twelve lines below it in its own file.</b>
+    /// <see cref="BoundaryMarking.WidestSurfaces"/> carries the sibling principle — a section
+    /// prints only when it discriminates — and it was articulated for that finding and never
+    /// applied to this one.
+    /// </para>
+    /// <para>
+    /// <b>A fraction rather than a fixed rank, because the population is the boundaries and a
+    /// proportion of them is the claim</b> — the same reading <see cref="BlastTopFraction"/> and
+    /// <see cref="ChangeCostTopFraction"/> take, and the opposite of
+    /// <see cref="ConcealedTopRank"/>, whose population is one cohort of wildly varying size.
+    /// Measured at this value: <b>34 of nopCommerce's boundaries and 9 of jellyfin's</b>, against
+    /// 131 and 58.
+    /// </para>
+    /// <para>
+    /// <b>The absolute floor stays and is not redundant.</b> Rank alone would nominate the top 5%
+    /// of boundaries however tame they are — <c>docs/ARCHITECTURE.md</c> §9's gate that cannot
+    /// fail. A solution whose boundaries are all thin still reports nothing here, which is the
+    /// answer rather than an empty section.
+    /// </para>
+    /// </remarks>
+    public double BoundaryTopFraction { get; init; } = 0.05;
+
     // ------------------------------------------------------------------ shape ----
 
     /// <summary>Fan-in and fan-out both at or above this is a hub.</summary>
@@ -306,6 +342,7 @@ public sealed record AnalysisPolicy
         (nameof(ConcealedFanInCeiling), ConcealedFanInCeiling),
         (nameof(ConcealedFanOutCeiling), ConcealedFanOutCeiling),
         (nameof(BlastFanInMultiple), BlastFanInMultiple),
+        (nameof(BoundaryTopFraction), BoundaryTopFraction),
         (nameof(BlastTopFraction), BlastTopFraction),
         (nameof(BlastComplexityPercentile), BlastComplexityPercentile),
         (nameof(ChangeCostTopFraction), ChangeCostTopFraction),
@@ -371,6 +408,9 @@ public sealed record AnalysisPolicy
         // upper bound matters more than it looks: this gate is the only thing keeping blast
         // radius self-limiting, and a fraction of 2 would silently turn it into a roll-call of
         // every type clearing the other three conditions.
+        if (BoundaryTopFraction is <= 0 or > 1)
+            throw new ArgumentOutOfRangeException(nameof(BoundaryTopFraction), BoundaryTopFraction, "BoundaryTopFraction is a share of the boundary population and must be within 0..1.");
+
         if (BlastTopFraction > 1)
             throw new ArgumentOutOfRangeException(nameof(BlastTopFraction), BlastTopFraction, "BlastTopFraction is a share of a cohort and must be within 0..1.");
 

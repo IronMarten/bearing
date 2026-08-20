@@ -294,16 +294,54 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     // ------------------------------------------------------------- boundary marking ----
 
     /// <summary>
-    /// Boundaries carrying real logic are the probe's, read off the section's own subsection.
+    /// <b>Defect 33, fixed.</b> The probe names two boundaries; Core names one, because the second
+    /// is not unusual among boundaries.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The fifth deliberate divergence, and it applies this file's other half's rule to its
+    /// first half.</b> §3.10 says a section prints only when it discriminates — the principle
+    /// <see cref="BoundaryMarking.WidestSurfaces"/> was built on, twelve lines below a gate that
+    /// never received it. On its own, <c>maxMemberCyclomatic &gt;= HighCc</c> fires on
+    /// <b>19.5% of nopCommerce's 672 boundaries and 33.3% of jellyfin's 174</b>, and a claim made
+    /// about a third of the population it filters is describing that population.
+    /// </para>
+    /// <para>
+    /// <b>The floor stays, so this can still find nothing</b>, and the rank is what makes the
+    /// selectivity explicit and equal across codebases. On the fixture the boundary population is
+    /// small enough that the top share rounds to one, which is the same floor
+    /// <see cref="Distribution.TopRankLimit"/> gives blast radius and change cost.
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void Boundaries_carrying_real_logic_are_the_probes()
+    public void The_boundary_set_is_narrower_than_the_probes_where_it_did_not_discriminate()
     {
         var expected = ProbeNominations("   BOUNDARIES CARRYING REAL LOGIC", stopAt: "WIDEST");
         var actual = CoreTypeNominations(FindingKind.BoundaryCarriesLogic);
 
-        Assert.Equal(expected, actual);
-        Assert.Equal(["ReconciliationController", "ShipmentController"], actual);
+        Assert.Equal(["ReconciliationController", "ShipmentController"], expected);
+        Assert.Equal(["ShipmentController"], actual);
+    }
+
+    /// <summary>
+    /// The boundary rank is a gate in both directions.
+    /// </summary>
+    /// <remarks>
+    /// The control the absolute form never had: widening the share brings the probe's second
+    /// boundary back, and narrowing it does not empty the finding, because the floor decides that.
+    /// A gate whose other branch cannot be reached is <c>docs/ARCHITECTURE.md</c> §9's, and this
+    /// is the assertion that says which of the two conditions is doing the work on this fixture.
+    /// </remarks>
+    [Fact]
+    public void The_boundary_rank_is_reachable_from_both_sides()
+    {
+        Assert.Equal(
+            ["ReconciliationController", "ShipmentController"],
+            BoundariesUnder(core.Model.Policy with { BoundaryTopFraction = 0.5 }));
+
+        // And the floor is what makes an empty answer possible at all: no boundary on this fixture
+        // reaches cc 40, so the rank gate has nothing to admit however wide it is opened.
+        Assert.Empty(BoundariesUnder(core.Model.Policy with { BoundaryTopFraction = 1, HighCc = 40 }));
     }
 
     /// <summary>
@@ -1181,6 +1219,18 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     /// cohort assignment reads the policy during the walk, so a policy is a model rather than a
     /// view.
     /// </remarks>
+    private static List<string> BoundariesUnder(AnalysisPolicy policy)
+    {
+        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        return Analysis.FindingsFor(model)
+            .OfKind(FindingKind.BoundaryCarriesLogic)
+            .Select(f => model.Find(f.Subject)!.Name)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+    }
+
     private static List<string> SurfacesUnder(AnalysisPolicy policy)
     {
         var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })

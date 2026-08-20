@@ -88,6 +88,7 @@ public sealed class PolicySweepTests(CoreWalkFixture core)
 
         // Shares of a population, where a notch of 0.1 would be a doubling.
         [nameof(AnalysisPolicy.BlastTopFraction)] = 0.01,
+        [nameof(AnalysisPolicy.BoundaryTopFraction)] = 0.01,
         [nameof(AnalysisPolicy.ChangeCostTopFraction)] = 0.01,
     };
 
@@ -194,6 +195,7 @@ public sealed class PolicySweepTests(CoreWalkFixture core)
         nameof(AnalysisPolicy.ConcealedFanOutCeiling) => policy with { ConcealedFanOutCeiling = v },
         nameof(AnalysisPolicy.BlastFanInMultiple) => policy with { BlastFanInMultiple = v },
         nameof(AnalysisPolicy.BlastTopFraction) => policy with { BlastTopFraction = v },
+        nameof(AnalysisPolicy.BoundaryTopFraction) => policy with { BoundaryTopFraction = v },
         nameof(AnalysisPolicy.BlastComplexityPercentile) => policy with { BlastComplexityPercentile = v },
         nameof(AnalysisPolicy.ChangeCostTopFraction) => policy with { ChangeCostTopFraction = v },
         nameof(AnalysisPolicy.RollCallDivisor) => policy with { RollCallDivisor = (int)v },

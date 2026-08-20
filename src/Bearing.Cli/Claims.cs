@@ -195,23 +195,62 @@ public static class Claims
             "");
     }
 
+    /// <summary>
+    /// The claim leads with the rank, because the rank is what the gate decided.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §34, and the measurement moved the diagnosis.</b> The register
+    /// recorded this as <i>cohorts are too big to be peers</i> — <i>"93x the median of its 2,909
+    /// peers"</i> about a group holding 53% of the solution's methods. Measured, size is not what
+    /// breaks the claim: <b>58 of nopCommerce's 70 usable cohorts have a method median of 1 or
+    /// 0</b>, so the ratio is the subject's own complexity divided by one. The two largest ratios
+    /// on that solution come from cohorts with a median of 1, and the 1,022-method cohort with a
+    /// median of 3 produces the <i>smallest</i>.
+    /// </para>
+    /// <para>
+    /// <b>So the sentence says what was measured.</b> <c>b5cc69a</c> made this a rank gate and the
+    /// wording kept leading with the ratio — the same mistake as <c>docs/DEFECTS.md</c> §28, where
+    /// a section sorted on the multiple and opened on the percentile. Rank is a true statement
+    /// about a peer group of any size: <i>the most complex of 2,909 methods</i> is checkable, and
+    /// does not collapse when the median sits on the floor.
+    /// </para>
+    /// <para>
+    /// <b>The two numbers are stated side by side rather than as their ratio</b>, so a median of 1
+    /// is visible instead of hidden inside a multiplication. The ratio is still a gate and still a
+    /// receipt; what it is not any more is the claim.
+    /// </para>
+    /// <para>
+    /// <b>And the population is counted in the right units.</b> The old sentence read
+    /// <i>"its 2,909 peers"</i> off <c>CohortSize</c>, which counts <b>methods</b> — the group is
+    /// 193 types. Both numbers are said now, because a reader who checks either one against the
+    /// cohort would otherwise find the tool wrong.
+    /// </para>
+    /// <para>
+    /// <b>Type-level concealed decision keeps the ratio wording deliberately</b>: its gate is still
+    /// the multiple, so leading on it is honest there. The two sentences differ because the two
+    /// gates do — <c>TASKS.md</c>, D2.
+    /// </para>
+    /// </remarks>
     private static Claim ConcealedMethod(SolutionModel model, Finding finding)
     {
         var (type, member) = Member(model, finding.Subject);
         if (type is null || member is null) return Claim.None;
 
-        var times = finding.ValueOf("CyclomaticXMedian") ?? 0;
-        var peers = finding.ValueOf("CohortSize") ?? 0;
+        var rank = finding.ValueOf("CyclomaticRank") ?? 1;
+        var methods = finding.ValueOf("CohortSize") ?? 0;
+        var median = finding.ValueOf("MedianCohortCyclomatic") ?? 0;
 
-        var basis = double.IsInfinity(times)
-            ? "the only complexity among its "
-            : $"{Sentences.Number(times)}x the median complexity of its ";
+        var standing = rank <= 1
+            ? "the most complex"
+            : $"among the {Sentences.Whole(Math.Ceiling(rank))} most complex";
 
         return new Claim(
             Sentences.Member(type.Name, member.Name),
-            $"{basis}{Sentences.Whole(peers)} peers",
-            $"cc {member.Cyclomatic}, dsm {member.Dsm}, nesting {member.MaxNestingDepth}, "
-            + $"{member.LinesOfCode} lines",
+            $"{standing} of the {Sentences.Plural(methods, "method")} in "
+            + $"{Sentences.PeerGroup(type.Cohort, type.CohortSize)}.",
+            $"cc {member.Cyclomatic} against a peer median of {Sentences.Number(median)}; "
+            + $"dsm {member.Dsm}, nesting {member.MaxNestingDepth}, {member.LinesOfCode} lines",
             $"{Path.GetFileName(member.Location.File)}:{member.Location.Line}");
     }
 
@@ -399,15 +438,33 @@ public static class Claims
             "");
     }
 
+    /// <summary>
+    /// A boundary carrying decisions, with the population it was judged against.
+    /// </summary>
+    /// <remarks>
+    /// <b>The evidence line is new with <c>docs/DEFECTS.md</c> §33 and the gap was old.</b> This
+    /// claim carried no numbers at all, which was invisible while every card was the same size and
+    /// became the whole of the lead card the moment the rank gate made this the rarest kind on the
+    /// fixture — the same hole layer span had, found the same way. What it states is the pair the
+    /// gate reads: where the type sits among the boundaries, and what the median boundary looks
+    /// like, so <i>"cc 14"</i> is a comparison rather than a number.
+    /// </remarks>
     private static Claim BoundaryLogic(SolutionModel model, Finding finding)
     {
         if (model.Find(finding.Subject) is not { } type) return Claim.None;
+
+        var boundaries = finding.ValueOf("BoundaryCount") ?? 0;
+        var median = finding.ValueOf("MedianBoundaryCyclomatic") ?? 0;
 
         return new Claim(
             type.Name,
             $"{type.MostComplexMember?.Name} is cc {type.MaxMemberCyclomatic}. "
             + "Business decisions at an external edge are the hardest kind to change later.",
-            "",
+            boundaries > 0
+                ? $"among the most complex of this solution's {Sentences.Whole(boundaries)} "
+                  + $"{Sentences.Do(boundaries, "boundary", "boundaries")}, where the median is "
+                  + $"cc {Sentences.Number(median)}"
+                : "",
             "");
     }
 

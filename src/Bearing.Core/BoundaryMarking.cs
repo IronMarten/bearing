@@ -33,26 +33,66 @@ public static class BoundaryMarking
 
     /// <summary>Boundaries with real decisions inside them.</summary>
     /// <remarks>
+    /// <para>
     /// Decisions at an external edge are the hardest kind to change later: the consumers are on
     /// the other side of the boundary, so the tool cannot see who depends on the behaviour and
     /// neither, usually, can the team.
+    /// </para>
+    /// <para>
+    /// <b>Two conditions, and the second one is <c>docs/DEFECTS.md</c> §33.</b> The complexity
+    /// floor alone fired on <b>19.5% of nopCommerce's 672 boundaries and 33.3% of jellyfin's
+    /// 174</b> — a claim about a third of the population it filters is describing that population,
+    /// not finding an anomaly in it, and <i>"boundaries carrying real logic"</i> said about a third
+    /// of all boundaries is close to saying <i>"boundaries"</i>. The rank condition makes the
+    /// selectivity explicit and constant across codebases: <b>34 on nopCommerce and 9 on
+    /// jellyfin</b>.
+    /// </para>
+    /// <para>
+    /// <b>The rule is the one written for this file's other half.</b>
+    /// <see cref="WidestSurfaces"/> carries it — a section prints only when it discriminates —
+    /// and it was articulated there and never applied here, immediately above it.
+    /// </para>
+    /// <para>
+    /// <b>The floor stays, and it is what lets this find nothing.</b> A rank gate on its own
+    /// nominates the top 5% of boundaries however tame they all are, which is
+    /// <c>docs/ARCHITECTURE.md</c> §9's gate that cannot fail. Both conditions are gated receipts,
+    /// so a reader can see which one a boundary cleared and which one kept it out.
+    /// </para>
     /// </remarks>
     public static IEnumerable<Finding> CarryingRealLogic(SolutionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
 
         var policy = model.Policy;
+        var boundaries = model.Types.Where(IsBoundary).ToList();
+        if (boundaries.Count == 0) return [];
+
+        // The population is the boundaries, which is the set the claim is about — measured over
+        // the whole solution it would be a different gate, and one that says nothing about how
+        // unusual a boundary is among boundaries.
+        var logic = Distribution.Of(boundaries.Select(type => (double)type.MaxMemberCyclomatic));
+        var topRank = logic.TopRankLimit(policy.BoundaryTopFraction);
+
         var found = new List<(int Complexity, Finding Finding)>();
 
-        foreach (var type in model.Types)
+        foreach (var type in boundaries)
         {
-            if (!IsBoundary(type)) continue;
             if (type.MaxMemberCyclomatic < policy.HighCc) continue;
+
+            var rank = logic.RankOf(type.MaxMemberCyclomatic);
+            if (rank > topRank) continue;
 
             found.Add((type.MaxMemberCyclomatic, new Finding(
                 new FindingKey(FindingKind.BoundaryCarriesLogic, type.Subject),
                 [
                     Receipt.Gated("MaxMemberCyclomatic", type.MaxMemberCyclomatic, nameof(AnalysisPolicy.HighCc)),
+                    Receipt.Gated("MaxMemberCyclomaticRank", rank, nameof(AnalysisPolicy.BoundaryTopFraction)),
+                    // The limit and the population it was taken over, for the reason BlastRadius
+                    // gives: a rank alone does not say what it had to beat, and it moves with the
+                    // number of boundaries rather than with the policy.
+                    Receipt.Of("BoundaryTopRankLimit", topRank),
+                    Receipt.Of("BoundaryCount", boundaries.Count),
+                    Receipt.Of("MedianBoundaryCyclomatic", logic.Median),
                     Receipt.Of("DataShape", type.DataShape),
                     Receipt.Of("FanIn", type.FanIn),
                     Receipt.Of("FanOut", type.FanOut),

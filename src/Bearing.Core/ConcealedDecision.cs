@@ -90,6 +90,12 @@ public static class ConcealedDecision
                         Receipt.Gated("Cyclomatic", member.Cyclomatic, nameof(AnalysisPolicy.MinDecisionCc)),
                         Receipt.Gated("CyclomaticXMedian", reading.TimesMedian, nameof(AnalysisPolicy.OutlierFactor)),
                         Receipt.Gated("CyclomaticRank", reading.Rank, nameof(AnalysisPolicy.ConcealedTopRank)),
+                        // The median the ratio was taken against, which is the half of this gate a
+                        // reader cannot otherwise see — WidestSurfaces' precedent. It matters more
+                        // here than there: on nopCommerce 58 of 70 usable cohorts have a method
+                        // median of 1 or 0, so "93x the median" is "cc 93 against a median of 1"
+                        // and the multiplication hides which of the two numbers is doing the work.
+                        Receipt.Of("MedianCohortCyclomatic", complexity.Median),
                         Receipt.Of("CyclomaticPctl", reading.Percentile),
                         Receipt.Of("Dsm", member.Dsm),
                         Receipt.Of("MaxNestingDepth", member.MaxNestingDepth),

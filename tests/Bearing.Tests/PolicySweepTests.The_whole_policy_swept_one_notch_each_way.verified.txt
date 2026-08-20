@@ -19,6 +19,7 @@ BreaksAloneMinFanIn                  1       1   moves      moves
 ConcealedFanInCeiling                2     0.1   -          -
 ConcealedFanOutCeiling               2     0.1   moves      -
 BlastFanInMultiple                   2     0.1   -          -
+BoundaryTopFraction               0.05    0.01   -          -
 BlastTopFraction                  0.05    0.01   -          -
 BlastComplexityPercentile           70       1   -          -
 ChangeCostTopFraction             0.05    0.01   -          moves
