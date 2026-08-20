@@ -1,4 +1,3 @@
-using ArchProbe;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
@@ -88,10 +87,11 @@ public sealed class AnalysisPolicyTests
     [InlineData("MinFanIn", "--min-fan-in")]
     [InlineData("GodObjectMembers", "--god-object-members")]
     [InlineData("SurfaceOutlierMultiple", "--surface-outlier-multiple")]
-    public void Flag_names_are_derived_from_the_property_and_match_the_probes(string property, string flag)
+    public void Flag_names_are_derived_from_the_property_and_match_the_spellings_users_know(string property, string flag)
     {
         // The derivation is the point: the flag cannot drift from the property because it is not
-        // written down twice. These cases pin the rule against the spellings users already know.
+        // written down twice. These cases pin the rule against the spellings users already know —
+        // the probe's, originally, and now the ones in README.md and in anyone's shell history.
         Assert.Equal(flag, CommandLine.FlagFor(property));
     }
 
@@ -114,33 +114,43 @@ public sealed class AnalysisPolicyTests
         Assert.All(PreviouslyUnnamed, gate => Assert.Contains(gate, named));
     }
 
+    /// <summary>
+    /// The eleven thresholds that predate the policy still hold the values they were tuned to.
+    /// </summary>
+    /// <remarks>
+    /// <b>This was a comparison and is now a statement, which is R2 arriving here.</b> Until the
+    /// probe was retired it asserted the probe's default against the policy's, eleven times, and
+    /// what it caught was one of the two being retuned without the other. There is no other any
+    /// more, so the literals below were transcribed from the probe's options on the day it was
+    /// deleted and are now the defaults' only witness. A retune is meant to change this file —
+    /// that is the whole of what it asks — but it can no longer happen by accident in a place
+    /// nobody looked.
+    /// </remarks>
     [Fact]
-    public void The_flags_that_already_existed_match_the_probe_exactly()
+    public void The_flags_that_already_existed_hold_the_values_they_were_tuned_to()
     {
-        // Mechanical, and the point: if someone retunes a flag in one place and not the other,
-        // the policy stops describing the run it claims to describe.
-        var probe = new Options();
         var policy = AnalysisPolicy.Default;
 
-        Assert.Equal(probe.MinCohort, policy.MinCohort);
-        Assert.Equal(probe.OutlierFactor, policy.OutlierFactor);
-        Assert.Equal(probe.MinFanIn, policy.MinFanIn);
-        Assert.Equal(probe.StableThreshold, policy.StableThreshold);
-        Assert.Equal(probe.HighCc, policy.HighCc);
-        Assert.Equal(probe.MinDecisionCc, policy.MinDecisionCc);
-        Assert.Equal(probe.HubMin, policy.HubMin);
-        Assert.Equal(probe.GodObjectMembers, policy.GodObjectMembers);
-        Assert.Equal(probe.MinKindSpan, policy.MinKindSpan);
-        Assert.Equal(probe.MinTangle, policy.MinTangle);
-        Assert.Equal(probe.Top, policy.Top);
+        Assert.Equal(5, policy.MinCohort);
+        Assert.Equal(3.0, policy.OutlierFactor);
+        Assert.Equal(5, policy.MinFanIn);
+        Assert.Equal(0.2, policy.StableThreshold);
+        Assert.Equal(10, policy.HighCc);          // McCabe's conventional "worth a look"
+        Assert.Equal(5, policy.MinDecisionCc);    // below this, concealed decision contradicts itself
+        Assert.Equal(5, policy.HubMin);           // fan-in AND fan-out both at or above
+        Assert.Equal(20, policy.GodObjectMembers);
+        Assert.Equal(3, policy.MinKindSpan);      // architectural kinds a component reaches across
+        Assert.Equal(4, policy.MinTangle);        // mutual pairs and triples are ordinary C#
+        Assert.Equal(15, policy.Top);
     }
 
     [Fact]
-    public void The_thirteen_carry_the_values_the_probe_gates_on()
+    public void The_thirteen_carry_the_values_they_were_extracted_from()
     {
-        // Transcribed from the conditions in Report.cs. Behavioural coverage of these gates
-        // lives in SuppressionTests and the goldens; this pins the transcription itself, which
-        // is the step where a hunt through 997 lines can quietly get one wrong.
+        // Transcribed from the conditions in the probe's Report.cs, where each was a literal
+        // inline in its gate. Behavioural coverage lives in SuppressionTests; this pins the
+        // transcription itself, which is the step where a hunt through 997 lines can quietly
+        // get one wrong. The trailing comment on each line is the condition it came from.
         var p = AnalysisPolicy.Default;
 
         Assert.Equal(2.0, p.ConcealedFanInCeiling);              // FanInXMedian <= 2.0
@@ -160,10 +170,11 @@ public sealed class AnalysisPolicyTests
     }
 
     [Fact]
-    public void The_derived_gates_reproduce_the_probes_arithmetic()
+    public void The_derived_gates_reproduce_the_arithmetic_they_replaced()
     {
-        // The two that are relations rather than constants. Reproduced here against the
-        // formulas they replace, at the defaults and away from them.
+        // The two that are relations rather than constants. Reproduced against the formulas
+        // they replace — written out longhand at each call site in the probe — at the
+        // defaults and away from them.
         var p = AnalysisPolicy.Default;
 
         Assert.Equal(p.Top / 3, p.RollCallThreshold);
