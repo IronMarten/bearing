@@ -720,6 +720,22 @@ the card's strongest position renders a claim the fixture never puts there:
 > more than it should, which is `MEASURE-concealed-decision.md`'s defect class one level up. The
 > design number was right about the shape and the rule is right about the size.
 
+**The fifth real run, at X11, and this one changed the artifact rather than a number.** The mosaic
+was correct cell by cell and the suite had nothing to say about it, because what it got wrong is a
+*reading*:
+
+| Found | Why the fixture could not show it |
+|---|---|
+| **The picture inverted the two projects that matter.** By tinted area it ranks `Nop.Services` › `Nop.Web` › `Nop.Web.Framework`; by the quantity every claim uses — counts of types — the order is `Nop.Web.Framework` (29%) › `Nop.Services` (26%) › `Nop.Web` (12%). `Nop.Web` carries the joint-most findings and the most ink and is the **least dense of the five, with 31 dependents**: the leaf, and by the reader's own logic the safest place to work | **the fixture has three projects and one of them holds 94% of the lines.** A rank inversion needs enough projects to have an order, and a correlation between area and count needs a population to appear in. On TestBed the picture and the counts agree by accident of scale |
+| **Label placement needed a second solution to exercise at all.** nopCommerce has five depended-on projects and every name fits; **jellyfin has twenty, places eleven and discloses nine**. The disclosure arm — `DEFECTS.md` §31's rule in a new drawing — never runs on nopCommerce and cannot run on the fixture | the fixture has three projects, so no label ever collides. The arm that drops a name and lists it is unreachable by construction, which is the same shape as the mosaic's `Unlabelled` and is why both are written down here rather than pinned |
+
+> **The lesson is one row wider than the last four.** The other real runs found inputs a synthetic
+> fixture cannot contain. This one found that a *correct* drawing can still be a wrong picture, and
+> that no assertion about the drawing catches it: every cell was in the right place, every mark was
+> true, the file was well-formed, and the conclusion a reader drew from it was inverted. What
+> caught it was a person reading the artifact and saying what they saw out loud — which is A11's
+> whole method, applied to a picture rather than to a report.
+
 ### The complete inventory, measured in one pass
 
 Everything above was found one port at a time, which made a fixed backlog read as fresh decay
