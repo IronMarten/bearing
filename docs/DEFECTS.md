@@ -135,9 +135,30 @@ hard-fail rule would refuse a major .NET codebase over unrelated CVEs.
 
 ### 5. `DataAccess` classification is a hardcoded list of four ORMs
 
-Misses LinqToDB and FluentMigrator, so nopCommerce's data layer reads as `Internal` and
-layer-span goes silent rather than misfiring. Silence is the better failure of the two, which is
-why it survived this long.
+The list is `Microsoft.EntityFrameworkCore`, `System.Data`, `Dapper`, `NHibernate`, plus a
+`base:DbContext` rule. It misses **LinqToDB** and **FluentMigrator**, which is what nopCommerce
+uses.
+
+**Re-measured 2026-08-20 against `nop-v5`, and the consequence this entry used to claim was
+wrong.** It said the data layer *"reads as `Internal`"* and *"layer-span goes silent"*. Neither
+holds:
+
+- `DataAccess` fires **23 times**, 20 of them inside `Nop.Data` — but **every one of the 23 is
+  matched by `System.Data*`**, not by an ORM rule and not by `base:DbContext`. The classification
+  is right by coincidence, which is the same shape as defect 2's `HubMin = 5`.
+- Layer span is **not** silent: `NopStartup` reaches across three kinds and is nominated.
+- What is actually missed is the largest coherent group in the project: **114 of `Nop.Data`'s 129
+  `Internal` types are the `*Builder` mapping layer** under `Nop.Data/Mapping/Builders/`, one per
+  entity, all touching `FluentMigrator.Builders`. They are data access by any reading and they
+  are classified `Internal`.
+
+**So the failure is a misclassification of 114 types, not a silence.** That is worse than the
+entry claimed, because kind is not cosmetic — it is a cohort basis, it gates layer span, and it
+feeds effective fan-out and the boundary section.
+
+**It does not move the plot.** A project's density is findings over *all* its types regardless of
+kind, so `Nop.Data`'s 12-of-153 reading is unaffected — worth stating because `A11` round 2
+pre-registers that project as *"surprisingly clean"* and a fix here does not disturb it.
 
 ### 6. Visit-order dependence — **resolved**
 
