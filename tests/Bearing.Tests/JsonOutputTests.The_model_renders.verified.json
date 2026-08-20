@@ -72,10 +72,10 @@
         "ca": 2,
         "ce": 0,
         "abstractTypes": 6,
-        "totalTypes": 155,
-        "abstractness": 0.03870967741935484,
+        "totalTypes": 172,
+        "abstractness": 0.03488372093023256,
         "instability": 0,
-        "distanceFromMainSequence": 0.9612903225806452,
+        "distanceFromMainSequence": 0.9651162790697675,
         "zone": "Pain"
       }
     },
@@ -104,7 +104,7 @@
         "ca": 0,
         "ce": 1,
         "abstractTypes": 0,
-        "totalTypes": 3,
+        "totalTypes": 5,
         "abstractness": 0,
         "instability": 1,
         "distanceFromMainSequence": 0,
@@ -12765,6 +12765,1150 @@
       ]
     },
     {
+      "id": "type|Core|global::TestBed.Core.Tangles.AlphaNode",
+      "name": "AlphaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.AlphaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 31
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.AlphaNode|global::TestBed.Core.Tangles.AlphaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.AlphaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 33
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.AlphaNode|global::TestBed.Core.Tangles.AlphaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 35
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.BetaNode",
+      "name": "BetaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.BetaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 39
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.BetaNode|global::TestBed.Core.Tangles.BetaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.BetaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 41
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.BetaNode|global::TestBed.Core.Tangles.BetaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 43
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.BoltCatch",
+      "name": "BoltCatch",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.BoltCatch",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 73
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core.Tangles",
+      "cohortBasis": "namespace",
+      "cohortSize": 6,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 3,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.BoltCatch|global::TestBed.Core.Tangles.BoltCatch.Depth()",
+      "dsm": 1,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 3,
+      "publicMemberCount": 2,
+      "executableMemberCount": 2,
+      "parameterCount": 1,
+      "dataShape": 3,
+      "linesOfCode": 8,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.BoltCatch|_other",
+          "name": "_other",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 75
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.BoltCatch|global::TestBed.Core.Tangles.BoltCatch.Bind(global::TestBed.Core.Tangles.TwinLatch)",
+          "name": "Bind",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 77
+          },
+          "cyclomatic": 1,
+          "dsm": 1,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.BoltCatch|global::TestBed.Core.Tangles.BoltCatch.Depth()",
+          "name": "Depth",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 79
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.DeltaNode",
+      "name": "DeltaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.DeltaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 55
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.DeltaNode|global::TestBed.Core.Tangles.DeltaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.DeltaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 57
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.DeltaNode|global::TestBed.Core.Tangles.DeltaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 59
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.EastLink",
+      "name": "EastLink",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.EastLink",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 39
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core.Tangles",
+      "cohortBasis": "namespace",
+      "cohortSize": 6,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.EastLink|global::TestBed.Core.Tangles.EastLink.Hop(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.EastLink|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 41
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.EastLink|global::TestBed.Core.Tangles.EastLink.Hop(int)",
+          "name": "Hop",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 43
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.EpsilonNode",
+      "name": "EpsilonNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.EpsilonNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 63
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.EpsilonNode|global::TestBed.Core.Tangles.EpsilonNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.EpsilonNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 65
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.EpsilonNode|global::TestBed.Core.Tangles.EpsilonNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 67
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.EtaNode",
+      "name": "EtaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.EtaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 79
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.EtaNode|global::TestBed.Core.Tangles.EtaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.EtaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 81
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.EtaNode|global::TestBed.Core.Tangles.EtaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 83
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.GammaNode",
+      "name": "GammaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.GammaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 47
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.GammaNode|global::TestBed.Core.Tangles.GammaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.GammaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 49
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.GammaNode|global::TestBed.Core.Tangles.GammaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 51
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.IotaNode",
+      "name": "IotaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.IotaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 95
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 2,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.IotaNode|global::TestBed.Core.Tangles.IotaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.IotaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 97
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.IotaNode|global::TestBed.Core.Tangles.IotaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 99
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.NorthLink",
+      "name": "NorthLink",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.NorthLink",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 31
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core.Tangles",
+      "cohortBasis": "namespace",
+      "cohortSize": 6,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.NorthLink|global::TestBed.Core.Tangles.NorthLink.Hop(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.NorthLink|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 33
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.NorthLink|global::TestBed.Core.Tangles.NorthLink.Hop(int)",
+          "name": "Hop",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 35
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.SouthLink",
+      "name": "SouthLink",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.SouthLink",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 47
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core.Tangles",
+      "cohortBasis": "namespace",
+      "cohortSize": 6,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.SouthLink|global::TestBed.Core.Tangles.SouthLink.Hop(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.SouthLink|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 49
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.SouthLink|global::TestBed.Core.Tangles.SouthLink.Hop(int)",
+          "name": "Hop",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 51
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.ThetaNode",
+      "name": "ThetaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.ThetaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 87
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.ThetaNode|global::TestBed.Core.Tangles.ThetaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.ThetaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 89
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.ThetaNode|global::TestBed.Core.Tangles.ThetaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 91
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.TwinLatch",
+      "name": "TwinLatch",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.TwinLatch",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 63
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core.Tangles",
+      "cohortBasis": "namespace",
+      "cohortSize": 6,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 3,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.TwinLatch|global::TestBed.Core.Tangles.TwinLatch.Depth()",
+      "dsm": 1,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 3,
+      "publicMemberCount": 2,
+      "executableMemberCount": 2,
+      "parameterCount": 1,
+      "dataShape": 3,
+      "linesOfCode": 8,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.TwinLatch|_other",
+          "name": "_other",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 65
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.TwinLatch|global::TestBed.Core.Tangles.TwinLatch.Bind(global::TestBed.Core.Tangles.BoltCatch)",
+          "name": "Bind",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 67
+          },
+          "cyclomatic": 1,
+          "dsm": 1,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.TwinLatch|global::TestBed.Core.Tangles.TwinLatch.Depth()",
+          "name": "Depth",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 69
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.WestLink",
+      "name": "WestLink",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.WestLink",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 55
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core.Tangles",
+      "cohortBasis": "namespace",
+      "cohortSize": 6,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 2,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.WestLink|global::TestBed.Core.Tangles.WestLink.Hop(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.WestLink|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 57
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.WestLink|global::TestBed.Core.Tangles.WestLink.Hop(int)",
+          "name": "Hop",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Loop.cs",
+            "line": 59
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Core.Tangles.ZetaNode",
+      "name": "ZetaNode",
+      "fullyQualifiedName": "global::TestBed.Core.Tangles.ZetaNode",
+      "namespace": "TestBed.Core.Tangles",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 71
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "suffix:Node",
+      "cohortBasis": "name suffix",
+      "cohortSize": 9,
+      "fanIn": 1,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 2,
+      "instability": 0.5,
+      "instabilityRaw": 0.5,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.Tangles.ZetaNode|global::TestBed.Core.Tangles.ZetaNode.Step(int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.ZetaNode|_next",
+          "name": "_next",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 73
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Core.Tangles.ZetaNode|global::TestBed.Core.Tangles.ZetaNode.Step(int)",
+          "name": "Step",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Tangles/Ring.cs",
+            "line": 75
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
       "id": "type|Core|global::TestBed.Core.TariffCalculator",
       "name": "TariffCalculator",
       "fullyQualifiedName": "global::TestBed.Core.TariffCalculator",
@@ -14292,6 +15436,154 @@
       ]
     },
     {
+      "id": "type|Core|global::TestBed.Interop.CarrierTwin",
+      "name": "CarrierTwin",
+      "fullyQualifiedName": "global::TestBed.Interop.CarrierTwin",
+      "namespace": "TestBed.Interop",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Shared/CarrierTwin.cs",
+        "line": 45
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Interop",
+      "cohortBasis": "namespace",
+      "cohortSize": 4,
+      "fanIn": 1,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 3,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 2,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Core|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Normalize()",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 2,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 6,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Scac",
+          "name": "Scac",
+          "kind": "Property",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Shared/CarrierTwin.cs",
+            "line": 47
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Normalize()",
+          "name": "Normalize",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Shared/CarrierTwin.cs",
+            "line": 49
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
+      "id": "type|Core|global::TestBed.Interop.TwinRelay",
+      "name": "TwinRelay",
+      "fullyQualifiedName": "global::TestBed.Interop.TwinRelay",
+      "namespace": "TestBed.Interop",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/Shared/CarrierTwin.cs",
+        "line": 56
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Interop",
+      "cohortBasis": "namespace",
+      "cohortSize": 4,
+      "fanIn": 0,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 0,
+      "instability": 1,
+      "instabilityRaw": 1,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Interop.TwinRelay|global::TestBed.Interop.TwinRelay.Route(string)",
+      "dsm": 1,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 10,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Interop.TwinRelay|_twin",
+          "name": "_twin",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Core/Shared/CarrierTwin.cs",
+            "line": 58
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Core|global::TestBed.Interop.TwinRelay|global::TestBed.Interop.TwinRelay.Route(string)",
+          "name": "Route",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/Shared/CarrierTwin.cs",
+            "line": 60
+          },
+          "cyclomatic": 1,
+          "dsm": 1,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 1,
+          "linesOfCode": 5
+        }
+      ]
+    },
+    {
       "id": "type|Data|global::TestBed.Data.OrderRepository",
       "name": "OrderRepository",
       "fullyQualifiedName": "global::TestBed.Data.OrderRepository",
@@ -14423,6 +15715,171 @@
           "maxNestingDepth": 1,
           "parameterCount": 1,
           "linesOfCode": 4
+        }
+      ]
+    },
+    {
+      "id": "type|Data|global::TestBed.Interop.CarrierTwin",
+      "name": "CarrierTwin",
+      "fullyQualifiedName": "global::TestBed.Interop.CarrierTwin",
+      "namespace": "TestBed.Interop",
+      "assembly": "Data",
+      "project": "Data",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Data/CarrierTwin.cs",
+        "line": 20
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Interop",
+      "cohortBasis": "namespace",
+      "cohortSize": 4,
+      "fanIn": 0,
+      "fanOut": 1,
+      "effectiveFanOut": 1,
+      "inboundReferences": 0,
+      "instability": 1,
+      "instabilityRaw": 1,
+      "cyclomatic": 2,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Data|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Retain(string, int)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 2,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 2,
+      "dataShape": 3,
+      "linesOfCode": 10,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Data|global::TestBed.Interop.CarrierTwin|_archive",
+          "name": "_archive",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Data/CarrierTwin.cs",
+            "line": 22
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Data|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Retain(string, int)",
+          "name": "Retain",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Data/CarrierTwin.cs",
+            "line": 24
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 1,
+          "parameterCount": 2,
+          "linesOfCode": 5
+        }
+      ]
+    },
+    {
+      "id": "type|Data|global::TestBed.Interop.TagArchive",
+      "name": "TagArchive",
+      "fullyQualifiedName": "global::TestBed.Interop.TagArchive",
+      "namespace": "TestBed.Interop",
+      "assembly": "Data",
+      "project": "Data",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Data/CarrierTwin.cs",
+        "line": 35
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Interop",
+      "cohortBasis": "namespace",
+      "cohortSize": 4,
+      "fanIn": 1,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 2,
+      "instability": 0,
+      "instabilityRaw": 0,
+      "cyclomatic": 3,
+      "maxMemberCyclomatic": 2,
+      "mostComplexMember": "member|Data|global::TestBed.Interop.TagArchive|global::TestBed.Interop.TagArchive.Last",
+      "dsm": 1,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 3,
+      "publicMemberCount": 2,
+      "executableMemberCount": 2,
+      "parameterCount": 2,
+      "dataShape": 3,
+      "linesOfCode": 8,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Data|global::TestBed.Interop.TagArchive|_last",
+          "name": "_last",
+          "kind": "Field",
+          "accessibility": "",
+          "location": {
+            "file": "TestBed/Data/CarrierTwin.cs",
+            "line": 37
+          },
+          "cyclomatic": 0,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Data|global::TestBed.Interop.TagArchive|global::TestBed.Interop.TagArchive.Record(string)",
+          "name": "Record",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Data/CarrierTwin.cs",
+            "line": 39
+          },
+          "cyclomatic": 1,
+          "dsm": 1,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        },
+        {
+          "id": "member|Data|global::TestBed.Interop.TagArchive|global::TestBed.Interop.TagArchive.Last",
+          "name": "Last",
+          "kind": "Property",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Data/CarrierTwin.cs",
+            "line": 41
+          },
+          "cyclomatic": 2,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 0,
+          "linesOfCode": 1
         }
       ]
     },
@@ -18542,6 +19999,201 @@
       }
     },
     {
+      "from": "type|Core|global::TestBed.Core.Tangles.AlphaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.BetaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 33
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.BetaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.GammaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 41
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.BoltCatch",
+      "to": "type|Core|global::TestBed.Core.Tangles.TwinLatch",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Parameter"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 75
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.DeltaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.EpsilonNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 57
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.EastLink",
+      "to": "type|Core|global::TestBed.Core.Tangles.SouthLink",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 41
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.EpsilonNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.ZetaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 65
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.EtaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.ThetaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 81
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.GammaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.DeltaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 49
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.IotaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.AlphaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 97
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.NorthLink",
+      "to": "type|Core|global::TestBed.Core.Tangles.EastLink",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 33
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.SouthLink",
+      "to": "type|Core|global::TestBed.Core.Tangles.WestLink",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 49
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.ThetaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.IotaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 89
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.TwinLatch",
+      "to": "type|Core|global::TestBed.Core.Tangles.BoltCatch",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Parameter"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 65
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.WestLink",
+      "to": "type|Core|global::TestBed.Core.Tangles.NorthLink",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Loop.cs",
+        "line": 57
+      }
+    },
+    {
+      "from": "type|Core|global::TestBed.Core.Tangles.ZetaNode",
+      "to": "type|Core|global::TestBed.Core.Tangles.EtaNode",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Tangles/Ring.cs",
+        "line": 73
+      }
+    },
+    {
       "from": "type|Core|global::TestBed.Core.TariffCalculator",
       "to": "type|Core|global::TestBed.Core.TenantStore",
       "weight": 2,
@@ -19023,6 +20675,20 @@
       }
     },
     {
+      "from": "type|Core|global::TestBed.Interop.TwinRelay",
+      "to": "type|Core|global::TestBed.Interop.CarrierTwin",
+      "weight": 3,
+      "kinds": [
+        "Other",
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Core/Shared/CarrierTwin.cs",
+        "line": 58
+      }
+    },
+    {
       "from": "type|Data|global::TestBed.Data.OrderRepository",
       "to": "type|Core|global::TestBed.Core.NormalizationContext",
       "weight": 3,
@@ -19033,6 +20699,19 @@
       "site": {
         "file": "TestBed/Data/OrderRepository.cs",
         "line": 10
+      }
+    },
+    {
+      "from": "type|Data|global::TestBed.Interop.CarrierTwin",
+      "to": "type|Data|global::TestBed.Interop.TagArchive",
+      "weight": 2,
+      "kinds": [
+        "Field",
+        "Invocation"
+      ],
+      "site": {
+        "file": "TestBed/Data/CarrierTwin.cs",
+        "line": 22
       }
     },
     {
@@ -19070,6 +20749,33 @@
     "projects": [],
     "typeTangles": [
       {
+        "id": "set|type\\|Core\\|global::TestBed.Core.Tangles.AlphaNode|type\\|Core\\|global::TestBed.Core.Tangles.BetaNode|type\\|Core\\|global::TestBed.Core.Tangles.DeltaNode|type\\|Core\\|global::TestBed.Core.Tangles.EpsilonNode|type\\|Core\\|global::TestBed.Core.Tangles.EtaNode|type\\|Core\\|global::TestBed.Core.Tangles.GammaNode|type\\|Core\\|global::TestBed.Core.Tangles.IotaNode|type\\|Core\\|global::TestBed.Core.Tangles.ThetaNode|type\\|Core\\|global::TestBed.Core.Tangles.ZetaNode",
+        "size": 9,
+        "members": [
+          "type|Core|global::TestBed.Core.Tangles.AlphaNode",
+          "type|Core|global::TestBed.Core.Tangles.BetaNode",
+          "type|Core|global::TestBed.Core.Tangles.DeltaNode",
+          "type|Core|global::TestBed.Core.Tangles.EpsilonNode",
+          "type|Core|global::TestBed.Core.Tangles.EtaNode",
+          "type|Core|global::TestBed.Core.Tangles.GammaNode",
+          "type|Core|global::TestBed.Core.Tangles.IotaNode",
+          "type|Core|global::TestBed.Core.Tangles.ThetaNode",
+          "type|Core|global::TestBed.Core.Tangles.ZetaNode"
+        ],
+        "path": [
+          "type|Core|global::TestBed.Core.Tangles.AlphaNode",
+          "type|Core|global::TestBed.Core.Tangles.BetaNode",
+          "type|Core|global::TestBed.Core.Tangles.GammaNode",
+          "type|Core|global::TestBed.Core.Tangles.DeltaNode",
+          "type|Core|global::TestBed.Core.Tangles.EpsilonNode",
+          "type|Core|global::TestBed.Core.Tangles.ZetaNode",
+          "type|Core|global::TestBed.Core.Tangles.EtaNode",
+          "type|Core|global::TestBed.Core.Tangles.ThetaNode",
+          "type|Core|global::TestBed.Core.Tangles.IotaNode"
+        ],
+        "pathCoversEveryMember": true
+      },
+      {
         "id": "set|type\\|Core\\|global::TestBed.Core.AccessorialNormalizer|type\\|Core\\|global::TestBed.Core.AddressNormalizer|type\\|Core\\|global::TestBed.Core.RateNormalizer|type\\|Core\\|global::TestBed.Core.ReferenceNormalizer|type\\|Core\\|global::TestBed.Core.Router|type\\|Core\\|global::TestBed.Core.ShipmentCoordinator|type\\|Core\\|global::TestBed.Core.TrackingNormalizer|type\\|Core\\|global::TestBed.Core.TransitNormalizer",
         "size": 8,
         "members": [
@@ -19088,6 +20794,23 @@
           "type|Core|global::TestBed.Core.Router"
         ],
         "pathCoversEveryMember": false
+      },
+      {
+        "id": "set|type\\|Core\\|global::TestBed.Core.Tangles.EastLink|type\\|Core\\|global::TestBed.Core.Tangles.NorthLink|type\\|Core\\|global::TestBed.Core.Tangles.SouthLink|type\\|Core\\|global::TestBed.Core.Tangles.WestLink",
+        "size": 4,
+        "members": [
+          "type|Core|global::TestBed.Core.Tangles.EastLink",
+          "type|Core|global::TestBed.Core.Tangles.NorthLink",
+          "type|Core|global::TestBed.Core.Tangles.SouthLink",
+          "type|Core|global::TestBed.Core.Tangles.WestLink"
+        ],
+        "path": [
+          "type|Core|global::TestBed.Core.Tangles.EastLink",
+          "type|Core|global::TestBed.Core.Tangles.SouthLink",
+          "type|Core|global::TestBed.Core.Tangles.WestLink",
+          "type|Core|global::TestBed.Core.Tangles.NorthLink"
+        ],
+        "pathCoversEveryMember": true
       }
     ]
   },

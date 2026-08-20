@@ -100,7 +100,9 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
 
    TYPE TANGLES — 4+ types that all reach each other, so none of
    them can be tested or changed in isolation:
+     9 types: AlphaNode, BetaNode, DeltaNode, EpsilonNode, EtaNode, GammaNode, IotaNode, ThetaNode, ...
      8 types: AccessorialNormalizer, AddressNormalizer, RateNormalizer, ReferenceNormalizer, Router, ShipmentCoordinator, TrackingNormalizer, TransitNormalizer
+     4 types: EastLink, NorthLink, SouthLink, WestLink
 
 -- SHARED MUTABLE STATE (no cohort required) -------------------
    (writes to static mutable state — every caller on every thread shares these)
@@ -111,31 +113,30 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.04, D 0.96  (Ca 2 depend on it, Ce 0 reach out, 6/155 abstract)  <-- ZONE OF PAIN (stable and concrete)
-     Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
+     Core — I 0.33, A 0.03, D 0.63  (Ca 2 depend on it, Ce 1 reach out, 6/172 abstract)
+     Data — I 0.5, A 0, D 0.5  (Ca 1 depend on it, Ce 1 reach out, 0/3 abstract)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
    UNREFERENCED PROJECTS — no other project depends on these:
-     Data
      Tools
      Entry points, executables and API hosts are excluded — a root is not dead.
      But test projects are skipped by default, so anything used ONLY by tests
      appears here. Verify before deleting.
 
 -- NO PEER GROUP -----------------------------------------------
-   17 of 159 types (10.7%) sit in cohorts below --min-cohort (5).
+   20 of 177 types (11.3%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these. They are absent from the
    nominations above and from prediction-sheet.csv, and their Pctl/XMedian
    columns are blank where a cohort of one made them meaningless.
 
    Extreme against the WHOLE SOLUTION despite having no peer group.
    Weaker evidence — this compares unlike things — but not nothing:
-     OrderRepository [DataAccess] — top 2% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
-     PayloadTag [Internal] — top 4% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
+     OrderRepository [DataAccess] — top 1% by complexity (cc 18 in BuildQuery), solution-wide. (no cohort to compare against)
+     PayloadTag [Internal] — top 3% by complexity (cc 13 in Score), solution-wide. (no cohort to compare against)
      LayeringArchive [DataAccess] — top 5% by fan-in (8 callers), solution-wide. (no cohort to compare against)
      LayeringBeacon [ExternalCall] — top 5% by fan-in (8 callers), solution-wide. (no cohort to compare against)
      LayeringEndpoint [ApiBoundary] — top 5% by fan-in (8 callers), solution-wide. (no cohort to compare against)
-     RoutingDepot [Internal] — top 7% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
+     RoutingDepot [Internal] — top 6% by complexity (cc 12 in Route), solution-wide. (no cohort to compare against)
 
    All types with no usable peer group, by fan-in:
      LayeringArchive — fan-in 8, cc 2, cohort 'Layering' (size 3)
@@ -151,8 +152,8 @@ Draft sentences. Receipts in parentheses. Rewrite before the session.
      PricingVault — fan-in 1, cc 8, cohort 'Vault' (size 3)
      SessionVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
      TokenVault — fan-in 1, cc 1, cohort 'Vault' (size 3)
-     OrderRepository — fan-in 0, cc 19, cohort 'DataAccess' (size 1)
-     RateRepository — fan-in 0, cc 2, cohort 'Repository' (size 1)
+     CarrierTwin — fan-in 1, cc 4, cohort 'Interop' (size 3)
+     TagArchive — fan-in 1, cc 3, cohort 'Interop' (size 3)
 
    NOTE: a type with no peers still has its own METHODS as a cohort —
    check methods.csv for it. And its real comparison is its own history,

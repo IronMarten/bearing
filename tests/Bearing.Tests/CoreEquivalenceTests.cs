@@ -216,7 +216,7 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
         Assert.Equal(6, analysed.AbstractTypes);
-        Assert.Equal(155, analysed.TotalTypes);          // 128 before P6's twelve, 140 before P7's fifteen
+        Assert.Equal(172, analysed.TotalTypes);          // 128 → P6 140 → P7 155 → P8 172
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
@@ -240,9 +240,13 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
         // docs/DEFECTS.md §1.
         var coupling = CoreProjectCoupling().ToDictionary(c => c.Project, StringComparer.Ordinal);
 
-        Assert.Equal(3, coupling["Data"].TotalTypes);
+        // Five in Data since P8: PayloadTag, CarrierTwin and TagArchive, plus the RateRepository
+        // and PayloadTag rows that were always there.
+        Assert.Equal(5, coupling["Data"].TotalTypes);
         Assert.Equal(2, coupling["Tools"].TotalTypes);
-        Assert.Equal(run.Result.Types.Count(t => t.Project == "Data") + 1, coupling["Data"].TotalTypes);
+        // Plus two since P8: both collisions have a declaration in Data, and the probe credits
+        // each merged row to a single project, so Data loses one row per collision.
+        Assert.Equal(run.Result.Types.Count(t => t.Project == "Data") + 2, coupling["Data"].TotalTypes);
     }
 
     // Read from the model rather than assembled here. When the test built the tuples itself it
@@ -320,7 +324,9 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void Type_tangles_over_the_fixture_are_what_they_should_be()
     {
-        var tangle = Assert.Single(core.Model.TypeTangles);
+        // The Normalizer tangle, which is the one this test was written for. P8 added two rings
+        // beside it and they are asserted in their own tests; this one still owns the eight.
+        var tangle = core.Model.TypeTangles.Single(c => c.Size == 8);
 
         var names = tangle.Members
             .Select(m => core.Model.Find(m)!.Name)
@@ -355,40 +361,105 @@ public sealed class CoreEquivalenceTests(FixtureRun run, CoreWalkFixture core)
     [Fact]
     public void Every_step_of_a_tangles_loop_is_a_real_dependency()
     {
-        var tangle = Assert.Single(core.Model.TypeTangles);
+        // Every tangle since P8, not just the one: a ring's loop is its whole component, so this
+        // walks nine steps and four as well as the original three.
+        Assert.All(core.Model.TypeTangles, Walkable);
 
-        Assert.NotEmpty(tangle.Path);
-        Assert.Equal(tangle.Path.Count, tangle.Path.Distinct().Count());
-        Assert.All(tangle.Path, step => Assert.Contains(step, tangle.Members));
-
-        for (var i = 0; i < tangle.Path.Count; i++)
+        void Walkable(Cycle tangle)
         {
-            var from = core.Model.Find(tangle.Path[i])!;
-            var to = tangle.Path[(i + 1) % tangle.Path.Count];
+            Assert.NotEmpty(tangle.Path);
+            Assert.Equal(tangle.Path.Count, tangle.Path.Distinct().Count());
+            Assert.All(tangle.Path, step => Assert.Contains(step, tangle.Members));
 
-            Assert.True(
-                from.Outbound.Contains(to),
-                $"{from.Name} does not depend on {core.Model.Find(to)!.Name}, so the loop is not walkable.");
+            for (var i = 0; i < tangle.Path.Count; i++)
+            {
+                var from = core.Model.Find(tangle.Path[i])!;
+                var to = tangle.Path[(i + 1) % tangle.Path.Count];
+
+                Assert.True(
+                    from.Outbound.Contains(to),
+                    $"{from.Name} does not depend on {core.Model.Find(to)!.Name}, so the loop is not walkable.");
+            }
         }
     }
 
     /// <summary>
-    /// The fixture's cycles are both larger than their loops, so the disclosure arm is what it
-    /// exercises — and the covering arm is not exercised here at all.
+    /// The fixture exercises both arms of the loop sentence now, and the note that used to say it
+    /// could not is the thing P8 deleted.
     /// </summary>
     /// <remarks>
-    /// Recorded as an assertion rather than left to the snapshot because it is a fixture gap and
-    /// not a property of the tool: <c>docs/TESTING.md</c> §6. A component whose shortest loop
-    /// visits every member renders a line with no qualifier on it, and nothing in TestBed
-    /// produces one — <c>GraphTests</c> and <c>ProjectCycleTests</c> are where that arm is
-    /// covered. If a plant ever makes this fail, the fixture got better and this is the note to
-    /// delete.
+    /// <para>
+    /// <b>This assertion used to read <c>Assert.False</c> for every cycle</b>, with a remark saying
+    /// the covering arm was not exercised here at all and that a plant making it fail meant the
+    /// fixture had got better. P8 is that plant: two rings, of nine types and of four, whose
+    /// representative loop visits every member because a ring has exactly one way through it.
+    /// </para>
+    /// <para>
+    /// <b>Both arms are asserted rather than just the new one.</b> The Normalizer tangle is still
+    /// the partial case and the namespace cycle still is, so the two sentences — the bare loop and
+    /// the <i>"3 of the 8; all 8 reach each other"</i> disclosure — now render in one report, which
+    /// is the only arrangement in which a renderer confusing them is visible.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void Neither_of_the_fixtures_loops_covers_its_whole_component()
+    public void The_fixture_exercises_both_arms_of_the_loop_sentence()
     {
+        // The partial arm, which is what the fixture always had.
         Assert.All(core.Model.NamespaceCycles, c => Assert.False(c.PathCoversEveryMember));
-        Assert.All(core.Model.TypeTangles, c => Assert.False(c.PathCoversEveryMember));
+        Assert.Contains(core.Model.TypeTangles, c => !c.PathCoversEveryMember);
+
+        // And the covering arm, which is P8's. Two of them, at different sizes, because the
+        // sentence is the same whether the component is four types or nine.
+        var covering = core.Model.TypeTangles.Where(c => c.PathCoversEveryMember).ToList();
+
+        Assert.Equal(2, covering.Count);
+        Assert.All(covering, c => Assert.Equal(c.Size, c.Path.Count));
+        Assert.Equal([4, 9], covering.Select(c => c.Size).Order());
+    }
+
+    /// <summary>
+    /// Tangles are ordered largest first, which one tangle could never have shown.
+    /// </summary>
+    /// <remarks>
+    /// The fixture had a single tangle until P8, so every comparator produced the same output and
+    /// the ordering was decoration. Nine, eight and four is an order a wrong comparator changes.
+    /// </remarks>
+    [Fact]
+    public void Tangles_are_ordered_largest_first()
+    {
+        var sizes = core.Model.TypeTangles.Select(c => c.Size).ToList();
+
+        Assert.Equal([9, 8, 4], sizes);
+    }
+
+    /// <summary>
+    /// The tangle floor decides in both directions.
+    /// </summary>
+    /// <remarks>
+    /// <b>The sweep cannot see this one and that is a property of the sweep.</b>
+    /// <c>PolicySweepTests</c> fingerprints the finding set, and a type tangle is not a finding —
+    /// it is structure, on the model. So <c>MinTangle</c> reports <c>-</c> in that table however
+    /// well the fixture covers it, which is the third kind of dash: not a dead constant and not a
+    /// distribution that cannot reach it, but an instrument that does not measure it.
+    /// <c>docs/TESTING.md</c> §6.
+    /// </remarks>
+    [Fact]
+    public void The_tangle_floor_decides_in_both_directions()
+    {
+        // Raised past the four-ring, the four-ring goes and the other two stay.
+        Assert.Equal([9, 8], TangleSizesUnder(core.Model.Policy with { MinTangle = 5 }));
+
+        // Lowered, the mutual pair arrives — which is the judgement the floor exists to make, and
+        // the reason it is not 2. Two types that reference each other are not a tangle.
+        Assert.Equal([9, 8, 4, 2], TangleSizesUnder(core.Model.Policy with { MinTangle = 2 }));
+    }
+
+    private static List<int> TangleSizesUnder(AnalysisPolicy policy)
+    {
+        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
+            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        return model.TypeTangles.Select(c => c.Size).ToList();
     }
 
     /// <summary>

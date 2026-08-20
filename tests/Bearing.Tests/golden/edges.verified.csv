@@ -34,6 +34,7 @@ global::TestBed.Core.GuaranteedServiceNormalizer,global::TestBed.Core.RawRespons
 global::TestBed.Core.Router,global::TestBed.Core.IResponseNormalizer,3
 global::TestBed.Core.ShipmentCoordinator,global::TestBed.Core.TariffCalculator,3
 global::TestBed.Data.OrderRepository,global::TestBed.Core.NormalizationContext,3
+global::TestBed.Interop.TwinRelay,global::TestBed.Interop.CarrierTwin,3
 global::TestBed.Core.AccessorialLedger,global::TestBed.Core.ShipmentLedger,2
 global::TestBed.Core.AccessorialNormalizer,global::TestBed.Core.AuditClient,2
 global::TestBed.Core.AccessorialNormalizer,global::TestBed.Core.NormalizationContext,2
@@ -199,6 +200,21 @@ global::TestBed.Core.StorageCatalog,global::TestBed.Core.Vaults.TokenVault,2
 global::TestBed.Core.SurchargeApplier,global::TestBed.Core.Pricing.SurchargeTable,2
 global::TestBed.Core.SurchargeLedger,global::TestBed.Core.ShipmentLedger,2
 global::TestBed.Core.SurchargeReconciler,global::TestBed.Core.NormalizeStep,2
+global::TestBed.Core.Tangles.AlphaNode,global::TestBed.Core.Tangles.BetaNode,2
+global::TestBed.Core.Tangles.BetaNode,global::TestBed.Core.Tangles.GammaNode,2
+global::TestBed.Core.Tangles.BoltCatch,global::TestBed.Core.Tangles.TwinLatch,2
+global::TestBed.Core.Tangles.DeltaNode,global::TestBed.Core.Tangles.EpsilonNode,2
+global::TestBed.Core.Tangles.EastLink,global::TestBed.Core.Tangles.SouthLink,2
+global::TestBed.Core.Tangles.EpsilonNode,global::TestBed.Core.Tangles.ZetaNode,2
+global::TestBed.Core.Tangles.EtaNode,global::TestBed.Core.Tangles.ThetaNode,2
+global::TestBed.Core.Tangles.GammaNode,global::TestBed.Core.Tangles.DeltaNode,2
+global::TestBed.Core.Tangles.IotaNode,global::TestBed.Core.Tangles.AlphaNode,2
+global::TestBed.Core.Tangles.NorthLink,global::TestBed.Core.Tangles.EastLink,2
+global::TestBed.Core.Tangles.SouthLink,global::TestBed.Core.Tangles.WestLink,2
+global::TestBed.Core.Tangles.ThetaNode,global::TestBed.Core.Tangles.IotaNode,2
+global::TestBed.Core.Tangles.TwinLatch,global::TestBed.Core.Tangles.BoltCatch,2
+global::TestBed.Core.Tangles.WestLink,global::TestBed.Core.Tangles.NorthLink,2
+global::TestBed.Core.Tangles.ZetaNode,global::TestBed.Core.Tangles.EtaNode,2
 global::TestBed.Core.TariffCalculator,global::TestBed.Core.TenantStore,2
 global::TestBed.Core.TariffLedger,global::TestBed.Core.ShipmentLedger,2
 global::TestBed.Core.TariffReconciler,global::TestBed.Core.NormalizeStep,2
@@ -219,6 +235,7 @@ global::TestBed.Core.TransitNormalizer,global::TestBed.Core.ShipmentCoordinator,
 global::TestBed.Core.TransitNormalizer,global::TestBed.Core.TariffCalculator,2
 global::TestBed.Core.TransitReconciler,global::TestBed.Core.NormalizeStep,2
 global::TestBed.Core.Vaults.PricingVault,global::TestBed.Core.NormalizeStep,2
+global::TestBed.Interop.CarrierTwin,global::TestBed.Interop.TagArchive,2
 global::TestBed.Core.AccessorialNormalizer,global::TestBed.Core.IResponseNormalizer,1
 global::TestBed.Core.AddressNormalizer,global::TestBed.Core.IResponseNormalizer,1
 global::TestBed.Core.AuditPolicySink,global::TestBed.Core.IPolicySink,1

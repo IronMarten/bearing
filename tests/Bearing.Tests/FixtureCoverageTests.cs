@@ -443,38 +443,43 @@ public sealed class FixtureCoverageTests(FixtureRun run, CoreWalkFixture core)
     /// for. So the same deletion in <c>ChangeCost</c> passes the suite.
     /// </para>
     /// <para>
-    /// <b>Recorded rather than forced, deliberately.</b> Making Core's arm observable needs a
-    /// boundary in the solution's top 5% by fan-in. The realistic shape is a base controller —
-    /// real codebases' carry enormous fan-in and are unambiguously boundaries — and this fixture
-    /// has one, <c>ControllerBase</c> at fan-in 8, which the classifier misses only because the
-    /// name lacks the suffix. Reaching the limit of 6.9 needs fan-in 11, so three more
-    /// controllers. Choosing 0.10 instead, which <c>ControllerBase</c> would clear at rank 7.5, is
-    /// picking the constant to admit our own plant. Neither is worth doing to close a gap that
-    /// only exists at this fixture's size. <c>TASKS.md</c> P7.
+    /// <b>And P8 closed it without aiming at it, which is what the note above predicted.</b> That
+    /// note said the gap <i>"only exists at this fixture's size"</i> and refused to force it —
+    /// three more controllers to reach a limit of 6.9, or picking 0.10 to admit our own plant.
+    /// P8's tangles and collision took the solution from 128 analysed types to 179, the top-5%
+    /// rank limit moved with it, and <c>LayeringEndpoint</c> at fan-in 8 came inside the slice on
+    /// its own. <b>The arm is observed on both sides now</b>, and the reason is the population
+    /// rather than a plant built to admit it — which is the only way it was ever going to be
+    /// worth having.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_change_cost_plant_observes_the_ApiBoundary_arm_in_the_probe_only()
+    public void The_change_cost_ApiBoundary_arm_is_observed_on_both_sides_now()
     {
         var callback = run.Type("DispatchCallbackController");
 
         Assert.Equal("ApiBoundary", callback.Kind);
         Assert.True(callback.FanIn >= run.Options.MinCohort);
 
-        // Core does not nominate it, and the reason is the share gate rather than the kind or the
-        // floor — both of which it still clears. Asserted so that the day a plant reaches the
-        // solution's top slice, this fails and the arm is recorded as observed on both sides.
+        // DispatchCallbackController is still outside Core's slice, and the reason is still the
+        // share gate rather than the kind or the floor — both of which it clears.
         var subject = core.Model.Types.Single(t => t.Name == "DispatchCallbackController");
         Assert.True(subject.FanIn >= core.Model.Policy.MinFanIn);
         Assert.DoesNotContain(
             Analysis.FindingsFor(core.Model).OfKind(FindingKind.ChangeCost),
             f => f.Subject == subject.Subject);
 
-        // And every subject Core does nominate is a Contract, which is what makes the arm
-        // deletable there.
-        Assert.All(
-            Analysis.FindingsFor(core.Model).OfKind(FindingKind.ChangeCost),
-            f => Assert.Equal("Contract", core.Model.Find(f.Subject)!.Classification.Kind));
+        // But the arm itself is no longer deletable in Core: LayeringEndpoint is an ApiBoundary and
+        // Core nominates it, so dropping the kind from ChangeCost now moves the finding set. That
+        // is the half this test was written to say was missing.
+        var kinds = Analysis.FindingsFor(core.Model)
+            .OfKind(FindingKind.ChangeCost)
+            .Select(f => core.Model.Find(f.Subject)!.Classification.Kind)
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(["ApiBoundary", "Contract"], kinds);
 
         // Two of them since P6, whose LayeringEndpoint is reached by eight conduits and clears the
         // probe's absolute floor without having been built to. It does not rescue the arm in Core

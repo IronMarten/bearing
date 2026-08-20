@@ -245,24 +245,39 @@ public sealed class CohortTests
 public sealed class CohortEquivalenceTests(CoreWalkFixture core, FixtureRun probe)
 {
     /// <summary>The planted collision, which Core keeps as two types and the probe merges.</summary>
-    private const string CollidingName = "global::TestBed.Shared.PayloadTag";
+    /// <summary>
+    /// The planted cross-project collisions: one fully-qualified name each, two assemblies each.
+    /// </summary>
+    /// <remarks>
+    /// <b>Two since P8, and the plural is the point.</b> <c>PayloadTag</c> proves the ROW is kept
+    /// apart and cannot prove more, because it has no edges in either declaration.
+    /// <c>CarrierTwin</c> carries an inbound edge in one assembly and an outbound edge in the
+    /// other, which is what makes the merge fabricate a dependency — <c>ProjectCycleTests</c>.
+    /// Everything here excludes both, because everything here is about what the two walkers agree
+    /// on.
+    /// </remarks>
+    private static readonly HashSet<string> CollidingNames = new(StringComparer.Ordinal)
+    {
+        "global::TestBed.Shared.PayloadTag",
+        "global::TestBed.Interop.CarrierTwin",
+    };
 
     [Fact]
     public void Every_type_lands_in_the_same_cohort_as_the_probe_put_it_in()
     {
         var byName = core.Model.Types
-            .Where(t => t.FullyQualifiedName != CollidingName)
+            .Where(t => !CollidingNames.Contains(t.FullyQualifiedName))
             .ToDictionary(t => t.FullyQualifiedName, StringComparer.Ordinal);
 
         var compared = 0;
-        foreach (var p in probe.Result.Types.Where(t => t.Id != CollidingName))
+        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
         {
             Assert.Equal(p.Cohort, byName[p.Id].Cohort.Key);
             Assert.Equal(p.CohortBasis, byName[p.Id].Cohort.Basis);
             compared++;
         }
 
-        Assert.Equal(probe.Result.Types.Count - 1, compared);
+        Assert.Equal(probe.Result.Types.Count - CollidingNames.Count, compared);
     }
 
     [Fact]
@@ -273,19 +288,28 @@ public sealed class CohortEquivalenceTests(CoreWalkFixture core, FixtureRun prob
             .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
 
         var collidedCohorts = core.Model.Types
-            .Where(t => t.FullyQualifiedName == CollidingName)
+            .Where(t => CollidingNames.Contains(t.FullyQualifiedName))
             .Select(t => t.Cohort.Key)
             .ToHashSet(StringComparer.Ordinal);
 
         foreach (var type in core.Model.Types.Where(t => !collidedCohorts.Contains(t.Cohort.Key)))
             Assert.Equal(probeSizes[type.Cohort.Key], type.CohortSize);
 
-        // Where the collision lands, Core has one more member than the probe — it is counting
-        // two declarations the probe folded into one. That is DEFECTS.md §1 reaching the
-        // population every percentile in that cohort is taken against.
+        // Where a collision lands, Core has one more member per collision than the probe — it is
+        // counting two declarations the probe folded into one. That is DEFECTS.md §1 reaching the
+        // population every percentile in that cohort is taken against. Since P8 there are two
+        // collisions, and both land in the same cohort, so the gap there is two.
         Assert.NotEmpty(collidedCohorts);
         foreach (var cohort in collidedCohorts)
-            Assert.Equal(probeSizes[cohort] + 1, core.Model.Types.Count(t => t.Cohort.Key == cohort));
+        {
+            var folded = core.Model.Types.Count(t =>
+                string.Equals(t.Cohort.Key, cohort, StringComparison.Ordinal)
+                && CollidingNames.Contains(t.FullyQualifiedName)) / 2;
+
+            Assert.Equal(
+                probeSizes[cohort] + folded,
+                core.Model.Types.Count(t => string.Equals(t.Cohort.Key, cohort, StringComparison.Ordinal)));
+        }
     }
 
     [Fact]

@@ -216,25 +216,31 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         var expected = ProbeNominations("   All types with no usable peer group, by fan-in:", stopAt: "NOTE:");
         var actual = CoreTypeNominations(FindingKind.Coverage);
 
-        // Seventeen and eighteen since P6, which added four peerless types: its three shared
-        // dependency targets, each the only member of the cohort it lands in, and RouteAttribute.
-        // The eight *Conduit types are not among them — they are a name-suffix cohort of eight,
-        // which is what keeps the plant out of every existing peer group.
-        Assert.Equal(17, expected.Count);
-        Assert.Equal(18, actual.Count);
+        // Twenty and twenty-two since P8, which added the four *Link types — a cohort of four,
+        // one below the floor — and the second collision. P6 took it to seventeen and eighteen by
+        // adding its three shared dependency targets and RouteAttribute; the eight *Conduit types
+        // are still not among them, being a name-suffix cohort of eight.
+        Assert.Equal(20, expected.Count);
+        Assert.Equal(22, actual.Count);
 
-        // Same components, and the extra entry is the second declaration rather than a new subject.
+        // Same components, and the extra entries are second declarations rather than new subjects.
         Assert.Equal(expected, actual.Distinct(StringComparer.Ordinal).ToList());
 
-        var collided = Analysis.FindingsFor(core.Model)
-            .OfKind(FindingKind.Coverage)
-            .Select(f => core.Model.Find(f.Subject)!)
-            .Where(t => t.Name == "PayloadTag")
-            .ToList();
+        // Both collisions land here, each as two rows where the probe has one. That is the gap
+        // reaching the disclosure: a population the probe reports as peerless once and Core
+        // reports twice, because there are two declarations and they are two types.
+        foreach (var name in (string[])["PayloadTag", "CarrierTwin"])
+        {
+            var collided = Analysis.FindingsFor(core.Model)
+                .OfKind(FindingKind.Coverage)
+                .Select(f => core.Model.Find(f.Subject)!)
+                .Where(t => string.Equals(t.Name, name, StringComparison.Ordinal))
+                .ToList();
 
-        Assert.Equal(2, collided.Count);
-        Assert.Equal(["Data", "Tools"], collided.Select(t => t.Assembly).Order(StringComparer.Ordinal));
-        Assert.Single(collided.Select(t => t.FullyQualifiedName).Distinct(StringComparer.Ordinal));
+            Assert.Equal(2, collided.Count);
+            Assert.Equal(2, collided.Select(t => t.Assembly).Distinct(StringComparer.Ordinal).Count());
+            Assert.Single(collided.Select(t => t.FullyQualifiedName).Distinct(StringComparer.Ordinal));
+        }
     }
 
     /// <summary>
@@ -455,11 +461,13 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
                 "NormalizationContext", "NormalizedResponse", "RawResponse",
             ],
             probeSaid);
-        Assert.Equal(["NormalizationContext", "NormalizedResponse", "RawResponse"], coreSays);
+        Assert.Equal(
+            ["LayeringEndpoint", "NormalizationContext", "NormalizedResponse", "RawResponse"],
+            coreSays);
 
         // In one direction only. A gate may narrow a finding, never widen it.
         Assert.Equal(
-            ["DispatchCallbackController", "LayeringEndpoint", "ModelDescription"],
+            ["DispatchCallbackController", "ModelDescription"],
             probeSaid.Except(coreSays, StringComparer.Ordinal).Order(StringComparer.Ordinal));
         Assert.Empty(coreSays.Except(probeSaid, StringComparer.Ordinal));
     }
@@ -485,7 +493,8 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
         // The cohort floor is nothing to this finding now: it has no cohort in it.
         Assert.Equal(atDefaults, ChangeCostUnder(core.Model.Policy with { MinCohort = 16 }));
 
-        // The fan-in floor is. Raising it past the smallest survivor drops it.
+        // The fan-in floor is. Raising it past the smallest survivor drops it — two of them since
+        // P8, because LayeringEndpoint came inside the solution-wide slice when the fixture grew.
         Assert.Equal(
             ["NormalizationContext", "RawResponse"],
             ChangeCostUnder(core.Model.Policy with { MinFanIn = 16 }));
@@ -520,10 +529,11 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
     [Fact]
     public void The_change_cost_share_decides_in_both_directions()
     {
-        // Unchanged by P6: the default still nominates the three contracts, and LayeringEndpoint
-        // is outside the slice at solution midrank 9 against a limit of 7.2.
+        // P8 moved this: change cost is gated SOLUTION-WIDE by X2, so the rank limit is a share of
+        // a population that grew by twenty-one types, and LayeringEndpoint came inside the slice it
+        // used to sit just outside. The finding did not change its mind — the solution got bigger.
         Assert.Equal(
-            ["NormalizationContext", "NormalizedResponse", "RawResponse"],
+            ["LayeringEndpoint", "NormalizationContext", "NormalizedResponse", "RawResponse"],
             CoreTypeNominations(FindingKind.ChangeCost));
 
         // Loosening it admits the boundary the probe's absolute floor always accepted, which is
@@ -545,7 +555,7 @@ public sealed class FindingEquivalenceTests(CoreWalkFixture core, FixtureRun pro
 
         // And tightening it past the third survivor narrows the finding.
         Assert.Equal(
-            ["NormalizationContext", "RawResponse"],
+            ["NormalizationContext", "NormalizedResponse", "RawResponse"],
             ChangeCostUnder(core.Model.Policy with { ChangeCostTopFraction = 0.02 }));
     }
 

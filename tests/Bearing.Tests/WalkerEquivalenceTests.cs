@@ -66,41 +66,76 @@ public sealed class CoreWalkFixture
 public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun probe)
 {
     /// <summary>
-    /// The planted cross-project collision: one fully-qualified name, two assemblies.
+    /// The planted cross-project collisions: one fully-qualified name each, two assemblies each.
     /// </summary>
-    private const string CollidingName = "global::TestBed.Shared.PayloadTag";
+    /// <remarks>
+    /// <b>Two since P8, and the plural is the point.</b> <c>PayloadTag</c> proves the ROW is kept
+    /// apart and cannot prove more, because it has no edges in either declaration.
+    /// <c>CarrierTwin</c> carries an inbound edge in one assembly and an outbound edge in the
+    /// other, which is what makes the merge fabricate a dependency — <c>ProjectCycleTests</c>.
+    /// Everything here excludes both, because everything here is about what the two walkers agree
+    /// on.
+    /// </remarks>
+    private static readonly HashSet<string> CollidingNames = new(StringComparer.Ordinal)
+    {
+        "global::TestBed.Shared.PayloadTag",
+        "global::TestBed.Interop.CarrierTwin",
+    };
 
     [Fact]
-    public void Core_finds_the_same_types_plus_the_one_the_probe_merges()
+    public void Core_finds_the_same_types_plus_the_ones_the_probe_merges()
     {
         var probeNames = probe.Result.Types.Select(t => t.Id).ToList();
         var coreNames = core.Model.Types.Select(t => t.FullyQualifiedName).ToList();
 
-        // The probe collapses the collision into one row; Core keeps both declarations.
-        Assert.Equal(1, probeNames.Count(n => n == CollidingName));
-        Assert.Equal(2, coreNames.Count(n => n == CollidingName));
+        // The probe collapses each collision into one row; Core keeps both declarations of each.
+        foreach (var collision in CollidingNames)
+        {
+            Assert.Equal(1, probeNames.Count(n => string.Equals(n, collision, StringComparison.Ordinal)));
+            Assert.Equal(2, coreNames.Count(n => string.Equals(n, collision, StringComparison.Ordinal)));
+        }
 
-        Assert.Equal(probeNames.Count + 1, coreNames.Count);
+        Assert.Equal(probeNames.Count + CollidingNames.Count, coreNames.Count);
         Assert.Equal(probeNames.Order(StringComparer.Ordinal), coreNames.Distinct().Order(StringComparer.Ordinal));
     }
 
     [Fact]
-    public void The_collision_is_two_types_in_two_assemblies_rather_than_one_with_summed_metrics()
+    public void The_collisions_are_two_types_in_two_assemblies_rather_than_one_with_summed_metrics()
     {
-        var split = core.Model.Types.Where(t => t.FullyQualifiedName == CollidingName).ToList();
-        var merged = probe.Result.Types.Single(t => t.Id == CollidingName);
+        // Both collisions, and the assemblies differ between them on purpose: PayloadTag spans two
+        // projects that do not reference each other, CarrierTwin spans a reference edge, which is
+        // what lets its merge fabricate a dependency. P8.
+        Assert.Equal(
+            [["Core", "Data"], ["Data", "Tools"]],
+            CollidingNames
+                .Select(name => core.Model.Types
+                    .Where(t => string.Equals(t.FullyQualifiedName, name, StringComparison.Ordinal))
+                    .Select(t => t.Assembly)
+                    .Order(StringComparer.Ordinal)
+                    .ToList())
+                .OrderBy(a => a[0], StringComparer.Ordinal)
+                .ToList());
 
-        Assert.Equal(2, split.Count);
-        Assert.Equal(["Data", "Tools"], split.Select(t => t.Assembly).Order(StringComparer.Ordinal));
+        foreach (var name in CollidingNames)
+        {
+            var split = core.Model.Types
+                .Where(t => string.Equals(t.FullyQualifiedName, name, StringComparison.Ordinal))
+                .ToList();
+            var merged = probe.Result.Types.Single(t => string.Equals(t.Id, name, StringComparison.Ordinal));
 
-        // The probe's row is the two declarations added together. Core's are the parts.
-        Assert.Equal(merged.MemberCount, split.Sum(t => t.MemberCount));
-        Assert.Equal(merged.Loc, split.Sum(t => t.LinesOfCode));
-        Assert.Equal(merged.Cyclomatic, split.Sum(t => t.Cyclomatic));
+            Assert.Equal(2, split.Count);
+
+            // The probe's row is the two declarations added together. Core's are the parts.
+            Assert.Equal(merged.MemberCount, split.Sum(t => t.MemberCount));
+            Assert.Equal(merged.Loc, split.Sum(t => t.LinesOfCode));
+            Assert.Equal(merged.Cyclomatic, split.Sum(t => t.Cyclomatic));
+        }
+
+        var split2 = core.Model.Types.Where(t => CollidingNames.Contains(t.FullyQualifiedName)).ToList();
 
         // And each part is attributed to the project that actually declares it, rather than
         // both being credited to whichever one loaded first.
-        Assert.All(split, t => Assert.Equal(t.Assembly, t.Project));
+        Assert.All(split2, t => Assert.Equal(t.Assembly, t.Project));
     }
 
     [Theory]
@@ -108,18 +143,18 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
     public void Every_uncollided_type_measures_the_same(string measure)
     {
         var byName = core.Model.Types
-            .Where(t => t.FullyQualifiedName != CollidingName)
+            .Where(t => !CollidingNames.Contains(t.FullyQualifiedName))
             .ToDictionary(t => t.FullyQualifiedName, StringComparer.Ordinal);
 
         var compared = 0;
-        foreach (var p in probe.Result.Types.Where(t => t.Id != CollidingName))
+        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
         {
             var c = byName[p.Id];
             Assert.Equal(ProbeMeasure(p, measure), CoreMeasure(c, measure));
             compared++;
         }
 
-        Assert.Equal(probe.Result.Types.Count - 1, compared);
+        Assert.Equal(probe.Result.Types.Count - CollidingNames.Count, compared);
     }
 
     public static TheoryData<string> Measures =>
@@ -135,7 +170,7 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
     {
         var byName = core.Model.Types.ToLookup(t => t.FullyQualifiedName, StringComparer.Ordinal);
 
-        foreach (var p in probe.Result.Types.Where(t => t.Id != CollidingName))
+        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
             Assert.Equal(p.Kind, byName[p.Id].Single().Classification.Kind);
     }
 
@@ -154,7 +189,7 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
     public void The_same_edges_are_found_with_the_same_weights()
     {
         var probeEdges = probe.Result.Edges
-            .Where(e => e.From != CollidingName && e.To != CollidingName)
+            .Where(e => !CollidingNames.Contains(e.From) && !CollidingNames.Contains(e.To))
             .ToDictionary(e => (e.From, e.To), e => e.Weight);
 
         var coreEdges = new Dictionary<(string, string), int>();
@@ -162,7 +197,7 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
         {
             var from = core.Model.Find(e.From)!.FullyQualifiedName;
             var to = core.Model.Find(e.To)!.FullyQualifiedName;
-            if (from == CollidingName || to == CollidingName) continue;
+            if (CollidingNames.Contains(from) || CollidingNames.Contains(to)) continue;
 
             coreEdges[(from, to)] = coreEdges.GetValueOrDefault((from, to)) + e.Weight;
         }
@@ -177,7 +212,7 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
     {
         var byName = core.Model.Types.ToLookup(t => t.FullyQualifiedName, StringComparer.Ordinal);
 
-        foreach (var p in probe.Result.Types.Where(t => t.Id != CollidingName))
+        foreach (var p in probe.Result.Types.Where(t => !CollidingNames.Contains(t.Id)))
             Assert.Equal(
                 p.ExternalNamespaces.Order(StringComparer.Ordinal),
                 byName[p.Id].Single().ExternalNamespaces.Order(StringComparer.Ordinal));
@@ -192,7 +227,7 @@ public sealed class WalkerEquivalenceTests(CoreWalkFixture core, FixtureRun prob
         // compare the intersection on the probe's terms.
         foreach (var group in probe.Result.Methods.GroupBy(m => m.DeclaringTypeId, StringComparer.Ordinal))
         {
-            if (group.Key == CollidingName) continue;
+            if (CollidingNames.Contains(group.Key)) continue;
 
             var coreMembers = byName[group.Key].Single().Members;
             foreach (var m in group)

@@ -419,6 +419,38 @@ member|Core|global::TestBed.Core.SurchargeReconciler|_normalize,_normalize,Field
 member|Core|global::TestBed.Core.SurchargeReconciler|_validate,_validate,Field,,type|Core|global::TestBed.Core.SurchargeReconciler,Core,0,0,0,0,0,0,1,TestBed/Core/Reconcilers.cs,242
 member|Core|global::TestBed.Core.SurchargeReconciler|global::TestBed.Core.SurchargeReconciler.Reconcile(int),Reconcile,Method,Public,type|Core|global::TestBed.Core.SurchargeReconciler,Core,3,0,0,0,1,1,6,TestBed/Core/Reconcilers.cs,244
 member|Core|global::TestBed.Core.SystemClock|global::TestBed.Core.SystemClock.UtcNow,UtcNow,Property,Public,type|Core|global::TestBed.Core.SystemClock,Core,1,0,0,0,0,0,1,TestBed/Core/DipContrast.cs,12
+member|Core|global::TestBed.Core.Tangles.AlphaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.AlphaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,33
+member|Core|global::TestBed.Core.Tangles.AlphaNode|global::TestBed.Core.Tangles.AlphaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.AlphaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,35
+member|Core|global::TestBed.Core.Tangles.BetaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.BetaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,41
+member|Core|global::TestBed.Core.Tangles.BetaNode|global::TestBed.Core.Tangles.BetaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.BetaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,43
+member|Core|global::TestBed.Core.Tangles.BoltCatch|_other,_other,Field,,type|Core|global::TestBed.Core.Tangles.BoltCatch,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,75
+member|Core|global::TestBed.Core.Tangles.BoltCatch|global::TestBed.Core.Tangles.BoltCatch.Bind(global::TestBed.Core.Tangles.TwinLatch),Bind,Method,Public,type|Core|global::TestBed.Core.Tangles.BoltCatch,Core,1,1,0,0,0,1,1,TestBed/Core/Tangles/Loop.cs,77
+member|Core|global::TestBed.Core.Tangles.BoltCatch|global::TestBed.Core.Tangles.BoltCatch.Depth(),Depth,Method,Public,type|Core|global::TestBed.Core.Tangles.BoltCatch,Core,2,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,79
+member|Core|global::TestBed.Core.Tangles.DeltaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.DeltaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,57
+member|Core|global::TestBed.Core.Tangles.DeltaNode|global::TestBed.Core.Tangles.DeltaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.DeltaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,59
+member|Core|global::TestBed.Core.Tangles.EastLink|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.EastLink,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,41
+member|Core|global::TestBed.Core.Tangles.EastLink|global::TestBed.Core.Tangles.EastLink.Hop(int),Hop,Method,Public,type|Core|global::TestBed.Core.Tangles.EastLink,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Loop.cs,43
+member|Core|global::TestBed.Core.Tangles.EpsilonNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.EpsilonNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,65
+member|Core|global::TestBed.Core.Tangles.EpsilonNode|global::TestBed.Core.Tangles.EpsilonNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.EpsilonNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,67
+member|Core|global::TestBed.Core.Tangles.EtaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.EtaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,81
+member|Core|global::TestBed.Core.Tangles.EtaNode|global::TestBed.Core.Tangles.EtaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.EtaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,83
+member|Core|global::TestBed.Core.Tangles.GammaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.GammaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,49
+member|Core|global::TestBed.Core.Tangles.GammaNode|global::TestBed.Core.Tangles.GammaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.GammaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,51
+member|Core|global::TestBed.Core.Tangles.IotaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.IotaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,97
+member|Core|global::TestBed.Core.Tangles.IotaNode|global::TestBed.Core.Tangles.IotaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.IotaNode,Core,2,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,99
+member|Core|global::TestBed.Core.Tangles.NorthLink|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.NorthLink,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,33
+member|Core|global::TestBed.Core.Tangles.NorthLink|global::TestBed.Core.Tangles.NorthLink.Hop(int),Hop,Method,Public,type|Core|global::TestBed.Core.Tangles.NorthLink,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Loop.cs,35
+member|Core|global::TestBed.Core.Tangles.SouthLink|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.SouthLink,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,49
+member|Core|global::TestBed.Core.Tangles.SouthLink|global::TestBed.Core.Tangles.SouthLink.Hop(int),Hop,Method,Public,type|Core|global::TestBed.Core.Tangles.SouthLink,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Loop.cs,51
+member|Core|global::TestBed.Core.Tangles.ThetaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.ThetaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,89
+member|Core|global::TestBed.Core.Tangles.ThetaNode|global::TestBed.Core.Tangles.ThetaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.ThetaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,91
+member|Core|global::TestBed.Core.Tangles.TwinLatch|_other,_other,Field,,type|Core|global::TestBed.Core.Tangles.TwinLatch,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,65
+member|Core|global::TestBed.Core.Tangles.TwinLatch|global::TestBed.Core.Tangles.TwinLatch.Bind(global::TestBed.Core.Tangles.BoltCatch),Bind,Method,Public,type|Core|global::TestBed.Core.Tangles.TwinLatch,Core,1,1,0,0,0,1,1,TestBed/Core/Tangles/Loop.cs,67
+member|Core|global::TestBed.Core.Tangles.TwinLatch|global::TestBed.Core.Tangles.TwinLatch.Depth(),Depth,Method,Public,type|Core|global::TestBed.Core.Tangles.TwinLatch,Core,2,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,69
+member|Core|global::TestBed.Core.Tangles.WestLink|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.WestLink,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Loop.cs,57
+member|Core|global::TestBed.Core.Tangles.WestLink|global::TestBed.Core.Tangles.WestLink.Hop(int),Hop,Method,Public,type|Core|global::TestBed.Core.Tangles.WestLink,Core,2,0,0,0,0,1,1,TestBed/Core/Tangles/Loop.cs,59
+member|Core|global::TestBed.Core.Tangles.ZetaNode|_next,_next,Field,,type|Core|global::TestBed.Core.Tangles.ZetaNode,Core,0,0,0,0,0,0,1,TestBed/Core/Tangles/Ring.cs,73
+member|Core|global::TestBed.Core.Tangles.ZetaNode|global::TestBed.Core.Tangles.ZetaNode.Step(int),Step,Method,Public,type|Core|global::TestBed.Core.Tangles.ZetaNode,Core,1,0,0,0,0,1,1,TestBed/Core/Tangles/Ring.cs,75
 member|Core|global::TestBed.Core.TariffCalculator|_tenants,_tenants,Field,,type|Core|global::TestBed.Core.TariffCalculator,Core,0,0,0,0,0,0,1,TestBed/Core/TariffCalculator.cs,7
 "member|Core|global::TestBed.Core.TariffCalculator|global::TestBed.Core.TariffCalculator.Apply(decimal, string, int, bool, bool)",Apply,Method,Public,type|Core|global::TestBed.Core.TariffCalculator,Core,22,0,0,0,2,5,30,TestBed/Core/TariffCalculator.cs,9
 member|Core|global::TestBed.Core.TariffLedger|_ledger,_ledger,Field,,type|Core|global::TestBed.Core.TariffLedger,Core,0,0,0,0,0,0,1,TestBed/Core/Ledgers.cs,90
@@ -466,9 +498,18 @@ member|Core|global::TestBed.Core.Vaults.SessionVault|global::TestBed.Core.Vaults
 member|Core|global::TestBed.Core.Vaults.TokenVault|_normalize,_normalize,Field,,type|Core|global::TestBed.Core.Vaults.TokenVault,Core,0,0,0,0,0,0,1,TestBed/Core/Vaults/Vaults.cs,69
 member|Core|global::TestBed.Core.Vaults.TokenVault|global::TestBed.Core.Vaults.TokenVault.Read(int),Read,Method,Public,type|Core|global::TestBed.Core.Vaults.TokenVault,Core,1,0,0,0,0,1,1,TestBed/Core/Vaults/Vaults.cs,71
 member|Core|global::TestBed.Core.VersionController|global::TestBed.Core.VersionController.Get(),Get,Method,Public,type|Core|global::TestBed.Core.VersionController,Core,1,0,0,0,0,0,1,TestBed/Core/Ops.cs,75
+member|Core|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Normalize(),Normalize,Method,Public,type|Core|global::TestBed.Interop.CarrierTwin,Core,2,0,0,0,0,0,1,TestBed/Core/Shared/CarrierTwin.cs,49
+member|Core|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Scac,Scac,Property,Public,type|Core|global::TestBed.Interop.CarrierTwin,Core,0,0,0,0,0,0,1,TestBed/Core/Shared/CarrierTwin.cs,47
+member|Core|global::TestBed.Interop.TwinRelay|_twin,_twin,Field,,type|Core|global::TestBed.Interop.TwinRelay,Core,0,0,0,0,0,0,1,TestBed/Core/Shared/CarrierTwin.cs,58
+member|Core|global::TestBed.Interop.TwinRelay|global::TestBed.Interop.TwinRelay.Route(string),Route,Method,Public,type|Core|global::TestBed.Interop.TwinRelay,Core,1,1,0,0,1,1,5,TestBed/Core/Shared/CarrierTwin.cs,60
 "member|Data|global::TestBed.Data.OrderRepository|global::TestBed.Data.OrderRepository.BuildQuery(global::TestBed.Core.NormalizationContext, string, global::System.DateTime?, global::System.DateTime?, int?, bool)",BuildQuery,Method,Public,type|Data|global::TestBed.Data.OrderRepository,Data,18,11,0,0,3,6,30,TestBed/Data/OrderRepository.cs,10
 "member|Data|global::TestBed.Data.OrderRepository|global::TestBed.Data.OrderRepository.CountOrders(global::System.Data.IDbConnection, string)",CountOrders,Method,Public,type|Data|global::TestBed.Data.OrderRepository,Data,1,2,0,0,1,2,7,TestBed/Data/OrderRepository.cs,41
 member|Data|global::TestBed.Data.RateRepository|global::TestBed.Data.RateRepository.GetBaseRate(string),GetBaseRate,Method,Public,type|Data|global::TestBed.Data.RateRepository,Data,2,0,0,0,1,1,4,TestBed/Data/RateRepository.cs,9
+member|Data|global::TestBed.Interop.CarrierTwin|_archive,_archive,Field,,type|Data|global::TestBed.Interop.CarrierTwin,Data,0,0,0,0,0,0,1,TestBed/Data/CarrierTwin.cs,22
+"member|Data|global::TestBed.Interop.CarrierTwin|global::TestBed.Interop.CarrierTwin.Retain(string, int)",Retain,Method,Public,type|Data|global::TestBed.Interop.CarrierTwin,Data,2,0,0,0,1,2,5,TestBed/Data/CarrierTwin.cs,24
+member|Data|global::TestBed.Interop.TagArchive|_last,_last,Field,,type|Data|global::TestBed.Interop.TagArchive,Data,0,0,0,0,0,0,1,TestBed/Data/CarrierTwin.cs,37
+member|Data|global::TestBed.Interop.TagArchive|global::TestBed.Interop.TagArchive.Last,Last,Property,Public,type|Data|global::TestBed.Interop.TagArchive,Data,2,0,0,0,0,0,1,TestBed/Data/CarrierTwin.cs,41
+member|Data|global::TestBed.Interop.TagArchive|global::TestBed.Interop.TagArchive.Record(string),Record,Method,Public,type|Data|global::TestBed.Interop.TagArchive,Data,1,1,0,0,0,1,1,TestBed/Data/CarrierTwin.cs,39
 member|Data|global::TestBed.Shared.PayloadTag|global::TestBed.Shared.PayloadTag.Describe(),Describe,Method,Public,type|Data|global::TestBed.Shared.PayloadTag,Data,2,0,0,0,1,0,4,TestBed/Data/PayloadTag.cs,21
 member|Data|global::TestBed.Shared.PayloadTag|global::TestBed.Shared.PayloadTag.Label,Label,Property,Public,type|Data|global::TestBed.Shared.PayloadTag,Data,0,0,0,0,0,0,1,TestBed/Data/PayloadTag.cs,19
 member|Tools|global::TestBed.Shared.PayloadTag|_weights,_weights,Field,,type|Tools|global::TestBed.Shared.PayloadTag,Tools,0,0,0,0,0,0,1,TestBed/Tools/PayloadTag.cs,14

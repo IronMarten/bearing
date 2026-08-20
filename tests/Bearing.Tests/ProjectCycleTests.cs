@@ -29,7 +29,8 @@ namespace Bearing.Tests;
 /// remembered.
 /// </para>
 /// </remarks>
-public sealed class ProjectCycleTests
+[Collection(FixtureCollection.Name)]
+public sealed class ProjectCycleTests(CoreWalkFixture core)
 {
     private static IReadOnlyList<Cycle> Among(
         (string TypeId, string Project)[] types,
@@ -177,5 +178,64 @@ public sealed class ProjectCycleTests
             ("Service", "Tag")));
 
         Assert.Equal(["Core", "Web"], Names(fabricated));
+    }
+    // ------------------------------------------------------- D1, over the real fixture ----
+
+    /// <summary>
+    /// <b>D1's retro-protection, and the half <c>PayloadTag</c> could not carry.</b> The fixture
+    /// contains a name declared in two assemblies whose <i>merge</i> closes a project cycle that
+    /// its split does not.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The test above proves the mechanism over primitives. This one proves the fixture contains
+    /// it — which matters because <c>PayloadTag</c>, the collision that was already there, has
+    /// fan-in 0 in both declarations and no outbound edges either. A type nothing points at and
+    /// which points at nothing sits in no component whichever way it is keyed, so merged and split
+    /// give identical answers and the defect's damage was unobservable on this fixture.
+    /// </para>
+    /// <para>
+    /// <c>CarrierTwin</c> is wired the way nopCommerce's collision was: an inbound edge inside
+    /// Core and an outbound edge inside Data. Split, neither crosses a project boundary. Merged,
+    /// one of them must — and Data already depends on Core, so the aggregate closes into a cycle
+    /// that no code in the fixture contains. <c>P8</c>, and <c>tests/TestBed/Core/Shared/CarrierTwin.cs</c>
+    /// carries the arithmetic.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_fixtures_collision_fabricates_a_project_cycle_only_when_merged()
+    {
+        var model = core.Model;
+
+        // The collision is real and Core keeps it apart: two rows, one per assembly, and the
+        // edges sit on different declarations.
+        var twins = model.Types.Where(t => t.Name == "CarrierTwin").OrderBy(t => t.Assembly, StringComparer.Ordinal).ToList();
+
+        Assert.Equal(2, twins.Count);
+        Assert.Equal((1, 0), (twins[0].FanIn, twins[0].FanOut));   // Core: pointed at
+        Assert.Equal((0, 1), (twins[1].FanIn, twins[1].FanOut));   // Data: pointing out
+
+        // Split — what Core does. No project cycle, which is the right answer.
+        Assert.Empty(model.ProjectCycles);
+
+        // Merged — what keying on the fully-qualified name alone does. The assembly segment of the
+        // identity is dropped, which is precisely the defect, and the same edges then close.
+        static string Merge(string canonical)
+        {
+            var parts = canonical.Split('|');
+            return parts.Length == 3 ? $"{parts[0]}|{parts[2]}" : canonical;
+        }
+
+        var merged = Cycles.AmongProjects(
+            model.Types
+                .GroupBy(t => Merge(t.Subject.Canonical), StringComparer.Ordinal)
+                .Select(g => (g.Key, g.OrderBy(t => t.Assembly, StringComparer.Ordinal).First().Project)),
+            model.Edges.Select(e => (Merge(e.From.Canonical), Merge(e.To.Canonical))));
+
+        var fabricated = Assert.Single(merged);
+
+        Assert.Equal(
+            ["Core", "Data"],
+            fabricated.Members.Select(m => m.Canonical.Split('|')[^1]).Order(StringComparer.Ordinal));
     }
 }

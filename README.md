@@ -49,6 +49,12 @@ about — components with no peer group, excluded generated code, projects that 
 load. A tool that quietly says nothing about the riskiest thing in your codebase is worse
 than no tool.
 
+**The JSON and CSV are unstable while the tool is 0.x.** `--json` carries a `schemaVersion`,
+independent of the tool's version and moved only when a consumer would have to change to keep
+reading. Pin against it if you build on the output. The shape is not a public contract before
+1.0 — one deliverable is still unbuilt and it will add fields — and it becomes one at 1.0 if
+anyone is depending on it by then.
+
 ## Design constraints
 
 These are not preferences. Each one was learned by building the opposite and watching it

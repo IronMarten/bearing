@@ -49,11 +49,15 @@ public sealed class StructureTests(FixtureRun run)
         // *Caliper — and twenty-eight edges, which are the references that hold each family's
         // fan-in median where its gate needs it. Sixteen methods, not fifteen: SpanCaliper carries
         // a second one so its cyclomatic total lands on the tie that fixes its percentile.
-        Assert.Equal(159, run.Result.Types.Count);
-        Assert.Equal(345, run.Result.Edges.Count);
+        //
+        // And P8 again: nine *Node, four *Link, a mutual pair, and the four types of the second
+        // identity collision. The probe's count stays two behind Core's rather than one, because
+        // there are two collisions for it to merge now.
+        Assert.Equal(177, run.Result.Types.Count);
+        Assert.Equal(362, run.Result.Edges.Count);
         // Methods are counted per declaration, so unlike Types this is not distorted by the
         // planted collision: Describe, Score and Weight are all three present.
-        Assert.Equal(165, run.Result.Methods.Count);
+        Assert.Equal(186, run.Result.Methods.Count);
     }
 
     // ---- Generated code exclusion -------------------------------------------------

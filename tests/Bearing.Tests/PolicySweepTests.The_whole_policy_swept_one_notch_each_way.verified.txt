@@ -22,7 +22,7 @@ BlastFanInMultiple                   2     0.1   -          moves
 BoundaryTopFraction               0.05    0.01   -          -
 BlastTopFraction                  0.05    0.01   -          -
 BlastComplexityPercentile           70       1   -          moves
-ChangeCostTopFraction             0.05    0.01   -          moves
+ChangeCostTopFraction             0.05    0.01   moves      -
 RollCallDivisor                      3       1   moves      moves
 SurfaceOutlierMultiple             1.5     0.1   -          -
 SurfaceOutlierFloor                  1       1   -          -
