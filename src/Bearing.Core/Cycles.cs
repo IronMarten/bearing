@@ -125,13 +125,14 @@ public static class Cycles
     /// here means the namespaces cannot be understood, extracted or built independently
     /// whatever directory they live in.
     /// </remarks>
-    public static IReadOnlyList<Cycle> AmongNamespaces(SolutionModel model)
+    public static IReadOnlyList<Cycle> AmongNamespaces(IReadOnlyList<TypeNode> types)
     {
-        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(types);
 
+        var byId = types.ToDictionary(t => t.Subject.Canonical, StringComparer.Ordinal);
         var adjacency = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
 
-        foreach (var type in model.Types)
+        foreach (var type in types)
         {
             var from = NamespaceOf(type);
             if (!adjacency.TryGetValue(from, out var reaches))
@@ -143,7 +144,7 @@ public static class Cycles
             {
                 // A dangling edge names a type that was excluded or did not load. It cannot
                 // contribute a namespace, and guessing one from the name would invent an edge.
-                if (model.Find(target) is not { } dependency) continue;
+                if (!byId.TryGetValue(target.Canonical, out var dependency)) continue;
 
                 var to = NamespaceOf(dependency);
                 if (!string.Equals(from, to, StringComparison.Ordinal)) reaches.Add(to);
@@ -161,18 +162,10 @@ public static class Cycles
     /// Not gated by a policy value. Two projects each naming a type in the other is the whole of
     /// the finding: unlike a type tangle, there is no size at which it becomes ordinary.
     /// </remarks>
-    public static IReadOnlyList<Cycle> AmongProjects(SolutionModel model)
-    {
-        ArgumentNullException.ThrowIfNull(model);
-
-        return AmongProjects(
-            model.Types.Select(t => (t.Subject.Canonical, t.Project)),
-            model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
-    }
-
-    /// <summary>
-    /// The same computation over primitives.
-    /// </summary>
+    /// <remarks>
+    /// Over primitives, and there is no <see cref="SolutionModel"/> overload beside it — see the
+    /// note on <see cref="SolutionModel.NamespaceCycles"/> for why the model does the projecting.
+    /// </remarks>
     /// <param name="types">Each analysed type's identity and the project that declares it.</param>
     /// <param name="edges">Each dependency, by type identity at both ends.</param>
     /// <remarks>
@@ -220,13 +213,13 @@ public static class Cycles
     /// Type tangles: groups of at least <see cref="AnalysisPolicy.MinTangle"/> types that all
     /// reach each other, largest first.
     /// </summary>
-    public static IReadOnlyList<Cycle> AmongTypes(SolutionModel model)
+    public static IReadOnlyList<Cycle> AmongTypes(IReadOnlyList<TypeNode> types, int minTangle)
     {
-        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(types);
 
-        var byId = model.Types.ToDictionary(t => t.Subject.Canonical, StringComparer.Ordinal);
+        var byId = types.ToDictionary(t => t.Subject.Canonical, StringComparer.Ordinal);
 
-        var adjacency = model.Types.ToDictionary(
+        var adjacency = types.ToDictionary(
             t => t.Subject.Canonical,
             t => (IReadOnlyList<string>)t.Outbound
                 .Select(target => target.Canonical)
@@ -234,7 +227,7 @@ public static class Cycles
                 .ToList(),
             StringComparer.Ordinal);
 
-        return Build(adjacency, model.Policy.MinTangle, id => byId[id].Subject);
+        return Build(adjacency, minTangle, id => byId[id].Subject);
     }
 
     private static string NamespaceOf(TypeNode type) =>

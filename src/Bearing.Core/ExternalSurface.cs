@@ -97,11 +97,9 @@ public static class ExternalSurface
     /// with its failure mode unchanged and stated where it is defined.
     /// </para>
     /// </remarks>
-    public static IntegrationMap Integrations(SolutionModel model)
+    public static IntegrationMap Integrations(IReadOnlyList<ExternalDependency> everything)
     {
-        ArgumentNullException.ThrowIfNull(model);
-
-        var everything = model.ExternalDependencies;
+        ArgumentNullException.ThrowIfNull(everything);
 
         return new IntegrationMap(
             everything.Where(d => !IsPlumbing(d.Namespace)).ToList(),
@@ -119,17 +117,17 @@ public static class ExternalSurface
     /// number, and because invariant 4's statement is about all of them: consumer impact of a
     /// change at any contact point is outside what static analysis can see.
     /// </remarks>
-    public static ContactPoints Of(SolutionModel model)
+    public static ContactPoints Of(IReadOnlyList<TypeNode> types)
     {
-        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(types);
 
         return new ContactPoints(
-            Kind(model, Inbound),
-            Kind(model, Outbound));
+            Kind(types, Inbound),
+            Kind(types, Outbound));
     }
 
-    private static List<TypeNode> Kind(SolutionModel model, string kind) =>
-        model.Types
+    private static List<TypeNode> Kind(IReadOnlyList<TypeNode> types, string kind) =>
+        types
             .Where(t => string.Equals(t.Classification.Kind, kind, StringComparison.Ordinal))
             .OrderBy(t => t.Subject.Canonical, StringComparer.Ordinal)
             .ToList();

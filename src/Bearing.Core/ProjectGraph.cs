@@ -81,18 +81,6 @@ public sealed class ProjectGraph
         : Groups.GroupBy(g => g.Layer).Max(layer => layer.Count());
 
     /// <summary>Builds the graph for a solution.</summary>
-    public static ProjectGraph Of(SolutionModel model)
-    {
-        ArgumentNullException.ThrowIfNull(model);
-
-        return Of(
-            model.Types.Select(t => (t.Subject.Canonical, t.Project)),
-            model.Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
-    }
-
-    /// <summary>
-    /// The same over primitives.
-    /// </summary>
     /// <remarks>
     /// Primitives for the reason <see cref="Cycles.AmongProjects(IEnumerable{ValueTuple{string,
     /// string}}, IEnumerable{ValueTuple{string, string}})"/> and <see cref="ProjectReachability"/>

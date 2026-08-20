@@ -538,10 +538,10 @@ public sealed class SolutionModel
     /// it would be computing. <see cref="CohortStatisticsSet"/> carries what is blank and why.
     /// </remarks>
     public IReadOnlyDictionary<string, CohortStatistics> Statistics =>
-        _statistics ??= CohortStatisticsSet.ForSolution(this);
+        _statistics ??= CohortStatisticsSet.ForSolution(Types, Policy);
 
     /// <summary>Mutually dependent namespaces, largest cycle first.</summary>
-    public IReadOnlyList<Cycle> NamespaceCycles => _namespaceCycles ??= Cycles.AmongNamespaces(this);
+    public IReadOnlyList<Cycle> NamespaceCycles => _namespaceCycles ??= Cycles.AmongNamespaces(Types);
 
     /// <summary>
     /// Mutually dependent projects, largest cycle first.
@@ -555,18 +555,22 @@ public sealed class SolutionModel
     /// <c>docs/DEFECTS.md</c> §1 fabricated here before <see cref="SubjectRef"/> keyed types by
     /// assembly.
     /// </remarks>
-    public IReadOnlyList<Cycle> ProjectCycles => _projectCycles ??= Cycles.AmongProjects(this);
+    public IReadOnlyList<Cycle> ProjectCycles => _projectCycles ??= Cycles.AmongProjects(
+        Types.Select(t => (t.Subject.Canonical, t.Project)),
+        Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
     /// <summary>
     /// The project dependency graph, layered and folded — what the architecture diagram draws.
     /// </summary>
-    public ProjectGraph ProjectGraph => _projectGraph ??= ProjectGraph.Of(this);
+    public ProjectGraph ProjectGraph => _projectGraph ??= ProjectGraph.Of(
+        Types.Select(t => (t.Subject.Canonical, t.Project)),
+        Edges.Select(e => (e.From.Canonical, e.To.Canonical)));
 
     /// <summary>
     /// Groups of types that all reach each other, largest first. Gated at
     /// <see cref="AnalysisPolicy.MinTangle"/>.
     /// </summary>
-    public IReadOnlyList<Cycle> TypeTangles => _typeTangles ??= Cycles.AmongTypes(this);
+    public IReadOnlyList<Cycle> TypeTangles => _typeTangles ??= Cycles.AmongTypes(Types, Policy.MinTangle);
 
     /// <summary>
     /// Projects no other project depends on, ordered by name.
@@ -608,7 +612,7 @@ public sealed class SolutionModel
     /// <summary>
     /// The solution's external contact points, split inbound and outbound.
     /// </summary>
-    public ContactPoints ContactPoints => _contactPoints ??= ExternalSurface.Of(this);
+    public ContactPoints ContactPoints => _contactPoints ??= ExternalSurface.Of(Types);
 
     /// <summary>
     /// External systems this codebase talks to, with the plumbing filtered out and counted.
@@ -618,7 +622,7 @@ public sealed class SolutionModel
     /// that <c>System.Linq</c> is not an integration is a judgement, and the raw list is what
     /// makes the judgement checkable.
     /// </remarks>
-    public IntegrationMap Integrations => _integrations ??= ExternalSurface.Integrations(this);
+    public IntegrationMap Integrations => _integrations ??= ExternalSurface.Integrations(ExternalDependencies);
 
     /// <summary>Every namespace outside the solution that analysed types touch.</summary>
     public IReadOnlyList<ExternalDependency> ExternalDependencies =>

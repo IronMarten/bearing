@@ -82,22 +82,24 @@ public static class CohortStatisticsSet
     /// <summary>
     /// Every analysed type's statistics, keyed by <see cref="SubjectRef.Canonical"/>.
     /// </summary>
-    public static IReadOnlyDictionary<string, CohortStatistics> ForSolution(SolutionModel model)
+    public static IReadOnlyDictionary<string, CohortStatistics> ForSolution(
+        IReadOnlyList<TypeNode> types, AnalysisPolicy policy)
     {
-        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(types);
+        ArgumentNullException.ThrowIfNull(policy);
 
-        var solutionFanIn = Distribution.Of(model.Types.Select(t => (double)t.FanIn));
-        var solutionMaxCc = Distribution.Of(model.Types.Select(t => (double)t.MaxMemberCyclomatic));
+        var solutionFanIn = Distribution.Of(types.Select(t => (double)t.FanIn));
+        var solutionMaxCc = Distribution.Of(types.Select(t => (double)t.MaxMemberCyclomatic));
 
         var statistics = new Dictionary<string, CohortStatistics>(StringComparer.Ordinal);
 
-        foreach (var group in model.Types.GroupBy(t => t.Cohort.Key, StringComparer.Ordinal))
+        foreach (var group in types.GroupBy(t => t.Cohort.Key, StringComparer.Ordinal))
         {
             var peers = group.ToList();
 
             // The report's rule, applied to the export: below the floor there is no comparison to
             // report, so every cohort-relative column is blank rather than computed.
-            var comparable = peers.Count >= model.Policy.MinCohort;
+            var comparable = peers.Count >= policy.MinCohort;
 
             var fanIn = Distribution.Of(peers.Select(t => (double)t.FanIn));
             var fanOut = Distribution.Of(peers.Select(t => (double)t.FanOut));
