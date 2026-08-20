@@ -210,7 +210,18 @@ internal sealed class ModelBuilder
             return;
         }
 
-        if (ExternalMatch("Microsoft.EntityFrameworkCore", "System.Data", "Dapper", "NHibernate") is { } data)
+        // docs/DEFECTS.md §5. LinqToDB and FluentMigrator were missing, and on nopCommerce that
+        // was not a silence — it was 114 of Nop.Data's 129 Internal types, the *Builder mapping
+        // layer under Nop.Data/Mapping/Builders, one per entity. The 23 that did classify were
+        // caught by System.Data rather than by any ORM rule: right by coincidence.
+        //
+        // FluentMigrator is schema migration rather than querying, and it belongs here for the
+        // reason TypeKinds.DataAccess states — "reaches a database or persistence framework". A
+        // type that defines how an entity maps to a table is data access by any reading a
+        // developer would give it.
+        if (ExternalMatch(
+                "Microsoft.EntityFrameworkCore", "System.Data", "Dapper", "NHibernate",
+                "LinqToDB", "FluentMigrator") is { } data)
         {
             node.Classification = new TypeClassification(TypeKinds.DataAccess, "external-ns:" + data);
             return;

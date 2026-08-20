@@ -156,7 +156,7 @@ asserts the lower-bound wording is *absent* when nothing failed, and
 `A_project_that_did_not_load_is_what_bounds_the_numbers` asserts it is present, and names the
 project, when something did.
 
-### 5. `DataAccess` classification is a hardcoded list of four ORMs
+### 5. `DataAccess` classification is a hardcoded list of four ORMs — **fixed**
 
 The list is `Microsoft.EntityFrameworkCore`, `System.Data`, `Dapper`, `NHibernate`, plus a
 `base:DbContext` rule. It misses **LinqToDB** and **FluentMigrator**, which is what nopCommerce
@@ -182,6 +182,39 @@ feeds effective fan-out and the boundary section.
 **It does not move the plot.** A project's density is findings over *all* its types regardless of
 kind, so `Nop.Data`'s 12-of-153 reading is unaffected — worth stating because `A11` round 2
 pre-registers that project as *"surprisingly clean"* and a fix here does not disturb it.
+
+**Fixed 2026-08-20** by adding `LinqToDB` and `FluentMigrator` to the prefix list. Measured on both
+reference solutions before and after:
+
+| | nopCommerce | jellyfin |
+|---|---|---|
+| types reclassified | **134**, all `Internal` → `DataAccess` | **0** |
+| `DataAccess` | 23 → 157 | 24 → 24 |
+| evidence | 129 `FluentMigrator.Builders`, 15 `FluentMigrator`, 7 `LinqToDB`, 1 `FluentMigrator.Runner` | unchanged — it uses EF Core, already on the list |
+
+**jellyfin is the control and it does not move**, which is what says this is a gap in the list
+rather than a rule tuned to one codebase.
+
+**What it changed downstream is larger than the classification, and is the point.** `Kind` is a
+cohort basis and it gates layer span, so on nopCommerce:
+
+- **Layer span went from 1 finding to 5.** It fired only on `NopStartup` before, because the
+  `DataAccess` arm of "reaches across three kinds" could not fire on a solution whose data layer
+  read as `Internal`. The four it now finds are the ones the finding exists for —
+  `AvalaraTaxManager`, `OmnisendService`, `FacebookPixelService` and `InstallationService`, each
+  reaching an API boundary, a data provider and an outbound HTTP client.
+- **The lead claim changed.** Selection is rarest-kind-first (X10), and layer span was rarest at
+  one. At five it is no longer, so the report now opens on `FormValueRequiredAttribute`
+  (load-bearing and intricate, 1 of 4). **`TASKS.md`'s note that "layer span leads on both real
+  solutions" was true and is now false for nopCommerce.**
+- Concealed decision 79 → 78 and no-peer-group 107 → 106, both from cohorts recomposing around the
+  new kind.
+
+**The fixture cannot see any of this and no test asserts it.** TestBed references neither library —
+it cannot, without taking a package dependency for a classification rule — so the suite is green
+and unchanged either way. That is the same shape as the gaps `TASKS.md` Track P exists for, and it
+is recorded there rather than left implied. The evidence for this fix is the two real-solution
+runs above, and re-running them is how it stays true.
 
 ### 6. Visit-order dependence — **resolved**
 
