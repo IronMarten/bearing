@@ -147,6 +147,14 @@ public sealed class SolutionWalker
     }
 
     /// <summary>Loads the solution and walks it.</summary>
+    /// <remarks>
+    /// <b>Five steps, named, and it used to be one method.</b> At cc 25 over 109 lines with four
+    /// levels of nesting it was the worst method in this codebase on all three measures at once —
+    /// which is the tool's own verdict on itself, and the reason it was split. Nothing about the
+    /// order or the work changed; what changed is that each step can be read without the other
+    /// four in view. The two closures stay closures because each is a projection of
+    /// <c>compilations</c> that the builder holds for the length of the walk.
+    /// </remarks>
     public async Task<SolutionModel> WalkAsync(CancellationToken cancellationToken = default)
     {
         var diagnostics = new List<string>();
@@ -161,7 +169,36 @@ public sealed class SolutionWalker
         };
 
         var solution = await OpenAsync(workspace, cancellationToken).ConfigureAwait(false);
+        var projects = SelectProjects(solution, skipped);
 
+        var (compilations, projectNodes) =
+            await CompileAsync(projects, diagnostics, cancellationToken).ConfigureAwait(false);
+
+        var builder = new ModelBuilder(
+            _options, InSolutionOf(compilations), OriginOfAssembly(compilations));
+
+        await WalkTypesAsync(builder, compilations, cancellationToken).ConfigureAwait(false);
+
+        return builder.Build(_options.SolutionPath, projectNodes, new Coverage
+        {
+            ExclusionsApplied = _options.ExcludedPathFragments,
+            SkippedProjects = skipped,
+            LoadDiagnostics = diagnostics,
+            ExcludedTypes = builder.ExcludedTypes,
+        });
+    }
+
+    /// <summary>
+    /// The C# projects to analyse, recording into <paramref name="skipped"/> the ones excluded
+    /// for looking like tests.
+    /// </summary>
+    /// <remarks>
+    /// The skip is recorded rather than silent because invariant 8 says so, and because a test
+    /// project's absence understates fan-in for everything it uses — <c>FixtureBuilder</c> in the
+    /// fixture is exactly that case, and it is planted to look like dead code because of it.
+    /// </remarks>
+    private List<Project> SelectProjects(Solution solution, List<string> skipped)
+    {
         var projects = solution.Projects
             .Where(p => p.Language == LanguageNames.CSharp)
             .Where(p =>
@@ -176,8 +213,24 @@ public sealed class SolutionWalker
             throw new InvalidOperationException(
                 $"No C# projects loaded from '{_options.SolutionPath}'. Is the solution restored?");
 
+        return projects;
+    }
+
+    /// <summary>
+    /// Compiles each project, and records what each one is while the compilation is in hand.
+    /// </summary>
+    /// <remarks>
+    /// A project that will not compile is dropped and disclosed, never guessed at: its types
+    /// would be missing either way, and a reader who sees no diagnostic is entitled to assume
+    /// the graph is complete.
+    /// </remarks>
+    private static async Task<(List<(Project Project, Compilation Compilation)> Compilations,
+                              List<ProjectNode> Nodes)> CompileAsync(
+        List<Project> projects, List<string> diagnostics, CancellationToken cancellationToken)
+    {
         var compilations = new List<(Project Project, Compilation Compilation)>();
-        var projectNodes = new List<ProjectNode>();
+        var nodes = new List<ProjectNode>();
+
         foreach (var project in projects)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -190,20 +243,44 @@ public sealed class SolutionWalker
             }
 
             compilations.Add((project, compilation));
-            projectNodes.Add(new ProjectNode(
+            nodes.Add(new ProjectNode(
                 project.Name,
                 compilation.GetEntryPoint(cancellationToken) is not null,
                 compilation.Options.OutputKind == OutputKind.DynamicallyLinkedLibrary));
         }
 
-        var solutionAssemblies = compilations
+        return (compilations, nodes);
+    }
+
+    /// <summary>Whether a symbol is declared by one of the assemblies being analysed.</summary>
+    /// <remarks>
+    /// By assembly name rather than by project: this is the question "is this ours", and the
+    /// answer has to be the same for a type reached through a reference as for one reached
+    /// through source.
+    /// </remarks>
+    private static Func<ISymbol?, bool> InSolutionOf(
+        List<(Project Project, Compilation Compilation)> compilations)
+    {
+        var assemblies = compilations
             .Select(c => c.Compilation.Assembly.Name)
             .ToHashSet(StringComparer.Ordinal);
 
-        bool IsInSolution(ISymbol? s) =>
-            s?.ContainingAssembly is not null && solutionAssemblies.Contains(s.ContainingAssembly.Name);
+        return symbol =>
+            symbol?.ContainingAssembly is not null
+            && assemblies.Contains(symbol.ContainingAssembly.Name);
+    }
 
-        var originByAssembly = new Dictionary<string, ExternalOrigin>(StringComparer.Ordinal);
+    /// <summary>Where an external symbol's assembly was resolved from.</summary>
+    /// <remarks>
+    /// Read off the reference paths once, up front, because the same assembly is referenced by
+    /// many projects and the answer cannot differ between them. Package beats Framework beats
+    /// Unknown, so a NuGet copy of something that also ships in the SDK reads as a package.
+    /// </remarks>
+    private static Func<ISymbol?, ExternalOrigin> OriginOfAssembly(
+        List<(Project Project, Compilation Compilation)> compilations)
+    {
+        var byAssembly = new Dictionary<string, ExternalOrigin>(StringComparer.Ordinal);
+
         foreach (var (_, compilation) in compilations)
         {
             foreach (var reference in compilation.References.OfType<PortableExecutableReference>())
@@ -212,19 +289,29 @@ public sealed class SolutionWalker
 
                 var origin = OriginOfPath(reference.FilePath);
                 if (origin == ExternalOrigin.Unknown) continue;
-                if (originByAssembly.TryGetValue(assembly.Name, out var seen) && seen >= origin) continue;
+                if (byAssembly.TryGetValue(assembly.Name, out var seen) && seen >= origin) continue;
 
-                originByAssembly[assembly.Name] = origin;
+                byAssembly[assembly.Name] = origin;
             }
         }
 
-        ExternalOrigin OriginOf(ISymbol? s) =>
-            s?.ContainingAssembly is { } a && originByAssembly.TryGetValue(a.Name, out var origin)
+        return symbol =>
+            symbol?.ContainingAssembly is { } a && byAssembly.TryGetValue(a.Name, out var origin)
                 ? origin
                 : ExternalOrigin.Unknown;
+    }
 
-        var builder = new ModelBuilder(_options, IsInSolution, OriginOf);
-
+    /// <summary>Walks every analysable type in every compilation into the builder.</summary>
+    /// <remarks>
+    /// One pass, and the reason is in this class's own summary: fan-in and fan-out come out of
+    /// this traversal rather than from N calls to <c>FindReferencesAsync</c>, which is what sets
+    /// the cost of a run on a large solution.
+    /// </remarks>
+    private async Task WalkTypesAsync(
+        ModelBuilder builder,
+        List<(Project Project, Compilation Compilation)> compilations,
+        CancellationToken cancellationToken)
+    {
         foreach (var (project, compilation) in compilations)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -247,14 +334,6 @@ public sealed class SolutionWalker
                 ModelBuilder.Classify(node, type);
             }
         }
-
-        return builder.Build(_options.SolutionPath, projectNodes, new Coverage
-        {
-            ExclusionsApplied = _options.ExcludedPathFragments,
-            SkippedProjects = skipped,
-            LoadDiagnostics = diagnostics,
-            ExcludedTypes = builder.ExcludedTypes,
-        });
     }
 
     /// <summary>
