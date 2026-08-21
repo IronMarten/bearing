@@ -12,6 +12,32 @@ namespace IronMarten.Bearing;
 /// </param>
 public readonly record struct TypeReference(SubjectRef From, SubjectRef To, EdgeKind Kind, SourceLocation Site);
 
+/// <summary>One reference from one member to another.</summary>
+/// <param name="From">
+/// The member the reference is written inside, or <see langword="null"/> where there is none.
+/// </param>
+/// <param name="To">The member referred to.</param>
+/// <param name="Kind">What kind of reference it is, from the syntax it appears in.</param>
+/// <param name="Site">Where it is written.</param>
+/// <remarks>
+/// <para>
+/// <b>A parallel graph, not a decoration on <see cref="TypeReference"/>, and A9 is why.</b> The
+/// type graph suppresses a reference from a type to itself — a self-edge is not a dependency and
+/// admitting one would move fan-in, fan-out, instability and every cycle. At member level that same
+/// reference is the whole question: a private helper's only caller is almost always a sibling
+/// method on its own type, and a dead-code claim built on the type graph would report every one of
+/// them as unreferenced.
+/// </para>
+/// <para>
+/// <b><see cref="From"/> is nullable because not every reference is inside a member.</b> A base
+/// list, a type-level attribute and a generic constraint are all written on the type itself. Those
+/// still count as inbound to whatever they name — a type is not dead because the only thing naming
+/// it is an attribute — so they are recorded with no source member rather than dropped.
+/// </para>
+/// </remarks>
+public readonly record struct MemberReference(
+    SubjectRef? From, SubjectRef To, EdgeKind Kind, SourceLocation Site);
+
 /// <summary>
 /// A dependency between two types, aggregated over every site that produced it.
 /// </summary>
@@ -162,6 +188,28 @@ public sealed class Member
 
     /// <summary>What kind of declaration it is.</summary>
     public MemberKind Kind { get; }
+
+    /// <summary>
+    /// Every reference the walk found pointing at this member.
+    /// </summary>
+    /// <remarks>
+    /// <b>A9's first layer, and the model had no place for it before.</b> Every reference endpoint
+    /// was a type — measured, 385 of 385 on the fixture — because <c>ReferenceCollector</c> walked
+    /// from the type declaration and never knew which member it was inside. Members are first-class
+    /// everywhere else in the model; this is the last place they were not.
+    /// </remarks>
+    public IReadOnlyList<MemberReference> Inbound => _inbound;
+
+    /// <summary>How many references point at this member. Zero is the dead-code question.</summary>
+    /// <remarks>
+    /// <b>Zero is a question and never an answer</b> — <c>TECHREQ-job-a.md</c> §5.6 is the list of
+    /// ways it lies, and A9's remaining layers are that list. Nothing in Core reads this yet.
+    /// </remarks>
+    public int InboundReferenceCount => _inbound.Count;
+
+    private readonly List<MemberReference> _inbound = [];
+
+    internal void AddInbound(MemberReference reference) => _inbound.Add(reference);
 
     /// <summary>
     /// Whether this is the kind of member a method-level finding is about — a method or a
@@ -481,6 +529,19 @@ public sealed class Coverage
     /// <c>ModelBuilder.Build</c>, which is the only place that can know it.
     /// </remarks>
     public int EdgesToUnanalysedTypes { get; internal set; }
+
+    /// <summary>
+    /// References that name a member this walk recorded no row for, and which are therefore absent
+    /// from the member graph.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="EdgesToUnanalysedTypes"/> one level down, and it exists for A9. The dead-code
+    /// claim is that a member has no inbound references; how many references failed to land on a
+    /// member at all is part of whether a reader should believe it. Non-zero is the ordinary case
+    /// — a member of a type in a skipped test project or an excluded file resolves to a symbol a
+    /// reference can name and to no row here.
+    /// </remarks>
+    public int MemberReferencesToUnanalysedMembers { get; internal set; }
 }
 
 /// <summary>

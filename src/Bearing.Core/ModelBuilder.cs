@@ -55,6 +55,12 @@ internal sealed class ModelBuilder
     private readonly Dictionary<string, TypeNode> _types = new(StringComparer.Ordinal);
     private readonly Dictionary<string, List<CohortCandidate>> _candidates = new(StringComparer.Ordinal);
     private readonly Dictionary<(string From, string To), List<TypeReference>> _references = [];
+
+    /// <summary>Inbound member references, keyed on the member they point at — A9's first layer.</summary>
+    private readonly Dictionary<string, List<MemberReference>> _memberReferences = new(StringComparer.Ordinal);
+
+    /// <summary>Member subjects already built, so a signature is generated once rather than per reference.</summary>
+    private readonly Dictionary<ISymbol, SubjectRef?> _memberSubjects = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<string, SubjectRef> _subjects = new(StringComparer.Ordinal);
 
     internal ModelBuilder(
@@ -207,14 +213,21 @@ internal sealed class ModelBuilder
 
     private void CollectReferences(TypeNode node, SyntaxNode syntax, SemanticModel model)
     {
-        var collector = new ReferenceCollector(model, syntax, (symbol, kind, site) =>
+        var collector = new ReferenceCollector(model, syntax, found =>
         {
-            var target = ResolveToNamedType(symbol);
+            var target = ResolveToNamedType(found.Symbol);
             if (target is null) return;
 
             if (_isInSolution(target))
             {
                 var targetSubject = SubjectRef.ForType(target.ContainingAssembly!.Name, Fq(target));
+
+                // The member graph is recorded first, and before the self-edge guard below — A9,
+                // and see MemberReference. A private helper's only caller is usually a sibling on
+                // its own type, and that is exactly the reference the type graph must not contain
+                // and the dead-code question cannot do without.
+                RecordMemberReference(node, target, found);
+
                 if (string.Equals(targetSubject.Canonical, node.Subject.Canonical, StringComparison.Ordinal)) return;
 
                 node.AddOutbound(targetSubject);
@@ -223,7 +236,7 @@ internal sealed class ModelBuilder
                 if (!_references.TryGetValue(key, out var list))
                     _references[key] = list = [];
 
-                list.Add(new TypeReference(node.Subject, targetSubject, kind, site));
+                list.Add(new TypeReference(node.Subject, targetSubject, found.Kind, found.Site));
             }
             else if (ExternalNamespaceLabel(target) is { } ns)
             {
@@ -233,6 +246,75 @@ internal sealed class ModelBuilder
         });
 
         collector.Visit(syntax);
+    }
+
+    /// <summary>
+    /// Records one reference in the member graph, when both it and its target are members.
+    /// </summary>
+    /// <remarks>
+    /// <b>A reference to a type is not a reference to a member and is dropped here.</b>
+    /// <c>Foo x</c> names a type; <c>new Foo()</c> names its constructor and is kept. Keeping the
+    /// first would give every member of <c>Foo</c> an inbound reference it does not have, which is
+    /// invariant 4's "safe to delete" inverted.
+    /// </remarks>
+    private void RecordMemberReference(TypeNode node, INamedTypeSymbol target, FoundReference found)
+    {
+        if (MemberSubjectOf(found.Symbol, target) is not { } to) return;
+
+        var from = found.Within is null ? null : SubjectOfDeclared(node, found.Within);
+
+        if (!_memberReferences.TryGetValue(to.Canonical, out var list))
+            _memberReferences[to.Canonical] = list = [];
+
+        list.Add(new MemberReference(from, to, found.Kind, found.Site));
+    }
+
+    /// <summary>
+    /// The subject of the member a reference points at, or <see langword="null"/> if it points at
+    /// something that is not one.
+    /// </summary>
+    /// <remarks>
+    /// <b>Cached on the symbol, because this runs once per reference and the walk's other member
+    /// work does not.</b> nopCommerce produces 112,124 references over 25,165 members, so the same
+    /// signature is generated forty times over otherwise — and a documentation comment ID is built
+    /// rather than read off. The declaring type comes from <paramref name="target"/>, which
+    /// <see cref="ResolveToNamedType"/> has already reduced to its original definition, so a
+    /// reference through <c>Foo&lt;int&gt;</c> and one through <c>Foo&lt;string&gt;</c> land on the
+    /// same member.
+    /// </remarks>
+    private SubjectRef? MemberSubjectOf(ISymbol symbol, INamedTypeSymbol target)
+    {
+        if (symbol is not (IMethodSymbol or IPropertySymbol or IFieldSymbol or IEventSymbol)) return null;
+
+        var definition = symbol.OriginalDefinition;
+        if (_memberSubjects.TryGetValue(definition, out var cached)) return cached;
+
+        var id = definition.GetDocumentationCommentId();
+        var subject = id is null || target.ContainingAssembly is null
+            ? null
+            : SubjectRef.ForMember(target.ContainingAssembly.Name, Fq(target), id);
+
+        return _memberSubjects[definition] = subject;
+    }
+
+    /// <summary>
+    /// The subject of a member being <i>declared</i> in the type currently being walked.
+    /// </summary>
+    /// <remarks>
+    /// Built from <paramref name="node"/> rather than from the symbol's own containing type, so it
+    /// is the same string <see cref="MemberSubject"/> produced when the member was recorded. The
+    /// two have to join or the member graph points at nothing.
+    /// </remarks>
+    private SubjectRef? SubjectOfDeclared(TypeNode node, ISymbol member)
+    {
+        if (_memberSubjects.TryGetValue(member, out var cached)) return cached;
+
+        var id = member.GetDocumentationCommentId();
+        var subject = id is null
+            ? null
+            : SubjectRef.ForMember(node.Assembly, node.FullyQualifiedName, id);
+
+        return _memberSubjects[member] = subject;
     }
 
     /// <summary>
@@ -386,6 +468,8 @@ internal sealed class ModelBuilder
             .OrderBy(t => t.Subject.Canonical, StringComparer.Ordinal)
             .ToList();
 
+        AttachMemberReferences(types, coverage);
+
         // Projects are canonicalised for the same reason types and edges above them are, and were
         // not until R2 — docs/DEFECTS.md §37. They arrive in workspace load order, which is the
         // order the .sln declares them in, so reversing four lines of a solution file with no
@@ -399,6 +483,41 @@ internal sealed class ModelBuilder
         return new SolutionModel(
             solutionPath, _options.Policy, _options.ToolVersion, ordered, types, edges, coverage,
             _externalOrigins);
+    }
+
+    /// <summary>
+    /// Hands each member the references pointing at it, and counts the ones that point nowhere.
+    /// </summary>
+    /// <remarks>
+    /// <b>The same shape as the type graph's unresolved count, and for the same reason.</b>
+    /// <c>_isInSolution</c> answers "does this symbol belong to a project here", which is not "did
+    /// the walk record a member for it" — an excluded file, a skipped test project and a
+    /// compiler-generated member all resolve to symbols a reference can name. Counted rather than
+    /// dropped silently: invariant 8, and A9 is going to claim that a member has no inbound
+    /// references, so how many references failed to land on one is part of whether that claim can
+    /// be trusted.
+    /// </remarks>
+    private void AttachMemberReferences(List<TypeNode> types, Coverage coverage)
+    {
+        var byCanonical = new Dictionary<string, Member>(StringComparer.Ordinal);
+        foreach (var type in types)
+            foreach (var member in type.Members)
+                byCanonical[member.Subject.Canonical] = member;
+
+        var unresolved = 0;
+
+        foreach (var (canonical, references) in _memberReferences)
+        {
+            if (!byCanonical.TryGetValue(canonical, out var member))
+            {
+                unresolved += references.Count;
+                continue;
+            }
+
+            foreach (var reference in references) member.AddInbound(reference);
+        }
+
+        coverage.MemberReferencesToUnanalysedMembers = unresolved;
     }
 
     /// <summary>Package beats Framework beats Unknown. See <see cref="_externalOrigins"/>.</summary>

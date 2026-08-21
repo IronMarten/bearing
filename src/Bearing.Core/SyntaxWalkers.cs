@@ -24,9 +24,22 @@ internal sealed class ReferenceCollector : CSharpSyntaxWalker
 {
     private readonly SemanticModel _model;
     private readonly SyntaxNode _root;
-    private readonly Action<ISymbol, EdgeKind, SourceLocation> _onReference;
+    private readonly Action<FoundReference> _onReference;
 
-    internal ReferenceCollector(SemanticModel model, SyntaxNode root, Action<ISymbol, EdgeKind, SourceLocation> onReference)
+    /// <summary>
+    /// The member the walk is currently inside, or <see langword="null"/> at type level.
+    /// </summary>
+    /// <remarks>
+    /// <b>Tracked on the way down rather than reconstructed on the way up, and that is the cost
+    /// argument.</b> <see cref="KindOf"/> already walks the parent chain per name node; finding the
+    /// enclosing member the same way would walk it a second time, for every one of the 112,124
+    /// references nopCommerce produces. Set once per member declaration instead — 25,165 times on
+    /// the same solution, each a <c>GetDeclaredSymbol</c> the member metrics were going to make
+    /// anyway.
+    /// </remarks>
+    private ISymbol? _within;
+
+    internal ReferenceCollector(SemanticModel model, SyntaxNode root, Action<FoundReference> onReference)
         : base(SyntaxWalkerDepth.Node)
     {
         _model = model;
@@ -38,8 +51,35 @@ internal sealed class ReferenceCollector : CSharpSyntaxWalker
     {
         if (node is null) return;
         if (node != _root && node is BaseTypeDeclarationSyntax) return;
+
+        if (DeclaresAMember(node))
+        {
+            var enclosing = _within;
+            _within = _model.GetDeclaredSymbol(node);
+            base.Visit(node);
+            _within = enclosing;
+            return;
+        }
+
         base.Visit(node);
     }
+
+    /// <summary>Whether entering this node means entering a member.</summary>
+    /// <remarks>
+    /// <b>A field's declarator rather than its declaration</b>, for <c>docs/DEFECTS.md</c> §39's
+    /// reason: <c>GetDeclaredSymbol</c> answers <see langword="null"/> for a
+    /// <c>BaseFieldDeclarationSyntax</c>, so a reference in an initialiser would be attributed to
+    /// nothing at all. It is also the only reading that survives <c>int a = X(), b = Y();</c>,
+    /// where the two initialisers belong to different members.
+    /// </remarks>
+    private static bool DeclaresAMember(SyntaxNode node) => node switch
+    {
+        BaseTypeDeclarationSyntax => false,
+        BaseFieldDeclarationSyntax => false,          // its declarators carry the members
+        VariableDeclaratorSyntax v => v.Parent?.Parent is BaseFieldDeclarationSyntax,
+        MemberDeclarationSyntax => true,
+        _ => false,
+    };
 
     public override void VisitIdentifierName(IdentifierNameSyntax node) => Resolve(node);
 
@@ -58,7 +98,7 @@ internal sealed class ReferenceCollector : CSharpSyntaxWalker
         var span = node.GetLocation().GetLineSpan();
         var site = new SourceLocation(span.Path ?? "", span.StartLinePosition.Line + 1);
 
-        _onReference(symbol, KindOf(node, symbol), site);
+        _onReference(new FoundReference(symbol, KindOf(node, symbol), site, _within));
     }
 
     /// <summary>
@@ -121,6 +161,23 @@ internal sealed class ReferenceCollector : CSharpSyntaxWalker
         return EdgeKind.Other;
     }
 }
+
+/// <summary>One resolved reference, as the collector found it.</summary>
+/// <param name="Symbol">What the name resolved to. A type, or a member of one.</param>
+/// <param name="Kind">What kind of reference it is, from the syntax it appears in.</param>
+/// <param name="Site">Where it is written.</param>
+/// <param name="Within">
+/// The member it is written inside, or <see langword="null"/> where it is on the type itself — a
+/// base list, a type-level attribute, a constraint.
+/// </param>
+/// <remarks>
+/// A record rather than four callback arguments, because <c>Within</c> is the fourth and A9's
+/// remaining layers will want a fifth. The collector resolves it rather than handing back syntax:
+/// it already holds the semantic model, and doing it here means one <c>GetDeclaredSymbol</c> per
+/// member instead of one per reference.
+/// </remarks>
+internal readonly record struct FoundReference(
+    ISymbol Symbol, EdgeKind Kind, SourceLocation Site, ISymbol? Within);
 
 /// <summary>
 /// Cyclomatic complexity and mutation counts for one member body.
