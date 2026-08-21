@@ -1578,3 +1578,43 @@ plant's contribution and what it did not disturb are in `docs/TESTING.md` §6.
 
 `members.csv` and the JSON now publish a readable `Signature` beside the id, and `SchemaVersion` is
 `2.0` — a key changing value is a major, where a field being added is not.
+
+### 42. A file Roslyn cannot parse is walked anyway, and the report says it read everything
+
+The walk reacts only when `GetCompilationAsync` returns null. A file whose *syntax* fails to parse
+still produces a compilation — with errors — so `CompileAsync` records nothing, the walkers run
+over Roslyn's error-recovery tree, and `WHAT WAS NOT ANALYSED` prints **"Every project selected for
+analysis produced a compilation."** That sentence is a false assurance, and it is the defect.
+
+**What the recovery tree actually costs, reproduced.** A two-file project, one file using C# 14
+extension members against the pinned Roslyn 4.12, `LangVersion=preview`, the other ordinary:
+
+- `NeighbourInSameFile` — declared under `namespace Lib;` in the broken file — was collected as
+  `global::NeighbourInSameFile`. The parse error ended the file-scoped namespace early, so the type
+  is attributed to the global namespace. **Its `SubjectRef` is therefore wrong**, which means every
+  namespace-level claim misplaces it and a `--baseline` comparison reads it as one type deleted and
+  a different one added.
+- Its `public IPlainService? Service { get; set; }` produced **no edge at all**. Fan-in on
+  `IPlainService` is understated by one, silently.
+- The type count was 4, which is correct. Nothing about the output looks wrong.
+
+**The blast radius is the file, not the project.** A third, well-formed file in the same project
+was walked correctly and both its `Field` edges came through. So the realistic shape of this is a
+handful of files in a large solution, not a failed run — which is what makes it survivable, and
+also what makes it invisible.
+
+**Current exposure is zero, and that is why this is recorded rather than rushed.** Instrumenting
+`CompileAsync` to count syntax-error files across both cloned solutions: nopCommerce **0 of 3,683**
+in 27 projects, Jellyfin **0 of 1,653** in 21 projects, with `Load diagnostics: none` on both, so
+the denominators are honest. Both are `net8.0`-era, which is the C# the pinned Roslyn handles — the
+measurement shows we are not broken now, not that we cannot be.
+
+**Two fixes, and only the second is the point.** Reporting the count belongs in `WHAT WAS NOT
+ANALYSED`, but it is a tripwire rather than a feature: on healthy code it prints nothing, and its
+job is that *we* find out rather than a customer does. The fix that matters is **not walking a tree
+that has syntax errors at all** — a missing type is an honest gap, a type under the wrong namespace
+is wrong data, and drift comparison cannot tell the second from a real change.
+
+**Not an argument for chasing Roslyn versions.** Any version has a language ceiling and C# 15 will
+exist; upgrading moves the cliff rather than removing it. What removes the class is the tool
+knowing when it could not read something. See `TASKS.md` Track D.
