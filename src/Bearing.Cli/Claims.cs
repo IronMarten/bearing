@@ -329,7 +329,6 @@ public static class Claims
     private static IEnumerable<string> Unseen(Finding finding)
     {
         if (finding.Holds(Qualifiers.TestUsageUnobservable)) yield return "usage from test projects";
-        if (finding.Holds(Qualifiers.ContainerMayResolve)) yield return "a container resolving it";
     }
 
     private static Claim BlastRadius(SolutionModel model, Finding finding)

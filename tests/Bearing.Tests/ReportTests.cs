@@ -422,7 +422,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         // because a section that silently stopped disclosing would still pass that.
         Assert.Equal(2, disclosures.Count);
         Assert.Contains(disclosures, d => d.Contains("7 types not shown of 22", StringComparison.Ordinal));
-        Assert.Contains(disclosures, d => d.Contains("nominations not shown of 77", StringComparison.Ordinal));
+        Assert.Contains(disclosures, d => d.Contains("nominations not shown of 76", StringComparison.Ordinal));
         Assert.All(disclosures, d => Assert.Contains("raise --top", d, StringComparison.Ordinal));
     }
 

@@ -9,6 +9,10 @@ namespace IronMarten.Bearing;
 /// <param name="InterfaceImplementations">Members that exist because an interface asked for them.</param>
 /// <param name="Overrides">Members that override a base member.</param>
 /// <param name="ExternallyVisible">Members reachable from outside the assembly that declares them.</param>
+/// <param name="SoleConstructors">
+/// Constructors that are the only accessible one their type declares — whatever creates the type
+/// calls this, and a container never names it.
+/// </param>
 /// <param name="Considered">Members with no inbound reference, before any exclusion.</param>
 /// <remarks>
 /// <para>
@@ -29,6 +33,7 @@ public sealed record DeadCodeExclusions(
     int InterfaceImplementations,
     int Overrides,
     int ExternallyVisible,
+    int SoleConstructors,
     int Considered)
 {
     /// <summary>How many of the considered members an exclusion removed.</summary>
@@ -89,7 +94,7 @@ public static class NoStaticReferences
 
         foreach (var (type, member) in Considered(model))
         {
-            if (Excluding(member) is not null) continue;
+            if (Excluding(type, member) is not null) continue;
 
             yield return new Finding(
                 new FindingKey(FindingKind.NoStaticReferences, member.Subject),
@@ -103,7 +108,6 @@ public static class NoStaticReferences
                 ],
                 [
                     new Qualifier(Qualifiers.TestUsageUnobservable, testsUnobservable),
-                    new Qualifier(Qualifiers.ContainerMayResolve, MayBeInjected(type, member)),
                 ],
                 []);
         }
@@ -114,16 +118,17 @@ public static class NoStaticReferences
     {
         ArgumentNullException.ThrowIfNull(model);
 
-        var considered = Considered(model).Select(x => x.Member).ToList();
+        var considered = Considered(model).ToList();
 
         return new DeadCodeExclusions(
-            considered.Count(RuntimeInvoked),
-            considered.Count(m => m.ImplementsInterface),
-            considered.Count(m => m.IsOverride),
-            considered.Count(m => m.IsExternallyVisible),
+            considered.Count(x => RuntimeInvoked(x.Member)),
+            considered.Count(x => x.Member.ImplementsInterface),
+            considered.Count(x => x.Member.IsOverride),
+            considered.Count(x => x.Member.IsExternallyVisible),
+            considered.Count(x => SoleConstructor(x.Type, x.Member)),
             considered.Count)
         {
-            Excluded = considered.Count(m => Excluding(m) is not null),
+            Excluded = considered.Count(x => Excluding(x.Type, x.Member) is not null),
         };
     }
 
@@ -141,12 +146,13 @@ public static class NoStaticReferences
     /// disagree about what was excluded — which is the failure that makes a disclosure worse than
     /// none.
     /// </remarks>
-    private static string? Excluding(Member member) => member switch
+    private static string? Excluding(TypeNode type, Member member) => member switch
     {
         _ when RuntimeInvoked(member) => "invoked by the runtime",
         { ImplementsInterface: true } => "implements an interface",
         { IsOverride: true } => "overrides a base member",
         { IsExternallyVisible: true } => "externally visible",
+        _ when SoleConstructor(type, member) => "the type's only accessible constructor",
         _ => null,
     };
 
@@ -164,24 +170,49 @@ public static class NoStaticReferences
         member.IsEntryPoint || (member.Kind == MemberKind.Constructor && member.IsStatic);
 
     /// <summary>
-    /// Whether a container is the plausible caller: a constructor on a type something names.
+    /// Whether this is the only constructor anything outside the type could call.
     /// </summary>
     /// <remarks>
-    /// <b>The DI signature, stated as the fact it is rather than as a guess about the framework.</b>
-    /// Something references the type — so it is not unreached — and nothing calls this constructor,
-    /// which is what registration by generic argument looks like from here: <c>AddSingleton&lt;T&gt;()</c>
-    /// names <c>T</c> and calls none of its constructors. It is deliberately not a test for whether
-    /// the solution uses a container, because that would be a curated list of registration APIs,
-    /// and <c>docs/DEFECTS.md</c> §5 is the standing example of what one of those costs.
     /// <para>
-    /// <b>A private constructor is excluded, and that was a real misfire.</b> A container can only
-    /// call a constructor it can reach, so saying "a container may resolve it" about a private one
-    /// is not a caveat but a wrong statement — it shipped on nopCommerce's
-    /// <c>RoxyFilemanException</c>, which is the factory-method pattern and not injection at all.
+    /// <b>The DI signature, and it is an exclusion rather than a caveat because the pattern is
+    /// systematic.</b> A type with one accessible constructor and no caller for it is what
+    /// registration looks like from inside the solution: <c>AddSingleton&lt;T&gt;()</c> names
+    /// <c>T</c> and calls none of its constructors, and convention scanning names nothing at all.
+    /// On nopCommerce this is <b>24 of 29 nominations</b> — a section that is five-sixths one
+    /// systematic pattern is invariant 1's cry-wolf failure however carefully each row is worded.
+    /// </para>
+    /// <para>
+    /// <b>Only when it is the sole accessible constructor, and that is the whole precision of the
+    /// rule.</b> A container picks one constructor, so a type offering several has siblings that
+    /// nothing calls and nothing was ever going to call — those are real dead overloads and they
+    /// stay nominated. nopCommerce has one, Jellyfin none, which is what makes the narrower rule
+    /// worth having rather than "exclude constructors".
+    /// </para>
+    /// <para>
+    /// <b>It does not ask whether the type is referenced, and requiring that was the earlier
+    /// mistake.</b> A container reaches a type by naming it or by scanning for it; the second
+    /// leaves no reference at all, which is exactly the <c>AuditPolicySink</c> case §5.6 calls
+    /// out. Requiring an inbound reference made the rule miss the shape it exists for, and left
+    /// nopCommerce's <c>EventConsumer</c> nominated with no category named at all.
+    /// </para>
+    /// <para>
+    /// <b>A private constructor is not one of these</b>, and treating it as one was a real misfire:
+    /// a container can only call a constructor it can reach, so it shipped on nopCommerce's
+    /// <c>RoxyFilemanException</c>, which is the factory-method pattern and not injection. A type
+    /// whose only constructor is private has no accessible one, so nothing here is excluded and
+    /// that constructor stays nominated.
+    /// </para>
+    /// <para>
+    /// It is deliberately not a test for whether the solution uses a container, because that would
+    /// be a curated list of registration APIs, and <c>docs/DEFECTS.md</c> §5 is the standing
+    /// example of what one of those costs.
     /// </para>
     /// </remarks>
-    private static bool MayBeInjected(TypeNode type, Member member) =>
+    private static bool SoleConstructor(TypeNode type, Member member) =>
+        Constructible(member) && type.Members.Count(Constructible) == 1;
+
+    /// <summary>A constructor something outside the type could call.</summary>
+    private static bool Constructible(Member member) =>
         member is { Kind: MemberKind.Constructor, IsStatic: false }
-        && !string.Equals(member.Accessibility, "Private", StringComparison.Ordinal)
-        && type.InboundReferenceCount > 0;
+        && !string.Equals(member.Accessibility, "Private", StringComparison.Ordinal);
 }

@@ -193,6 +193,7 @@ internal static class FindingSections
         yield return $"     {excluded.InterfaceImplementations,6}  implements an interface — callers reach it through the contract";
         yield return $"     {excluded.Overrides,6}  overrides a base member — same";
         yield return $"     {excluded.ExternallyVisible,6}  visible outside this assembly — the caller may not be in this solution";
+        yield return $"     {excluded.SoleConstructors,6}  the type's only constructor — whatever creates the type calls it";
         yield return "   (a member can be in several of those, so they do not sum to the number set aside)";
     }
 

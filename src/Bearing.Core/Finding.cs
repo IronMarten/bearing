@@ -70,18 +70,6 @@ public static class Qualifiers
     public const string TestUsageUnobservable = "test-usage-unobservable";
 
     /// <summary>
-    /// A container is a plausible caller: a constructor on a type something else names.
-    /// </summary>
-    /// <remarks>
-    /// The DI signature as a fact rather than a guess about the framework. Something references
-    /// the type, so it is not unreached; nothing calls this constructor, which is exactly what
-    /// registration by generic argument looks like from here — <c>AddSingleton&lt;T&gt;()</c> names
-    /// <c>T</c> and calls none of its constructors. 1,965 constructors across the two reference
-    /// solutions have this shape.
-    /// </remarks>
-    public const string ContainerMayResolve = "container-may-resolve";
-
-    /// <summary>
     /// Connectivity is low in <b>absolute</b> terms, not merely relative to peers — so the
     /// subject can be described as plumbing.
     /// </summary>

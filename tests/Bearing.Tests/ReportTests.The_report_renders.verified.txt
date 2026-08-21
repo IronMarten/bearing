@@ -32,7 +32,7 @@ Every claim shows the numbers behind it.
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
      Core · AuthenticationMiddleware.cs:8 · spans architectural layers, 1 of 14
    AuditReconciler._validate — no static references found — verify before deleting. Nothing refers to AuditReconciler either.
-     Core · Reconcilers.cs:149 · no static references found, 1 of 77
+     Core · Reconcilers.cs:149 · no static references found, 1 of 76
 
    Each one is the strongest row of its section. The rest of that section is
    below, and every finding this run made is in --json and --csv.
@@ -177,14 +177,15 @@ Every claim shows the numbers behind it.
    DocumentController._carrier — no static references found — verify before deleting. Nothing refers to DocumentController either. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:47
    DocumentReconciler._validate — no static references found — verify before deleting. 2 references reach DocumentReconciler itself. (private field, 1 line; not visible here: usage from test projects) — Reconcilers.cs:255
    ErrorGauge._normalize — no static references found — verify before deleting. 10 references reach ErrorGauge itself. (private field, 1 line; not visible here: usage from test projects) — Gauges.cs:105
-   (62 nominations not shown of 77 — raise --top to see them.)
+   (61 nominations not shown of 76 — raise --top to see them.)
 
-   235 members had no inbound reference. 158 of those are not asked about,
+   235 members had no inbound reference. 159 of those are not asked about,
    because being referred to by nothing here is what each of them looks like:
           1  invoked by the runtime — an entry point, or a static constructor
           9  implements an interface — callers reach it through the contract
           0  overrides a base member — same
         156  visible outside this assembly — the caller may not be in this solution
+          5  the type's only constructor — whatever creates the type calls it
    (a member can be in several of those, so they do not sum to the number set aside)
 
 -- CIRCULAR REFERENCES -----------------------------------------

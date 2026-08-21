@@ -161,20 +161,44 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
         Assert.Contains(subjects, s => s.EndsWith("F:TestBed.Core.Depots.LabelDepot._normalize", StringComparison.Ordinal));
     }
 
-    /// <summary>A constructor on a type something names says a container may be the caller.</summary>
+    /// <summary>
+    /// A type's only accessible constructor is set aside, and a sibling overload is not.
+    /// </summary>
     /// <remarks>
-    /// The DI shape, and the qualifier says what is true rather than guessing at a framework: the
-    /// type is referenced, the constructor is not, which is what registration by generic argument
-    /// looks like from inside the solution.
+    /// <b>Chris's call, on the measurement: a counted exclusion rather than a caveat.</b> A type
+    /// with one accessible constructor and no caller for it is what registration looks like from
+    /// inside the solution, and on nopCommerce that was 24 of 29 nominations — a section that is
+    /// five-sixths one systematic pattern is invariant 1's failure however carefully each row is
+    /// worded. The precision is in "only": a container picks one constructor, so a type offering
+    /// several has siblings nothing was ever going to call, and those stay.
     /// </remarks>
     [Fact]
-    public void A_constructor_on_a_referenced_type_names_the_container_it_cannot_see()
+    public void A_sole_accessible_constructor_is_set_aside()
     {
-        var constructors = Findings.OfKind(FindingKind.NoStaticReferences)
-            .Where(f => f.Holds(Qualifiers.ContainerMayResolve))
-            .ToList();
+        var nominated = Findings.OfKind(FindingKind.NoStaticReferences)
+            .Select(f => f.Subject.Canonical)
+            .ToHashSet(StringComparer.Ordinal);
 
-        Assert.All(constructors, f =>
-            Assert.EndsWith("ctor", f.Subject.Canonical.Split('(')[0], StringComparison.Ordinal));
+        foreach (var type in core.Model.Types)
+        {
+            var accessible = type.Members
+                .Where(m => m.Kind == MemberKind.Constructor && !m.IsStatic
+                            && m.Accessibility != "Private")
+                .ToList();
+
+            if (accessible.Count != 1) continue;
+
+            Assert.DoesNotContain(accessible[0].Subject.Canonical, nominated);
+        }
+    }
+
+    /// <summary>The exclusion is counted, and the section says so.</summary>
+    [Fact]
+    public void The_sole_constructor_exclusion_is_counted()
+    {
+        var excluded = NoStaticReferences.Excluded(core.Model);
+
+        Assert.True(excluded.SoleConstructors > 0, "the fixture declares no sole-constructor types");
+        Assert.Contains("the type's only constructor", Text, StringComparison.Ordinal);
     }
 }
