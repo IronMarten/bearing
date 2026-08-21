@@ -25,6 +25,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0" />
+    <PackageReference Include="Microsoft.VisualStudio.SolutionPersistence" Version="1.0.52" />
   </ItemGroup>
 
   <!--
@@ -34,11 +35,7 @@
   -->
   <Target Name="RemoveMSBuildAssemblies" AfterTargets="ResolveAssemblyReferences">
     <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-                               Condition="'%(Filename)' == 'Microsoft.Build'
-                                       or '%(Filename)' == 'Microsoft.Build.Framework'
-                                       or '%(Filename)' == 'Microsoft.Build.Tasks.Core'
-                                       or '%(Filename)' == 'Microsoft.Build.Utilities.Core'" />
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Microsoft.Build'&#xA;                                       or '%(Filename)' == 'Microsoft.Build.Framework'&#xA;                                       or '%(Filename)' == 'Microsoft.Build.Tasks.Core'&#xA;                                       or '%(Filename)' == 'Microsoft.Build.Utilities.Core'" />
     </ItemGroup>
   </Target>
 

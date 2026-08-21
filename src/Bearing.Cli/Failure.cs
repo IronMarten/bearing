@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing.Cli;
+﻿namespace IronMarten.Bearing.Cli;
 
 /// <summary>
 /// What the tool says when it cannot start.
@@ -18,9 +18,16 @@ namespace IronMarten.Bearing.Cli;
 /// </para>
 /// <para>
 /// <b>The extension is read after the failure, never before it.</b> There is no pre-flight check
-/// rejecting <c>.slnx</c>, because the day MSBuild learns to parse one the load will simply
-/// succeed and this text will stop being reached — whereas a guard in front of the load would go
-/// on refusing a file that had started working, and nothing would fail to say so.
+/// rejecting <c>.slnx</c>, and the design note that predicted why is worth keeping now that it has
+/// paid: the text said it would stop being reached the day the load learned to succeed, and
+/// <c>docs/DEFECTS.md</c> §8 is that day. A guard in front of the load would have gone on refusing
+/// a file that had started working, and nothing would have failed to say so.
+/// </para>
+/// <para>
+/// <b>What a <c>.slnx</c> failure means now is different, so the sentence is too.</b> It is no
+/// longer "this tool does not read your format" — it does — but a file that did not parse or names
+/// a project that is not there. Leaving the old text would be the tool blaming its own limitation
+/// for the user's typo.
 /// </para>
 /// </remarks>
 public static class Failure
@@ -68,9 +75,9 @@ public static class Failure
 
         if (string.Equals(extension, ".slnx", StringComparison.OrdinalIgnoreCase))
         {
-            yield return "That is an XML solution file. Bearing reads the .sln format, and MSBuild's";
-            yield return "solution parser does not accept .slnx yet — so this is a limitation and not";
-            yield return "a problem with your file. If a .sln for the same projects still exists, use it.";
+            yield return "Bearing reads .slnx, so the format is not the problem. The file itself could";
+            yield return "not be parsed as an XML solution — check that it is well-formed, and that every";
+            yield return "Path it names resolves from the folder the .slnx is in.";
             yield break;
         }
 

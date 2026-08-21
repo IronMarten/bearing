@@ -1,3 +1,4 @@
+﻿using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -470,13 +471,27 @@ public sealed class SolutionWalker
         return ExternalOrigin.Unknown;
     }
 
+    /// <summary>
+    /// The solution formats MSBuild's own parser cannot read, which this opens project by project.
+    /// </summary>
+    /// <remarks>
+    /// One entry, and it is a list so that adding the next format is a line rather than a second
+    /// branch. <c>.slnx</c> is XML and MSBuild's solution parser rejects it outright —
+    /// <c>MSB4068: The element &lt;Solution&gt; is unrecognized</c>, because MSBuild reads it as a
+    /// project file — so <c>OpenSolutionAsync</c> cannot be given one at any version currently
+    /// resolvable here.
+    /// </remarks>
+    private static readonly string[] ReadDirectly = [".slnx"];
+
     private async Task<Solution> OpenAsync(MSBuildWorkspace workspace, CancellationToken cancellationToken)
     {
         try
         {
-            return await workspace
-                .OpenSolutionAsync(_options.SolutionPath, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            return ReadDirectly.Contains(Path.GetExtension(_options.SolutionPath), StringComparer.OrdinalIgnoreCase)
+                ? await OpenProjectsAsync(workspace, cancellationToken).ConfigureAwait(false)
+                : await workspace
+                    .OpenSolutionAsync(_options.SolutionPath, cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
         }
 #pragma warning disable CA1031 // see the remarks above: the scope is one call, and the types are MSBuild's to change
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -488,6 +503,80 @@ public sealed class SolutionWalker
             };
         }
     }
+
+    /// <summary>
+    /// A solution whose container MSBuild will not parse, opened one project at a time.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Only the container is new; the projects are ordinary.</b> A <c>.slnx</c> lists the same
+    /// <c>.csproj</c> files a <c>.sln</c> does, and MSBuild evaluates each of those exactly as it
+    /// always has — so the gap is a file format, not a toolchain. Reading it with the serializer
+    /// Visual Studio and the SDK use, then handing the paths to <c>OpenProjectAsync</c>, closes
+    /// <c>docs/DEFECTS.md</c> §8 without moving off the Roslyn version every golden was measured
+    /// against.
+    /// </para>
+    /// <para>
+    /// <b>Project references come in on their own.</b> <c>OpenProjectAsync</c> follows them, so a
+    /// project named by another but missing from the solution file still arrives — the same
+    /// behaviour <c>OpenSolutionAsync</c> has, and the reason this returns
+    /// <see cref="Workspace.CurrentSolution"/> at the end rather than accumulating what each call
+    /// returned.
+    /// </para>
+    /// <para>
+    /// <b>A solution with no projects in it is opened, not refused.</b> An empty <c>&lt;Solution
+    /// /&gt;</c> parses, and what comes back is a walk over nothing — which is what an empty
+    /// <c>.sln</c> already produces. Treating it as unreadable would be the tool disagreeing with
+    /// the file about whether the file is valid.
+    /// </para>
+    /// </remarks>
+    private async Task<Solution> OpenProjectsAsync(
+        MSBuildWorkspace workspace, CancellationToken cancellationToken)
+    {
+        var serializer = SolutionSerializers.GetSerializerByMoniker(_options.SolutionPath)
+                         ?? throw new InvalidOperationException(
+                             $"No solution serializer handles '{_options.SolutionPath}'.");
+
+        var model = await serializer.OpenAsync(_options.SolutionPath, cancellationToken).ConfigureAwait(false);
+
+        var directory = Path.GetDirectoryName(Path.GetFullPath(_options.SolutionPath)) ?? ".";
+
+        foreach (var project in model.SolutionProjects)
+        {
+            var full = Path.GetFullPath(Path.Combine(directory, project.FilePath));
+
+            // Solution folders and shared-project entries have no .csproj behind them, and
+            // SkipUnrecognizedProjects only covers what the workspace was asked to open.
+            if (!File.Exists(full)) continue;
+
+            // Already here because something opened before it referenced it. OpenProjectAsync
+            // throws rather than no-opping on a second open — "'Core' is already part of the
+            // workspace" — so the transitive pull described above has to be checked for, not just
+            // relied on. Any solution whose projects reference each other hits this, which is
+            // most of them.
+            if (Opened(workspace).Contains(full)) continue;
+
+            await workspace.OpenProjectAsync(full, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
+        return workspace.CurrentSolution;
+    }
+
+    /// <summary>
+    /// The project files the workspace already holds, by full path.
+    /// </summary>
+    /// <remarks>
+    /// Read fresh on each iteration rather than accumulated, because opening one project can add
+    /// several — a set this method maintained itself would know only about the ones it asked for.
+    /// Case-insensitive: the path in a solution file and the path MSBuild resolved differ in case
+    /// often enough on Windows, and a miss here is an exception rather than a duplicate.
+    /// </remarks>
+    private static HashSet<string> Opened(Workspace workspace) =>
+        workspace.CurrentSolution.Projects
+            .Select(p => p.FilePath)
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Select(p => Path.GetFullPath(p!))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
     private bool ShouldAnalyse(INamedTypeSymbol type)
     {

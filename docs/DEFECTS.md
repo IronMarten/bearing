@@ -1,4 +1,4 @@
-# Known defects
+﻿# Known defects
 
 Behaviour that is wrong today, recorded rather than fixed. Every entry names what supersedes it.
 
@@ -333,7 +333,7 @@ when it is zero. Measured rates: **123 of Jellyfin's edges, 57 of nopCommerce's*
 > movement in the snapshot after the fix is one new line reading `none`. `docs/TESTING.md` §6 owes
 > this gap a row.
 
-### 8. `.slnx` solutions do not load at all — **confirmed at A2**
+### 8. `.slnx` solutions do not load at all — **fixed**
 
 Orchard Core could not be analysed. Cannot block extraction — TestBed is a `.sln`.
 
@@ -341,6 +341,39 @@ Reproduced deliberately at A2 against a hand-written `.slnx` over TestBed's thre
 `Microsoft.Build.Construction.SolutionFile.Parse` throws `InvalidProjectFileException: No file
 format header found`. **And it takes the tool down with it** — eleven frames of MSBuild stack
 trace, straight at the user, which is §23 and a separate defect from this one.
+
+**Fixed, and not by moving off the toolchain the goldens were measured on.** The obvious repair —
+upgrade Roslyn until `MSBuildWorkspace` reads `.slnx` — was available and was the wrong one four
+days before a review: it is a jump from 4.12 to 5.9, it changes symbol resolution, and every
+golden in the suite is measured against the current one. Nothing about that risk is repaid by a
+solution format.
+
+What was actually missing is smaller than it looked. **Only the container is new.** A `.slnx`
+names the same `.csproj` files a `.sln` does, and MSBuild evaluates each of those exactly as it
+always has — so `SolutionWalker.OpenProjectsAsync` reads the file with
+`Microsoft.VisualStudio.SolutionPersistence`, the serializer Visual Studio and the SDK use, and
+hands each path to `OpenProjectAsync`. Confirmed on nopCommerce: a `.slnx` listing its 28 projects
+produces a report byte-identical to the one from `NopCommerce.sln`, across 3,209 types, differing
+only in the file name in the banner.
+
+Two things the repair had to get right, and one of them was found by the test rather than by
+reading:
+
+- **`OpenProjectAsync` follows project references**, so a project pulled in by an earlier one is
+  already present when its own turn comes — and the second open throws `'Core' is already part of
+  the workspace` rather than doing nothing. Any solution whose projects reference each other hits
+  this, which is most of them. The workspace is re-read on each iteration rather than a set being
+  accumulated, because opening one project can add several.
+- **An empty `<Solution />` is valid and now parses**, so it is a walk over nothing rather than a
+  failure — which is what an empty `.sln` already produced. Two tests in
+  `SolutionLoadFailureTests` had been using it as their unreadable input and now use a genuinely
+  malformed file; a test asserting a failure that has stopped being one is a test that passes for
+  the wrong reason.
+
+**§23's design note paid.** It predicted that the `.slnx` advice would stop being reached the day
+the load learned to succeed, which is why the extension is read after the failure and never
+before. That is this day. The sentence itself changed, because what a `.slnx` failure means is now
+a malformed file or a project path that does not resolve — not a format the tool cannot read.
 
 ### 9. Change cost gates on `minCohort` where it means a fan-in floor — **fixed in Core**
 

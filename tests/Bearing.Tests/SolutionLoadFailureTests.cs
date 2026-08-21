@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -31,7 +31,9 @@ public sealed class SolutionLoadFailureTests
     public async Task An_unreadable_solution_raises_a_load_failure_rather_than_msbuilds_own()
     {
         using var scratch = new Scratch();
-        var path = scratch.Write("Broken.slnx", "<Solution />");
+        // Genuinely malformed, not merely empty: "<Solution />" parses now (docs/DEFECTS.md
+        // §8) and an empty solution is a walk over nothing rather than a failure.
+        var path = scratch.Write("Broken.slnx", "<Solution><Project Path=");
 
         var failure = await Assert.ThrowsAsync<SolutionLoadException>(
             () => new SolutionWalker(new WalkOptions { SolutionPath = path }).WalkAsync());
@@ -52,7 +54,7 @@ public sealed class SolutionLoadFailureTests
     /// why <see cref="Failure"/> reads the path rather than the message to tell them apart.
     /// </remarks>
     [Theory]
-    [InlineData("Solution.slnx", "<Solution />")]
+    [InlineData("Solution.slnx", "<Solution><Project Path=")]
     [InlineData("NotASolution.sln", "this is not a solution")]
     [InlineData("Project.csproj", "<Project Sdk=\"Microsoft.NET.Sdk\" />")]
     public async Task Every_shape_of_unreadable_input_arrives_as_a_load_failure(string name, string content)
@@ -62,6 +64,59 @@ public sealed class SolutionLoadFailureTests
 
         await Assert.ThrowsAsync<SolutionLoadException>(
             () => new SolutionWalker(new WalkOptions { SolutionPath = path }).WalkAsync());
+    }
+
+    /// <summary>
+    /// A well-formed <c>.slnx</c> loads, and loads the same solution its <c>.sln</c> does.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §8. The container is the only new thing — the projects a
+    /// <c>.slnx</c> names are the same <c>.csproj</c> files, so the claim worth pinning is not
+    /// "it opened" but "it opened the same thing". Comparing type counts against the fixture's
+    /// own <c>.sln</c> is what makes a silently half-loaded solution fail here.
+    /// </para>
+    /// <para>
+    /// Written at test time rather than committed, for the reason the malformed inputs are: a
+    /// second solution file beside <c>TestBed.sln</c> is a file every tool that scans the tree
+    /// would try to build.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task A_well_formed_slnx_loads_the_same_solution_its_sln_does()
+    {
+        using var scratch = new Scratch();
+
+        var projects = Directory
+            .EnumerateFiles(Path.GetDirectoryName(RepoPaths.TestBedSolution)!, "*.csproj", SearchOption.AllDirectories)
+            .Select(p => Path.GetRelativePath(Path.GetDirectoryName(RepoPaths.TestBedSolution)!, p))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        Assert.NotEmpty(projects);
+
+        var slnx = "<Solution>"
+                   + string.Join("", projects.Select(p => $"<Project Path=\"{p}\" />"))
+                   + "</Solution>";
+
+        // Beside TestBed.sln, because the Path attributes are relative to the .slnx.
+        var path = Path.Combine(Path.GetDirectoryName(RepoPaths.TestBedSolution)!, "FromSlnx.slnx");
+        await File.WriteAllTextAsync(path, slnx);
+
+        try
+        {
+            var fromSlnx = await new SolutionWalker(new WalkOptions { SolutionPath = path }).WalkAsync();
+            var fromSln = await new SolutionWalker(
+                new WalkOptions { SolutionPath = RepoPaths.TestBedSolution }).WalkAsync();
+
+            Assert.Equal(
+                fromSln.Types.Select(t => t.Subject.Canonical).Order(StringComparer.Ordinal),
+                fromSlnx.Types.Select(t => t.Subject.Canonical).Order(StringComparer.Ordinal));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     // ------------------------------------------------------------------ what it says ----
