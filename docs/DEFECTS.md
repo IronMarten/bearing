@@ -1312,3 +1312,48 @@ during phase 0, written down and never automated.
 one guarantee on the model is worth three correct renderers, and the next export would have had
 the same coin-flip. `SolutionModel.Projects` now says "ordered by name". The JSON snapshot moved
 `Data` above `Tools` and nothing else changed.
+
+### 38. `undefinedx its peer median` — **fixed**
+
+Blast radius' sentence interpolated the fan-in multiple and followed it with a literal `x`:
+
+```
+BaseController — 89 distinct callers (undefinedx its peer median) and internally complex.
+```
+
+**`Sentences.Number` is not the bug and was already right.** Defect 28 made it render an infinite
+ratio as the word *undefined* rather than as `∞` or a collapsed large number, because a ratio
+against a zero median is undefined and a renderer that prints `999x` turns that into what reads as
+a measurement. The bug is a **call site that appends an `x` to whatever comes back**.
+
+**The same file already had the branch, eighty lines up.** `Claims.ConcealedDecision` reads:
+
+```csharp
+var basis = double.IsInfinity(times)
+    ? "the only complexity among "
+    : $"{Sentences.Number(times)}x the median internal complexity of ";
+```
+
+Blast radius never got one. So this is defect 28 finished rather than a new discovery: the
+formatter was fixed, one of its two consumers was fixed, and the other was not.
+
+**It was live on a real solution and in frozen study materials.** `BaseController` is one of
+nopCommerce's most depended-on types, and the line above is in `a13-materials/nop-v6.txt` — the
+A11 round 2 artifact, before it was regenerated as v7. It is exactly the class of presentation
+defect round 2 exists to judge, so a participant meeting it would have produced a finding already
+known.
+
+**Fixed by branching, and the replacement states what is true and no more**: `(its peer median is
+zero)`. The typical peer has no callers at all, so no multiple of it exists — a weaker claim than a
+ratio rather than a stronger one, which is the choice §3.2 makes for the same reason.
+
+**Found by building a fixture plant that was then discarded.** P5's case gave a cohort a zero
+fan-in median, which surfaced this immediately; the plant itself turned out to be unnecessary and
+was thrown away, and the defect it exposed is the thing that was worth the trip.
+
+**Tested on constructed findings**, `ClaimsTests.An_undefined_ratio_never_renders_as_a_multiple`,
+over both sentences that take a multiple. The fixture cannot reach the case and building a plant
+for it would be a large fixture change to protect a small branch. A synthetic finding cannot prove
+a detector produces such a value; it proves the renderer survives one, which is the half that was
+broken. Verified by control: removing the branch fails the blast-radius row and leaves the
+concealed-decision row passing.

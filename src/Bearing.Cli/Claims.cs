@@ -258,10 +258,23 @@ public static class Claims
     {
         if (model.Find(finding.Subject) is not { } type) return Claim.None;
 
+        // A ratio against a zero median is undefined, and `Sentences.Number` says so — but
+        // "undefined" followed by an "x" is not a word. docs/DEFECTS.md §38. The concealed-decision
+        // sentence above already branches for this; this one never did, and shipped
+        // "89 distinct callers (undefinedx its peer median)" on nopCommerce's BaseController.
+        //
+        // The replacement states what is actually true and no more: the median is zero, so the
+        // typical peer has no callers at all and no multiple of it exists. That is a weaker claim
+        // than a ratio rather than a stronger one, which is the same choice §3.2 makes.
+        var times = finding.ValueOf("FanInXMedian") ?? 0;
+        var against = double.IsInfinity(times)
+            ? "(its peer median is zero)"
+            : $"({Sentences.Number(times)}x its peer median)";
+
         return new Claim(
             type.Name,
             $"{Sentences.Plural(type.FanIn, "distinct caller")} "
-            + $"({Sentences.Number(finding.ValueOf("FanInXMedian") ?? 0)}x its peer median) and "
+            + $"{against} and "
             + "internally complex. A bug here propagates widely.",
             $"cc {type.Cyclomatic}, fan-out {type.FanOut}, "
             + $"{Sentences.Plural(type.InboundReferenceCount, "call site")}",

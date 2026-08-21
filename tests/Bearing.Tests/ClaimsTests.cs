@@ -24,6 +24,54 @@ public sealed class ClaimsTests(CoreWalkFixture core)
 {
     private FindingSet Findings => Analysis.FindingsFor(core.Model);
 
+    /// <summary>
+    /// No sentence puts an "x" after a ratio that does not exist.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §38. A ratio against a zero peer median is undefined, and
+    /// <c>Sentences.Number</c> renders it as the word <i>undefined</i> — which is right, and which
+    /// two call sites then followed with a literal <c>x</c>. Concealed decision branches for it;
+    /// blast radius did not, and shipped <i>"89 distinct callers (undefinedx its peer median)"</i>
+    /// on nopCommerce's <c>BaseController</c> — in the frozen A11 round 2 materials, until this.
+    /// </para>
+    /// <para>
+    /// <b>Asserted on constructed findings because the fixture cannot reach it.</b> A cohort whose
+    /// fan-in median is zero and which still clears blast radius needs a shape TestBed does not
+    /// have, and building one to protect a sentence would be a large plant for a small branch —
+    /// P5 was discarded for that reason. What a synthetic finding cannot do is prove the detector
+    /// produces such a value; what it can do is prove the renderer survives one, which is the half
+    /// that was broken.
+    /// </para>
+    /// </remarks>
+    [Theory]
+    [InlineData(FindingKind.BugBlastRadius, "FanInXMedian")]
+    [InlineData(FindingKind.ConcealedDecisionType, "MaxMemberCyclomaticXMedian")]
+    public void An_undefined_ratio_never_renders_as_a_multiple(FindingKind kind, string ratio)
+    {
+        var subject = core.Model.Types.Single(t => t.Name == "ShipmentLedger");
+
+        var finding = new Finding(
+            new FindingKey(kind, subject.Subject),
+            [
+                Receipt.Gated(ratio, double.PositiveInfinity, nameof(AnalysisPolicy.OutlierFactor)),
+                Receipt.Of("MedianCohortCyclomatic", 0),
+                Receipt.Gated("CohortSize", 6, nameof(AnalysisPolicy.MinCohort)),
+            ],
+            [],
+            []);
+
+        var claim = Claims.For(core.Model, finding);
+
+        Assert.NotEqual(Claim.None, claim);
+        Assert.DoesNotContain("undefinedx", claim.Sentence, StringComparison.Ordinal);
+
+        // And not by dropping the word either — "0x" or "∞x" would each be a measurement the
+        // tool cannot support, which is the failure D28 fixed one level down.
+        Assert.DoesNotContain("∞", claim.Sentence, StringComparison.Ordinal);
+        Assert.DoesNotContain("Infinity", claim.Sentence, StringComparison.Ordinal);
+    }
+
     /// <summary>Every finding the fixture produces can be worded.</summary>
     /// <remarks>
     /// <b>A kind with no arm returns <c>Claim.None</c> and renders as nothing at all</b>, which is
