@@ -261,9 +261,19 @@ losing one:
 
 ### The leave-one-out verdict table
 
-Run 2026-08-20, after P9, against 30 guards. **The previous run was after P6**, and the inventory
-had drifted onto doc comments in the meantime — see `tools/leave-one-out.sh`'s header for what that
-cost and what it is keyed on now.
+Run 2026-08-20 after the X14 plant, against 30 guards, and **every verdict is what the run after P9
+gave** — same counts, same `suite-only` set, same single `DEAD` gate. That is the result the plant
+wanted: `MemberIdentityTraps.cs` moves nine snapshots and no gate's observability. The P9 run's
+predecessor was after P6, and the inventory had drifted onto doc comments in between — see
+`tools/leave-one-out.sh`'s header for what that cost and what it is keyed on now.
+
+> **Create the output directory before you run it, or every verdict is a lie.** The script writes
+> the mutant's report to `$OUT/mutant.txt` and compares it with `$OUT/baseline.txt`; if `$OUT` does
+> not exist both redirections fail, `diff` compares two missing files, and **every gate comes back
+> `output-moves`** — a full inventory with nothing dead and nothing suite-only, which is exactly
+> what a healthy run looks like. It cost one 13-minute run here before the shell's stderr was read
+> rather than its verdicts. The verdict table is the thing to sanity-check: an inventory that has
+> never produced a `suite-only` row has not measured anything.
 
 | verdict | count | what it means |
 |---|---|---|
@@ -276,7 +286,9 @@ outlier threshold, and change cost's `MinFanIn` floor.
 
 **`DEAD`, and it is the only one: `BlastRadius`'s `MinCohort` cohort floor.** Already recorded — it
 is item 3 of `FixtureCoverageTests.The_new_findings_have_gates_the_fixture_cannot_observe`, and the
-measurement confirms the record rather than adding to it.
+measurement confirms the record rather than adding to it. It survived the X14 plant, which is worth
+saying: two new types in the biggest cohort did not make a cohort floor observable, so the reason it
+is dead is not a shortage of types.
 
 **Two entries that were on the board as owed plants are not owed.** P1 existed to make blast
 radius' absolute fan-in floor observable and P2 its `FanInXMedian` gate; the two verdicts above are
@@ -317,14 +329,12 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **144 type rows** from **145 declarations**, 149 methods, 317 edges, 2 excluded,
-  **zero load warnings**, **1 skipped project** (`Core.Tests`). The row/declaration gap is the
-  planted identity collision below. **It is the probe's answer and it is now permanent** — Core
-  keys types on `(assembly, FQN)` and reports 145, which is the one divergence extraction is
-  allowed; the probe is frozen, so this gap closes when the probe retires and not before.
-  P6 moved all of these: twelve types and twenty-seven edges — 8 × 3 dependency fields, plus three
-  `[Route]` usages, which are references like any other. Held by
-  `StructureTests.Fixture_shape_is_stable`, which pins the first three.
+- **197 type rows**, **377 edges**, **200 method-like members**, 2 excluded, **zero load
+  warnings**, **1 skipped project** (`Core.Tests`). Held by
+  `StructureTests.Fixture_shape_is_stable` (the first three),
+  `StructureTests.Scaffolded_code_is_excluded_by_default` and
+  `StructureTests.Solution_loads_with_no_warnings` — every figure on this line has a named test
+  beside it, which is the only form in which it is worth writing down.
 
   > These four numbers were **89 / 90 / 88 / 202** in this file until they were checked against
   > the goldens, having drifted through every plant since they were written. Nothing asserted
@@ -337,6 +347,14 @@ Tidying it up changes the expected answers.
   > it happened twice: three of these five are pinned in `StructureTests` and nobody re-read this
   > line, and the other two (declarations, cohorts) are pinned nowhere at all. Treat every figure
   > in this section as a comment until you have found the test that holds it.
+  >
+  > **A third time, caught at X14**, reading 144 / 145 / 149 / 317 against a fixture of 197 and
+  > 377 — drifted through P6 to P3 under a paragraph whose own warning is that this keeps
+  > happening. **Two of the five figures are gone rather than corrected.** The declaration count
+  > was never pinned anywhere, and the sentence explaining the gap between it and the row count
+  > was about the probe holding a different answer — the probe retired at R2, so that gap has had
+  > no second opinion behind it for some time. A figure with no test is not a known answer, and
+  > re-deriving one so it can rot again is the move this note exists to stop.
 - namespace cycle: 4 namespaces — `TestBed.Core` ↔ `.Depots` ↔ `.Pricing` ↔ `.Vaults`
   (was two here for several sessions; pinned now in
   `CyclesAndCouplingTests.Namespace_cycles_over_the_fixture_are_what_they_should_be`)

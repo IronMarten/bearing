@@ -1358,7 +1358,7 @@ a detector produces such a value; it proves the renderer survives one, which is 
 broken. Verified by control: removing the branch fails the blast-radius row and leaves the
 concealed-decision row passing.
 
-### 39. A member subject is a display string, and four kinds of member are not identified by it
+### 39. A member subject is a display string, and four kinds of member are not identified by it — **fixed by X14**
 
 **Found while planning A9, which is the point at which it starts to matter.** X5 put dead code at
 member level, so a member subject stops being an internal key and becomes the thing a claim about
@@ -1410,5 +1410,24 @@ consumer that makes it dangerous**: a claim that a member has no static referenc
 subject that merges three events or two overloads, is a "safe to delete" about something with
 callers. That is invariant 4, and it is the specific burn `TECHREQ-job-a.md` §5.6 exists to prevent.
 
-**The remedy is a decision rather than a patch**, because every member id in every export moves and
-`JsonOutput.SchemaVersion` has to move with it. Recorded as **X14**.
+**The remedy was a decision rather than a patch**, because every member id in every export moves and
+`JsonOutput.SchemaVersion` has to move with it. **X14 was taken on this evidence: a member is
+identified by its documentation comment ID**, which separates all four cases by construction because
+it is the form the compiler emits for a cross-assembly reference. Repairing the display format —
+add `IncludeParamsRefOut`, resolve fields through their declarator, special-case `.cctor`, qualify
+explicit implementations — was rejected for the reason §5 and §30 both give: it is a curated list of
+the four cases somebody happened to measure, and the fifth is sorted wrong silently.
+
+**Two things travelled with the fix.** A field declaration now yields one member per variable, so
+`int a, b;` is two members rather than one named `a`. And a public field is charged to the declaring
+type's contract surface — `ShapeBreadth` had always counted one when measuring somebody *else's*
+type, so the model held both answers at once, and no fixture type had a public field to say so.
+
+**None of it was observable until the fixture could reach it.** The suite was byte-identical with
+the fix and without it, because TestBed declared none of the six shapes.
+`tests/TestBed/Core/MemberIdentityTraps.cs` is the plant and `MemberIdentityTests` is the eight
+assertions; the control is reverting X14 and watching all eight fail, which is what was done. The
+plant's contribution and what it did not disturb are in `docs/TESTING.md` §6.
+
+`members.csv` and the JSON now publish a readable `Signature` beside the id, and `SchemaVersion` is
+`2.0` — a key changing value is a major, where a field being added is not.
