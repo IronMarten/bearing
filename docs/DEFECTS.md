@@ -1196,14 +1196,22 @@ others.
 "nothing comparable to compare this against" as a finding that names the type.**
 
 **The same page contradicts it.** The census says of exactly those types: *"That is not a finding
-about those types — it is a record that the tool stayed quiet about them."* And the `NO PEER GROUP`
-section says only **3** of the 107 appear in the nominations above, so 104 types are counted as
-named on the strength of a disclosure alone.
+about those types — it is a record that the tool stayed quiet about them."*
 
-**On nopCommerce it is worth three points.** 3,209 − 473 named = 2,736 clean, 85.3%. Removing the
-104 leaves 369 named and **2,840 clean, 88.5%**. The mosaic's tint moves with it — those types are
-in the `n` path — and so does the plot caption's *"85% of this codebase has nothing said about it"*,
-which is the same figure rendered a second time.
+**On nopCommerce it is worth three points.** 3,209 − 473 named = 2,736 clean, 85.3%. With the
+disclosure out, **100 types leave the named population** and the tile reads **2,836 clean of 3,209,
+88.4%** — rendered as 88%. The mosaic's tint moves with it, those types being in the `n` path, and
+so does the plot caption's *"85% of this codebase has nothing said about it"*, which is the same
+figure rendered a second time.
+
+> **This entry first said 104 types and 88.5%, both derived rather than measured, and the re-cut
+> corrected them.** The arithmetic used the `NO PEER GROUP` section's own line — *"3 of them do
+> still appear in the nominations above"* — as the overlap between the disclosed types and the
+> claimed ones. That line is computed from `findings.About(f.Subject)`, an exact-subject question,
+> so it counts a type whose *own* row carries another claim and not one whose **member** does. Four
+> more of the 107 are named by a member-level finding and stay tinted, which makes the overlap 7
+> rather than 3. **The error was small and in the direction that flatters the fix**, which is the
+> direction to be most suspicious of; it survived one review and did not survive the run.
 
 **Same root as 40 and a different consequence**, so they are two entries rather than one: 40 is a
 caption that miscounts a mark set, this is a metric that includes a population the tool declined to
