@@ -1178,5 +1178,16 @@ Roslyn**, binding method bodies that `compile` deferred, and Bearing's own bookk
 under `members`, because the complexity metrics need the same work. A stage name is not an
 attribution, and A9's whole cost argument would have been made against the wrong number.
 
+**A9's member graph gave the rule its sharpest example yet, and it was not a claim that was wrong
+— it was two bugs the entire suite was blind to.** Layer 1 shipped green over 407 tests. Both bugs
+were found by taking a measurement on a real solution and then *reading the sample of what
+survived*: an extension method called as one resolves to the reduced symbol, whose signature has
+had the receiver removed, so `AddClientFields` — called from a dozen Jellyfin controllers — read as
+having no callers, and every extension method in both reference solutions was a dead-code
+candidate. And a partial method's two declarations are one member, so both were recorded under one
+subject: six of those on nopCommerce. **Neither shape existed in the fixture**, so neither could
+fail. The lesson is narrower than "test more": a sample of the output, looked at by a person,
+caught what a suite over a synthetic fixture structurally could not.
+
 `SeamTests.The_seam_test_is_actually_looking_at_something` exists for this reason: every
 other assertion in that file passes trivially against an assembly that is missing or empty.
