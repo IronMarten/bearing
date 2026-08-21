@@ -117,7 +117,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         // Keyed on (assembly, FQN), so both PayloadTag declarations are counted — docs/DEFECTS.md
         // §1. StructureTests.Fixture_shape_is_stable owns this number and its history; the point
         // here is only that the header renders it from the model rather than recounting.
-        Assert.Contains("195 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
+        Assert.Contains("197 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
     }
 
     /// <summary>

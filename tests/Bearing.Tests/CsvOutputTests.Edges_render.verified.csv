@@ -140,6 +140,7 @@ type|Core|global::TestBed.Core.GuaranteedServiceNormalizer,type|Core|global::Tes
 type|Core|global::TestBed.Core.IResponseNormalizer,type|Core|global::TestBed.Core.NormalizationContext,1,Parameter,TestBed/Core/Contracts.cs,5
 type|Core|global::TestBed.Core.IResponseNormalizer,type|Core|global::TestBed.Core.NormalizedResponse,1,ReturnType,TestBed/Core/Contracts.cs,5
 type|Core|global::TestBed.Core.IResponseNormalizer,type|Core|global::TestBed.Core.RawResponse,1,Parameter,TestBed/Core/Contracts.cs,5
+type|Core|global::TestBed.Core.IdentityTurnstile,type|Core|global::TestBed.Core.IIdentityWicket,2,Other;InterfaceImplementation,TestBed/Core/MemberIdentityTraps.cs,43
 type|Core|global::TestBed.Core.IngressMeter,type|Core|global::TestBed.Core.DepthGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,124
 type|Core|global::TestBed.Core.IngressMeter,type|Core|global::TestBed.Core.ErrorGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,125
 type|Core|global::TestBed.Core.IngressMeter,type|Core|global::TestBed.Core.LatencyGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,123

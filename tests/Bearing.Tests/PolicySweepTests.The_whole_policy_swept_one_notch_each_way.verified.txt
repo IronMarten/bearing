@@ -28,6 +28,6 @@ SurfaceOutlierMultiple             1.5     0.1   -          -
 SurfaceOutlierFloor                  1       1   -          -
 MaxNamedSurfaces                     5       1   -          -
 GlobalFanInPercentile               90       1   -          -
-GlobalComplexityPercentile          90       1   -          -
+GlobalComplexityPercentile          90       1   moves      -
 GlobalComplexityFloor                1       1   -          -
 MinTangle                            4       1   -          -

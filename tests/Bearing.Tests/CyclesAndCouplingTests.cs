@@ -64,8 +64,8 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         var analysed = coupling["Core"];
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
-        Assert.Equal(10, analysed.AbstractTypes);   // P3's four *Facet interfaces
-        Assert.Equal(188, analysed.TotalTypes);   // …P8 172 → P9 178 → P3 188
+        Assert.Equal(11, analysed.AbstractTypes);   // P3's four *Facet interfaces, and X14's IIdentityWicket
+        Assert.Equal(190, analysed.TotalTypes);   // …P8 172 → P9 178 → P3 188 → X14 190
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
@@ -422,7 +422,11 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
             [("System.Data", 3), ("System.Net.Http", 3)],
             map.Systems.Select(d => (d.Namespace, d.TypesTouching)));
 
-        Assert.Equal(22, map.PlumbingReferences);
+        // 23 rather than 22 since the X14 plant: an event needs a delegate type and the fixture
+        // declares none, so IdentityTurnstile reaches System.Action. That is plumbing, not an
+        // integration — map.Systems above is unchanged, which is the half that would have meant
+        // the plant disturbed something.
+        Assert.Equal(23, map.PlumbingReferences);
     }
 
     /// <summary>

@@ -487,6 +487,21 @@ internal sealed class ModelBuilder
                 node.ParameterCount += 1;
                 node.DataShape += ShapeBreadth(property.Type);
                 break;
+
+            // A public field is contract surface by this model's own definition — ShapeBreadth
+            // counts one when it measures somebody else's type. Until X14 no field reached here
+            // at all, because a field declaration has no symbol and this method takes one, so the
+            // two halves disagreed: a public field widened the contract of every type that
+            // depended on it and not the contract of the type that declared it.
+            //
+            // Events are deliberately not here, and for the same reason rather than in spite of
+            // it: ShapeBreadth counts properties and fields, because the question is how much
+            // data crosses the boundary. An event is a callback, and counting it would make
+            // "widest contract surface" mean two things at once.
+            case IFieldSymbol field:
+                node.ParameterCount += 1;
+                node.DataShape += ShapeBreadth(field.Type);
+                break;
         }
     }
 

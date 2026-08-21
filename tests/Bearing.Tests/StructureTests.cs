@@ -87,18 +87,28 @@ public sealed class StructureTests(CoreWalkFixture core)
         // and five *Roster property bags which depend only on it. Nine edges — four out of the
         // projection and five into it — which is what makes its effective fan-out zero against a
         // raw four, and the dependency-inversion exclusion the thing that decides its nomination.
-        Assert.Equal(195, core.Model.Types.Count);
+        //
+        // And the X14 plant adds two: IIdentityWicket and IdentityTurnstile, with one edge — the
+        // implementation, which is the only edge in the file. It carries the six member shapes
+        // §39 got wrong and the fixture did not contain; MemberIdentityTraps.cs says why each is
+        // there. Nothing that already existed gains fan-in, a cohort or a contact point.
+        Assert.Equal(197, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
         // which node an edge lands on without changing how many pairs there are.
-        Assert.Equal(376, core.Model.Edges.Count);
+        Assert.Equal(377, core.Model.Edges.Count);
 
         // Methods are counted per declaration, so unlike Types this was never distorted by the
         // planted collisions: Describe, Score and Weight are all three present. Core holds
         // members on the type rather than in a flat list, and counts constructors as method-like
         // because they carry cyclomatic complexity — three of the 186 are constructors.
-        Assert.Equal(193, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        //
+        // Seven of these are the X14 plant, and the count is the point of it: two constructors
+        // where a display string saw one, and five methods where it saw three — the two TryAdmit
+        // overloads differ only by `out`, and the explicit IIdentityWicket.Admit sat on top of the
+        // ordinary Admit. Before X14 this number would have been 196.
+        Assert.Equal(200, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------
