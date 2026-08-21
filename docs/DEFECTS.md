@@ -1147,6 +1147,92 @@ board rather than being repaired locally. Candidate remedies, none measured: a c
 with fallback to a finer basis, or refusing a bare name-suffix basis when the suffix covers more
 than some share of the solution.
 
+### 40. The mosaic outlines twelve cells and calls them the eleven claims above — **fixed**
+
+`Mosaic`'s caption:
+
+```
+Some finding is about 473 of them, which is the tint; the 12 outlined in red are the
+claims above, in the same order.
+```
+
+`START HERE` carries **eleven** claims. The twelfth outline is the `Coverage` exemplar — a type the
+report deliberately makes no claim about.
+
+**Two selectors disagree, and each is right on its own terms.** `Mosaic.Marks` fills the leading set
+from `Selection.Exemplars`, which groups `findings.All` by kind and takes one per group; `Coverage`
+is a kind, so it contributes an exemplar. `Highlights` excludes `Coverage` from the claim list on
+purpose, and says why: *"It is a disclosure rather than a claim."* Neither is wrong. **The caption
+is**, because it asserts a correspondence between two sets built by different rules.
+
+**It has been wrong in every cut that has this mosaic**: v4, v5, v6 and v7 each say `11 outlined`
+against 10 claims, and v8 says 12 against 11. The constant off-by-one is why the ratio never looked
+suspicious — the caption's number always exceeded the claim count by exactly one, and nothing on the
+page puts the two figures side by side.
+
+**Live in the A11 round 2 artifact.** `a13-materials/nop-v8.html` carries it, T9 asks a participant
+what the mosaic is for, and the caption is what answers. A participant who counts is being told the
+report claims something it does not.
+
+**The fix was a choice rather than a correction, and both halves of it were taken.** The leading
+set drops `Coverage` — `Mosaic.Marks` filters `Selection.Exemplars` through
+`Claims.IsRiskClaim`, the same predicate `Highlights` uses, so the picture outlines the list the
+page prints. And the caption stops asserting a correspondence it cannot guarantee: it now reads
+*"the types the claims above are about"*, which stays true the day two claims land on one type and
+the cell count drops below the claim count. Keeping the disclosure on the picture was the rejected
+option — a mark whose caption has to explain that one of them is not a claim is a worse picture
+than one that does not draw it.
+
+**Gated by `MosaicTests.The_outlined_cells_are_exactly_the_claims_the_page_leads_with`**, which
+asserts the outline count against the claims and first requires the fixture to produce a disclosure
+exemplar the claims do not also name — without that line it would pass on a fixture where the
+question cannot arise. Control: restoring the unfiltered `Exemplars` call fails it, and three
+others.
+
+### 41. The `Clean` tile counts a disclosure as a finding — **fixed**
+
+*"85% — of 3,209 types, no finding names them."* The 15% is `Subjects.Named`, which walks
+`findings.All`, and `findings.All` includes the 107 `Coverage` entries. **The tile is treating
+"nothing comparable to compare this against" as a finding that names the type.**
+
+**The same page contradicts it.** The census says of exactly those types: *"That is not a finding
+about those types — it is a record that the tool stayed quiet about them."* And the `NO PEER GROUP`
+section says only **3** of the 107 appear in the nominations above, so 104 types are counted as
+named on the strength of a disclosure alone.
+
+**On nopCommerce it is worth three points.** 3,209 − 473 named = 2,736 clean, 85.3%. Removing the
+104 leaves 369 named and **2,840 clean, 88.5%**. The mosaic's tint moves with it — those types are
+in the `n` path — and so does the plot caption's *"85% of this codebase has nothing said about it"*,
+which is the same figure rendered a second time.
+
+**Same root as 40 and a different consequence**, so they are two entries rather than one: 40 is a
+caption that miscounts a mark set, this is a metric that includes a population the tool declined to
+judge. A fix that excludes `Coverage` from `Subjects.Named` addresses this one and leaves 40
+standing.
+
+**Which way it should go was not obvious, and the census decided it.** A type with no peer group
+*is* a type the report has a row about, so an argument existed for changing the tile's wording
+instead. What settled it is that the page already says which reading is right, in the section that
+owns the disclosure: *"that is not a finding about those types."* Two places disagreeing is the
+defect; the one that states its reasoning is the one that survives.
+
+**Fixed at the single derivation rather than in four renderers.** `Subjects.Named` now counts
+claims — `Claims.IsRiskClaim(finding.Kind)` — which is what its own docstring already argued for:
+one derivation, because two of them disagree silently. Repairing the tile alone would have left the
+mosaic's tint, the plot's y-axis and `Foundations`' share carrying the old population, and the fifth
+consumer to be written wrong later.
+
+**What moved on the fixture**, which is the behaviour change the golden records: clean 64% → 71%,
+and the concentration tile from `Data` 2.78x to `Core` 1.04x — the excess a project carries is now
+an excess of claims, and `Data` was winning it partly on disclosures.
+
+**Gated by `TilesTests.Clean_does_not_count_a_type_the_run_declined_to_judge`**, which recomputes
+the share from the claims rather than reading it back off the mosaic. The test that existed held the
+tile against `Mosaic.Marked` and both against `Subjects.Named`, which is the right shape and cannot
+catch this: when the shared derivation is wrong the renderers agree on the wrong number and nothing
+fails. Control: reverting the filter fails the new test and leaves the old one passing, which was
+run and is the point of the entry.
+
 ## How these were found
 
 Worth recording, because the methods generalise and the defects do not.
