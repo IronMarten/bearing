@@ -507,5 +507,7 @@ already understood. These are questions with no answer yet.
 
   **A plant cannot settle this and a measurement did**, which is `TASKS.md`'s X4 entry being wrong
   about its own blocker rather than about its subject.
-- **Dead code at member level or types only.** Far more useful, far more false-positive
-  prone.
+- ~~**Dead code at member level or types only.**~~ **Answered — X5, and it is member level.**
+  Kept here for the measurement that decided the shape of the work: every edge endpoint the walk
+  records is a type, so this is a change to reference *collection* and not a new detector. Far more
+  useful, far more false-positive prone, and both remain true — `TASKS.md` A9 carries the cost.
