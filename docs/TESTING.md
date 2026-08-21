@@ -1151,5 +1151,14 @@ are true and both are needed — the component really is mutually reachable, and
 loop really is three long. The finding about **Bearing's own code** stood; the inference about
 **the product** did not survive one real solution, and it was made from the fixture.
 
+**A12 is the newest one, and the claim it nearly shipped was a reading of its own instrument.**
+The profile puts 45–55% of a run in one stage of Bearing's own code, `references`, which reads as
+"the walk is where the time goes and the walk is ours". Two throwaway builds — one that binds every
+name and records nothing, one that visits the syntax and binds nothing — put **91% of that stage in
+Roslyn**, binding method bodies that `compile` deferred, and Bearing's own bookkeeping at 0.69s and
+1.23s. The tell was in the second build: with reference resolution off, 6.15s of binding reappeared
+under `members`, because the complexity metrics need the same work. A stage name is not an
+attribution, and A9's whole cost argument would have been made against the wrong number.
+
 `SeamTests.The_seam_test_is_actually_looking_at_something` exists for this reason: every
 other assertion in that file passes trivially against an assembly that is missing or empty.
