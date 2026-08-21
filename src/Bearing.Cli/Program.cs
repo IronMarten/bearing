@@ -34,6 +34,12 @@ internal static class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        // Before anything else, because these two together are the only reading that includes the
+        // host starting. See StartupCost: the profile's total has to be the number a stopwatch
+        // outside the process would show, or the first row of the table is an apology for the rest.
+        var startup = StartupCost();
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
         UseUtf8();
 
         var version = ToolInfo.ReadVersion(Assembly.GetExecutingAssembly());
@@ -76,7 +82,7 @@ internal static class Program
 
         try
         {
-            return await AnalyseAsync(options, invocation).ConfigureAwait(false);
+            return await AnalyseAsync(options, invocation, startup, clock).ConfigureAwait(false);
         }
         catch (SolutionLoadException ex)
         {
@@ -99,12 +105,41 @@ internal static class Program
     /// question — it reintroduces the load-order bug.
     /// </remarks>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-    private static async Task<int> AnalyseAsync(WalkOptions options, Invocation invocation)
+    private static async Task<int> AnalyseAsync(
+        WalkOptions options,
+        Invocation invocation,
+        TimeSpan startup,
+        System.Diagnostics.Stopwatch clock)
     {
-        var model = await new SolutionWalker(options).WalkAsync().ConfigureAwait(false);
-        var findings = Analysis.FindingsFor(model);
+        var mark = TimeSpan.Zero;
+        var stages = new List<ProfileStage> { new("startup", startup, "process start to Main") };
 
+        // Each stage is charged the interval since the last one ended, so the rows cannot overlap
+        // and cannot leave a gap between them that is charged to nothing.
+        TimeSpan Lap()
+        {
+            var elapsed = clock.Elapsed;
+            var lap = elapsed - mark;
+            mark = elapsed;
+            return lap;
+        }
+
+        // Everything Main did before handing over: parsing the arguments, and locating and
+        // registering MSBuild. The second of those is not free and belongs to nobody else's row.
+        stages.Add(new ProfileStage("register", Lap(), "MSBuild located"));
+
+        var walker = new SolutionWalker(options);
+        var model = await walker.WalkAsync().ConfigureAwait(false);
+        Lap();
+        stages.AddRange(ProfileReport.StagesOf(walker.Profile));
+
+        var findings = Analysis.FindingsFor(model);
+        stages.Add(new ProfileStage("analysis", Lap(), Sentences.Plural(findings.All.Count, "finding")));
+
+        // Rendering and writing are one stage because they are one act: Report.For is lazy, so
+        // the lines are produced by the loop that prints them and there is no seam to time.
         foreach (var line in Report.For(model, findings)) Console.WriteLine(line);
+        stages.Add(new ProfileStage("report", Lap(), "terminal"));
 
         // After the report, and to stderr, so that neither the file nor the note about it can
         // land in the middle of output somebody is piping.
@@ -112,37 +147,80 @@ internal static class Program
         {
             JsonOutput.Write(json, model, DateTimeOffset.UtcNow);
             Console.Error.WriteLine($"Wrote {json}");
+            stages.Add(new ProfileStage("json", Lap()));
         }
 
         if (invocation.CsvDirectory is { } csv)
+        {
             foreach (var path in CsvOutput.Write(csv, model))
                 Console.Error.WriteLine($"Wrote {path}");
+            stages.Add(new ProfileStage("csv", Lap()));
+        }
 
         if (invocation.HtmlPath is { } html)
         {
             HtmlReport.Write(html, model, findings, DateTimeOffset.UtcNow, invocation.Full);
             Console.Error.WriteLine($"Wrote {html}");
+            stages.Add(new ProfileStage("html", Lap()));
         }
 
         if (invocation.DiagramPath is { } diagram)
         {
             ArchitectureDiagram.Write(diagram, model);
             Console.Error.WriteLine($"Wrote {diagram}");
+            stages.Add(new ProfileStage("diagram", Lap()));
         }
 
         if (invocation.MosaicPath is { } mosaic)
         {
             Mosaic.Write(mosaic, model, findings);
             Console.Error.WriteLine($"Wrote {mosaic}");
+            stages.Add(new ProfileStage("mosaic", Lap()));
         }
 
         if (invocation.PlotPath is { } plot)
         {
             ReachPlot.Write(plot, model, findings);
             Console.Error.WriteLine($"Wrote {plot}");
+            stages.Add(new ProfileStage("plot", Lap()));
         }
 
+        if (invocation.Profile)
+            foreach (var line in ProfileReport.For(stages, startup + clock.Elapsed))
+                Console.Error.WriteLine(line);
+
         return 0;
+    }
+
+    /// <summary>
+    /// How long the process took to reach <see cref="Main"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Read from the OS rather than from a stopwatch, because no stopwatch this program starts can
+    /// see the part before its first line runs — the host resolving the runtime, loading the
+    /// assemblies and jitting the entry point. On a self-contained tool that is not always small,
+    /// and a profile whose total is smaller than the wall clock a caller measured is a profile
+    /// that will be argued with rather than used.
+    /// </para>
+    /// <para>
+    /// Best effort. Process start time is unreadable on some hosts and, in principle, can come
+    /// back later than now if the clock moved; both give zero rather than a negative first row.
+    /// </para>
+    /// </remarks>
+    private static TimeSpan StartupCost()
+    {
+        try
+        {
+            using var self = System.Diagnostics.Process.GetCurrentProcess();
+            var since = DateTime.Now - self.StartTime;
+            return since > TimeSpan.Zero ? since : TimeSpan.Zero;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or PlatformNotSupportedException
+                                      or System.ComponentModel.Win32Exception)
+        {
+            return TimeSpan.Zero;
+        }
     }
 
     /// <summary>

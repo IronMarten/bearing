@@ -15,6 +15,7 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="MosaicPath">Where to write the mosaic as SVG, or null.</param>
 /// <param name="PlotPath">Where to write the plot as SVG, or null.</param>
 /// <param name="Full">Whether the report enumerates every finding rather than leading with one per kind.</param>
+/// <param name="Profile">Whether to print, to stderr, where the run's time went.</param>
 /// <remarks>
 /// The file outputs are <b>additions</b> to the terminal report rather than alternatives to it.
 /// A run that writes JSON still prints, because the two answer different people: a report is read
@@ -31,7 +32,8 @@ public sealed record Invocation(
     string? DiagramPath = null,
     string? MosaicPath = null,
     string? PlotPath = null,
-    bool Full = false);
+    bool Full = false,
+    bool Profile = false);
 
 /// <summary>
 /// Raised when the command line cannot be understood. Carries a message a user can act on.
@@ -150,6 +152,7 @@ public static class CommandLine
         string? mosaicPath = null;
         string? plotPath = null;
         var full = false;
+        var profile = false;
 
         for (var i = 0; i < args.Count; i++)
         {
@@ -166,6 +169,10 @@ public static class CommandLine
 
                 case "--full":
                     full = true;
+                    continue;
+
+                case "--profile":
+                    profile = true;
                     continue;
 
                 case "--include-tests":
@@ -249,7 +256,8 @@ public static class CommandLine
             DiagramPath: diagramPath,
             MosaicPath: mosaicPath,
             PlotPath: plotPath,
-            Full: full);
+            Full: full,
+            Profile: profile);
     }
 
     private static string Next(IReadOnlyList<string> args, ref int i, string flag)
@@ -275,6 +283,7 @@ public static class CommandLine
         yield return "  --mosaic <file.svg>        also write the mosaic: every type as one cell";
         yield return "  --plot <file.svg>          also write the plot: projects by reach and density";
         yield return "  --full                     enumerate every finding instead of one per kind";
+        yield return "  --profile                  also print, to stderr, where the run's time went";
         yield return "  --version                  print the version and exit";
         yield return "";
         yield return "  Thresholds — every value the report cites can be moved:";
