@@ -273,10 +273,13 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <p><strong>Type tangles (4+)</strong> — <span class="sub">Groups of types that all reach each other, so none of them can be tested or changed alone.</span></p>
 <p class="claim">9: AlphaNode, BetaNode, DeltaNode, EpsilonNode, EtaNode, GammaNode, IotaNode, ThetaNode, ZetaNode</p>
 <p class="loop">loop: AlphaNode → BetaNode → GammaNode → DeltaNode → EpsilonNode → ZetaNode → EtaNode → ThetaNode → IotaNode → AlphaNode</p>
+<p class="sub">Held by Field, Invocation; heaviest: AlphaNode ↔ BetaNode, 2 reference(s).</p>
 <p class="claim">8: AccessorialNormalizer, AddressNormalizer, RateNormalizer, ReferenceNormalizer, Router, ShipmentCoordinator, TrackingNormalizer, TransitNormalizer</p>
 <p class="loop">loop: AccessorialNormalizer → ShipmentCoordinator → Router → AccessorialNormalizer — 3 of the 8; all 8 reach each other</p>
+<p class="sub">Held by Invocation, Construction, Field; heaviest: AccessorialNormalizer ↔ ShipmentCoordinator, 2 reference(s).</p>
 <p class="claim">4: EastLink, NorthLink, SouthLink, WestLink</p>
 <p class="loop">loop: EastLink → SouthLink → WestLink → NorthLink → EastLink</p>
+<p class="sub">Held by Field, Invocation; heaviest: EastLink ↔ SouthLink, 2 reference(s).</p>
 <h3>What was not analysed</h3>
 <p class="sub">Every number above is computed over what was actually read. This is the rest.</p>
 <ul class="sub">

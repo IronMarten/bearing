@@ -633,13 +633,26 @@ public static class HtmlReport
 
         NotLayering(page, [.. shaped.Where(c => !c.IsReportable)], id => Name(model, id));
 
+        var typeProjects = model.Types.Select(t => (t.Subject.Canonical, t.Project)).ToList();
+
         CycleGroup(page, "Projects", model.ProjectCycles,
             "Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.",
-            id => Name(model, id));
+            id => Name(model, id),
+            cycle => ProjectLinks.Closing(cycle, typeProjects, model.Edges)
+                .Take(6)
+                .Select(link => $"{link.From} → {link.To}: {link.Weight} reference(s)"
+                                + (link.Example is { } e
+                                    ? $" — heaviest: {Name(model, e.From)} → {Name(model, e.To)}"
+                                    : "")));
+
+        var holds = model.ShapedTypeTangles.ToDictionary(t => t.Tangle, t => t);
 
         CycleGroup(page, $"Type tangles ({Html.Number(model.Policy.MinTangle)}+)", model.TypeTangles,
             "Groups of types that all reach each other, so none of them can be tested or changed alone.",
-            id => Name(model, id));
+            id => Name(model, id),
+            cycle => holds.TryGetValue(cycle, out var shaped)
+                ? [Holds(shaped, id => Name(model, id))]
+                : []);
     }
 
     /// <summary>
@@ -680,8 +693,32 @@ public static class HtmlReport
         page.Append("</ul>\n");
     }
 
+    /// <summary>
+    /// What holds a tangle together, worded as the text report words it.
+    /// </summary>
+    /// <remarks>
+    /// Duplicated deliberately rather than shared through a helper the two renderers both call:
+    /// the text section builds its line with the text section's idioms, and the one thing that
+    /// must not drift is the judgement, which is in Core. If these sentences diverge in phrasing
+    /// nothing breaks; if the shape did, that would be two reports disagreeing about the code.
+    /// </remarks>
+    private static string Holds(ShapedTangle tangle, Func<SubjectRef, string> name)
+    {
+        if (tangle.Shape == TangleShape.Hierarchy)
+            return "A type hierarchy: set the inheritance aside and nothing mutually dependent "
+                   + "is left, so this is a base and its own implementations.";
+
+        var kinds = string.Join(", ", tangle.Kinds.Take(3));
+        var held = kinds.Length == 0 ? "Held by references the walk could not attribute" : $"Held by {kinds}";
+
+        return tangle.Heaviest is { } pair
+            ? $"{held}; heaviest: {name(pair.First)} ↔ {name(pair.Second)}, {pair.Weight} reference(s)."
+            : held + ".";
+    }
+
     private static void CycleGroup(
-        StringBuilder page, string title, IReadOnlyList<Cycle> cycles, string blurb, Func<SubjectRef, string> name)
+        StringBuilder page, string title, IReadOnlyList<Cycle> cycles, string blurb,
+        Func<SubjectRef, string> name, Func<Cycle, IEnumerable<string>>? annotate = null)
     {
         page.Append($"<p><strong>{Html.Text(title)}</strong> — <span class=\"sub\">{Html.Text(blurb)}</span></p>\n");
 
@@ -705,6 +742,9 @@ public static class HtmlReport
                 page.Append($" — {Html.Count(cycle.Path.Count)} of the {Html.Count(cycle.Size)}; ")
                     .Append($"all {Html.Count(cycle.Size)} reach each other");
             page.Append("</p>\n");
+
+            foreach (var line in annotate?.Invoke(cycle) ?? [])
+                page.Append($"<p class=\"sub\">{Html.Text(line)}</p>\n");
         }
     }
 

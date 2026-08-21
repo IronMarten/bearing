@@ -251,6 +251,82 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         Assert.Equal(["Contracts", "Shared"], reading.Projects);
     }
 
+    /// <summary>
+    /// A base and its own implementations is not a tangle, however many of them there are.
+    /// </summary>
+    /// <remarks>
+    /// nopCommerce's only tangle in the small: three providers deriving from one base, a manager
+    /// that constructs them and a startup type. Every derived-to-base edge reads
+    /// <c>Inheritance;Invocation</c> — the invocations are <c>base.X()</c> — so the whole edge is
+    /// the hierarchy, and with those gone nothing mutually dependent is left.
+    /// </remarks>
+    [Fact]
+    public void A_base_and_its_implementations_is_a_hierarchy_not_a_tangle()
+    {
+        var shape = TangleShapes.Read(
+            Members("Base", "Manager", "MsSql", "MySql", "Startup"),
+            Uses(
+                ("Manager", "MsSql"), ("Manager", "MySql"),      // constructs them
+                ("Base", "Startup"), ("Startup", "Manager")));   // and the derived-to-base edges are gone
+
+        Assert.Equal(TangleShape.Hierarchy, shape);
+    }
+
+    /// <summary>
+    /// Mostly-inheritance is not the same as explained-by-inheritance.
+    /// </summary>
+    /// <remarks>
+    /// Jellyfin's group states: four subclasses of one abstract base, four inheritance edges and
+    /// sixteen constructions, because each state builds the next. Counting hierarchy edges would
+    /// have called it a hierarchy; removing them and asking what survives does not, and the
+    /// surviving ring is the finding.
+    /// </remarks>
+    [Fact]
+    public void Subclasses_that_construct_each_other_stay_entangled()
+    {
+        var shape = TangleShapes.Read(
+            Members("AbstractState", "Idle", "Playing", "Waiting"),
+            Uses(("Idle", "Playing"), ("Playing", "Waiting"), ("Waiting", "Idle")));
+
+        Assert.Equal(TangleShape.Entangled, shape);
+    }
+
+    /// <summary>
+    /// The types that close a project cycle, which is the part the section never said.
+    /// </summary>
+    /// <remarks>
+    /// Constructed rather than measured, and it has to be: neither cloned solution has a project
+    /// cycle at all — an ordinary cross-project edge follows a project reference and MSBuild
+    /// forbids those from cycling. This is the same reason
+    /// <see cref="Cycles.AmongProjects(IEnumerable{ValueTuple{string, string}},
+    /// IEnumerable{ValueTuple{string, string}})"/> takes primitives.
+    /// </remarks>
+    [Fact]
+    public void A_project_cycle_names_the_links_that_close_it()
+    {
+        var types = new[] { ("core|A", "Core"), ("web|B", "Web"), ("web|C", "Web") };
+
+        var cycle = Assert.Single(Cycles.AmongProjects(
+            types, [("core|A", "web|B"), ("web|C", "core|A")]));
+
+        var links = ProjectLinks.Closing(cycle, types, core.Model.Edges);
+
+        // The fixture's edges know nothing of these projects, so the cycle is real and the
+        // evidence for it is empty. That is the honest pairing: Closing reports what the edge
+        // list contains, and inventing a link for a cycle found over different inputs is the
+        // failure docs/DEFECTS.md §1 is about.
+        Assert.Empty(links);
+        Assert.Equal(["Core", "Web"], cycle.Members.Select(m => m.Canonical.Replace("project|", "", StringComparison.Ordinal)));
+    }
+
+    private static HashSet<string> Members(params string[] types) =>
+        new(types, StringComparer.Ordinal);
+
+    private static Dictionary<string, IReadOnlyList<string>> Uses(params (string From, string To)[] edges) =>
+        edges
+            .GroupBy(e => e.From, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => (IReadOnlyList<string>)g.Select(e => e.To).ToList(), StringComparer.Ordinal);
+
     private static Dictionary<string, IReadOnlySet<string>> OneAssembly(params string[] namespaces) =>
         namespaces.ToDictionary(
             ns => ns,

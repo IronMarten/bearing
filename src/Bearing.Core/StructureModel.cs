@@ -733,6 +733,19 @@ public sealed class SolutionModel
     public IReadOnlyList<Cycle> TypeTangles => _typeTangles ??= Cycles.AmongTypes(Types, Policy.MinTangle);
 
     /// <summary>
+    /// Each type tangle with what holds it together, in the same order as
+    /// <see cref="TypeTangles"/>.
+    /// </summary>
+    /// <remarks>
+    /// Beside the components rather than replacing them, for the reason
+    /// <see cref="ShapedNamespaceCycles"/> is: the membership and the reading of it are different
+    /// questions. Unlike the namespace cycles, nothing here is set aside — every tangle is still
+    /// reported and only the claim about it changes.
+    /// </remarks>
+    public IReadOnlyList<ShapedTangle> ShapedTypeTangles =>
+        _shapedTypeTangles ??= TangleShapes.OfTypes(TypeTangles, Edges);
+
+    /// <summary>
     /// Projects no other project depends on, ordered by name.
     /// </summary>
     /// <remarks>
@@ -849,6 +862,7 @@ public sealed class SolutionModel
             : ExternalOrigin.Unknown;
 
     private IReadOnlyList<ShapedCycle>? _shapedNamespaceCycles;
+    private IReadOnlyList<ShapedTangle>? _shapedTypeTangles;
     private IReadOnlyList<ExternalDependency>? _externalDependencies;
     private IReadOnlyList<(string Namespace, IReadOnlyList<TypeNode> Types)>? _namespaces;
     private ContactPoints? _contactPoints;

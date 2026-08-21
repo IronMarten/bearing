@@ -231,10 +231,13 @@ Every claim shows the numbers behind it.
    them can be tested or changed in isolation:
      9 types: AlphaNode, BetaNode, DeltaNode, EpsilonNode, EtaNode, GammaNode, IotaNode, ThetaNode — 8 of 9 shown
        loop: AlphaNode -> BetaNode -> GammaNode -> DeltaNode -> EpsilonNode -> ZetaNode -> EtaNode -> ThetaNode -> IotaNode -> AlphaNode
+       held by Field, Invocation; heaviest: AlphaNode <-> BetaNode, 2 references
      8 types: AccessorialNormalizer, AddressNormalizer, RateNormalizer, ReferenceNormalizer, Router, ShipmentCoordinator, TrackingNormalizer, TransitNormalizer
        loop: AccessorialNormalizer -> ShipmentCoordinator -> Router -> AccessorialNormalizer — 3 of the 8; all 8 reach each other
+       held by Invocation, Construction, Field; heaviest: AccessorialNormalizer <-> ShipmentCoordinator, 2 references
      4 types: EastLink, NorthLink, SouthLink, WestLink
        loop: EastLink -> SouthLink -> WestLink -> NorthLink -> EastLink
+       held by Field, Invocation; heaviest: EastLink <-> SouthLink, 2 references
 
 -- SHARED MUTABLE STATE (no cohort required) -------------------
    (writes to static mutable state — every caller on every thread shares these)

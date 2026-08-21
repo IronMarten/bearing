@@ -228,7 +228,7 @@ public static class JsonOutput
         new(
             [.. model.ShapedNamespaceCycles.Select(c => Cycle(c.Cycle) with { Shape = c.Shape })],
             [.. model.ProjectCycles.Select(Cycle)],
-            [.. model.TypeTangles.Select(Cycle)]);
+            [.. model.ShapedTypeTangles.Select(t => Cycle(t.Tangle) with { Holds = t.Shape })]);
 
     private static CycleBlock Cycle(Cycle cycle) =>
         new(
@@ -410,8 +410,13 @@ public static class JsonOutput
 
     /// <param name="Shape">
     /// What closes the cycle, for namespace cycles. Null on the project and type graphs, which
-    /// are not classified — a consumer filtering on it gets everything there, which is what the
-    /// unclassified answer means.
+    /// this vocabulary does not describe.
+    /// </param>
+    /// <param name="Holds">
+    /// What holds the component together, for type tangles. Null elsewhere. Two fields rather
+    /// than one, because the two vocabularies answer different questions and a consumer that
+    /// could not tell which it had would be guessing: a namespace cycle is set aside when its
+    /// shape is benign, while every tangle is reported and only its sentence changes.
     /// </param>
     private sealed record CycleBlock(
         string Id,
@@ -419,7 +424,8 @@ public static class JsonOutput
         IReadOnlyList<string> Members,
         IReadOnlyList<string> Path,
         bool PathCoversEveryMember,
-        CycleShape? Shape = null);
+        CycleShape? Shape = null,
+        TangleShape? Holds = null);
 
     private sealed record BoundaryBlock(
         IReadOnlyList<string> Inbound,

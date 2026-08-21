@@ -29,6 +29,20 @@ internal static class StructureSections
     /// </remarks>
     private const int HeldPairsPerCycle = 6;
 
+    /// <summary>
+    /// Directed links named under a reported project cycle.
+    /// </summary>
+    /// <remarks>
+    /// A cycle of four projects has at most a handful of links that close it, and naming them all
+    /// is the point — this is a cap against a pathological graph, not against the ordinary one.
+    /// </remarks>
+    private const int ProjectLinksPerCycle = 6;
+
+    /// <summary>
+    /// Reference kinds named when saying what holds a tangle together.
+    /// </summary>
+    private const int KindsPerTangle = 3;
+
     /// <summary>The same, for the type graph, where names are shorter.</summary>
     private const int TypesPerTangle = 8;
 
@@ -54,6 +68,38 @@ internal static class StructureSections
     /// has nothing to ask anyone to do.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// What holds a tangle together — the line that decides whether it is worth unpicking.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Both arms are claims about the same component, and only one of them is a defect.</b>
+    /// nopCommerce's single tangle is <c>BaseDataProvider</c> beside its own three providers, and
+    /// it dissolves entirely once inheritance is set aside. Saying "none of them can be tested or
+    /// changed in isolation" about a class hierarchy is how a reader decides the section does not
+    /// know what one is.
+    /// </para>
+    /// <para>
+    /// It is still listed. Unlike a namespace cycle there is nothing misleading about the
+    /// membership — those six types really do reach each other — so what changes is the sentence
+    /// beside it, not whether it appears.
+    /// </para>
+    /// </remarks>
+    private static string Holds(ShapedTangle tangle, Func<SubjectRef, string> name)
+    {
+        if (tangle.Shape == TangleShape.Hierarchy)
+            return "a type hierarchy: set the inheritance aside and nothing mutually "
+                   + "dependent is left, so this is a base and its own implementations";
+
+        var kinds = string.Join(", ", tangle.Kinds.Take(KindsPerTangle));
+        var held = kinds.Length == 0 ? "held by references the walk could not attribute" : $"held by {kinds}";
+
+        return tangle.Heaviest is { } pair
+            ? $"{held}; heaviest: {name(pair.First)} <-> {name(pair.Second)}, "
+              + Sentences.Plural(pair.Weight, "reference")
+            : held;
+    }
+
     private static IEnumerable<string> NotLayering(
         IReadOnlyList<ShapedCycle> cycles, int top, Func<SubjectRef, string> name)
     {
@@ -224,10 +270,25 @@ internal static class StructureSections
 
         string ProjectName(SubjectRef id) => projectNames.GetValueOrDefault(id, id.Canonical);
 
+        var typeProjects = model.Types.Select(t => (t.Subject.Canonical, t.Project)).ToList();
+
         foreach (var cycle in shownProjects)
         {
             yield return "     " + Members(cycle, "projects", ProjectsPerCycle, " <-> ", ProjectName);
             yield return "       " + Loop(cycle, ProjectName);
+
+            // No suppression here, unlike the namespace cycles: the assembly is the unit anyone
+            // extracts, so two of them naming each other is a finding at any weight. What was
+            // missing is where to start, which is the heaviest link and the type that carries it.
+            foreach (var link in ProjectLinks.Closing(cycle, typeProjects, model.Edges).Take(ProjectLinksPerCycle))
+            {
+                var carrier = link.Example is { } edge
+                    ? $" — heaviest: {TypeName(edge.From)} -> {TypeName(edge.To)}"
+                    : "";
+
+                yield return $"       {link.From} -> {link.To}: "
+                             + Sentences.Plural(link.Weight, "reference") + carrier;
+            }
         }
 
         foreach (var line in projectDisclosure) yield return line;
@@ -236,18 +297,20 @@ internal static class StructureSections
         yield return $"   TYPE TANGLES — {model.Policy.MinTangle}+ types that all reach each other, so none of";
         yield return "   them can be tested or changed in isolation:";
 
-        var tangles = model.TypeTangles;
-        if (tangles.Count == 0)
+        if (model.TypeTangles.Count == 0)
             yield return "     (none — mutual pairs and triples are ordinary and not reported)";
 
-        var (shownTangles, tangleDisclosure) = Sentences.Cap(tangles, model.Policy.Top, "tangle", "     ");
+        var (shownTangles, tangleDisclosure) = Sentences.Cap(
+            model.ShapedTypeTangles, model.Policy.Top, "tangle", "     ");
 
         string TypeName(SubjectRef id) => model.Find(id)?.Name ?? id.Canonical;
 
-        foreach (var tangle in shownTangles)
+        foreach (var shapedTangle in shownTangles)
         {
+            var tangle = shapedTangle.Tangle;
             yield return "     " + Members(tangle, "types", TypesPerTangle, ", ", TypeName);
             yield return "       " + Loop(tangle, TypeName);
+            yield return "       " + Holds(shapedTangle, TypeName);
         }
 
         foreach (var line in tangleDisclosure) yield return line;
