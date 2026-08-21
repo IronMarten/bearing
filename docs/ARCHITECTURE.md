@@ -524,7 +524,7 @@ already understood. These are questions with no answer yet.
   records is a type, so this is a change to reference *collection* and not a new detector. Far more
   useful, far more false-positive prone, and both remain true — `TASKS.md` A9 carries the cost.
 
-- **What the cohort floor is for, when one number is doing two jobs — X3.** `MinCohort` is read in
+- **~~What the cohort floor is for, when one number is doing two jobs.~~ Answered — X3, and the parameter is split.** `CohortBasisFloor` owns selection, `MinCohort` keeps sufficiency, both at 5, landed byte-identical. **The second half of the answer — what a thin cohort may be nominated as — is superseded by X16 below**, which found that the question was posed on the wrong variable. `MinCohort` is read in
   two places that pull in opposite directions, and neither can move without the other:
 
   - **Selection**, `Cohorts.Assign`: `.Where(candidateCounts[c.Key] >= minCohort).OrderBy(c =>
@@ -574,3 +574,48 @@ already understood. These are questions with no answer yet.
   belongs on candidate count whatever the basis is. 42% of nopCommerce sits in cohorts of 100+
   against 6.6% of Jellyfin, which is also why this looks like a nopCommerce problem from one
   solution and a general one from two.
+
+- **How a cohort-relative claim is gated — X16.** Ten of the forty-two entries in
+  [`DEFECTS.md`](DEFECTS.md) are one design decision failing repeatedly: §2 absolute gates do not
+  travel, §9 a floor doing two jobs, §10 the same, §14 an unsatisfiable percentile floor, §17 a peer
+  group that is not one, §19 the sentence discarding what would make it true, §28 a ratio against a
+  zero median, §33 a gate that fires on a third of what it filters, §34 a cohort of 2,909, §38
+  `undefinedx its peer median`. Each was repaired locally and each repair added or moved a
+  threshold. **That recurrence is the finding.**
+
+  **Measured 2026-08-21, method cohorts on both reference solutions:**
+
+  | | nopCommerce (139 cohorts) | Jellyfin (156) |
+  |---|---|---|
+  | peer median is 0 or 1 — so `3x median` **is** `cc >= 3` | 123 (88%) | 127 (81%) |
+  | zero dispersion, MAD = 0 | 104 (74%) | 100 (64%) |
+  | largest cohort | `suffix:Service` n=2,927 median 1 MAD 1 max 93 | `suffix:Manager` n=1,339 median 1 MAD 1 max 56 |
+  | second | `base:BaseNopModel` **n=1,656 median 0 MAD 0** max 12 | `suffix:Info` n=927 median 0 MAD 0 max 45 |
+
+  **A cohort of 1,656 with zero dispersion is what kills the size hypothesis.** Every gate in this
+  family thresholds *cohort size* — a floor, a ceiling, a rank limit, a minimum decision count — and
+  size is uncorrelated with whether the peer distribution supports a comparative claim at all. A
+  cohort of 3 and a cohort of 1,656 fail identically. That is why each fix holds at the size it was
+  measured against and breaks at the next one: **every one of them is a threshold on a proxy.**
+
+  **The variable is dispersion.** With spread, an outlier is an outlier at any n; without it, nobody
+  is, at any n. Stated that way the family collapses into one rule, and the rule *removes*
+  thresholds — `ConcealedTopRank` exists to control volume that median-1 cohorts create, and
+  `MinCohort`'s gating role exists to control the thin end of the same problem.
+
+  **The trap, found while working it through and recorded so it is not rediscovered.** A naive
+  dispersion gate is *worse* than what ships: at MAD = 0 the scale estimate collapses, so
+  `median + k·MAD` is the median and everything above it fires — across 74% of nopCommerce's
+  cohorts. Swapping the statistic is not the fix.
+
+  **What the trap points at is the actual answer: let the claim follow the distribution rather than
+  making a threshold chase the size.** A type at cc 12 among 1,656 peers all at 0 is a finding, and
+  it is not a relative one. With spread the sentence is *"unusual among its peers — cc 93 against a
+  median of 1"*; without spread it is *"the only one of its kind — cc 12 where all 1,656 peers are
+  0"*. Two claims, each true where it is used, neither needing a size threshold. Same shape as the
+  namespace-cycle repair of the same day: classify by what is actually there instead of
+  thresholding an aggregate.
+
+  **Scope**: expected to close §10, §14, §28, §34, §38 and the remainder of X3, and to delete
+  `ConcealedTopRank` and `MinCohort`'s gating use. **Unmeasured** — the replacement has not been run
+  end to end, and that measurement is the first piece of work, not the last.

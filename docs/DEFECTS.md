@@ -431,8 +431,21 @@ nothing gated at all: it moves from `ns:MediaBrowser.Model.Dlna` (8 peers) to `s
 (3), where three peers make cc 80 an outlier. A fix aimed here would have changed every percentile
 in the report and been credited with the wrong mechanism.
 
-So this waits on X3, now written down with its numbers in `ARCHITECTURE.md` §11 — split the
-parameter, then let thin cohorts nominate with count-based rather than percentile-based claims.
+**The parameter split is done** — `CohortBasisFloor` owns selection, `MinCohort` keeps sufficiency
+— and it does not close this. Letting thin cohorts nominate runs into `ConcealedTopRank`, which is
+3: `Reading.Rank` is midrank from the top, so in a cohort of three the ranks are 1, 2 and 3 and the
+gate admits every member. The gate that exists to stop the finding growing with the size of the
+codebase goes vacuous at exactly the cohort sizes this entry is about.
+
+**That is the third repair in a row to open a new one, and the recurrence is the finding.** This is
+one of ten entries — §2, §9, §10, §14, §17, §19, §28, §33, §34, §38 — that are the same design
+decision failing, each repaired locally by adding or moving a threshold on *cohort size*. Measured
+on both solutions, size is the wrong variable: 88% of nopCommerce's method cohorts have a median of
+0 or 1, so `3x median` **is** `cc >= 3`; 74% have zero dispersion; and `base:BaseNopModel` has
+**1,656 members with MAD 0**. A cohort of three and a cohort of 1,656 fail identically.
+
+**So this is a symptom and it should not be repaired again.** It carries zero field incidence and it
+now waits on **X16** — how a cohort-relative claim is gated at all — in `ARCHITECTURE.md` §11.
 
 ### 11. The layer-span collapse hides the anomaly it shares a signature with — **fixed in Core**
 
