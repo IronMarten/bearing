@@ -64,8 +64,8 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         var analysed = coupling["Core"];
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
-        Assert.Equal(11, analysed.AbstractTypes);   // P3's four *Facet interfaces, and X14's IIdentityWicket
-        Assert.Equal(191, analysed.TotalTypes);   // …P8 172 → P9 178 → P3 188 → member identity 191
+        Assert.Equal(12, analysed.AbstractTypes);   // P3's four *Facet interfaces, X14's IIdentityWicket, A9's TallyProbe
+        Assert.Equal(193, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
@@ -426,7 +426,11 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         // declares none, so IdentityTurnstile reaches System.Action. That is plumbing, not an
         // integration — map.Systems above is unchanged, which is the half that would have meant
         // the plant disturbed something.
-        Assert.Equal(23, map.PlumbingReferences);
+        // 26 since A9 layer 3: SettlementProbe reaches System.Collections.Generic, System and
+        // System.Runtime.Serialization — the last for [OnDeserialized], which is the plant's
+        // whole point. All three are plumbing; map.Systems above is unchanged, which is the half
+        // that would have meant the plant disturbed an integration.
+        Assert.Equal(26, map.PlumbingReferences);
     }
 
     /// <summary>

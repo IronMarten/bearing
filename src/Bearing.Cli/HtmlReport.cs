@@ -1053,6 +1053,7 @@ public static class HtmlReport
         Qualifiers.TooLargeToHold => "too large to hold at once",
         Qualifiers.PartOfALayeringPattern => "one of a repeated pattern",
         Qualifiers.PartOfAnUnreadGroup => "one of several unread on its type",
+        Qualifiers.AnAttributeMayDirectIt => "an attribute may direct something to it",
         Qualifiers.TestUsageUnobservable => "test usage not visible here",
         Qualifiers.GloballyExtremeFanIn => "extreme fan-in solution-wide",
         Qualifiers.GloballyExtremeComplexity => "extreme complexity solution-wide",

@@ -126,6 +126,7 @@ public static class NoStaticReferences
                 [
                     new Qualifier(Qualifiers.TestUsageUnobservable, testsUnobservable),
                     new Qualifier(Qualifiers.PartOfAnUnreadGroup, group),
+                    new Qualifier(Qualifiers.AnAttributeMayDirectIt, member.HasAttributes),
                 ],
                 []);
         }

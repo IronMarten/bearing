@@ -226,6 +226,7 @@ internal sealed class ModelBuilder
             IsExternallyVisible = ExternallyVisible(symbol),
             IsOverride = symbol is { IsOverride: true },
             IsStatic = symbol is { IsStatic: true },
+            HasAttributes = symbol?.GetAttributes().Length > 0,
         };
 
         node.Members.Add(recorded);

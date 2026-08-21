@@ -83,6 +83,26 @@ public static class Qualifiers
     public const string PartOfAnUnreadGroup = "part-of-an-unread-group";
 
     /// <summary>
+    /// An attribute on the member may direct something outside this solution to it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A qualifier and not an exclusion, and the reason is <c>[Obsolete]</c>.</b> Most
+    /// attributes on an unreferenced member are something addressing it — a serialisation
+    /// callback, a message handler, a test — but not all of them are, and an obsolete private
+    /// method nothing calls is exactly as dead as it looks. Excluding on any attribute would hide
+    /// it; naming the category is what §5.6 actually asks for.
+    /// </para>
+    /// <para>
+    /// <b>Measured before it was added</b>, which is why it is not an exclusion on volume either:
+    /// none of Jellyfin's nominations carried an attribute and three of nopCommerce's five did, so
+    /// this is a correctness gap rather than a noise one. The case it closes is a private
+    /// <c>[OnDeserialized]</c> callback — non-public, so no other exclusion reaches it.
+    /// </para>
+    /// </remarks>
+    public const string AnAttributeMayDirectIt = "an-attribute-may-direct-it";
+
+    /// <summary>
     /// A test project was skipped, so usage from tests was never visible to this walk.
     /// </summary>
     /// <remarks>

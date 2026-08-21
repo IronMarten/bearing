@@ -347,6 +347,9 @@ public static class Claims
     /// </remarks>
     private static IEnumerable<string> Unseen(Finding finding)
     {
+        if (finding.Holds(Qualifiers.AnAttributeMayDirectIt))
+            yield return "whatever an attribute on it directs there";
+
         if (finding.Holds(Qualifiers.TestUsageUnobservable)) yield return "usage from test projects";
     }
 

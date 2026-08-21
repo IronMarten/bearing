@@ -290,6 +290,7 @@ type|Core|global::TestBed.Core.SaturationMeter,type|Core|global::TestBed.Core.Er
 type|Core|global::TestBed.Core.SaturationMeter,type|Core|global::TestBed.Core.LatencyGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,175
 type|Core|global::TestBed.Core.SaturationMeter,type|Core|global::TestBed.Core.QueueGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,178
 type|Core|global::TestBed.Core.SaturationMeter,type|Core|global::TestBed.Core.ThroughputGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,174
+type|Core|global::TestBed.Core.SettlementProbe,type|Core|global::TestBed.Core.TallyProbe,1,Inheritance,TestBed/Core/DeadCodeMemberTraps.cs,38
 type|Core|global::TestBed.Core.ShipmentController,type|Core|global::TestBed.Core.ControllerBase,1,Inheritance,TestBed/Core/Controllers.cs,52
 type|Core|global::TestBed.Core.ShipmentController,type|Core|global::TestBed.Core.NormalizationContext,6,Other;Parameter;Construction,TestBed/Core/Controllers.cs,56
 type|Core|global::TestBed.Core.ShipmentController,type|Core|global::TestBed.Core.NormalizedResponse,5,Other;ReturnType,TestBed/Core/Controllers.cs,56

@@ -96,12 +96,17 @@ public sealed class StructureTests(CoreWalkFixture core)
         // partial method. Nothing that already existed gains fan-in, a cohort or a contact point,
         // and the extension goes through the interface so that the two types do not name each
         // other — that made a two-type tangle, which is a finding the plant did not aim at.
-        Assert.Equal(198, core.Model.Types.Count);
+        //
+        // And A9 layer 3's plant adds two more: TallyProbe and SettlementProbe, one edge. They
+        // carry the member-level dead-code categories, and every member on them is NON-PUBLIC on
+        // purpose — the type-level plants in DeadCodeTraps.cs all pass by being externally
+        // visible, so a public member-level trap would test nothing.
+        Assert.Equal(200, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
         // which node an edge lands on without changing how many pairs there are.
-        Assert.Equal(379, core.Model.Edges.Count);
+        Assert.Equal(380, core.Model.Edges.Count);
 
         // Methods are counted per declaration, so unlike Types this was never distorted by the
         // planted collisions: Describe, Score and Weight are all three present. Core holds
@@ -114,7 +119,9 @@ public sealed class StructureTests(CoreWalkFixture core)
         // on top of the ordinary Admit. Plus IsWired and OnRefused, and OnRefused is ONE member
         // from two declarations — recording both parts put two rows under one subject, which is
         // six colliding subjects on nopCommerce.
-        Assert.Equal(202, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        // Seven more with layer 3's plant: the virtual and its override, a constructor, a wired
+        // handler, a serialisation callback, a string-dispatched method and the one that names it.
+        Assert.Equal(209, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------

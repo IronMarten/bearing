@@ -224,6 +224,19 @@ public sealed class Member
     /// <summary>Whether this member is a project's entry point.</summary>
     public bool IsEntryPoint { get; internal set; }
 
+    /// <summary>
+    /// Whether this member declares any attribute.
+    /// </summary>
+    /// <remarks>
+    /// <b>Whether, not which, and the difference is the whole design.</b> An attribute is how
+    /// something outside the compiler's reference graph addresses a member — a serialiser, a
+    /// container, a test runner, a routing table — so its presence is the one general signal
+    /// §5.6's remaining categories share. Naming <i>which</i> attributes mean invocation would be
+    /// a curated list, and <c>docs/DEFECTS.md</c> §5 is the standing example of what one costs:
+    /// the case it has not heard of is sorted wrong, silently.
+    /// </remarks>
+    public bool HasAttributes { get; internal set; }
+
     /// <summary>Whether this member is static.</summary>
     /// <remarks>
     /// Carried for the one case where it changes what a reference count means: a <b>static

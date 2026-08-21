@@ -1,7 +1,7 @@
 ﻿
 ================================================================
 BEARING {version} — TestBed.sln
-198 types — classes and interfaces — in 3 projects. Unusual findings first, then structure.
+200 types — classes and interfaces — in 3 projects. Unusual findings first, then structure.
 Every claim shows the numbers behind it.
 ================================================================
 
@@ -27,12 +27,12 @@ Every claim shows the numbers behind it.
      Core · Contracts.cs:25 · change cost, 1 of 4
    ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.
      Core · Controllers.cs:52 · concealed decision, 1 of 7
-   TariffCalculator.Apply — the most complex of the 42 methods in the 31 types in TestBed.Core.
+   TariffCalculator.Apply — the most complex of the 49 methods in the 33 types in TestBed.Core.
      Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 14
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
      Core · AuthenticationMiddleware.cs:8 · spans architectural layers, 1 of 14
    AuditReconciler._validate — no static references found — verify before deleting. 4 of AuditReconciler's 5 data members have no reader, so read them as a group.
-     Core · Reconcilers.cs:149 · no static references found, 1 of 76
+     Core · Reconcilers.cs:149 · no static references found, 1 of 80
 
    Each one is the strongest row of its section. The rest of that section is
    below, and every finding this run made is in --json and --csv.
@@ -48,9 +48,9 @@ Every claim shows the numbers behind it.
    CustomsTrait.DutyBand — looks like plumbing but is the only complexity among the 6 types whose name ends in Trait. (top 8%; cc 6, dsm 0, fan-in 1, fan-out 0)
 
 -- CONCEALED DECISION, METHOD LEVEL ----------------------------
-   TariffCalculator.Apply — the most complex of the 42 methods in the 31 types in TestBed.Core. (cc 22 against a peer median of 1; dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
+   TariffCalculator.Apply — the most complex of the 49 methods in the 33 types in TestBed.Core. (cc 22 against a peer median of 1; dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9
    ShipmentLedger.Record — the most complex of the 13 methods in the 12 types whose name ends in Ledger. (cc 16 against a peer median of 1; dsm 1, nesting 1, 26 lines) — Ledgers.cs:40
-   ShipmentCoordinator.Coordinate — among the 2 most complex of the 42 methods in the 31 types in TestBed.Core. (cc 13 against a peer median of 1; dsm 11, nesting 1, 25 lines) — ShipmentCoordinator.cs:18
+   ShipmentCoordinator.Coordinate — among the 2 most complex of the 49 methods in the 33 types in TestBed.Core. (cc 13 against a peer median of 1; dsm 11, nesting 1, 25 lines) — ShipmentCoordinator.cs:18
    ShipmentController.Post — the most complex of the 8 methods in the 8 types deriving from ControllerBase. (cc 12 against a peer median of 1; dsm 4, nesting 2, 20 lines) — Controllers.cs:56
    ReconciliationController.Reconcile — among the 2 most complex of the 8 methods in the 8 types deriving from ControllerBase. (cc 11 against a peer median of 1; dsm 0, nesting 1, 18 lines) — Reconcilers.cs:291
    ThroughputGauge.Sample — the most complex of the 5 methods in the 5 types whose name ends in Gauge. (cc 9 against a peer median of 1; dsm 0, nesting 1, 20 lines) — Gauges.cs:62
@@ -84,7 +84,7 @@ Every claim shows the numbers behind it.
    by how many of its types touch them:
      System.Data                                3 types  (framework)
      System.Net.Http                            3 types  (framework)
-     (23 language/runtime references omitted as plumbing)
+     (26 language/runtime references omitted as plumbing)
 
    BOUNDARIES CARRYING REAL LOGIC — decisions made at the edge:
      ShipmentController — Post is cc 12. Business decisions at an external edge are the hardest kind to change later. (among the most complex of this solution's 19 boundaries, where the median is cc 1)
@@ -193,18 +193,18 @@ Every claim shows the numbers behind it.
    QuoteController._carrier — no static references found — verify before deleting. 1 reference reaches QuoteController itself. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:20
    QuoteReconciler._validate — no static references found — verify before deleting. 2 references reach QuoteReconciler itself. (private field, 1 line; not visible here: usage from test projects) — Reconcilers.cs:216
    RateController._carrier — no static references found — verify before deleting. Nothing refers to RateController either. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:29
-   ShipmentCoordinator._gateway — no static references found — verify before deleting. 14 references reach ShipmentCoordinator itself. (private field, 1 line; not visible here: usage from test projects) — ShipmentCoordinator.cs:9
-   SurchargeReconciler._validate — no static references found — verify before deleting. 2 references reach SurchargeReconciler itself. (private field, 1 line; not visible here: usage from test projects) — Reconcilers.cs:242
-   TrackingController._carrier — no static references found — verify before deleting. Nothing refers to TrackingController either. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:38
-   (4 nominations not shown of 19 — raise --top to see them.)
+   SettlementProbe.AfterLoad — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (private method, 2 lines; not visible here: whatever an attribute on it directs there and usage from test projects) — DeadCodeMemberTraps.cs:63
+   SettlementProbe.OnReplayed — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (private method, 1 line; not visible here: usage from test projects) — DeadCodeMemberTraps.cs:73
+   SettlementProbe.Replay — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (internal method, 4 lines; not visible here: usage from test projects) — DeadCodeMemberTraps.cs:75
+   (8 nominations not shown of 23 — raise --top to see them.)
 
-   235 members had no inbound reference. 159 of those are not asked about,
+   241 members had no inbound reference. 161 of those are not asked about,
    because being referred to by nothing here is what each of them looks like:
           1  invoked by the runtime — an entry point, or a static constructor
           9  implements an interface — callers reach it through the contract
-          0  overrides a base member — same
+          1  overrides a base member — same
         156  visible outside this assembly — the caller may not be in this solution
-          5  the type's only constructor — whatever creates the type calls it
+          6  the type's only constructor — whatever creates the type calls it
    (a member can be in several of those, so they do not sum to the number set aside)
 
 -- CIRCULAR REFERENCES -----------------------------------------
@@ -236,7 +236,7 @@ Every claim shows the numbers behind it.
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
    abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
-     Core — I 0, A 0.06, D 0.94  (Ca 2 depend on it, Ce 0 reach out, 11/191 abstract)  <-- ZONE OF PAIN (stable and concrete)
+     Core — I 0, A 0.06, D 0.94  (Ca 2 depend on it, Ce 0 reach out, 12/193 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/5 abstract)  (near the main sequence)
      Tools — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/2 abstract)  (near the main sequence)
 
@@ -249,7 +249,7 @@ Every claim shows the numbers behind it.
      Skipped this run: Core.Tests.
 
 -- NO PEER GROUP -----------------------------------------------
-   22 of 198 types (11.1%) sit in cohorts below --min-cohort (5).
+   22 of 200 types (11%) sit in cohorts below --min-cohort (5).
    No PEER comparison was possible for these, so their percentile and
    multiple-of-median readings are blank rather than zero.
    4 of them do still appear in the nominations above:

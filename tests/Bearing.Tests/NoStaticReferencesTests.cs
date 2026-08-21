@@ -246,6 +246,77 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
         Assert.Contains(lonely, s => s.EndsWith("DepthGauge._normalize", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// The member-level categories, planted where they can be reached and asserted one by one.
+    /// </summary>
+    /// <remarks>
+    /// <b>Non-public on purpose</b> — <c>DeadCodeTraps.cs</c>'s three type-level plants all pass by
+    /// being externally visible, so a public member-level trap would test nothing. These are
+    /// <c>tests/TestBed/Core/DeadCodeMemberTraps.cs</c>, and they do not all end the same way:
+    /// two must not be nominated, one must be nominated with its category named, and one is
+    /// nominated with nothing but the standing caveat because that is this tool's honest limit.
+    /// </remarks>
+    [Fact]
+    public void An_override_is_excluded_and_a_wired_handler_is_simply_referenced()
+    {
+        var nominated = Findings.OfKind(FindingKind.NoStaticReferences)
+            .Select(f => f.Subject.Canonical)
+            .ToList();
+
+        // The override: callers reach it through the base declaration, so it is excluded.
+        Assert.DoesNotContain(nominated, s => s.EndsWith("SettlementProbe.Sample", StringComparison.Ordinal));
+
+        // The += handler: a method group is an ordinary reference and needs no handling at all.
+        // If this ever fires, method-group references have stopped resolving.
+        Assert.DoesNotContain(nominated, s => s.EndsWith("SettlementProbe.OnSettled", StringComparison.Ordinal));
+
+        // And the base virtual IS nominated, correctly: nothing calls it, so neither it nor the
+        // override ever runs. The exclusion is for overrides, not for everything near one.
+        Assert.Contains(nominated, s => s.EndsWith("TallyProbe.Sample", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// A serialisation callback is nominated with its category named, never bare.
+    /// </summary>
+    /// <remarks>
+    /// <b>The gap the plant found, and §5.6's bar stated exactly.</b> A private
+    /// <c>[OnDeserialized]</c> method is non-public, so no other exclusion reaches it, and before
+    /// the attribute qualifier existed it appeared with nothing said about why it might be
+    /// reachable — which is the criterion's own words: not reported as unreferenced <i>without its
+    /// category named</i>.
+    /// </remarks>
+    [Fact]
+    public void A_serialisation_callback_is_nominated_with_its_category_named()
+    {
+        var callback = Assert.Single(
+            Findings.OfKind(FindingKind.NoStaticReferences),
+            f => f.Subject.Canonical.EndsWith("SettlementProbe.AfterLoad(System.Runtime.Serialization.StreamingContext)",
+                StringComparison.Ordinal));
+
+        Assert.True(callback.Holds(Qualifiers.AnAttributeMayDirectIt));
+        Assert.Contains("whatever an attribute on it directs there", Text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A method named only by a string literal is nominated, and that is the recorded limit.
+    /// </summary>
+    /// <remarks>
+    /// <b>Asserted so the limit is a decision rather than an oversight.</b> §5.6 specifies string
+    /// literals matching <i>type</i> names, which are long and distinctive. Member names are
+    /// neither — matching <c>"Name"</c> or <c>"Add"</c> against every member called that would
+    /// rescue half a codebase on a coincidence — so the handling is deliberately not extended to
+    /// them. What protects the reader is the label: verify before deleting.
+    /// </remarks>
+    [Fact]
+    public void A_string_dispatched_method_is_nominated_and_that_is_the_recorded_limit()
+    {
+        var nominated = Findings.OfKind(FindingKind.NoStaticReferences)
+            .Select(f => f.Subject.Canonical)
+            .ToList();
+
+        Assert.Contains(nominated, s => s.EndsWith("SettlementProbe.OnReplayed", StringComparison.Ordinal));
+    }
+
     /// <summary>The exclusion is counted, and the section says so.</summary>
     [Fact]
     public void The_sole_constructor_exclusion_is_counted()
