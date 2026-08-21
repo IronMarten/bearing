@@ -92,7 +92,27 @@ public static class NoStaticReferences
         // visible to this walk. Solution-level, and it qualifies every nomination equally.
         var testsUnobservable = model.Coverage.SkippedProjects.Count > 0;
 
-        var nominated = Considered(model).Where(x => Excluding(x.Type, x.Member) is null).ToList();
+        // Strongest first, which is FindingSet's contract and not this detector's preference:
+        // "each detector emits in a total order of its own -- strongest evidence first, broken by
+        // identity -- and nothing here re-sorts them". A9 shipped emitting in model order, and
+        // because Selection.Exemplars takes the first of each kind, the second-most-prominent line
+        // of the whole nopCommerce report was whichever type sorted first alphabetically: three
+        // one-line properties on a plugin's DTO, ahead of a fifteen-line private method nothing
+        // calls.
+        //
+        // Size is the measure, because this kind is cohort-free -- like hubs, which sorts on
+        // min(fan-in, fan-out) -- and every nomination has an inbound count of zero, so the count
+        // that fired cannot discriminate. The biggest thing nothing refers to is the one worth
+        // looking at first, and it is a fact rather than a threshold.
+        //
+        // It is also the number the row already prints. X10's follow-up found two sections sorting
+        // on one number and printing another, and concluded that an order the reader cannot see is
+        // not an order that helps them.
+        var nominated = Considered(model)
+            .Where(x => Excluding(x.Type, x.Member) is null)
+            .OrderByDescending(x => x.Member.LinesOfCode)
+            .ThenBy(x => x.Member.Subject.Canonical, StringComparer.Ordinal)
+            .ToList();
 
         // How many data members of each type survived. A member cannot know this about itself, so
         // the pass is over the whole candidate set — which is why Detect materialises rather than

@@ -31,8 +31,8 @@ Every claim shows the numbers behind it.
      Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 14
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
      Core · AuthenticationMiddleware.cs:8 · spans architectural layers, 1 of 14
-   AuditReconciler._validate — no static references found — verify before deleting. 4 of AuditReconciler's 5 data members have no reader, so read them as a group.
-     Core · Reconcilers.cs:149 · no static references found, 1 of 80
+   IdentityTurnstile.Turned — no static references found — verify before deleting. Nothing refers to IdentityTurnstile either.
+     Core · MemberIdentityTraps.cs:80 · no static references found, 1 of 80
 
    Each one is the strongest row of its section. The rest of that section is
    below, and every finding this run made is in --json and --csv.
@@ -181,21 +181,21 @@ Every claim shows the numbers behind it.
      TariffReconciler — 4 of its 5 data members have no reader.
    (3 types not shown of 18 — raise --top to see them.)
 
+   IdentityTurnstile.Turned — no static references found — verify before deleting. Nothing refers to IdentityTurnstile either. (public event, 5 lines; not visible here: usage from test projects) — MemberIdentityTraps.cs:80
+   IdentityTurnstile.TryAdmit — no static references found — verify before deleting. Nothing refers to IdentityTurnstile either. (public method, 5 lines; not visible here: usage from test projects) — MemberIdentityTraps.cs:136
+   SettlementProbe.Replay — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (internal method, 4 lines; not visible here: usage from test projects) — DeadCodeMemberTraps.cs:75
+   SettlementProbe.AfterLoad — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (private method, 2 lines; not visible here: whatever an attribute on it directs there and usage from test projects) — DeadCodeMemberTraps.cs:63
    DepthGauge._normalize — no static references found — verify before deleting. 10 references reach DepthGauge itself. (private field, 1 line; not visible here: usage from test projects) — Gauges.cs:98
    DocumentController._carrier — no static references found — verify before deleting. Nothing refers to DocumentController either. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:47
    DocumentReconciler._validate — no static references found — verify before deleting. 2 references reach DocumentReconciler itself. (private field, 1 line; not visible here: usage from test projects) — Reconcilers.cs:255
    ErrorGauge._normalize — no static references found — verify before deleting. 10 references reach ErrorGauge itself. (private field, 1 line; not visible here: usage from test projects) — Gauges.cs:105
    IIdentityWicket.Admit — no static references found — verify before deleting. 3 references reach IIdentityWicket itself. (public method, 1 line; not visible here: usage from test projects) — MemberIdentityTraps.cs:46
-   IdentityTurnstile.Turned — no static references found — verify before deleting. Nothing refers to IdentityTurnstile either. (public event, 5 lines; not visible here: usage from test projects) — MemberIdentityTraps.cs:80
-   IdentityTurnstile.TryAdmit — no static references found — verify before deleting. Nothing refers to IdentityTurnstile either. (public method, 5 lines; not visible here: usage from test projects) — MemberIdentityTraps.cs:136
    LatencyGauge._normalize — no static references found — verify before deleting. 10 references reach LatencyGauge itself. (private field, 1 line; not visible here: usage from test projects) — Gauges.cs:91
    QueueGauge._normalize — no static references found — verify before deleting. 10 references reach QueueGauge itself. (private field, 1 line; not visible here: usage from test projects) — Gauges.cs:112
    QuoteController._carrier — no static references found — verify before deleting. 1 reference reaches QuoteController itself. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:20
    QuoteReconciler._validate — no static references found — verify before deleting. 2 references reach QuoteReconciler itself. (private field, 1 line; not visible here: usage from test projects) — Reconcilers.cs:216
    RateController._carrier — no static references found — verify before deleting. Nothing refers to RateController either. (private field, 1 line; not visible here: usage from test projects) — Controllers.cs:29
-   SettlementProbe.AfterLoad — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (private method, 2 lines; not visible here: whatever an attribute on it directs there and usage from test projects) — DeadCodeMemberTraps.cs:63
    SettlementProbe.OnReplayed — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (private method, 1 line; not visible here: usage from test projects) — DeadCodeMemberTraps.cs:73
-   SettlementProbe.Replay — no static references found — verify before deleting. Nothing refers to SettlementProbe either. (internal method, 4 lines; not visible here: usage from test projects) — DeadCodeMemberTraps.cs:75
    (8 nominations not shown of 23 — raise --top to see them.)
 
    241 members had no inbound reference. 161 of those are not asked about,

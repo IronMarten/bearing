@@ -216,11 +216,16 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
         Assert.Equal(4, audit.Count);
         Assert.Contains("AuditReconciler — 4 of its 5 data members have no reader", Text, StringComparison.Ordinal);
 
-        // ... and where one of them IS printed on its own — START HERE leads with an exemplar
-        // per kind — the sentence names the group rather than contradicting the row below it.
+        // ... and the claim itself names the group, asserted on the wording rather than through
+        // the report. START HERE can lead with any of these — it takes one exemplar per kind — and
+        // a lone-member sentence there would contradict the grouped row below it. Which finding
+        // gets picked is Selection's business and changes with the fixture; that the sentence is
+        // right is this test's.
+        var worded = Claims.For(core.Model, audit[0]);
+
         Assert.Contains(
             "4 of AuditReconciler's 5 data members have no reader, so read them as a group",
-            Text,
+            worded.Sentence,
             StringComparison.Ordinal);
     }
 
@@ -315,6 +320,46 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
             .ToList();
 
         Assert.Contains(nominated, s => s.EndsWith("SettlementProbe.OnReplayed", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// The findings arrive strongest first, which is <c>FindingSet</c>'s contract.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Not this detector's preference — the set's stated contract</b>, which every other
+    /// detector already honoured: <i>"each detector emits in a total order of its own — strongest
+    /// evidence first, broken by identity — and nothing here re-sorts them"</i>. A9 shipped
+    /// emitting in model order, and because <c>Selection.Exemplars</c> takes the first of each
+    /// kind, the second-most-prominent line of the nopCommerce report became whichever type sorted
+    /// first alphabetically: a one-line property on a plugin's DTO, ahead of a fifteen-line private
+    /// method nothing calls.
+    /// </para>
+    /// <para>
+    /// <b>Size is the measure because this kind is cohort-free</b> — hubs sorts on
+    /// <c>min(fan-in, fan-out)</c> for the same reason — and every nomination has an inbound count
+    /// of zero, so the number that fired cannot discriminate. It is also the number the row prints:
+    /// X10's follow-up found two sections sorting on one number and showing another, and concluded
+    /// that an order the reader cannot see is not an order that helps them.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_findings_arrive_biggest_first()
+    {
+        var members = core.Model.Types
+            .SelectMany(t => t.Members)
+            .ToDictionary(m => m.Subject.Canonical, m => m, StringComparer.Ordinal);
+
+        var sizes = Findings.OfKind(FindingKind.NoStaticReferences)
+            .Select(f => members[f.Subject.Canonical].LinesOfCode)
+            .ToList();
+
+        Assert.NotEmpty(sizes);
+        Assert.Equal(sizes.OrderByDescending(n => n), sizes);
+
+        // And the order discriminates on this fixture rather than being vacuously sorted, which a
+        // population of equal-sized members would be.
+        Assert.True(sizes.Distinct().Count() > 1, "every nomination is the same size, so the order proves nothing");
     }
 
     /// <summary>The exclusion is counted, and the section says so.</summary>
