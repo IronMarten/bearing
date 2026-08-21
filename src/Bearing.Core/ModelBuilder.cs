@@ -175,8 +175,10 @@ internal sealed class ModelBuilder
         var bases = new List<string>();
         for (var b = type.BaseType; b is not null; b = b.BaseType) bases.Add(b.Name);
 
-        string? ExternalMatch(params string[] prefixes) => node.ExternalNamespaces
-            .FirstOrDefault(ns => prefixes.Any(p => ns.StartsWith(p, StringComparison.Ordinal)));
+        // The lists and the matching rule are FrameworkNamespaces, so both can be asserted —
+        // docs/DEFECTS.md §5 could be undone with the suite green until they were. TASKS.md P10.
+        string? ExternalMatch(IReadOnlyList<string> prefixes) =>
+            FrameworkNamespaces.Match(node.ExternalNamespaces, prefixes);
 
         var attribute = attributes.FirstOrDefault(a => a is "ApiControllerAttribute" or "RouteAttribute");
         if (attribute is not null)
@@ -198,7 +200,7 @@ internal sealed class ModelBuilder
             return;
         }
 
-        if (ExternalMatch("Microsoft.AspNetCore") is { } web)
+        if (ExternalMatch(FrameworkNamespaces.ApiBoundary) is { } web)
         {
             node.Classification = new TypeClassification(TypeKinds.ApiBoundary, "external-ns:" + web);
             return;
@@ -219,16 +221,13 @@ internal sealed class ModelBuilder
         // reason TypeKinds.DataAccess states — "reaches a database or persistence framework". A
         // type that defines how an entity maps to a table is data access by any reading a
         // developer would give it.
-        if (ExternalMatch(
-                "Microsoft.EntityFrameworkCore", "System.Data", "Dapper", "NHibernate",
-                "LinqToDB", "FluentMigrator") is { } data)
+        if (ExternalMatch(FrameworkNamespaces.DataAccess) is { } data)
         {
             node.Classification = new TypeClassification(TypeKinds.DataAccess, "external-ns:" + data);
             return;
         }
 
-        if (ExternalMatch("System.Net.Http", "Azure.", "Amazon.", "RabbitMQ", "Confluent.Kafka",
-                          "MassTransit", "Stripe", "Twilio", "SendGrid", "Polly") is { } external)
+        if (ExternalMatch(FrameworkNamespaces.ExternalCall) is { } external)
         {
             node.Classification = new TypeClassification(TypeKinds.ExternalCall, "external-ns:" + external);
             return;
