@@ -224,6 +224,15 @@ public sealed class Member
     /// <summary>Whether this member is a project's entry point.</summary>
     public bool IsEntryPoint { get; internal set; }
 
+    /// <summary>Whether this member is static.</summary>
+    /// <remarks>
+    /// Carried for the one case where it changes what a reference count means: a <b>static
+    /// constructor</b> has no syntax that can call it, so its inbound count is zero in every
+    /// codebase that ever compiles. Nothing else about static-ness is load-bearing here — a static
+    /// method is called like any other.
+    /// </remarks>
+    public bool IsStatic { get; internal set; }
+
     /// <summary>How many references point at this member. Zero is the dead-code question.</summary>
     /// <remarks>
     /// <b>Zero is a question and never an answer</b> — <c>TECHREQ-job-a.md</c> §5.6 is the list of

@@ -50,6 +50,7 @@ public static class Analysis
         SharedMutableState.Detect,
         BoundaryMarking.CarryingRealLogic,
         BoundaryMarking.WidestSurfaces,
+        NoStaticReferences.Detect,
         NoPeerGroup.Detect,
     ];
 

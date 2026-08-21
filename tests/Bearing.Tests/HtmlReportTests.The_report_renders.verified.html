@@ -71,8 +71,8 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <p class="lede">A map of this solution and a short list of the components that are unusual <em>for what they are</em> — measured against their structural peers, never scored. Start with the picture; the findings are further down and they assume it.</p>
 <div class="tiles">
 <div class="tile"><b>21</b><span class="tl">Widest reach</span><span class="tn">types depend on NormalizeStep</span></div>
-<div class="tile"><b>71%</b><span class="tl">Clean</span><span class="tn">of 198 types, no finding names them</span></div>
-<div class="tile"><b>3.41x</b><span class="tl">Concentration</span><span class="tn">findings in Data, against its share of the types</span></div>
+<div class="tile"><b>65%</b><span class="tl">Clean</span><span class="tn">of 198 types, no finding names them</span></div>
+<div class="tile"><b>2.83x</b><span class="tl">Concentration</span><span class="tn">findings in Data, against its share of the types</span></div>
 <div class="tile"><b>22x</b><span class="tl">Sharpest outlier</span><span class="tn">TariffCalculator.Apply&#39;s internal complexity, against the middle of its group</span></div>
 </div>
 <div class="picture">
@@ -121,16 +121,16 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <text class="ax" transform="rotate(-90 30 274)" x="30" y="274" text-anchor="middle">how much of it a finding names →</text>
 <circle class="lf" cx="96.0" cy="64.0" r="5.5"/>
 <circle class="lf" cx="96.0" cy="64.0" r="5.0"/>
-<circle class="dot" cx="918.9" cy="371.9" r="34.0"/>
-<text class="nm" x="875" y="330" text-anchor="end">Core</text>
-<text class="sb" x="875" y="345" text-anchor="end">51 of 191 named</text>
+<circle class="dot" cx="918.9" cy="345.5" r="34.0"/>
+<text class="nm" x="875" y="303" text-anchor="end">Core</text>
+<text class="sb" x="875" y="318" text-anchor="end">63 of 191 named</text>
 <text class="lg" x="104" y="80">2 projects nothing depends on</text>
 </svg>
 </div>
-<p class="lede"><strong>71% of this codebase has nothing said about it</strong> — the pale dots, and most of the picture. <strong>What is named clusters rather than spreading</strong>: Data carries 3.41x its share of them. <strong>Core is what the most of it rests on</strong> — 2 types outside it reach in, and 27% of its own 191 are named, which is the dot furthest right and how high it sits. </p>
+<p class="lede"><strong>65% of this codebase has nothing said about it</strong> — the pale dots, and most of the picture. <strong>What is named clusters rather than spreading</strong>: Data carries 2.83x its share of them. <strong>Core is what the most of it rests on</strong> — 2 types outside it reach in, and 33% of its own 191 are named, which is the dot furthest right and how high it sits. </p>
 <p class="sub">One dot per project. Across, how much of the rest of the solution reaches into it; up, how much of it some finding below names; the area of the dot is how many types it declares. <strong>There is no bad corner and nothing is shaded</strong> — both axes are measurements, and which trade-off matters is the reader's call, because the tool has no severity model to make it with.</p>
 <h2>Top finding</h2>
-<p class="lede">The strongest row of the rarest kind this run found. 10 kinds fired and each has one claim below, <em>ordered by how uncommon each kind is in this codebase</em> — an ordering and not a severity, because this tool has no way to say a hub is worse than a cycle.</p>
+<p class="lede">The strongest row of the rarest kind this run found. 11 kinds fired and each has one claim below, <em>ordered by how uncommon each kind is in this codebase</em> — an ordering and not a severity, because this tool has no way to say a hub is worse than a cycle.</p>
 <div class="anat">
 <div class="lbl">what it is called<br>and what kind</div>
 <div class="fld"><b class="name">ShipmentController</b><span class="tag">Boundary carries logic</span><span class="sub">the only one in this codebase</span></div>
@@ -141,7 +141,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="lbl">the numbers behind it</div>
 <div class="fld"><p class="sub mono">among the most complex of this solution&#39;s 19 boundaries, where the median is cc 1</p></div>
 </div>
-<p class="sub">The other 9, in the same order — one per kind, each the strongest row of its own.</p>
+<p class="sub">The other 10, in the same order — one per kind, each the strongest row of its own.</p>
 <div class="rail">
 <div class="row">
 <div class="lbl"><span class="kind">Shared mutable state</span><span class="rank">1 of 2</span></div>
@@ -179,6 +179,10 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="lbl"><span class="kind">Spans architectural layers</span><span class="rank">1 of 14</span></div>
 <div class="fld"><b class="name">AuthenticationMiddleware [ApiBoundary]</b><p class="where">Core · AuthenticationMiddleware.cs:8</p><p class="claim">reaches across 3 kinds</p></div>
 </div>
+<div class="row">
+<div class="lbl"><span class="kind">No static references found</span><span class="rank">1 of 77</span></div>
+<div class="fld"><b class="name">AuditReconciler._validate</b><p class="where">Core · Reconcilers.cs:149</p><p class="claim">no static references found — verify before deleting. Nothing refers to AuditReconciler either.</p></div>
+</div>
 </div>
 <h2>Orientation</h2>
 <h3>The shape of it</h3>
@@ -206,7 +210,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </div>
 <p class="sub"><strong>Data +1</strong> holds Data, Tools</p>
 <h3>All of it, at once</h3>
-<p class="sub">Every one of the 198 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding is about 58 of them, which is the tint; the 9 outlined in red are the claims above, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
+<p class="sub">Every one of the 198 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding is about 70 of them, which is the tint; the 10 outlined in red are the claims above, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
 <div class="picture">
 <svg xmlns="http://www.w3.org/2000/svg" class="mo" viewBox="0 0 1000 656" width="1000" height="656" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 <style>
@@ -227,9 +231,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <text class="pn" x="6" y="44">Core</text>
 <rect class="bl" x="950.4941073766913" y="32" width="47.50589262330868" height="377.3559322033892" rx="2"/>
 <rect class="bl" x="950.4941073766913" y="413.3559322033892" width="47.50589262330868" height="214.64406779660982" rx="2"/>
-<path class="c" d="M4 48h132v233h-132zM137 246h89v95h-89zM137 342h89v95h-89zM228 48h89v87h-89zM228 136h89v87h-89zM228 224h89v84h-89zM228 393h89v79h-89zM228 551h89v73h-89zM318 389h78v77h-78zM552 48h74v74h-74zM628 48h64v74h-64zM760 48h61v74h-61zM822 48h61v74h-61zM885 48h58v74h-58zM397 189h67v61h-67zM397 252h67v61h-67zM397 314h67v61h-67zM397 376h67v61h-67zM397 439h67v61h-67zM397 563h67v61h-67zM595 123h59v60h-59zM656 123h59v60h-59zM717 123h59v60h-59zM835 123h55v60h-55zM891 123h51v60h-51zM466 185h53v54h-53zM466 240h53v54h-53zM466 295h53v54h-53zM466 350h53v54h-53zM466 405h53v54h-53zM466 515h53v54h-53zM466 570h53v54h-53zM520 185h56v51h-56zM577 185h56v51h-56zM634 185h56v51h-56zM692 185h56v51h-56zM749 185h51v51h-51zM801 185h46v51h-46zM849 185h46v51h-46zM896 185h46v51h-46zM520 288h48v44h-48zM520 424h48v39h-48zM570 280h41v45h-41zM570 327h41v45h-41zM570 421h41v39h-41zM570 544h41v39h-41zM570 585h41v39h-41zM613 280h43v38h-43zM657 280h43v38h-43zM702 280h43v38h-43zM746 280h43v38h-43zM791 280h37v38h-37zM829 280h37v38h-37zM868 280h37v38h-37zM906 280h37v38h-37zM613 320h38v37h-38zM613 358h38v37h-38zM613 396h38v37h-38zM613 511h38v37h-38zM613 549h38v37h-38zM613 587h38v37h-38zM652 320h35v40h-35zM688 320h35v40h-35zM725 320h35v40h-35zM798 320h35v40h-35zM834 320h35v40h-35zM871 320h35v40h-35zM907 320h35v40h-35zM652 361h38v36h-38zM652 399h38v36h-38zM652 436h38v36h-38zM652 474h38v36h-38zM652 512h38v36h-38zM652 550h38v36h-38zM652 588h38v36h-38zM692 361h35v40h-35zM728 361h35v40h-35zM764 361h35v40h-35zM800 361h35v40h-35zM836 361h35v40h-35zM872 361h35v40h-35zM908 361h35v40h-35zM692 524h36v32h-36zM692 558h36v32h-36zM692 592h36v32h-36zM729 402h34v33h-34zM765 402h34v33h-34zM800 402h34v33h-34zM872 402h34v33h-34zM729 437h32v36h-32zM729 475h32v36h-32zM729 513h32v36h-32zM729 550h32v36h-32zM729 588h32v36h-32zM762 437h36v31h-36zM800 437h36v31h-36zM838 437h36v31h-36zM876 437h36v31h-36zM914 437h29v31h-29zM762 470h31v30h-31zM762 501h31v30h-31zM762 532h31v30h-31zM762 563h31v30h-31zM762 594h31v30h-31zM794 470h28v32h-28zM824 470h28v32h-28zM854 470h28v32h-28zM884 470h28v32h-28zM914 470h28v32h-28zM794 504h31v29h-31zM794 534h31v29h-31zM794 565h31v29h-31zM794 595h31v29h-31zM827 504h28v33h-28zM856 504h28v33h-28zM885 504h28v33h-28zM915 504h28v33h-28zM827 538h33v28h-33zM827 567h33v28h-33zM827 596h33v28h-33zM861 538h29v32h-29zM891 538h29v32h-29zM861 571h12v17h-12zM861 589h12v17h-12zM861 607h12v17h-12zM875 571h12v17h-12zM875 589h12v17h-12zM875 607h12v17h-12zM889 571h12v17h-12zM889 589h12v17h-12zM889 607h12v17h-12zM903 571h12v17h-12zM916 571h12v17h-12zM930 571h12v17h-12zM903 589h12v17h-12zM903 607h12v17h-12zM916 589h12v17h-12zM930 589h12v17h-12zM916 607h12v17h-12zM930 607h12v17h-12z"/>
-<path class="n" d="M4 282h132v152h-132zM4 556h132v68h-132zM137 48h89v98h-89zM137 535h89v89h-89zM228 310h89v81h-89zM228 473h89v76h-89zM318 218h78v84h-78zM318 303h78v84h-78zM318 547h78v77h-78zM397 48h78v74h-78zM476 48h74v74h-74zM694 48h64v74h-64zM397 501h67v61h-67zM466 123h63v60h-63zM530 123h63v60h-63zM778 123h55v60h-55zM466 460h53v54h-53zM520 238h48v49h-48zM520 333h48v44h-48zM520 379h48v44h-48zM520 464h48v39h-48zM520 505h48v39h-48zM520 545h48v39h-48zM520 585h48v39h-48zM570 238h45v41h-45zM617 238h45v41h-45zM663 238h45v41h-45zM710 238h45v41h-45zM757 238h45v41h-45zM804 238h45v41h-45zM850 238h45v41h-45zM897 238h45v41h-45zM570 374h41v45h-41zM570 462h41v39h-41zM570 503h41v39h-41zM613 473h38v37h-38zM761 320h35v40h-35zM692 402h36v39h-36zM692 443h36v39h-36zM692 484h36v39h-36zM836 402h34v33h-34zM921 538h21v32h-21zM951 33h44v204h-44zM951 238h44v49h-44zM951 288h44v44h-44zM951 333h44v39h-44zM951 373h44v34h-44zM951 414h44v162h-44zM951 577h44v48h-44z"/>
-<path class="f" d="M4 436h132v119h-132zM137 147h89v98h-89zM137 438h89v95h-89zM318 48h78v84h-78zM318 133h78v84h-78zM318 468h78v77h-78zM397 123h67v64h-67zM613 434h38v37h-38zM908 402h34v33h-34z"/>
+<path class="c" d="M137 246h89v95h-89zM137 342h89v95h-89zM228 48h89v87h-89zM228 136h89v87h-89zM228 224h89v84h-89zM228 393h89v79h-89zM318 389h78v77h-78zM552 48h74v74h-74zM628 48h64v74h-64zM760 48h61v74h-61zM822 48h61v74h-61zM885 48h58v74h-58zM397 189h67v61h-67zM397 252h67v61h-67zM397 314h67v61h-67zM397 376h67v61h-67zM397 439h67v61h-67zM397 563h67v61h-67zM595 123h59v60h-59zM656 123h59v60h-59zM717 123h59v60h-59zM835 123h55v60h-55zM891 123h51v60h-51zM466 185h53v54h-53zM466 295h53v54h-53zM466 350h53v54h-53zM466 405h53v54h-53zM466 570h53v54h-53zM520 185h56v51h-56zM749 185h51v51h-51zM801 185h46v51h-46zM849 185h46v51h-46zM896 185h46v51h-46zM520 288h48v44h-48zM520 424h48v39h-48zM570 280h41v45h-41zM570 327h41v45h-41zM570 421h41v39h-41zM570 544h41v39h-41zM570 585h41v39h-41zM613 280h43v38h-43zM657 280h43v38h-43zM702 280h43v38h-43zM746 280h43v38h-43zM791 280h37v38h-37zM829 280h37v38h-37zM868 280h37v38h-37zM613 358h38v37h-38zM613 511h38v37h-38zM613 549h38v37h-38zM613 587h38v37h-38zM652 320h35v40h-35zM688 320h35v40h-35zM798 320h35v40h-35zM834 320h35v40h-35zM871 320h35v40h-35zM907 320h35v40h-35zM652 361h38v36h-38zM652 399h38v36h-38zM652 436h38v36h-38zM652 474h38v36h-38zM652 512h38v36h-38zM652 550h38v36h-38zM652 588h38v36h-38zM692 361h35v40h-35zM728 361h35v40h-35zM764 361h35v40h-35zM800 361h35v40h-35zM836 361h35v40h-35zM872 361h35v40h-35zM908 361h35v40h-35zM692 524h36v32h-36zM692 558h36v32h-36zM692 592h36v32h-36zM729 402h34v33h-34zM765 402h34v33h-34zM872 402h34v33h-34zM729 437h32v36h-32zM729 475h32v36h-32zM729 513h32v36h-32zM729 550h32v36h-32zM729 588h32v36h-32zM762 437h36v31h-36zM800 437h36v31h-36zM838 437h36v31h-36zM876 437h36v31h-36zM914 437h29v31h-29zM762 470h31v30h-31zM762 501h31v30h-31zM762 532h31v30h-31zM762 563h31v30h-31zM762 594h31v30h-31zM794 470h28v32h-28zM824 470h28v32h-28zM854 470h28v32h-28zM884 470h28v32h-28zM914 470h28v32h-28zM794 504h31v29h-31zM794 534h31v29h-31zM794 565h31v29h-31zM794 595h31v29h-31zM827 504h28v33h-28zM856 504h28v33h-28zM885 504h28v33h-28zM915 504h28v33h-28zM827 538h33v28h-33zM827 567h33v28h-33zM827 596h33v28h-33zM861 538h29v32h-29zM891 538h29v32h-29zM861 571h12v17h-12zM861 589h12v17h-12zM861 607h12v17h-12zM875 571h12v17h-12zM875 589h12v17h-12zM875 607h12v17h-12zM889 571h12v17h-12zM889 589h12v17h-12zM889 607h12v17h-12zM903 571h12v17h-12zM916 571h12v17h-12zM930 571h12v17h-12zM903 589h12v17h-12zM903 607h12v17h-12zM916 589h12v17h-12zM930 589h12v17h-12zM916 607h12v17h-12zM930 607h12v17h-12z"/>
+<path class="n" d="M4 48h132v233h-132zM4 282h132v152h-132zM4 556h132v68h-132zM137 48h89v98h-89zM137 535h89v89h-89zM228 310h89v81h-89zM228 473h89v76h-89zM318 218h78v84h-78zM318 303h78v84h-78zM318 547h78v77h-78zM397 48h78v74h-78zM476 48h74v74h-74zM694 48h64v74h-64zM397 501h67v61h-67zM466 123h63v60h-63zM530 123h63v60h-63zM778 123h55v60h-55zM466 240h53v54h-53zM466 460h53v54h-53zM466 515h53v54h-53zM577 185h56v51h-56zM634 185h56v51h-56zM692 185h56v51h-56zM520 238h48v49h-48zM520 333h48v44h-48zM520 379h48v44h-48zM520 464h48v39h-48zM520 505h48v39h-48zM520 545h48v39h-48zM520 585h48v39h-48zM570 238h45v41h-45zM617 238h45v41h-45zM663 238h45v41h-45zM710 238h45v41h-45zM757 238h45v41h-45zM804 238h45v41h-45zM850 238h45v41h-45zM897 238h45v41h-45zM570 374h41v45h-41zM570 462h41v39h-41zM570 503h41v39h-41zM906 280h37v38h-37zM613 320h38v37h-38zM613 396h38v37h-38zM613 473h38v37h-38zM725 320h35v40h-35zM761 320h35v40h-35zM692 402h36v39h-36zM692 443h36v39h-36zM692 484h36v39h-36zM800 402h34v33h-34zM836 402h34v33h-34zM921 538h21v32h-21zM951 33h44v204h-44zM951 238h44v49h-44zM951 288h44v44h-44zM951 333h44v39h-44zM951 373h44v34h-44zM951 414h44v162h-44zM951 577h44v48h-44z"/>
+<path class="f" d="M4 436h132v119h-132zM137 147h89v98h-89zM137 438h89v95h-89zM228 551h89v73h-89zM318 48h78v84h-78zM318 133h78v84h-78zM318 468h78v77h-78zM397 123h67v64h-67zM613 434h38v37h-38zM908 402h34v33h-34z"/>
 <rect class="f" x="2" y="638" width="10" height="10"/>
 <text class="lg" x="17" y="647">the findings lead with this</text>
 <rect class="n" x="188" y="638" width="10" height="10"/>
@@ -239,7 +243,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <text class="lg" x="998" y="647" text-anchor="end">Bearing · github.com/ironmarten/bearing</text>
 </svg>
 </div>
-<p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 44% of this drawing and 29% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
+<p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 55% of this drawing and 35% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
 <p class="sub">2 project(s) are on the picture but too small to hold a name at this size: Data, Tools.</p>
 <h3>Projects</h3>
 <p class="sub">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are abstract or interfaces. D = distance from the main sequence. <em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>
@@ -279,7 +283,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <li>Every project selected for analysis produced a compilation.</li>
 </ul>
 <h2>Everything else</h2>
-<p class="lede">This run made 76 findings across 11 kinds, and the page above leads with the strongest of each.</p>
+<p class="lede">This run made 153 findings across 12 kinds, and the page above leads with the strongest of each.</p>
 <h3>What fired, and what each kind means</h3>
 <p class="sub">Every kind this run found, rarest first — the same ordering the claims above use, and for the same reason it is not a severity.</p>
 <ul class="sub">
@@ -294,6 +298,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <li><strong>14 Concealed decision, method level</strong> — The same claim about one method. This is the primary level, not a drill-down of the one above.</li>
 <li><strong>14 Spans architectural layers</strong> — Named for one concern, reaching across several — it is doing cross-cutting work whatever it is called.</li>
 <li><strong>22 No peer group</strong> — Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.</li>
+<li><strong>77 No static references found</strong> — Nothing in this solution refers to these. Verify before deleting — the categories this analysis cannot see are named beside each one.</li>
 </ul>
 <p class="lede"><strong>None of them is hidden and none is summarised away</strong> — every one is in the exports, which carry every finding, every type, every member and every dependency:</p>
 <ul class="sub">

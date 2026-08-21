@@ -51,6 +51,14 @@ public static class Report
         foreach (var line in FindingSections.HubsAndGodObjects(model, findings)) yield return line;
         foreach (var line in FindingSections.SpansArchitecturalLayers(model, findings)) yield return line;
 
+        // After the risk findings and before the structure sections, which is where it belongs on
+        // both counts: it is a claim about components, and it is the one claim in the report a
+        // reader can act on destructively — so it sits where they have already seen what the run
+        // thinks is risky, rather than at the top where a list of things to delete would be the
+        // first impression. TECHREQ-job-a.md §5.6 calls this the feature most likely to be
+        // someone's first impression, which is an argument for placement as much as for wording.
+        foreach (var line in FindingSections.NoStaticReferencesFound(model, findings)) yield return line;
+
         foreach (var line in StructureSections.CircularReferences(model)) yield return line;
         foreach (var line in FindingSections.SharedMutableState(model, findings)) yield return line;
         foreach (var line in StructureSections.ProjectStability(model)) yield return line;

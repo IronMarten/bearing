@@ -58,6 +58,30 @@ public readonly record struct Qualifier(string Name, bool Holds, string? Gate = 
 public static class Qualifiers
 {
     /// <summary>
+    /// A test project was skipped, so usage from tests was never visible to this walk.
+    /// </summary>
+    /// <remarks>
+    /// <b>Certain rather than suspected, which is what makes it worth carrying.</b> Test projects
+    /// are excluded by default because test code inflates fan-in on exactly the types it covers
+    /// best — but the consequence is that a member used only by a test reads as used by nothing.
+    /// §5.6 names test-only usage as its own category for this reason, and the fixture plants
+    /// <c>FixtureBuilder</c> as the case.
+    /// </remarks>
+    public const string TestUsageUnobservable = "test-usage-unobservable";
+
+    /// <summary>
+    /// A container is a plausible caller: a constructor on a type something else names.
+    /// </summary>
+    /// <remarks>
+    /// The DI signature as a fact rather than a guess about the framework. Something references
+    /// the type, so it is not unreached; nothing calls this constructor, which is exactly what
+    /// registration by generic argument looks like from here — <c>AddSingleton&lt;T&gt;()</c> names
+    /// <c>T</c> and calls none of its constructors. 1,965 constructors across the two reference
+    /// solutions have this shape.
+    /// </remarks>
+    public const string ContainerMayResolve = "container-may-resolve";
+
+    /// <summary>
     /// Connectivity is low in <b>absolute</b> terms, not merely relative to peers — so the
     /// subject can be described as plumbing.
     /// </summary>

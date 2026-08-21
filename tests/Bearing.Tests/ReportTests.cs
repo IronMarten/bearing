@@ -63,11 +63,18 @@ public sealed class ReportTests(CoreWalkFixture core)
             "-- BREAKS ALONE (no cohort required) ---------------------------",
             "-- HUBS AND GOD OBJECTS (no cohort required) -------------------",
             "-- SPANS ARCHITECTURAL LAYERS (no cohort required) -------------",
+            "-- NO STATIC REFERENCES FOUND (no cohort required) -------------",
             "-- CIRCULAR REFERENCES -----------------------------------------",
             "-- SHARED MUTABLE STATE (no cohort required) -------------------",
             "-- PROJECT STABILITY vs ABSTRACTNESS ---------------------------",
             "-- NO PEER GROUP -----------------------------------------------",
         ];
+
+        // NO STATIC REFERENCES FOUND is Bearing's own and sits inside the probe's list rather than
+        // after it, which is the one place this test's shape has to bend. A9's section is a claim
+        // about components, so it belongs with the claims; putting it after PROJECT STABILITY to
+        // keep the probe's block contiguous would separate it from every other finding by two
+        // structure sections. The probe's order is preserved and one section is interleaved.
 
         // Bearing's own, in the order they are rendered after the probe's.
         string[] additions =
@@ -409,9 +416,14 @@ public sealed class ReportTests(CoreWalkFixture core)
             .Where(line => line.Contains("not shown of", StringComparison.Ordinal))
             .ToList();
 
-        Assert.Single(disclosures);
-        Assert.Contains("7 types not shown of 22", disclosures[0], StringComparison.Ordinal);
-        Assert.Contains("raise --top", disclosures[0], StringComparison.Ordinal);
+        // Two caps bite on this fixture and both say so. It was one until A9: the dead-code
+        // section nominates 78 members and shows --top of them, which is exactly the case
+        // docs/DEFECTS.md §3 is about. Asserted as a pair rather than loosened to "at least one",
+        // because a section that silently stopped disclosing would still pass that.
+        Assert.Equal(2, disclosures.Count);
+        Assert.Contains(disclosures, d => d.Contains("7 types not shown of 22", StringComparison.Ordinal));
+        Assert.Contains(disclosures, d => d.Contains("nominations not shown of 77", StringComparison.Ordinal));
+        Assert.All(disclosures, d => Assert.Contains("raise --top", d, StringComparison.Ordinal));
     }
 
     // ------------------------------------------------------------------ the snapshot ----

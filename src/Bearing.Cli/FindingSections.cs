@@ -142,6 +142,60 @@ internal static class FindingSections
         foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
     }
 
+    /// <summary>
+    /// Members nothing in the solution refers to — <c>TECHREQ-job-a.md</c> §5.6.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The heading, the rows and the note are all constrained by one rule</b>: §5.6 forbids the
+    /// word "dead" and forbids implying safety, so nothing here says unused, unreachable or
+    /// removable. The section says what was looked for, what was found, and what could not be
+    /// looked at.
+    /// </para>
+    /// <para>
+    /// <b>The exclusion counts are the section, not a footnote under it.</b> They remove 98–99% of
+    /// the members that have no inbound reference — 3,837 down to 48 on Jellyfin — and a reader
+    /// shown the survivors without being shown that number has been handed a list they cannot
+    /// calibrate. It is the same argument as the coverage section's, at the scale of one finding:
+    /// invariant 8, silence is not a clean bill of health.
+    /// </para>
+    /// <para>
+    /// <b>The categories are counted independently and say so.</b> A public override implementing
+    /// an interface member is in three of them, so they do not add up to the total removed, and a
+    /// reader doing the arithmetic and finding it wrong would be right to distrust the rest.
+    /// </para>
+    /// </remarks>
+    internal static IEnumerable<string> NoStaticReferencesFound(SolutionModel model, FindingSet findings)
+    {
+        yield return "";
+        yield return "-- NO STATIC REFERENCES FOUND (no cohort required) -------------";
+        yield return "   (nothing in this solution refers to these members. VERIFY BEFORE DELETING —";
+        yield return "    what this analysis cannot see is named on each row.)";
+
+        var excluded = NoStaticReferences.Excluded(model);
+        var found = findings.OfKind(FindingKind.NoStaticReferences);
+
+        if (excluded.Considered == 0)
+        {
+            yield return "   (none — every member this run analysed is referred to by something)";
+            yield break;
+        }
+
+        if (found.Count == 0) yield return "   (none)";
+
+        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
+
+        yield return "";
+        yield return $"   {Sentences.Plural(excluded.Considered, "member")} had no inbound reference. "
+                     + $"{Sentences.Whole(excluded.Excluded)} of those are not asked about,";
+        yield return "   because being referred to by nothing here is what each of them looks like:";
+        yield return $"     {excluded.RuntimeInvoked,6}  invoked by the runtime — an entry point, or a static constructor";
+        yield return $"     {excluded.InterfaceImplementations,6}  implements an interface — callers reach it through the contract";
+        yield return $"     {excluded.Overrides,6}  overrides a base member — same";
+        yield return $"     {excluded.ExternallyVisible,6}  visible outside this assembly — the caller may not be in this solution";
+        yield return "   (a member can be in several of those, so they do not sum to the number set aside)";
+    }
+
     internal static IEnumerable<string> SpansArchitecturalLayers(SolutionModel model, FindingSet findings)
     {
         yield return "";

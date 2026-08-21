@@ -82,6 +82,7 @@ public static class Claims
             FindingKind.SpansArchitecturalLayers => LayerSpan(model, finding),
             FindingKind.BoundaryCarriesLogic => BoundaryLogic(model, finding),
             FindingKind.WidestContractSurface => ContractSurface(model, finding),
+            FindingKind.NoStaticReferences => NoStaticReferences(model, finding),
             FindingKind.Coverage => NoPeerGroup(model, finding),
             _ => Claim.None,
         };
@@ -129,6 +130,7 @@ public static class Claims
         FindingKind.SharedMutableState => "Shared mutable state",
         FindingKind.BoundaryCarriesLogic => "Boundary carries logic",
         FindingKind.WidestContractSurface => "Widest contract surface",
+        FindingKind.NoStaticReferences => "No static references found",
         FindingKind.Coverage => "No peer group",
         _ => kind.ToString(),
     };
@@ -158,6 +160,8 @@ public static class Claims
             "A boundary type carrying real logic — the place where an outside caller reaches decision-making directly.",
         FindingKind.WidestContractSurface =>
             "The widest contracts this solution exposes, and the most expensive ones to change.",
+        FindingKind.NoStaticReferences =>
+            "Nothing in this solution refers to these. Verify before deleting — the categories this analysis cannot see are named beside each one.",
         FindingKind.Coverage =>
             "Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.",
         _ => "",
@@ -252,6 +256,80 @@ public static class Claims
             $"cc {member.Cyclomatic} against a peer median of {Sentences.Number(median)}; "
             + $"dsm {member.Dsm}, nesting {member.MaxNestingDepth}, {member.LinesOfCode} lines",
             $"{Path.GetFileName(member.Location.File)}:{member.Location.Line}");
+    }
+
+    /// <summary>
+    /// A member nothing in this solution refers to.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The sentence never says "dead", "unused" or "safe to delete", and that is
+    /// <c>TECHREQ-job-a.md</c> §5.6 written down rather than remembered.</b> The label it
+    /// prescribes is <i>"no static references found — verify before deleting"</i>, and invariant 4
+    /// is the reason: a tool that implies safety about something six customers depend on has caused
+    /// the burn it claimed to prevent. What this can honestly say is what it looked for and did not
+    /// find.
+    /// </para>
+    /// <para>
+    /// <b>The qualifiers are the second half of the requirement</b> — §5.6 asks the report to name
+    /// each category it could not rule out, so they are appended to the sentence rather than shown
+    /// somewhere a reader might not reach. A nomination with no qualifier is the strongest form
+    /// this finding takes, and it is still only "nothing here refers to it".
+    /// </para>
+    /// <para>
+    /// <b>Whether the declaring type is referenced is part of the claim, not decoration.</b> "This
+    /// type is used and this member of it is not" and "nothing reaches any of this" are different
+    /// findings with different remedies, and the reader can act on the first without opening
+    /// anything.
+    /// </para>
+    /// </remarks>
+    private static Claim NoStaticReferences(SolutionModel model, Finding finding)
+    {
+        var (type, member) = Member(model, finding.Subject);
+        if (type is null || member is null) return Claim.None;
+
+        var typeInbound = finding.ValueOf("DeclaringTypeInboundReferences") ?? 0;
+        // Two different findings and two different remedies: a live type with a member nothing
+        // calls is a member to remove; a type nothing reaches at all is a type to remove, and
+        // saying so about each of its members individually would be saying it many times.
+        // Sentences.Do rather than an inline ternary, which is docs/DEFECTS.md §32's remedy — and
+        // §32 said the next such number was "a defect waiting on the right input". It was: this
+        // read "1 reference reach UserAgentHelper itself" on nopCommerce, and the fixture makes no
+        // singular here either.
+        var standing = typeInbound > 0
+            ? $"{Sentences.Plural(typeInbound, "reference")} "
+              + $"{Sentences.Do(typeInbound, "reaches", "reach")} {type.Name} itself"
+            : $"Nothing refers to {type.Name} either";
+
+        // The categories go in the evidence rather than the sentence, and the reason is what the
+        // section looked like when they did not: one of them is solution-level and therefore true
+        // of every row, so it printed the same clause seventy-eight times. A parenthetical is
+        // where every other section puts the qualifying detail, and the claim stays one sentence.
+        var unseen = Unseen(finding).ToList();
+        var evidence = $"{member.Accessibility.ToLowerInvariant()} {member.Kind.ToString().ToLowerInvariant()}, "
+                       + Sentences.Plural(member.LinesOfCode, "line");
+
+        if (unseen.Count > 0) evidence += "; not visible here: " + Sentences.List(unseen);
+
+        return new Claim(
+            Sentences.Member(type.Name, member.Name),
+            $"no static references found — verify before deleting. {standing}.",
+            evidence,
+            $"{Path.GetFileName(member.Location.File)}:{member.Location.Line}");
+    }
+
+    /// <summary>
+    /// The categories this analysis could not rule out, in the reader's words.
+    /// </summary>
+    /// <remarks>
+    /// Read off the qualifiers the finding carries rather than re-derived, which is
+    /// <c>docs/ARCHITECTURE.md</c> §3: Core decides whether the qualifying fact holds and this
+    /// decides what words to put it in.
+    /// </remarks>
+    private static IEnumerable<string> Unseen(Finding finding)
+    {
+        if (finding.Holds(Qualifiers.TestUsageUnobservable)) yield return "usage from test projects";
+        if (finding.Holds(Qualifiers.ContainerMayResolve)) yield return "a container resolving it";
     }
 
     private static Claim BlastRadius(SolutionModel model, Finding finding)

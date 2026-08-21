@@ -51,6 +51,17 @@ public enum FindingKind
     /// </remarks>
     WidestContractSurface,
 
+    /// <summary>
+    /// §5.6. A member nothing in this solution refers to.
+    /// </summary>
+    /// <remarks>
+    /// <b>Named for the measurement and not for the conclusion.</b> §5.6 forbids the word "dead"
+    /// outright: the label is "no static references found — verify before deleting", because
+    /// invariant 4 is about never implying safety. The kind's name is the first place that could
+    /// have leaked, and this is what a JSON consumer will read.
+    /// </remarks>
+    NoStaticReferences,
+
     /// <summary>§3.11. What the run could not see. Part of the output, not a footnote.</summary>
     Coverage,
 }
