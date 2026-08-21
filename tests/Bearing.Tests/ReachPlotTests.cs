@@ -147,14 +147,20 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// declared and reach is dependents over everything outside — so a plot that started dividing
     /// by the whole solution, or counting lines instead of types, fails here rather than looking
     /// plausible. Counting types is the whole reason this picture replaced the mosaic.
+    /// <para>
+    /// <b>Claims and not findings</b>, <c>docs/DEFECTS.md</c> §41. This recomputation said
+    /// <c>About(...).Count > 0</c>, which is where the y-axis got the coverage disclosure — the one
+    /// kind whose entry says nothing could be judged about the type — counted as a finding naming
+    /// it. A second derivation only checks the first if it means the same thing.
+    /// </para>
     /// </remarks>
     [Fact]
     public void Both_axes_are_shares_of_types_and_not_of_anything_else()
     {
         var findings = Findings;
         var named = core.Model.Types
-            .Where(t => findings.About(t.Subject).Count > 0
-                        || t.Members.Any(m => findings.About(m.Subject).Count > 0))
+            .Where(t => findings.About(t.Subject).Any(f => Claims.IsRiskClaim(f.Kind))
+                        || t.Members.Any(m => findings.About(m.Subject).Any(f => Claims.IsRiskClaim(f.Kind))))
             .Select(t => t.Subject.Canonical)
             .ToHashSet(StringComparer.Ordinal);
 

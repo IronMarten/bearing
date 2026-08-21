@@ -58,6 +58,41 @@ public sealed class TilesTests(CoreWalkFixture core)
     }
 
     /// <summary>
+    /// A type the run declined to judge is clean — <c>docs/DEFECTS.md</c> §41.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The assertion above holds the tile against the mosaic and both against one derivation</b>,
+    /// which is the right shape and cannot catch this: when the shared derivation is wrong, the two
+    /// agree on the wrong number and nothing fails. That is how <i>"no finding names them"</i>
+    /// shipped counting the coverage disclosure — 104 of nopCommerce's types, three points of the
+    /// biggest glyph on the page — while the census below said in words that a no-peer-group row is
+    /// not a finding about a type.
+    /// </para>
+    /// <para>
+    /// <b>Recomputed against the claims rather than read back</b>, so it fails if the population
+    /// moves however many renderers agree with each other about it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Clean_does_not_count_a_type_the_run_declined_to_judge()
+    {
+        var findings = Findings;
+
+        var claimed = core.Model.Types
+            .Count(t => findings.About(t.Subject).Any(f => Claims.IsRiskClaim(f.Kind))
+                        || t.Members.Any(m => findings.About(m.Subject).Any(f => Claims.IsRiskClaim(f.Kind))));
+
+        var disclosed = findings.All.Count(f => !Claims.IsRiskClaim(f.Kind));
+        var expected = Math.Round(100d * (core.Model.Types.Count - claimed) / core.Model.Types.Count);
+
+        // The disclosure fired, or this asserts nothing the test above does not already hold.
+        Assert.True(disclosed > 0, "the fixture no longer produces a coverage disclosure");
+
+        Assert.Equal($"{expected:0}%", Single(Tiles.For(core.Model, findings), TileKind.Clean).Value);
+    }
+
+    /// <summary>
     /// Concentration names a project that holds more findings than its size accounts for.
     /// </summary>
     /// <remarks>

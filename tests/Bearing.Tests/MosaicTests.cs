@@ -67,7 +67,7 @@ public sealed class MosaicTests(CoreWalkFixture core)
         Assert.Equal(core.Model.Types.Count, Cells("c") + Cells("n") + Cells("f"));
 
     /// <summary>
-    /// A cell is tinted when a finding is about that type, and not when one merely names it.
+    /// A cell is tinted when a claim is about that type, and not when one merely names it.
     /// </summary>
     /// <remarks>
     /// The same rule <see cref="HtmlReport"/>'s drill-down applies. Marking a participant would say
@@ -75,11 +75,11 @@ public sealed class MosaicTests(CoreWalkFixture core)
     /// and the member walk has to happen or a real run's 1,091 method-level findings mark nothing.
     /// </remarks>
     [Fact]
-    public void The_tinted_cells_are_the_types_a_finding_is_about()
+    public void The_tinted_cells_are_the_types_a_claim_is_about()
     {
         var findings = Findings;
 
-        var expected = Types(findings.All).Count;
+        var expected = Types(findings.All.Where(f => Claims.IsRiskClaim(f.Kind))).Count;
         var tinted = Cells("n") + Cells("f");
 
         Assert.Equal(expected, tinted);
@@ -88,6 +88,41 @@ public sealed class MosaicTests(CoreWalkFixture core)
         // The fixture is deliberately bad code, so a mosaic with nothing marked would mean the
         // resolution silently failed rather than that the codebase is clean.
         Assert.True(tinted > 0);
+    }
+
+    /// <summary>
+    /// A type whose only entry is the coverage disclosure is not tinted — <c>docs/DEFECTS.md</c>
+    /// §41.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The assertion above cannot fail on its own, and that is why this one exists.</b> It
+    /// compares the picture against <see cref="Subjects.Named"/>'s population; both are one
+    /// derivation, so both moved together for four releases while the caption, the clean tile and
+    /// the plot's y-axis all said something the census contradicted in words. What pins the meaning
+    /// is the <i>difference</i> between the two populations, so this names it and requires it to be
+    /// non-empty.
+    /// </para>
+    /// <para>
+    /// <b>The fixture reaches this without a plant.</b> Its cohort floor leaves types with no peer
+    /// group, most of which carry no other claim — the same shape nopCommerce has at 104 types, two
+    /// orders of magnitude up. If a fixture change ever empties this set the assertion fails rather
+    /// than passing vacuously, which is the property <c>docs/TESTING.md</c> §8 asks a gate for.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_disclosure_alone_does_not_tint_a_cell()
+    {
+        var findings = Findings;
+
+        var disclosedOnly = Types(findings.All.Where(f => !Claims.IsRiskClaim(f.Kind)))
+            .Except(Types(findings.All.Where(f => Claims.IsRiskClaim(f.Kind))), StringComparer.Ordinal)
+            .ToList();
+
+        Assert.NotEmpty(disclosedOnly);
+        Assert.Equal(
+            Types(findings.All).Count - disclosedOnly.Count,
+            Mosaic.Marked(core.Model, findings).Named);
     }
 
     /// <summary>
@@ -110,15 +145,54 @@ public sealed class MosaicTests(CoreWalkFixture core)
     public void The_strong_mark_is_the_selection_the_findings_pane_leads_with()
     {
         var findings = Findings;
-        var exemplars = Selection.Exemplars(findings);
+        var claims = Selection.Exemplars(findings).Where(f => Claims.IsRiskClaim(f.Kind)).ToList();
 
-        Assert.Equal(Types(exemplars).Count, Cells("f"));
-        Assert.Equal(Types(exemplars).Count, Mosaic.Marked(core.Model, findings).Leading);
+        Assert.Equal(Types(claims).Count, Cells("f"));
+        Assert.Equal(Types(claims).Count, Mosaic.Marked(core.Model, findings).Leading);
 
         // A subset of the tint by construction: an exemplar is one of its kind's findings.
         Assert.True(Cells("f") > 0);
-        Assert.True(Cells("f") <= exemplars.Count);
+        Assert.True(Cells("f") <= claims.Count);
         Assert.True(Cells("f") + Cells("n") <= core.Model.Types.Count);
+    }
+
+    /// <summary>
+    /// The caption's count of outlined cells is the number of claims the page prints above it —
+    /// <c>docs/DEFECTS.md</c> §40.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The two numbers were built by different selectors and never met.</b>
+    /// <see cref="Selection.Exemplars"/> returns one per kind that fired, coverage included;
+    /// <see cref="Highlights"/> drops coverage because it is a disclosure. The mosaic outlined the
+    /// first set and its caption named the second, so on every real run it said <i>N</i> and meant
+    /// <i>N − 1</i> — never noticed, because nothing on the page put the counts side by side. This
+    /// test is that side-by-side.
+    /// </para>
+    /// <para>
+    /// <b>Asserted against the count the caption is built from</b> rather than against a literal:
+    /// a number pinned here would have to be retuned every time the fixture gains a kind, and a
+    /// retuned number is not a gate.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_outlined_cells_are_exactly_the_claims_the_page_leads_with()
+    {
+        var findings = Findings;
+        var exemplars = Selection.Exemplars(findings);
+        var claims = exemplars.Where(f => Claims.IsRiskClaim(f.Kind)).ToList();
+
+        var claimed = Types(claims);
+        var everything = Types(exemplars);
+
+        // The disclosure fired here and landed on a type no claim did, or the two counts are equal
+        // for a reason that has nothing to do with the fix and this passes vacuously.
+        Assert.True(
+            everything.Count > claimed.Count,
+            "the fixture no longer has a disclosure exemplar the claims do not also name");
+
+        Assert.Equal(claimed.Count, Mosaic.Marked(core.Model, findings).Leading);
+        Assert.Equal(claimed.Count, Cells("f"));
     }
 
     /// <summary>

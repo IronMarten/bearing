@@ -71,8 +71,8 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <p class="lede">A map of this solution and a short list of the components that are unusual <em>for what they are</em> — measured against their structural peers, never scored. Start with the picture; the findings are further down and they assume it.</p>
 <div class="tiles">
 <div class="tile"><b>21</b><span class="tl">Widest reach</span><span class="tn">types depend on NormalizeStep</span></div>
-<div class="tile"><b>64%</b><span class="tl">Clean</span><span class="tn">of 200 types, no finding names them</span></div>
-<div class="tile"><b>2.78x</b><span class="tl">Concentration</span><span class="tn">findings in Data, against its share of the types</span></div>
+<div class="tile"><b>71%</b><span class="tl">Clean</span><span class="tn">of 200 types, no finding names them</span></div>
+<div class="tile"><b>1.04x</b><span class="tl">Concentration</span><span class="tn">findings in Core, against its share of the types</span></div>
 <div class="tile"><b>cc 22</b><span class="tl">Most intricate</span><span class="tn">TariffCalculator.Apply, the most complex member in this solution</span></div>
 </div>
 <div class="picture">
@@ -108,26 +108,26 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <line class="gr" x1="96" y1="484" x2="960" y2="484"/>
 <text class="tk" x="86" y="488" text-anchor="end">0%</text>
 <line class="gr" x1="96" y1="400" x2="960" y2="400"/>
-<text class="tk" x="86" y="404" text-anchor="end">20%</text>
+<text class="tk" x="86" y="404" text-anchor="end">8%</text>
 <line class="gr" x1="96" y1="316" x2="960" y2="316"/>
-<text class="tk" x="86" y="320" text-anchor="end">40%</text>
+<text class="tk" x="86" y="320" text-anchor="end">16%</text>
 <line class="gr" x1="96" y1="232" x2="960" y2="232"/>
-<text class="tk" x="86" y="236" text-anchor="end">60%</text>
+<text class="tk" x="86" y="236" text-anchor="end">24%</text>
 <line class="gr" x1="96" y1="148" x2="960" y2="148"/>
-<text class="tk" x="86" y="152" text-anchor="end">80%</text>
+<text class="tk" x="86" y="152" text-anchor="end">32%</text>
 <line class="gr" x1="96" y1="64" x2="960" y2="64"/>
-<text class="tk" x="86" y="68" text-anchor="end">100%</text>
+<text class="tk" x="86" y="68" text-anchor="end">40%</text>
 <text class="ax" x="96" y="542">how much of the rest of the codebase reaches into it →</text>
 <text class="ax" transform="rotate(-90 30 274)" x="30" y="274" text-anchor="middle">how much of it a finding names →</text>
-<circle class="lf" cx="96.0" cy="64.0" r="5.5"/>
-<circle class="lf" cx="96.0" cy="64.0" r="5.0"/>
-<circle class="dot" cx="918.9" cy="342.5" r="34.0"/>
-<text class="nm" x="875" y="301" text-anchor="end">Core</text>
-<text class="sb" x="875" y="316" text-anchor="end">65 of 193 named</text>
+<circle class="lf" cx="96.0" cy="484.0" r="5.5"/>
+<circle class="lf" cx="96.0" cy="484.0" r="5.0"/>
+<circle class="dot" cx="918.9" cy="168.5" r="34.0"/>
+<text class="nm" x="875" y="126" text-anchor="end">Core</text>
+<text class="sb" x="875" y="141" text-anchor="end">58 of 193 named</text>
 <text class="lg" x="104" y="80">2 projects nothing depends on</text>
 </svg>
 </div>
-<p class="lede"><strong>64% of this codebase has nothing said about it</strong> — the pale dots, and most of the picture. <strong>What is named clusters rather than spreading</strong>: Data carries 2.78x its share of them. <strong>Core is what the most of it rests on</strong> — 2 types outside it reach in, and 34% of its own 193 are named, which is the dot furthest right and how high it sits. </p>
+<p class="lede"><strong>71% of this codebase has nothing said about it</strong> — the pale dots, and most of the picture. <strong>What is named clusters rather than spreading</strong>: Core carries 1.04x its share of them. <strong>Core is what the most of it rests on</strong> — 2 types outside it reach in, and 30% of its own 193 are named, which is the dot furthest right and how high it sits. </p>
 <p class="sub">One dot per project. Across, how much of the rest of the solution reaches into it; up, how much of it some finding below names; the area of the dot is how many types it declares. <strong>There is no bad corner and nothing is shaded</strong> — both axes are measurements, and which trade-off matters is the reader's call, because the tool has no severity model to make it with.</p>
 <h2>Top finding</h2>
 <p class="lede">The strongest row of the rarest kind this run found. 11 kinds fired and each has one claim below, <em>ordered by how uncommon each kind is in this codebase</em> — an ordering and not a severity, because this tool has no way to say a hub is worse than a cycle.</p>
@@ -210,7 +210,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </div>
 <p class="sub"><strong>Data +1</strong> holds Data, Tools</p>
 <h3>All of it, at once</h3>
-<p class="sub">Every one of the 200 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding is about 72 of them, which is the tint; the 10 outlined in red are the claims above, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
+<p class="sub">Every one of the 200 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding is about 58 of them, which is the tint; the 9 outlined in red are the types the claims above are about, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
 <div class="picture">
 <svg xmlns="http://www.w3.org/2000/svg" class="mo" viewBox="0 0 1000 656" width="1000" height="656" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 <style>
@@ -231,9 +231,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <text class="pn" x="6" y="44">Core</text>
 <rect class="bl" x="951.5295124037638" y="32" width="46.47048759623624" height="377.3559322033887" rx="2"/>
 <rect class="bl" x="951.5295124037638" y="413.3559322033887" width="46.47048759623624" height="214.64406779660956" rx="2"/>
-<path class="c" d="M136 342h89v93h-89zM136 436h89v93h-89zM227 136h90v85h-90zM227 222h90v85h-90zM227 308h90v82h-90zM227 472h90v76h-90zM318 469h77v77h-77zM625 48h71v76h-71zM698 48h62v76h-62zM825 48h59v76h-59zM885 48h59v76h-59zM397 125h66v64h-66zM397 255h66v60h-66zM397 317h66v60h-66zM397 379h66v60h-66zM397 440h66v60h-66zM397 502h66v60h-66zM464 125h65v61h-65zM657 125h58v61h-58zM716 125h58v61h-58zM776 125h58v61h-58zM890 125h54v61h-54zM464 187h53v57h-53zM464 246h53v53h-53zM464 354h53v53h-53zM464 409h53v53h-53zM464 463h53v53h-53zM518 187h55v51h-55zM575 187h55v51h-55zM800 187h50v51h-50zM851 187h45v51h-45zM898 187h45v51h-45zM518 239h44v53h-44zM518 348h44v47h-44zM518 495h44v42h-44zM564 331h42v44h-42zM564 376h42v44h-42zM564 467h42v38h-42zM564 586h42v38h-42zM607 286h43v37h-43zM651 286h43v37h-43zM696 286h43v37h-43zM741 286h43v37h-43zM785 286h43v37h-43zM830 286h37v37h-37zM868 286h37v37h-37zM907 286h37v37h-37zM607 399h38v36h-38zM607 550h38v36h-38zM607 588h38v36h-38zM646 324h36v38h-36zM683 324h36v38h-36zM721 324h36v38h-36zM833 324h36v38h-36zM870 324h36v38h-36zM908 324h36v38h-36zM646 363h38v36h-38zM646 401h38v36h-38zM646 438h38v36h-38zM646 476h38v36h-38zM646 513h38v36h-38zM646 551h38v36h-38zM646 588h38v36h-38zM685 363h36v38h-36zM722 363h36v38h-36zM759 363h36v38h-36zM796 363h36v38h-36zM834 363h36v38h-36zM871 363h36v38h-36zM908 363h36v38h-36zM685 403h36v38h-36zM685 560h36v31h-36zM685 593h36v31h-36zM723 403h36v32h-36zM760 403h36v32h-36zM797 403h36v32h-36zM908 403h36v32h-36zM723 474h31v36h-31zM723 512h31v36h-31zM723 550h31v36h-31zM723 588h31v36h-31zM755 436h31v36h-31zM755 512h31v36h-31zM755 550h31v36h-31zM755 588h31v36h-31zM787 436h36v31h-36zM825 436h29v31h-29zM855 436h29v31h-29zM885 436h29v31h-29zM915 436h29v31h-29zM787 469h30v30h-30zM787 500h30v30h-30zM787 531h30v30h-30zM787 563h30v30h-30zM787 594h30v30h-30zM818 469h30v29h-30zM850 469h30v29h-30zM882 469h30v29h-30zM913 469h30v29h-30zM818 500h30v30h-30zM818 531h30v30h-30zM818 563h30v30h-30zM818 594h30v30h-30zM850 500h30v29h-30zM881 500h30v29h-30zM913 500h30v29h-30zM850 530h29v30h-29zM850 562h29v30h-29zM850 594h29v30h-29zM881 530h35v25h-35zM881 557h15v14h-15zM897 557h15v14h-15zM913 557h15v14h-15zM929 557h15v14h-15zM881 572h12v16h-12zM881 590h12v16h-12zM881 608h12v16h-12zM894 572h15v13h-15zM911 572h15v13h-15zM928 572h15v13h-15zM894 587h17v11h-17zM894 600h17v11h-17zM894 613h17v11h-17zM913 587h14v14h-14zM929 587h14v14h-14zM913 602h20v10h-20zM913 614h20v10h-20zM934 602h9v22h-9z"/>
-<path class="n" d="M4 278h131v150h-131zM4 548h131v76h-131zM136 48h89v98h-89zM136 147h89v96h-89zM227 48h90v87h-90zM227 392h90v79h-90zM227 550h90v74h-90zM318 48h77v83h-77zM318 301h77v83h-77zM318 385h77v83h-77zM397 48h78v76h-78zM476 48h75v76h-75zM552 48h71v76h-71zM761 48h62v76h-62zM397 564h66v60h-66zM531 125h62v61h-62zM594 125h62v61h-62zM835 125h54v61h-54zM464 300h53v53h-53zM464 517h53v53h-53zM464 571h53v53h-53zM631 187h55v51h-55zM687 187h55v51h-55zM743 187h55v51h-55zM518 294h44v53h-44zM518 397h44v47h-44zM518 446h44v47h-44zM518 538h44v42h-44zM518 582h44v42h-44zM564 239h41v45h-41zM606 239h41v45h-41zM648 239h41v45h-41zM691 239h41v45h-41zM733 239h41v45h-41zM775 239h41v45h-41zM818 239h41v45h-41zM860 239h41v45h-41zM903 239h41v45h-41zM564 286h42v44h-42zM564 422h42v44h-42zM564 507h42v38h-42zM564 546h42v38h-42zM607 324h38v36h-38zM607 362h38v36h-38zM607 437h38v36h-38zM607 512h38v36h-38zM758 324h36v38h-36zM795 324h36v38h-36zM685 442h36v38h-36zM685 481h36v38h-36zM685 521h36v38h-36zM834 403h36v32h-36zM871 403h36v32h-36zM755 474h31v36h-31zM917 530h26v25h-26zM952 33h43v204h-43zM952 238h43v49h-43zM952 288h43v44h-43zM952 333h43v39h-43zM952 373h43v34h-43zM952 414h43v162h-43zM952 577h43v48h-43z"/>
-<path class="f" d="M4 48h131v229h-131zM4 430h131v117h-131zM136 245h89v96h-89zM136 531h89v93h-89zM318 132h77v83h-77zM318 216h77v83h-77zM318 547h77v77h-77zM397 190h66v64h-66zM607 475h38v36h-38zM723 436h31v36h-31z"/>
+<path class="c" d="M136 342h89v93h-89zM136 436h89v93h-89zM227 136h90v85h-90zM227 222h90v85h-90zM227 308h90v82h-90zM227 472h90v76h-90zM318 469h77v77h-77zM625 48h71v76h-71zM698 48h62v76h-62zM761 48h62v76h-62zM825 48h59v76h-59zM885 48h59v76h-59zM397 125h66v64h-66zM397 255h66v60h-66zM397 317h66v60h-66zM397 379h66v60h-66zM397 440h66v60h-66zM397 502h66v60h-66zM464 125h65v61h-65zM657 125h58v61h-58zM716 125h58v61h-58zM776 125h58v61h-58zM890 125h54v61h-54zM464 187h53v57h-53zM464 246h53v53h-53zM464 354h53v53h-53zM464 409h53v53h-53zM464 463h53v53h-53zM518 187h55v51h-55zM575 187h55v51h-55zM800 187h50v51h-50zM851 187h45v51h-45zM898 187h45v51h-45zM518 239h44v53h-44zM518 294h44v53h-44zM518 348h44v47h-44zM518 495h44v42h-44zM860 239h41v45h-41zM564 331h42v44h-42zM564 376h42v44h-42zM564 467h42v38h-42zM564 586h42v38h-42zM607 286h43v37h-43zM651 286h43v37h-43zM696 286h43v37h-43zM741 286h43v37h-43zM785 286h43v37h-43zM830 286h37v37h-37zM868 286h37v37h-37zM907 286h37v37h-37zM607 399h38v36h-38zM607 475h38v36h-38zM607 512h38v36h-38zM607 550h38v36h-38zM607 588h38v36h-38zM646 324h36v38h-36zM683 324h36v38h-36zM721 324h36v38h-36zM833 324h36v38h-36zM870 324h36v38h-36zM908 324h36v38h-36zM646 363h38v36h-38zM646 401h38v36h-38zM646 438h38v36h-38zM646 476h38v36h-38zM646 513h38v36h-38zM646 551h38v36h-38zM646 588h38v36h-38zM685 363h36v38h-36zM722 363h36v38h-36zM759 363h36v38h-36zM796 363h36v38h-36zM834 363h36v38h-36zM871 363h36v38h-36zM908 363h36v38h-36zM685 403h36v38h-36zM685 521h36v38h-36zM685 560h36v31h-36zM685 593h36v31h-36zM723 403h36v32h-36zM760 403h36v32h-36zM797 403h36v32h-36zM908 403h36v32h-36zM723 474h31v36h-31zM723 512h31v36h-31zM723 550h31v36h-31zM723 588h31v36h-31zM755 436h31v36h-31zM755 512h31v36h-31zM755 550h31v36h-31zM755 588h31v36h-31zM787 436h36v31h-36zM825 436h29v31h-29zM855 436h29v31h-29zM885 436h29v31h-29zM915 436h29v31h-29zM787 469h30v30h-30zM787 500h30v30h-30zM787 531h30v30h-30zM787 563h30v30h-30zM787 594h30v30h-30zM818 469h30v29h-30zM850 469h30v29h-30zM882 469h30v29h-30zM913 469h30v29h-30zM818 500h30v30h-30zM818 531h30v30h-30zM818 563h30v30h-30zM818 594h30v30h-30zM850 500h30v29h-30zM881 500h30v29h-30zM913 500h30v29h-30zM850 530h29v30h-29zM850 562h29v30h-29zM850 594h29v30h-29zM881 530h35v25h-35zM917 530h26v25h-26zM881 557h15v14h-15zM897 557h15v14h-15zM913 557h15v14h-15zM929 557h15v14h-15zM881 572h12v16h-12zM881 590h12v16h-12zM881 608h12v16h-12zM894 572h15v13h-15zM911 572h15v13h-15zM928 572h15v13h-15zM894 587h17v11h-17zM894 600h17v11h-17zM894 613h17v11h-17zM913 587h14v14h-14zM929 587h14v14h-14zM913 602h20v10h-20zM913 614h20v10h-20zM934 602h9v22h-9zM952 33h43v204h-43zM952 238h43v49h-43zM952 288h43v44h-43zM952 333h43v39h-43zM952 373h43v34h-43zM952 414h43v162h-43zM952 577h43v48h-43z"/>
+<path class="n" d="M4 278h131v150h-131zM4 548h131v76h-131zM136 48h89v98h-89zM136 147h89v96h-89zM227 48h90v87h-90zM227 392h90v79h-90zM227 550h90v74h-90zM318 48h77v83h-77zM318 301h77v83h-77zM318 385h77v83h-77zM397 48h78v76h-78zM476 48h75v76h-75zM552 48h71v76h-71zM397 564h66v60h-66zM531 125h62v61h-62zM594 125h62v61h-62zM835 125h54v61h-54zM464 300h53v53h-53zM464 517h53v53h-53zM464 571h53v53h-53zM631 187h55v51h-55zM687 187h55v51h-55zM743 187h55v51h-55zM518 397h44v47h-44zM518 446h44v47h-44zM518 538h44v42h-44zM518 582h44v42h-44zM564 239h41v45h-41zM606 239h41v45h-41zM648 239h41v45h-41zM691 239h41v45h-41zM733 239h41v45h-41zM775 239h41v45h-41zM818 239h41v45h-41zM903 239h41v45h-41zM564 286h42v44h-42zM564 422h42v44h-42zM564 507h42v38h-42zM564 546h42v38h-42zM607 324h38v36h-38zM607 362h38v36h-38zM607 437h38v36h-38zM758 324h36v38h-36zM795 324h36v38h-36zM685 442h36v38h-36zM685 481h36v38h-36zM834 403h36v32h-36zM871 403h36v32h-36zM755 474h31v36h-31z"/>
+<path class="f" d="M4 48h131v229h-131zM4 430h131v117h-131zM136 245h89v96h-89zM136 531h89v93h-89zM318 132h77v83h-77zM318 216h77v83h-77zM318 547h77v77h-77zM397 190h66v64h-66zM723 436h31v36h-31z"/>
 <rect class="f" x="2" y="638" width="10" height="10"/>
 <text class="lg" x="17" y="647">the findings lead with this</text>
 <rect class="n" x="188" y="638" width="10" height="10"/>
@@ -243,7 +243,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <text class="lg" x="998" y="647" text-anchor="end">Bearing · github.com/ironmarten/bearing</text>
 </svg>
 </div>
-<p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 56% of this drawing and 36% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
+<p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 48% of this drawing and 29% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
 <p class="sub">2 project(s) are on the picture but too small to hold a name at this size: Data, Tools.</p>
 <h3>Projects</h3>
 <p class="sub">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are abstract or interfaces. D = distance from the main sequence. <em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>

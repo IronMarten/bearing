@@ -220,8 +220,8 @@ public static class HtmlReport
         page.Append($"<p class=\"sub\">Every one of the {Html.Count(model.Types.Count)} types this run analysed, ");
         page.Append("one cell each, sized by how many lines it spans and grouped into the project that declares ");
         page.Append($"it — biggest project first. Some finding is about {Html.Count(marks.Named)} of them, which ");
-        page.Append($"is the tint; the {Html.Count(marks.Leading)} outlined in red are the claims above, in the ");
-        page.Append("same order. Both marks are a yes or a no and never a degree — a mosaic shaded by ");
+        page.Append($"is the tint; the {Html.Count(marks.Leading)} outlined in red are the types the claims ");
+        page.Append("above are about, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by ");
         page.Append("<em>how</em> unusual a component is would be a score, and this tool does not have one.</p>\n");
 
         page.Append("<div class=\"picture\">\n").Append(Mosaic.Render(model, findings)).Append("</div>\n");

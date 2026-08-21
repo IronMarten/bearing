@@ -12,9 +12,11 @@ namespace IronMarten.Bearing.Cli;
 /// picture and the prose describe different populations without anything failing.
 /// </para>
 /// <para>
-/// <b>A finding with no type here is not a finding that was lost.</b> Coverage is about the
-/// solution and a cycle is about a set of namespaces; neither has a cell, a location or a row, and
-/// callers are expected to drop them rather than to invent one.
+/// <b>A finding with no type here is not a finding that was lost.</b> A cycle is about a set of
+/// namespaces; it has no cell, no location and no row, and callers are expected to drop it rather
+/// than to invent one. <b>Coverage is not in that class and never was</b> — §3.11 nominates a type
+/// apiece and every one of them resolves — which is exactly why
+/// <see cref="Named"/> had to say what it counts rather than rely on a subject failing to resolve.
 /// </para>
 /// </remarks>
 internal static class Subjects
@@ -50,18 +52,38 @@ internal static class Subjects
     }
 
     /// <summary>
-    /// The identity of every type some finding in the set is about.
+    /// The identity of every type some <i>claim</i> in the set is about.
     /// </summary>
     /// <remarks>
-    /// The population the mosaic tints and the population the concentration tile counts, which have
-    /// to be the same population or the picture and the number above it are two different claims.
+    /// <para>
+    /// The population the mosaic tints, the population the clean tile counts as not-clean, the
+    /// density the plot puts up its y-axis and the share <see cref="Foundations"/> states. They have
+    /// to be one population or the picture and the numbers around it are separate claims about one
+    /// run, and none of them would fail.
+    /// </para>
+    /// <para>
+    /// <b>Claims, not findings, and that is defect 41.</b> This walked <c>findings.All</c>, so a
+    /// coverage entry counted as a finding naming its type — and coverage is the one kind that
+    /// asserts the opposite: <i>"nothing comparable enough to judge these against"</i>. On
+    /// nopCommerce it charged 104 types to the named population on the strength of the tool having
+    /// declined to judge them, taking the clean tile from 88% to 85% while the census two screens
+    /// down said in words that a no-peer-group row <i>"is not a finding about those types"</i>. The
+    /// same page, disagreeing with itself, in the number set in the largest glyph on it.
+    /// </para>
+    /// <para>
+    /// <b>The filter belongs here and not in the four callers.</b> That is the whole argument of
+    /// this file — one derivation, because two of them disagree silently — and a fix applied per
+    /// renderer would have left the fifth to be written wrong later.
+    /// <see cref="Claims.IsRiskClaim"/> is the same predicate <see cref="Highlights"/> and the HTML
+    /// findings pane already use, so <i>named</i> now means what <i>claim</i> means everywhere.
+    /// </para>
     /// </remarks>
     internal static IReadOnlySet<string> Named(SolutionModel model, FindingSet findings)
     {
         var named = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var finding in findings.All)
-            if (Of(model, finding) is { } type)
+            if (Claims.IsRiskClaim(finding.Kind) && Of(model, finding) is { } type)
                 named.Add(type.Subject.Canonical);
 
         return named;

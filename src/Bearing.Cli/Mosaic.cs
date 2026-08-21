@@ -266,6 +266,17 @@ public static class Mosaic
     /// its kind's findings — so the picture cannot show a type as led-with but not named, and
     /// <see cref="Cells"/> tests for the stronger mark first.
     /// </para>
+    /// <para>
+    /// <b>The leading set is the claims and not the exemplars, which is defect 40.</b>
+    /// <see cref="Selection.Exemplars"/> returns one per kind that fired, <i>coverage included</i>,
+    /// and it is right to: X10's rule is about what a run produced. What a picture outlines is a
+    /// different question, and the caption answers it — <i>"the claims above"</i> — so the mark set
+    /// has to be the set <see cref="Highlights"/> prints, which is the same list filtered by
+    /// <see cref="Claims.IsRiskClaim"/>. Without the filter the mosaic outlined a twelfth cell for a
+    /// type whose entire finding says nothing could be claimed about it, and said in words that it
+    /// was a claim. <b>Two selectors, one caption, and nothing on the page put the counts side by
+    /// side</b> — which is why four frozen study artifacts carried it.
+    /// </para>
     /// </remarks>
     private static Marking Marks(SolutionModel model, FindingSet findings)
     {
@@ -275,7 +286,7 @@ public static class Mosaic
         foreach (var canonical in Subjects.Named(model, findings))
             named.Add(canonical);
 
-        foreach (var exemplar in Selection.Exemplars(findings))
+        foreach (var exemplar in Selection.Exemplars(findings).Where(f => Claims.IsRiskClaim(f.Kind)))
             if (Subjects.Of(model, exemplar) is { } type) leading.Add(type.Subject.Canonical);
 
         return new Marking(named, leading);
