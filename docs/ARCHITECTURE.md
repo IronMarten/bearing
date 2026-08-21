@@ -1,4 +1,4 @@
-# Architecture
+﻿# Architecture
 
 What Bearing is built out of, and the rules that hold it together. Each rule here was
 learned by shipping the opposite. Where a rule is enforced by a test rather than by review,
@@ -523,3 +523,54 @@ already understood. These are questions with no answer yet.
   Kept here for the measurement that decided the shape of the work: every edge endpoint the walk
   records is a type, so this is a change to reference *collection* and not a new detector. Far more
   useful, far more false-positive prone, and both remain true — `TASKS.md` A9 carries the cost.
+
+- **What the cohort floor is for, when one number is doing two jobs — X3.** `MinCohort` is read in
+  two places that pull in opposite directions, and neither can move without the other:
+
+  - **Selection**, `Cohorts.Assign`: `.Where(candidateCounts[c.Key] >= minCohort).OrderBy(c =>
+    c.Precedence)` — *the most specific basis that still yields a usable group*. **Lowering it makes
+    cohorts finer.**
+  - **Gating**, `ConcealedDecision` and `BlastRadius`: `if (peers.Count < policy.MinCohort)
+    continue`. **Raising it silences nominations.**
+
+  **Measured 2026-08-21, both reference solutions, defaults unless stated.**
+
+  | | nopCommerce (3,209 types) | Jellyfin (1,545 types) |
+  |---|---|---|
+  | distinct cohorts | 160 | 164 |
+  | types below the floor of 5 | 107 (3.3%) | 132 (8.5%) |
+  | …of those, in a cohort of **one** | 38 | 38 |
+  | types in cohorts of 100+ | 1,349 (42%) | 102 (6.6%) |
+  | breaks-alone findings, uncapped | 27 | 14 |
+  | **…in a below-floor cohort — the D10 population** | **0** | **0** |
+  | types re-based when the floor moves 5 → 3 | — | **155 of 1,502 (10.3%)** |
+
+  **`DEFECTS.md` §10 does not occur on either real solution.** Not one breaks-alone finding sits in
+  a below-floor cohort, at any cap. `RoutingDepot` is a TestBed plant, the invariant-3 violation is
+  real and pinned, and its incidence in the wild is zero. **So X3 as the board stated it — "what a
+  below-floor type may be nominated as" — is asking about the wrong population**: 3–8% of types, a
+  third of them cohorts of one, producing no contradictions.
+
+  **The measurement that does matter is the last row.** Moving the floor one notch re-bases a tenth
+  of Jellyfin, because the floor decides *specificity*, not just sufficiency. It is also what makes
+  the obvious repair unsafe: `ConditionProcessor` leaves breaks alone at a floor of 3 with nothing
+  gated — it moves from `ns:MediaBrowser.Model.Dlna` (8 peers) to `suffix:Processor` (3), and three
+  peers make cc 80 an outlier. A fix aimed at D10 would have silently changed every percentile in
+  the report and been credited with the wrong mechanism.
+
+  **The proposal is to split the parameter and then remove the threshold from the claim.**
+  `CohortBasisFloor` for selection and `MinComparableCohort` for gating, both defaulting to 5, so
+  the report is byte-identical the day it lands. Then answer the thin-cohort question *by
+  construction* rather than by tuning: **let thin cohorts nominate, and degrade the sentence with
+  the evidence** — a cohort of three earns *"cc 80 against 3 peers, median 4"* and never *"top
+  5%"*. Percentile language needs enough peers for a percentile to mean something; count language
+  is honest at any size. That is the move `CohortStatistics` already makes when it blanks below the
+  floor, carried into the sentence instead of stopping at silence.
+
+  **The ceiling is the half with real incidence, and `DEFECTS.md` §28's recorded remedy does not
+  reach it.** §28 proposes refusing a bare name-suffix basis. nopCommerce's two largest cohorts are
+  base-type — `base:BaseNopModel` at 249 and `base:BaseNopEntityModel` at 178 — with
+  `suffix:Service` (193) third. A suffix-only rule leaves the worst one standing, so a ceiling
+  belongs on candidate count whatever the basis is. 42% of nopCommerce sits in cohorts of 100+
+  against 6.6% of Jellyfin, which is also why this looks like a nopCommerce problem from one
+  solution and a general one from two.

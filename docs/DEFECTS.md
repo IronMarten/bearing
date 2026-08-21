@@ -419,6 +419,21 @@ Pinned: `The_surviving_control_survives_because_of_a_different_live_defect`.
 
 Pinned: `The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone`.
 
+**Measured 2026-08-21: incidence on both reference solutions is zero.** Cross-referencing every
+breaks-alone finding, uncapped, against its cohort size: nopCommerce 0 of 27, Jellyfin 0 of 14. Not
+one sits in a below-floor cohort. `RoutingDepot` is a TestBed plant; the invariant-3 violation is
+real and pinned and it does not occur in the wild.
+
+**And the obvious repair is not available.** Lowering the floor looks like it fixes this — it does
+on the fixture — but `MinCohort` also selects *which basis* a type is compared against, so moving
+it 5 → 3 re-bases 155 of Jellyfin's 1,502 types. `ConditionProcessor` leaves breaks alone at 3 with
+nothing gated at all: it moves from `ns:MediaBrowser.Model.Dlna` (8 peers) to `suffix:Processor`
+(3), where three peers make cc 80 an outlier. A fix aimed here would have changed every percentile
+in the report and been credited with the wrong mechanism.
+
+So this waits on X3, now written down with its numbers in `ARCHITECTURE.md` §11 — split the
+parameter, then let thin cohorts nominate with count-based rather than percentile-based claims.
+
 ### 11. The layer-span collapse hides the anomaly it shares a signature with — **fixed in Core**
 
 The collapse assumes a shared kind signature means a shared phenomenon. Four boilerplate
@@ -1179,6 +1194,13 @@ end rather than the threshold end, so it belongs with the decision recorded as X
 board rather than being repaired locally. Candidate remedies, none measured: a cohort-size ceiling
 with fallback to a finer basis, or refusing a bare name-suffix basis when the suffix covers more
 than some share of the solution.
+
+**Measured 2026-08-21, and the second remedy is contradicted.** nopCommerce's two largest cohorts
+are base-type, not name-suffix: `base:BaseNopModel` at 249 and `base:BaseNopEntityModel` at 178,
+with `suffix:Service` (193) only third. Refusing a bare suffix basis would leave the worst one
+standing, so a ceiling belongs on candidate count whatever the basis is. The scale of the problem
+also differs by solution — 42% of nopCommerce's types sit in cohorts of 100+ against 6.6% of
+Jellyfin's — which is why one solution would have made this look like a nopCommerce quirk.
 
 ### 40. The mosaic outlines twelve cells and calls them the eleven claims above — **fixed**
 
