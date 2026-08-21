@@ -135,6 +135,46 @@ public static class Claims
         _ => kind.ToString(),
     };
 
+    /// <summary>
+    /// Whether a kind's gate is a fixed count rather than a share of the codebase.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Decision X13 named exactly these two, and <c>docs/DEFECTS.md</c> §2 is the measurement
+    /// behind it.</b> A comparative gate ranks and therefore always selects the same share; an
+    /// absolute gate asserts a property of the type — <c>min(fan-in, fan-out) &gt;= 5</c>, or
+    /// instability and complexity both past a bar — and the share it happens to select is a fact
+    /// about the codebase rather than about the gate. <c>HubMin = 5</c> takes <b>3.6% of
+    /// nopCommerce and 6.9% of Jellyfin</b>: one threshold, two codebases, nearly double.
+    /// </para>
+    /// <para>
+    /// <b>X13 kept both absolute and required them to say why</b>, because converting them is what
+    /// would erase the finding: a rank gate cannot report that one codebase is more coupled than
+    /// another, since every codebase has a top 5%. This is the "say why", and it is the last
+    /// outstanding half of §2.
+    /// </para>
+    /// </remarks>
+    public static bool GateIsAbsolute(FindingKind kind) =>
+        kind is FindingKind.HubOrGodObject or FindingKind.BreaksAlone;
+
+    /// <summary>
+    /// What an absolute gate selected here, and why that share does not travel.
+    /// </summary>
+    /// <remarks>
+    /// Written once and read by both renderers. The share is stated for <i>this</i> run rather
+    /// than quoting the other reference solution: a report should say what it found, and the
+    /// caveat is what makes the number safe to carry to a different codebase.
+    /// </remarks>
+    public static string ShareCaveat(int found, int types)
+    {
+        var share = types > 0 ? 100.0 * found / types : 0;
+
+        return $"{Sentences.Plural(found, "type")} of {Sentences.Whole(types)} — "
+               + $"{share.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)}%. "
+               + "This threshold is a fixed count rather than a share, so the percentage differs "
+               + "between codebases: compare what is named, not how many.";
+    }
+
     /// <summary>What a kind is about, for a heading that has to stand without an example under it.</summary>
     public static string KindBlurb(FindingKind kind) => kind switch
     {

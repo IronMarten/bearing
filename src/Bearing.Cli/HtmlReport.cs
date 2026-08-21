@@ -746,6 +746,12 @@ public static class HtmlReport
             page.Append($"<h3>{Html.Text(Claims.KindName(group.Key))} — {Html.Count(all.Count)}</h3>\n");
             page.Append($"<p class=\"sub\">{Html.Text(Claims.KindBlurb(group.Key))}</p>\n");
 
+            // docs/DEFECTS.md §2, decision X13: an absolute gate says what share it took here and
+            // that the share does not travel. Only where the gate is a fixed count — on a
+            // comparative gate the share IS the gate.
+            if (Claims.GateIsAbsolute(group.Key))
+                page.Append($"<p class=\"note\">{Html.Text(Claims.ShareCaveat(all.Count, model.Types.Count))}</p>\n");
+
             foreach (var finding in shown)
                 Card(page, model, finding);
 

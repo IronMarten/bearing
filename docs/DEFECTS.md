@@ -96,7 +96,7 @@ so it can never fire. It retires with the oracle at R2.
 > is that the fix is no longer only *asserted*: the thing it was supposed to prevent is measured as
 > absent, on the codebase where it was measured as present.
 
-### 2. Absolute gates do not travel between codebases — **two converted; the rest is X13**
+### 2. Absolute gates do not travel between codebases — **closed 2026-08-21**
 
 Change cost fires on 7.9% of nopCommerce, hubs on 6.9% of Jellyfin, both truncated to 15 by
 `--top`. Blast radius — the only percentile-gated finding — held at 1.0% and 0.9% across both.
@@ -166,6 +166,26 @@ rather than a repair.
   decided once.
 - **The job**, once X13 is answered, is applying the proven form to hubs and breaks alone. It is an
   hour against a known pattern rather than an open question.
+
+**Both are done, and the job turned out not to be the conversion.** X13 answered the decision by
+keeping hubs and breaks alone **absolute** — converting them is what would erase the finding, since
+a rank gate cannot report that one codebase is more coupled than another when every codebase has a
+top 5%. What X13 required instead was that they **say why**, which is what this entry's diagnosis
+was always for: the share is a fact about the codebase and a reader comparing two reports has to be
+told.
+
+**Both renderers now disclose it**, worded once in `Claims.ShareCaveat` and read by each:
+
+```
+   117 types of 3209 — 3.6%. This threshold is a fixed count rather
+   than a share, so the percentage differs between codebases: compare
+   what is named, not how many.
+```
+
+3.6% on nopCommerce and 6.9% on jellyfin — the table above, printed by the tool itself.
+`AbsoluteGateTests` holds the set of absolute kinds transcribed rather than derived, and holds the
+other half too: a comparative gate says nothing of the kind, because there the share *is* the gate
+and claiming it varies would be false.
 
 **Do not quote the old percentages.** Hubs 6.9% and breaks alone 2.8% predate the
 concealed-decision fix; breaks alone was `(none)` on nopCommerce and is now 27. The table above is

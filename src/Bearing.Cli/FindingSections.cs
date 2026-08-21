@@ -102,6 +102,8 @@ internal static class FindingSections
         if (found.Count == 0) yield return "   (none)";
 
         foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
+
+        foreach (var line in ShareCaveat(model, found)) yield return line;
     }
 
     internal static IEnumerable<string> HubsAndGodObjects(SolutionModel model, FindingSet findings)
@@ -124,10 +126,43 @@ internal static class FindingSections
 
         if (found.Count > 0)
         {
+            foreach (var line in ShareCaveat(model, found)) yield return line;
+
             yield return "   NOTE: routers, mediators and composition roots legitimately live here. That";
             yield return "   does not make the flag wrong — those are exactly the things not to change";
             yield return "   lightly. Mark the known ones rather than tuning them away.";
         }
+    }
+
+    /// <summary>
+    /// What an absolute gate selected here, wrapped to the section's width.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §2's last outstanding half, and decision X13's "say why". Printed
+    /// only where the gate is a fixed count, because on a comparative gate the share is the gate
+    /// and saying so would be noise.
+    /// </remarks>
+    private static IEnumerable<string> ShareCaveat(SolutionModel model, IReadOnlyList<Finding> found)
+    {
+        if (found.Count == 0 || !Claims.GateIsAbsolute(found[0].Kind)) yield break;
+
+        // Wrapped rather than emitted whole: this section's other lines sit inside about seventy
+        // columns and one 137-character line in the middle of them reads as a different document.
+        var words = Claims.ShareCaveat(found.Count, model.Types.Count).Split(' ');
+        var line = new System.Text.StringBuilder("  ");
+
+        foreach (var word in words)
+        {
+            if (line.Length + 1 + word.Length > 70)
+            {
+                yield return line.ToString();
+                line.Clear().Append("  ");
+            }
+
+            line.Append(' ').Append(word);
+        }
+
+        if (line.Length > 2) yield return line.ToString();
     }
 
     internal static IEnumerable<string> SharedMutableState(SolutionModel model, FindingSet findings)
