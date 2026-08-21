@@ -87,24 +87,37 @@ public sealed class TilesTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// The sharpest outlier is a measured multiple and never an undefined one.
+    /// The fourth tile names a member and states its complexity, with no cohort behind it.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §28. A ratio against a median of zero is undefined rather than
-    /// enormous, so it cannot be the largest anything — and <c>P9</c> is the plant that will make
-    /// this reachable on the fixture rather than only on a real solution.
+    /// <para>
+    /// <b>It replaced the sharpest-outlier tile on 2026-08-21</b>, which is what that tile's own
+    /// remark said should happen once D34 landed. Every quantity it could show was a ratio against
+    /// a cohort median, and D34's finding is that at the top end a cohort is not a peer group — so
+    /// the tile was putting the one number the register calls <i>"arithmetically true and
+    /// rhetorically false"</i> in the largest glyph on the page, hedged to <i>"the middle of its
+    /// group"</i> because the honest word could not be used.
+    /// </para>
+    /// <para>
+    /// <b>What is asserted is the absence of a comparison, not the presence of a number.</b> A cc
+    /// means the same thing in every codebase; the moment this tile acquires an <c>x</c> or the
+    /// word <i>median</i>, D34 is back.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void The_sharpest_outlier_is_a_defined_multiple()
+    public void The_fourth_tile_states_a_complexity_and_compares_it_to_nothing()
     {
-        var tiles = Tiles.For(core.Model, Findings);
-        var tile = tiles.SingleOrDefault(t => t.Kind == TileKind.SharpestOutlier);
+        var tile = Single(Tiles.For(core.Model, Findings), TileKind.MostIntricate);
 
-        if (tile.Value is null or "") return;
+        Assert.StartsWith("cc ", tile.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("x", tile.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("median", tile.Note, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("group", tile.Note, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("peer", tile.Note, StringComparison.OrdinalIgnoreCase);
 
-        Assert.DoesNotContain("undefined", tile.Value, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("∞", tile.Value, StringComparison.Ordinal);
-        Assert.EndsWith("x", tile.Value, StringComparison.Ordinal);
+        // And it names something a reader can go and open.
+        Assert.NotEmpty(tile.Subject);
+        Assert.Contains(tile.Subject, tile.Note, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -112,10 +125,10 @@ public sealed class TilesTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <b>Invariant 6, at the top of the page.</b> A run that nominated nothing has no concentration
-    /// and no outlier; rendering <c>0x</c> for either would assert a measurement that was never
-    /// taken, and a dash would assert one that came back empty. What survives is the pair that is
-    /// about the codebase rather than about the findings — and clean reads 100%, which is the
-    /// answer rather than a placeholder.
+    /// no concentration; rendering <c>0x</c> would assert a measurement that was never taken, and a
+    /// dash would assert one that came back empty. What survives is everything that is about the
+    /// codebase rather than about the findings — three of the four now — and clean reads 100%,
+    /// which is the answer rather than a placeholder.
     /// </remarks>
     [Fact]
     public void A_run_with_no_findings_keeps_only_the_tiles_it_can_support()
@@ -125,7 +138,12 @@ public sealed class TilesTests(CoreWalkFixture core)
         Assert.Contains(tiles, t => t.Kind == TileKind.WidestReach);
         Assert.Equal("100%", Single(tiles, TileKind.Clean).Value);
         Assert.DoesNotContain(tiles, t => t.Kind == TileKind.Concentration);
-        Assert.DoesNotContain(tiles, t => t.Kind == TileKind.SharpestOutlier);
+
+        // Three survive rather than two since the fourth tile stopped being about the findings.
+        // The old one read the largest ratio a detector had recorded, so it could only name
+        // something already nominated; complexity is a fact about the codebase whether or not
+        // anything fired on it, which is what the other two surviving tiles are as well.
+        Assert.Contains(tiles, t => t.Kind == TileKind.MostIntricate);
     }
 
     /// <summary>

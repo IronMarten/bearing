@@ -20,8 +20,8 @@ public enum TileKind
     /// <summary>The project holding more findings than its size accounts for.</summary>
     Concentration,
 
-    /// <summary>The largest multiple of a group median measured.</summary>
-    SharpestOutlier,
+    /// <summary>The most intricate member in the solution.</summary>
+    MostIntricate,
 }
 
 /// <summary>
@@ -61,7 +61,7 @@ public readonly record struct Tile(TileKind Kind, string Value, string Label, st
 /// </para>
 /// <para>
 /// <b>Selected by a quantity that cannot be gamed by size, and never by a threshold.</b> There is
-/// no constant in this file. Widest reach and sharpest outlier are maxima; clean is a share of the
+/// no constant in this file. Widest reach and most intricate are maxima; clean is a share of the
 /// whole; concentration picks the project with the largest <i>excess</i> of named types over its
 /// proportional share rather than the largest ratio, because a ratio lets a two-type project win
 /// with two findings — the same defect class as <c>MEASURE-concealed-decision.md</c>'s, one level
@@ -86,7 +86,7 @@ public static class Tiles
 
         return
         [
-            .. new[] { WidestReach(model), Clean(model, named), Concentration(model, named), Sharpest(model, findings) }
+            .. new[] { WidestReach(model), Clean(model, named), Concentration(model, named), MostIntricate(model) }
                 .Where(t => t is not null)
                 .Select(t => t!.Value)
         ];
@@ -201,43 +201,50 @@ public static class Tiles
     }
 
     /// <summary>
-    /// The largest multiple of a group median this run measured.
+    /// The most intricate member in the solution, named.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Provisional, and the reason is <c>D34</c> rather than the layout.</b> Every quantity here
-    /// is a ratio against the median of a cohort, and at the top end a cohort is not a peer group —
-    /// <c>suffix:Service</c> holds 2,909 of nopCommerce's 9,219 method-like members, so
-    /// <i>"93x the median of its 2,909 peers"</i> is a global ranking wearing a peer comparison's
-    /// clothes. The number is arithmetically sound and the word <i>peers</i> is what is not, so the
-    /// note says <i>group</i> and claims nothing about who is in it. When D34 lands this tile is
-    /// expected to change or to go; the rest of the row does not depend on it.
+    /// <b>This replaced the sharpest-outlier tile on 2026-08-21, which is what that tile's own
+    /// remark said should happen.</b> It read <i>"when D34 lands this tile is expected to change or
+    /// to go"</i>, and D34 has landed. Every quantity the old tile could show was a ratio against a
+    /// cohort median, and D34's finding is that at the top end a cohort is not a peer group —
+    /// <c>suffix:Service</c> holds 2,909 of nopCommerce's 9,219 method-like members. The tile was
+    /// therefore putting the single number D34 calls <i>"arithmetically true and rhetorically
+    /// false"</i> in the largest glyph on the page, hedged to <i>"the middle of its group"</i>
+    /// because the honest word could not be used.
     /// </para>
     /// <para>
-    /// <b>Read off the receipts rather than recomputed</b>, so the tile and the claim that produced
-    /// it cannot disagree — the multiple is whatever the detector recorded. An undefined ratio is
-    /// excluded rather than treated as enormous, which is <c>docs/DEFECTS.md</c> §28: a median of
-    /// zero makes the quantity undefined, and <c>undefined</c> is not the sharpest anything.
+    /// <b>Cyclomatic complexity needs no cohort, so there is nothing to hedge.</b> cc 176 is a
+    /// property of one method and means the same thing in every codebase — which is the same shape
+    /// as <see cref="WidestReach"/>, the tile beside it that has never needed a caveat. It also
+    /// keeps A13 tier 3's four claims rather than dropping the row to three.
+    /// </para>
+    /// <para>
+    /// <b>Read off the model rather than off the findings.</b> The old tile took the largest ratio
+    /// any detector <i>recorded</i>, so it could only name something already nominated; the most
+    /// intricate member is a fact about the codebase whether or not a finding fired on it, and
+    /// <c>TypeNode.MostComplexMember</c> is where the model already holds it.
     /// </para>
     /// </remarks>
-    private static Tile? Sharpest(SolutionModel model, FindingSet findings)
+    private static Tile? MostIntricate(SolutionModel model)
     {
-        var sharpest = findings.All
-            .Select(f => (Finding: f, Multiple: Multiple(f)))
-            .Where(x => x.Multiple is not null)
-            .OrderByDescending(x => x.Multiple!.Value.Times)
-            .ThenBy(x => x.Finding.Key.Canonical, StringComparer.Ordinal)
-            .Select(x => (x.Finding, x.Multiple!.Value.Times, x.Multiple!.Value.Quantity, Claim: Claims.For(model, x.Finding)))
-            .FirstOrDefault(x => x.Claim.Exists);
+        var worst = model.Types
+            .Where(t => t.MostComplexMember is not null && t.MaxMemberCyclomatic > 0)
+            .OrderByDescending(t => t.MaxMemberCyclomatic)
+            .ThenBy(t => t.Subject.Canonical, StringComparer.Ordinal)
+            .FirstOrDefault();
 
-        if (sharpest.Finding is null) return null;
+        if (worst?.MostComplexMember is not { } member) return null;
+
+        var named = Sentences.Member(worst.Name, member.Name);
 
         return new Tile(
-            TileKind.SharpestOutlier,
-            $"{Sentences.Number(sharpest.Times)}x",
-            "Sharpest outlier",
-            sharpest.Claim.Subject,
-            $"{sharpest.Claim.Subject}'s {sharpest.Quantity}, against the middle of its group");
+            TileKind.MostIntricate,
+            $"cc {worst.MaxMemberCyclomatic}",
+            "Most intricate",
+            named,
+            $"{named}, the most complex member in this solution");
     }
 
     /// <summary>
