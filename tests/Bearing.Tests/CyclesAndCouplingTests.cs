@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -150,6 +150,116 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
             ],
             cycle.Members);
     }
+
+    /// <summary>
+    /// The fixture's one namespace cycle is a folder layout, and the section is right to say so.
+    /// </summary>
+    /// <remarks>
+    /// <c>TestBed.Core</c> contains the other three, they are all one assembly, and nothing in
+    /// them holds anything in another. That is the shape a plugin has — a root beside its own
+    /// folders — and it is why the reported list over the fixture is empty rather than broken.
+    /// </remarks>
+    [Fact]
+    public void The_fixtures_namespace_cycle_is_folder_layout_not_coupling()
+    {
+        var shaped = Assert.Single(core.Model.ShapedNamespaceCycles);
+
+        Assert.Equal(CycleShape.FolderLayout, shaped.Shape);
+        Assert.False(shaped.IsReportable);
+        Assert.Equal("TestBed.Core", shaped.Anchor);
+        Assert.Empty(shaped.Pairs);
+    }
+
+    /// <summary>
+    /// Two peers holding each other is the finding, and the pair is the evidence for it.
+    /// </summary>
+    [Fact]
+    public void Peers_that_hold_each_other_are_coupling()
+    {
+        var reading = CycleShapes.Read(
+            ["Shop.Orders", "Shop.Customers"],
+            OneAssembly("Shop.Orders", "Shop.Customers"),
+            Held(("Shop.Orders", "Shop.Customers", 6), ("Shop.Customers", "Shop.Orders", 3)));
+
+        Assert.Equal(CycleShape.Coupling, reading.Shape);
+
+        var pair = Assert.Single(reading.Pairs);
+        Assert.Equal(9, pair.Weight);
+        Assert.Equal("Shop.Customers", pair.First);
+    }
+
+    /// <summary>
+    /// A root holding its own folder is not two components, however mutual the references are.
+    /// </summary>
+    /// <remarks>
+    /// The case that made the rule: a plugin whose root declares the settings class and injects
+    /// the service in <c>/Services</c>, while that service reads the settings back. Both
+    /// directions hold, and there is still nothing to extract — MSBuild ships the one assembly.
+    /// </remarks>
+    [Fact]
+    public void A_root_holding_its_own_subfolder_is_layout_not_coupling()
+    {
+        var reading = CycleShapes.Read(
+            ["Plugin.Tax", "Plugin.Tax.Services"],
+            OneAssembly("Plugin.Tax", "Plugin.Tax.Services"),
+            Held(("Plugin.Tax", "Plugin.Tax.Services", 4), ("Plugin.Tax.Services", "Plugin.Tax", 2)));
+
+        Assert.Equal(CycleShape.FolderLayout, reading.Shape);
+        Assert.Equal("Plugin.Tax", reading.Anchor);
+        Assert.Empty(reading.Pairs);
+    }
+
+    /// <summary>
+    /// Peers that only name each other's types hold nothing, so nothing is entangled.
+    /// </summary>
+    [Fact]
+    public void Peers_that_name_but_do_not_hold_are_shared_types()
+    {
+        var reading = CycleShapes.Read(
+            ["Web.Models.Catalog", "Web.Models.Orders"],
+            OneAssembly("Web.Models.Catalog", "Web.Models.Orders"),
+            Held());
+
+        Assert.Equal(CycleShape.SharedTypes, reading.Shape);
+        Assert.Null(reading.Anchor);
+        Assert.Empty(reading.Pairs);
+    }
+
+    /// <summary>
+    /// The folder-layout reading needs the single assembly, not just the containing namespace.
+    /// </summary>
+    /// <remarks>
+    /// Two projects that happen to share a namespace prefix are two things anyone can extract, so
+    /// the argument that makes layout safe to set aside does not apply and the cycle falls back to
+    /// being reported. Invariant: silence is only ever bought by the assembly boundary.
+    /// </remarks>
+    [Fact]
+    public void Containment_across_two_assemblies_is_not_folder_layout()
+    {
+        var projects = new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal)
+        {
+            ["Shared"] = new HashSet<string>(StringComparer.Ordinal) { "Shared" },
+            ["Shared.Contracts"] = new HashSet<string>(StringComparer.Ordinal) { "Contracts" },
+        };
+
+        var reading = CycleShapes.Read(
+            ["Shared", "Shared.Contracts"],
+            projects,
+            Held(("Shared", "Shared.Contracts", 2), ("Shared.Contracts", "Shared", 1)));
+
+        Assert.Equal(CycleShape.Coupling, reading.Shape);
+        Assert.Equal(["Contracts", "Shared"], reading.Projects);
+    }
+
+    private static Dictionary<string, IReadOnlySet<string>> OneAssembly(params string[] namespaces) =>
+        namespaces.ToDictionary(
+            ns => ns,
+            _ => (IReadOnlySet<string>)new HashSet<string>(StringComparer.Ordinal) { "TheAssembly" },
+            StringComparer.Ordinal);
+
+    private static Dictionary<(string From, string To), int> Held(
+        params (string From, string To, int Weight)[] references) =>
+        references.ToDictionary(r => (r.From, r.To), r => r.Weight);
 
     [Fact]
     public void Type_tangles_over_the_fixture_are_what_they_should_be()

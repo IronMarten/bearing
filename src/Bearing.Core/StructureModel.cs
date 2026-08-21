@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing;
+﻿namespace IronMarten.Bearing;
 
 /// <summary>
 /// One type-to-type dependency, at one syntactic site.
@@ -691,6 +691,19 @@ public sealed class SolutionModel
     public IReadOnlyList<Cycle> NamespaceCycles => _namespaceCycles ??= Cycles.AmongNamespaces(Types);
 
     /// <summary>
+    /// Each namespace cycle with what closes it, in the same order as
+    /// <see cref="NamespaceCycles"/>.
+    /// </summary>
+    /// <remarks>
+    /// Beside the components rather than replacing them: "what is mutually dependent" and "which
+    /// of those is a finding" are different questions and a caller may want either. A renderer
+    /// that shows only <see cref="ShapedCycle.IsReportable"/> owes the reader the count it left
+    /// out, which it can only give by having the whole list.
+    /// </remarks>
+    public IReadOnlyList<ShapedCycle> ShapedNamespaceCycles =>
+        _shapedNamespaceCycles ??= CycleShapes.OfNamespaces(NamespaceCycles, Types, Edges);
+
+    /// <summary>
     /// Mutually dependent projects, largest cycle first.
     /// </summary>
     /// <remarks>
@@ -835,6 +848,7 @@ public sealed class SolutionModel
             ? origin
             : ExternalOrigin.Unknown;
 
+    private IReadOnlyList<ShapedCycle>? _shapedNamespaceCycles;
     private IReadOnlyList<ExternalDependency>? _externalDependencies;
     private IReadOnlyList<(string Namespace, IReadOnlyList<TypeNode> Types)>? _namespaces;
     private ContactPoints? _contactPoints;
