@@ -1357,3 +1357,58 @@ for it would be a large fixture change to protect a small branch. A synthetic fi
 a detector produces such a value; it proves the renderer survives one, which is the half that was
 broken. Verified by control: removing the branch fails the blast-radius row and leaves the
 concealed-decision row passing.
+
+### 39. A member subject is a display string, and four kinds of member are not identified by it
+
+**Found while planning A9, which is the point at which it starts to matter.** X5 put dead code at
+member level, so a member subject stops being an internal key and becomes the thing a claim about
+deletion is attached to. Four separate failures land on `ModelBuilder.MemberSubject`, and they have
+one root: **the subject is `ISymbol.ToDisplayString(MemberFormat)`, and a display string is not an
+identity.** This is defect 13 one level up — that one was closed by construction because Core keyed
+a member as `(assembly, declaring type, signature)`, and this is the discovery that Core's
+*signature* is not sufficiently qualified either.
+
+**Measured on both reference solutions**, from `members.csv` as it ships today.
+
+| | nopCommerce | Jellyfin |
+|---|---|---|
+| members | 25,165 | 12,086 |
+| **blank `Accessibility`** | **4,638 (18.4%)** | **1,764 (14.6%)** |
+| colliding member ids | 7 | 17 |
+| members lost to a collision | 7 | 41 |
+
+**a. A field or an event field has no symbol at all.** `SemanticModel.GetDeclaredSymbol` returns
+`null` for `FieldDeclarationSyntax` and `EventFieldDeclarationSyntax` — the declaration is the
+`VariableDeclaratorSyntax` under it. `MemberSubject` falls back to `MemberName(member)`, and three
+things go wrong at once. **Accessibility is blank on every field**, which is the 18.4% above.
+**`AccumulateSurface` and `PublicMemberCount` skip them**, so a public field contributes nothing to
+the contract surface `WIDEST CONTRACT SURFACE` reads. And the id is a bare name where a method's is
+a qualified signature — `…CacheKeyManager|_keys` beside
+`…CacheKeyManager|global::Nop.Core.Caching.CacheKeyManager.AddKey(string)`.
+
+**b. An event field's id is the literal string `EventFieldDeclaration`.** `MemberName` has no arm
+for it, so it falls through to `member.Kind().ToString()`. Every event in a type therefore shares
+one subject: **15 colliding subjects on Jellyfin covering all 81 of its events**, three of them
+merging three events into one. nopCommerce declares no events and shows none of this, which is why
+two solutions are the standard.
+
+**c. `ref`, `out` and `in` are not in the signature.** `MemberFormat` sets
+`SymbolDisplayParameterOptions.IncludeType` and nothing else, so
+`NormalizePath(this string?, out char)` and `NormalizePath(this string?, char)` are both
+`NormalizePath(string, char)` — real, in `Emby.Server.Implementations.Library.PathExtensions`, and
+they are different members with different callers.
+
+**d. A static constructor is indistinguishable from an instance one**, and an explicit interface
+implementation from the ordinary member of the same name. `Nop.Core.Infrastructure.WebAppTypeFinder`
+declares both constructors and they render identically as `WebAppTypeFinder.WebAppTypeFinder()`;
+`MediaBrowser.Common.Plugins.BasePlugin<TConfigurationType>.Configuration` is the second shape.
+
+**Why it is a defect now and was not before.** Nothing user-facing joins on a member subject yet —
+`members.csv` publishes the id, and `CsvOutputTests.A_member_id_is_an_identifier_and_not_a_bare_name`
+asserts uniqueness over a fixture that does not contain any of these four cases. **A9 is the
+consumer that makes it dangerous**: a claim that a member has no static references, keyed on a
+subject that merges three events or two overloads, is a "safe to delete" about something with
+callers. That is invariant 4, and it is the specific burn `TECHREQ-job-a.md` §5.6 exists to prevent.
+
+**The remedy is a decision rather than a patch**, because every member id in every export moves and
+`JsonOutput.SchemaVersion` has to move with it. Recorded as **X14**.
