@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace IronMarten.Bearing.Cli;
@@ -226,7 +226,7 @@ public static class JsonOutput
 
     private static CycleBlocks Cycles(SolutionModel model) =>
         new(
-            [.. model.NamespaceCycles.Select(Cycle)],
+            [.. model.ShapedNamespaceCycles.Select(c => Cycle(c.Cycle) with { Shape = c.Shape })],
             [.. model.ProjectCycles.Select(Cycle)],
             [.. model.TypeTangles.Select(Cycle)]);
 
@@ -408,12 +408,18 @@ public static class JsonOutput
         IReadOnlyList<CycleBlock> Projects,
         IReadOnlyList<CycleBlock> TypeTangles);
 
+    /// <param name="Shape">
+    /// What closes the cycle, for namespace cycles. Null on the project and type graphs, which
+    /// are not classified — a consumer filtering on it gets everything there, which is what the
+    /// unclassified answer means.
+    /// </param>
     private sealed record CycleBlock(
         string Id,
         int Size,
         IReadOnlyList<string> Members,
         IReadOnlyList<string> Path,
-        bool PathCoversEveryMember);
+        bool PathCoversEveryMember,
+        CycleShape? Shape = null);
 
     private sealed record BoundaryBlock(
         IReadOnlyList<string> Inbound,

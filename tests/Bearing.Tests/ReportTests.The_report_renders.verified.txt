@@ -214,10 +214,13 @@ Every claim shows the numbers behind it.
    (a member can be in several of those, so they do not sum to the number set aside)
 
 -- CIRCULAR REFERENCES -----------------------------------------
-   NAMESPACE CYCLES — mutually dependent namespaces cannot be layered,
-   understood, or extracted independently:
-     4 namespaces: TestBed.Core <-> TestBed.Core.Depots <-> TestBed.Core.Pricing <-> TestBed.Core.Vaults
-       loop: TestBed.Core -> TestBed.Core.Depots -> TestBed.Core — 2 of the 4; all 4 reach each other
+   NAMESPACE CYCLES — sibling namespaces that hold each other as state,
+   so neither can be layered, understood or extracted without the other:
+     (none — no two peer namespaces hold each other)
+
+   MUTUALLY DEPENDENT, NOT REPORTED ABOVE — these components are real, and
+   none of them is a layering problem. The assembly is what gets extracted:
+     TestBed.Core — 4 namespaces, one assembly's own folders, all in Core
 
    PROJECT CYCLES — two projects each naming a type in the other. Legal
    MSBuild: only project references cannot cycle, and this is the type

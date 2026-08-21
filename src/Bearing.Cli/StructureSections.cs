@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing.Cli;
+﻿namespace IronMarten.Bearing.Cli;
 
 /// <summary>
 /// Job A's sections: what the solution is, rather than what is unusual about it.
@@ -19,6 +19,16 @@ internal static class StructureSections
     /// </remarks>
     private const int NamespacesPerCycle = 6;
 
+    /// <summary>
+    /// Mutually-holding pairs named under a reported cycle.
+    /// </summary>
+    /// <remarks>
+    /// The evidence for the finding rather than the finding itself, so it is capped harder than
+    /// the membership line: a reader needs to see that the coupling is real and where it is
+    /// heaviest, not every instance of it. Over the cap the count is stated.
+    /// </remarks>
+    private const int HeldPairsPerCycle = 6;
+
     /// <summary>The same, for the type graph, where names are shorter.</summary>
     private const int TypesPerTangle = 8;
 
@@ -27,6 +37,56 @@ internal static class StructureSections
     /// namespaces, so a cycle naming more than four of them is already the whole story.
     /// </summary>
     private const int ProjectsPerCycle = 4;
+
+    /// <summary>
+    /// The cycles that are real and are not findings, named with what closes them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Listed, not counted.</b> A line saying "21 suppressed" is a claim the reader cannot
+    /// check, and the suppression is the part of this section most likely to be wrong — it rests
+    /// on a reading of what the closing edges are, and a reading can misfire. Naming each one and
+    /// why costs a line apiece and makes disagreeing with the tool possible.
+    /// </para>
+    /// <para>
+    /// Under its own heading rather than indented beneath the findings, because these are not
+    /// lesser findings. They are components the graph really contains, about which the section
+    /// has nothing to ask anyone to do.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> NotLayering(
+        IReadOnlyList<ShapedCycle> cycles, int top, Func<SubjectRef, string> name)
+    {
+        if (cycles.Count == 0) yield break;
+
+        yield return "";
+        yield return "   MUTUALLY DEPENDENT, NOT REPORTED ABOVE — these components are real, and";
+        yield return "   none of them is a layering problem. The assembly is what gets extracted:";
+
+        var (shown, disclosure) = Sentences.Cap(cycles, top, "cycle", "     ");
+
+        foreach (var cycle in shown)
+        {
+            var label = cycle.Anchor ?? name(cycle.Cycle.Members[0]);
+
+            var reason = cycle.Shape switch
+            {
+                CycleShape.FolderLayout =>
+                    $"one assembly's own folders, all in {cycle.Projects[0]}",
+                CycleShape.SharedTypes =>
+                    "peers naming each other's entities or models, holding none of them",
+
+                // Coupling never reaches here — IsReportable is exactly that case — and the arm
+                // exists so that adding a shape without deciding how to say it fails visibly
+                // rather than printing an empty reason.
+                _ => "unclassified",
+            };
+
+            yield return $"     {label} — {Sentences.Plural(cycle.Cycle.Size, "namespace")}, {reason}";
+        }
+
+        foreach (var line in disclosure) yield return line;
+    }
 
     /// <summary>
     /// The types at this solution's edge — and, when there are none, why that is worth doubting.
@@ -110,29 +170,43 @@ internal static class StructureSections
     {
         yield return "";
         yield return "-- CIRCULAR REFERENCES -----------------------------------------";
-        yield return "   NAMESPACE CYCLES — mutually dependent namespaces cannot be layered,";
-        yield return "   understood, or extracted independently:";
-
-        var cycles = model.NamespaceCycles;
-        if (cycles.Count == 0) yield return "     (none)";
-
-        var (shownCycles, cycleDisclosure) = Sentences.Cap(cycles, model.Policy.Top, "cycle", "     ");
+        yield return "   NAMESPACE CYCLES — sibling namespaces that hold each other as state,";
+        yield return "   so neither can be layered, understood or extracted without the other:";
 
         // Recovered by asking the model which namespaces it has rather than by taking the
         // canonical form apart. A SubjectRef's string is an identity, not a display name, and
         // reaching into it here would couple the report to that encoding.
         var namespaceNames = model.Namespaces
-            .ToDictionary(n => SubjectRef.ForNamespace(n.Namespace), n => n.Namespace);
+            .ToDictionary(ns => SubjectRef.ForNamespace(ns.Namespace), ns => ns.Namespace);
 
         string NamespaceName(SubjectRef id) => namespaceNames.GetValueOrDefault(id, id.Canonical);
 
-        foreach (var cycle in shownCycles)
+        var shaped = model.ShapedNamespaceCycles;
+        var reportable = shaped.Where(c => c.IsReportable).ToList();
+        var setAside = shaped.Where(c => !c.IsReportable).ToList();
+
+        if (reportable.Count == 0)
+            yield return "     (none — no two peer namespaces hold each other)";
+
+        var (shownCycles, cycleDisclosure) = Sentences.Cap(reportable, model.Policy.Top, "cycle", "     ");
+
+        foreach (var shapedCycle in shownCycles)
         {
-            yield return "     " + Members(cycle, "namespaces", NamespacesPerCycle, " <-> ", NamespaceName);
-            yield return "       " + Loop(cycle, NamespaceName);
+            yield return "     " + Members(shapedCycle.Cycle, "namespaces", NamespacesPerCycle, " <-> ", NamespaceName);
+            yield return "       " + Loop(shapedCycle.Cycle, NamespaceName);
+
+            foreach (var pair in shapedCycle.Pairs.Take(HeldPairsPerCycle))
+                yield return $"       {pair.First} <-> {pair.Second} — "
+                             + Sentences.Plural(pair.Weight, "held reference");
+
+            if (shapedCycle.Pairs.Count > HeldPairsPerCycle)
+                yield return $"       ({shapedCycle.Pairs.Count - HeldPairsPerCycle} more mutually-holding "
+                             + "pairs in this cycle)";
         }
 
         foreach (var line in cycleDisclosure) yield return line;
+
+        foreach (var line in NotLayering(setAside, model.Policy.Top, NamespaceName)) yield return line;
 
         yield return "";
         yield return "   PROJECT CYCLES — two projects each naming a type in the other. Legal";

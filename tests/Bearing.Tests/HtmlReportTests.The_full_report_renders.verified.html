@@ -262,9 +262,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </table></div>
 <p class="sub">26 reference(s) to language and framework plumbing were filtered out of that list rather than dropped silently.</p>
 <h3>Circular references</h3>
-<p><strong>Namespaces</strong> — <span class="sub">Mutually dependent namespaces cannot be layered, understood or extracted independently.</span></p>
-<p class="claim">4: TestBed.Core, TestBed.Core.Depots, TestBed.Core.Pricing, TestBed.Core.Vaults</p>
-<p class="loop">loop: TestBed.Core → TestBed.Core.Depots → TestBed.Core — 2 of the 4; all 4 reach each other</p>
+<p><strong>Namespaces</strong> — <span class="sub">Sibling namespaces that hold each other as state, so neither can be layered, understood or extracted without the other.</span></p>
+<p class="empty">None.</p>
+<p><strong>Mutually dependent, not reported</strong> — <span class="sub">these components are real, and none of them is a layering problem. The assembly is what gets extracted.</span></p>
+<ul class="sub">
+<li>TestBed.Core — 4 namespace(s), one assembly&#39;s own folders, all in Core</li>
+</ul>
 <p><strong>Projects</strong> — <span class="sub">Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.</span></p>
 <p class="empty">None.</p>
 <p><strong>Type tangles (4+)</strong> — <span class="sub">Groups of types that all reach each other, so none of them can be tested or changed alone.</span></p>

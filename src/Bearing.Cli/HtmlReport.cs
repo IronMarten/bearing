@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace IronMarten.Bearing.Cli;
 
@@ -624,9 +624,14 @@ public static class HtmlReport
     {
         page.Append("<h3>Circular references</h3>\n");
 
-        CycleGroup(page, "Namespaces", model.NamespaceCycles,
-            "Mutually dependent namespaces cannot be layered, understood or extracted independently.",
+        var shaped = model.ShapedNamespaceCycles;
+
+        CycleGroup(page, "Namespaces", [.. shaped.Where(c => c.IsReportable).Select(c => c.Cycle)],
+            "Sibling namespaces that hold each other as state, so neither can be layered, "
+            + "understood or extracted without the other.",
             id => Name(model, id));
+
+        NotLayering(page, [.. shaped.Where(c => !c.IsReportable)], id => Name(model, id));
 
         CycleGroup(page, "Projects", model.ProjectCycles,
             "Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.",
@@ -635,6 +640,44 @@ public static class HtmlReport
         CycleGroup(page, $"Type tangles ({Html.Number(model.Policy.MinTangle)}+)", model.TypeTangles,
             "Groups of types that all reach each other, so none of them can be tested or changed alone.",
             id => Name(model, id));
+    }
+
+    /// <summary>
+    /// The components that are real and are not findings, with what closes each one.
+    /// </summary>
+    /// <remarks>
+    /// Rendered rather than counted, for the reason the text report lists them: the suppression
+    /// is the part of this section most likely to be wrong, and a reader who cannot see what was
+    /// set aside cannot disagree with it. Kept visually quieter than the findings above, because
+    /// they are not lesser findings — they are components about which there is nothing to do.
+    /// </remarks>
+    private static void NotLayering(
+        StringBuilder page, IReadOnlyList<ShapedCycle> cycles, Func<SubjectRef, string> name)
+    {
+        if (cycles.Count == 0) return;
+
+        page.Append("<p><strong>Mutually dependent, not reported</strong> — <span class=\"sub\">")
+            .Append("these components are real, and none of them is a layering problem. ")
+            .Append("The assembly is what gets extracted.</span></p>\n");
+
+        page.Append("<ul class=\"sub\">\n");
+
+        foreach (var cycle in cycles)
+        {
+            var label = cycle.Anchor ?? name(cycle.Cycle.Members[0]);
+
+            var reason = cycle.Shape switch
+            {
+                CycleShape.FolderLayout => $"one assembly's own folders, all in {cycle.Projects[0]}",
+                CycleShape.SharedTypes => "peers naming each other's entities or models, holding none of them",
+                _ => "unclassified",
+            };
+
+            page.Append($"<li>{Html.Text(label)} — {Html.Count(cycle.Cycle.Size)} namespace(s), ")
+                .Append($"{Html.Text(reason)}</li>\n");
+        }
+
+        page.Append("</ul>\n");
     }
 
     private static void CycleGroup(

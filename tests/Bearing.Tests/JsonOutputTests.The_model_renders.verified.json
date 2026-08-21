@@ -26467,7 +26467,8 @@
           "namespace|TestBed.Core",
           "namespace|TestBed.Core.Depots"
         ],
-        "pathCoversEveryMember": false
+        "pathCoversEveryMember": false,
+        "shape": "FolderLayout"
       }
     ],
     "projects": [],
@@ -26497,7 +26498,8 @@
           "type|Core|global::TestBed.Core.Tangles.ThetaNode",
           "type|Core|global::TestBed.Core.Tangles.IotaNode"
         ],
-        "pathCoversEveryMember": true
+        "pathCoversEveryMember": true,
+        "shape": null
       },
       {
         "id": "set|type\\|Core\\|global::TestBed.Core.AccessorialNormalizer|type\\|Core\\|global::TestBed.Core.AddressNormalizer|type\\|Core\\|global::TestBed.Core.RateNormalizer|type\\|Core\\|global::TestBed.Core.ReferenceNormalizer|type\\|Core\\|global::TestBed.Core.Router|type\\|Core\\|global::TestBed.Core.ShipmentCoordinator|type\\|Core\\|global::TestBed.Core.TrackingNormalizer|type\\|Core\\|global::TestBed.Core.TransitNormalizer",
@@ -26517,7 +26519,8 @@
           "type|Core|global::TestBed.Core.ShipmentCoordinator",
           "type|Core|global::TestBed.Core.Router"
         ],
-        "pathCoversEveryMember": false
+        "pathCoversEveryMember": false,
+        "shape": null
       },
       {
         "id": "set|type\\|Core\\|global::TestBed.Core.Tangles.EastLink|type\\|Core\\|global::TestBed.Core.Tangles.NorthLink|type\\|Core\\|global::TestBed.Core.Tangles.SouthLink|type\\|Core\\|global::TestBed.Core.Tangles.WestLink",
@@ -26534,7 +26537,8 @@
           "type|Core|global::TestBed.Core.Tangles.WestLink",
           "type|Core|global::TestBed.Core.Tangles.NorthLink"
         ],
-        "pathCoversEveryMember": true
+        "pathCoversEveryMember": true,
+        "shape": null
       }
     ]
   },
