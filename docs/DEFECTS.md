@@ -1653,3 +1653,43 @@ is wrong data, and drift comparison cannot tell the second from a real change.
 **Not an argument for chasing Roslyn versions.** Any version has a language ceiling and C# 15 will
 exist; upgrading moves the cliff rather than removing it. What removes the class is the tool
 knowing when it could not read something. See `TASKS.md` Track D.
+
+### 43. A solution needing a newer SDK is reported as an unreadable file
+
+Running against current nopCommerce, whose `global.json` pins `10.0.100`, on a machine carrying
+only 8.0.423:
+
+```
+Could not read the solution: .../nopCurrent/src/NopCommerce.sln
+  An exception of type System.InvalidOperationException was thrown: Failed to find all versions
+  of .NET Core MSBuild. Call to hostfxr_resolve_sdk2.
+
+Bearing needs a .sln file. Check the path names the solution rather than a
+project or a directory, and that the file is complete and readable.
+```
+
+**The file is perfect.** It is a well-formed `.sln` naming 38 projects that build for anyone with
+the right toolchain. The advice sends the user to inspect the one thing that is not wrong, and the
+sentence it lands on is the fallback arm — the one written for a mistyped path.
+
+**This is the likeliest first-run failure there is**, and more common than the three §23 named. A
+`.csproj` or a `.slnx` is a mistake a user makes once; a `global.json` pinning an SDK newer than the
+machine's is the normal condition of any shop that is not on the newest toolchain, and of every CI
+image that has not been updated. It is also not a user error at all — it is a missing prerequisite,
+and the remedy is an install rather than an edit.
+
+**§23's design is right and this is inside it, not against it.** The advice is chosen after the load
+fails, never before, and that stays. What §23 established is that the *three* causes it handled all
+arrive as one MSBuild sentence — `No file format header found` — so the message cannot discriminate
+and the path must. **This cause does not share that message.** `Failed to find all versions of .NET
+Core MSBuild` and `hostfxr_resolve_sdk2` name it exactly, so it is separable by the thing §23 could
+not use, and reading it here does not reopen what §23 closed.
+
+**What the sentence should say** is that the solution asks for an SDK this machine does not have,
+which `global.json` is asking for it, and that installing it is the fix — not that the file might be
+incomplete.
+
+**Adjacent to §42 and not the same, worth keeping apart.** This is the *load* stage failing loudly
+with the wrong explanation. §42 is the *parse* stage failing silently with no explanation. They sit
+in sequence on one road: without the newer SDK the run stops here, and with it the run proceeds to
+hand C# the pinned Roslyn cannot read to a walker that will not say so.
