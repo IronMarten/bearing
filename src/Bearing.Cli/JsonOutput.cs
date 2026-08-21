@@ -45,8 +45,20 @@ public static class JsonOutput
     /// is the case the version exists to answer, and the paid service is the consumer that will
     /// ask it, of files produced by tool versions it never saw.
     /// </para>
+    /// <para>
+    /// <b>2.0 changes what a member's <c>id</c> is — X14, and it is the first major.</b> The value
+    /// is now Roslyn's documentation comment ID rather than a display string, so a consumer holding
+    /// ids from a 1.x file cannot join them against a 2.0 one: the same member has a different id,
+    /// and nothing in the file says so. That is the definition of a major, and it is the reason the
+    /// minor would have been the wrong call — a field being added is ignorable, a key changing
+    /// value is not. <c>docs/DEFECTS.md</c> §39 is what the old ids were doing.
+    /// </para>
+    /// <para>
+    /// The readable form did not disappear with it: <c>signature</c> is new in 2.0 and carries what
+    /// <c>id</c> used to look like. It is not a key and §39 says which members share one.
+    /// </para>
     /// </remarks>
-    public const string SchemaVersion = "1.1";
+    public const string SchemaVersion = "2.0";
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -182,6 +194,7 @@ public static class JsonOutput
         new(
             member.Subject.Canonical,
             member.Name,
+            member.Signature,
             member.Kind,
             member.Accessibility,
             Site(member.Location),
@@ -371,6 +384,7 @@ public static class JsonOutput
     private sealed record MemberBlock(
         string Id,
         string Name,
+        string Signature,
         MemberKind Kind,
         string Accessibility,
         SiteBlock? Location,

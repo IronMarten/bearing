@@ -164,6 +164,13 @@ public static class CsvOutput
     /// column nothing can join on. Core keys a member on <c>(assembly, declaring type,
     /// signature)</c>, so the column is unique by construction and this file can be joined to
     /// <c>types.csv</c> without a heuristic.
+    /// <para>
+    /// <b>Two columns for the member, since X14, and only one of them is a key.</b> <c>Id</c>
+    /// carries the documentation comment ID and joins; <c>Signature</c> is the readable form and
+    /// does not — <c>docs/DEFECTS.md</c> §39 lists the four kinds of member it merges. Publishing
+    /// only the exact one would make the file unreadable, and publishing only the readable one is
+    /// the defect.
+    /// </para>
     /// </remarks>
     public static string Members(SolutionModel model)
     {
@@ -172,7 +179,7 @@ public static class CsvOutput
         var rows = new StringBuilder();
 
         Row(rows,
-            "Id", "Name", "Kind", "Accessibility", "DeclaringType", "Project",
+            "Id", "Name", "Signature", "Kind", "Accessibility", "DeclaringType", "Project",
             "Cyclomatic", "Dsm", "Transform", "StaticMutations",
             "MaxNestingDepth", "ParameterCount", "LinesOfCode", "File", "Line");
 
@@ -180,7 +187,7 @@ public static class CsvOutput
             foreach (var member in type.Members.OrderBy(m => m.Subject.Canonical, StringComparer.Ordinal))
             {
                 Row(rows,
-                    member.Subject.Canonical, member.Name, member.Kind.ToString(),
+                    member.Subject.Canonical, member.Name, member.Signature, member.Kind.ToString(),
                     member.Accessibility, type.Subject.Canonical, type.Project,
                     Num(member.Cyclomatic), Num(member.Dsm), Num(member.Transform),
                     Num(member.StaticMutations), Num(member.MaxNestingDepth),

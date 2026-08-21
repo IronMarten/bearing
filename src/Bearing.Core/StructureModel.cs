@@ -101,6 +101,7 @@ public sealed class Member
     internal Member(
         SubjectRef subject,
         string name,
+        string signature,
         MemberKind kind,
         string accessibility,
         SourceLocation location,
@@ -114,6 +115,7 @@ public sealed class Member
     {
         Subject = subject;
         Name = name;
+        Signature = signature;
         Kind = kind;
         Accessibility = accessibility;
         Location = location;
@@ -130,14 +132,33 @@ public sealed class Member
     /// Stable identity, qualified by the declaring type.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Qualified because a bare member name is not an identifier: the fixture alone has twelve
     /// types declaring <c>Apply</c>. See <c>docs/DEFECTS.md</c> §13 for what keying on the bare
     /// name would merge.
+    /// </para>
+    /// <para>
+    /// <b>The signature half is Roslyn's documentation comment ID</b> — decision X14, and
+    /// <c>docs/DEFECTS.md</c> §39 is the four ways the display string it replaced was not an
+    /// identity. <see cref="Signature"/> is the readable form, and it is not unique.
+    /// </para>
     /// </remarks>
     public SubjectRef Subject { get; }
 
     /// <summary>The member's own name, e.g. <c>Reconcile</c> or <c>.ctor</c>.</summary>
     public string Name { get; }
+
+    /// <summary>
+    /// The member as a developer would write it — <c>global::Ns.Foo.Bar(string, out char)</c>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Published beside <see cref="Subject"/> rather than instead of it, and it is not a key.</b>
+    /// X14 made the identity a documentation comment ID, which is exact and which nobody wants to
+    /// read down a column; this is what a person scanning <c>members.csv</c> is actually looking
+    /// for. Two members can share it — that is <c>docs/DEFECTS.md</c> §39, and the whole reason the
+    /// identity is somewhere else.
+    /// </remarks>
+    public string Signature { get; }
 
     /// <summary>What kind of declaration it is.</summary>
     public MemberKind Kind { get; }

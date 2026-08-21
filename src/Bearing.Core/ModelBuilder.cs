@@ -129,33 +129,80 @@ internal sealed class ModelBuilder
         {
             if (member is BaseTypeDeclarationSyntax) continue;   // nested type: its own node
 
-            var symbol = model.GetDeclaredSymbol(member);
-            node.MemberCount++;
-            if (symbol?.DeclaredAccessibility == Accessibility.Public) node.PublicMemberCount++;
-
-            var complexity = new ComplexityCollector(model, member);
-            complexity.Visit(member);
-
-            var hasBody = HasExecutableBody(member);
-            if (hasBody) node.ExecutableMemberCount++;
-
-            AccumulateSurface(node, symbol);
-
-            var memberSpan = member.GetLocation().GetLineSpan();
-            node.Members.Add(new Member(
-                MemberSubject(node, symbol, member),
-                MemberName(member),
-                KindOf(member),
-                symbol?.DeclaredAccessibility.ToString() ?? "",
-                new SourceLocation(memberSpan.Path ?? "", memberSpan.StartLinePosition.Line + 1),
-                complexity.Cyclomatic + (hasBody ? 1 : 0),
-                complexity.Dsm,
-                complexity.Transform,
-                complexity.StaticMutations,
-                complexity.MaxNesting,
-                ParameterCountOf(member),
-                memberSpan.EndLinePosition.Line - memberSpan.StartLinePosition.Line + 1));
+            foreach (var (symbol, declarator) in DeclaredBy(member, model))
+                AddMember(node, member, symbol, declarator, model);
         }
+    }
+
+    /// <summary>
+    /// The members one declaration declares, with the syntax that declares each.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Usually one, and for a field declaration it is one per variable</b> — <c>int a, b;</c> is
+    /// two fields, with two names, two accessibilities and two sets of callers. It used to be one
+    /// member named <c>a</c>, which is <c>docs/DEFECTS.md</c> §39: a dead-code claim cannot be made
+    /// about a member the model never separated from its neighbour.
+    /// </para>
+    /// <para>
+    /// <b>This is also the only place a field can get a symbol at all.</b>
+    /// <c>GetDeclaredSymbol</c> answers <see langword="null"/> for a
+    /// <c>BaseFieldDeclarationSyntax</c> — the declaration is the variable under it — which is why
+    /// every field shipped with a blank accessibility and no contribution to the public surface.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<(ISymbol? Symbol, SyntaxNode Declarator)> DeclaredBy(
+        MemberDeclarationSyntax member, SemanticModel model)
+    {
+        if (member is not BaseFieldDeclarationSyntax field)
+        {
+            yield return (model.GetDeclaredSymbol(member), member);
+            yield break;
+        }
+
+        foreach (var variable in field.Declaration.Variables)
+            yield return (model.GetDeclaredSymbol(variable), variable);
+    }
+
+    /// <summary>Records one member, with the metrics of the syntax that declares it.</summary>
+    /// <remarks>
+    /// <paramref name="member"/> decides what kind of thing this is and whether it has a body;
+    /// <paramref name="declarator"/> is what gets measured, so two initialisers on one field line
+    /// are not charged to each other.
+    /// </remarks>
+    private void AddMember(
+        TypeNode node,
+        MemberDeclarationSyntax member,
+        ISymbol? symbol,
+        SyntaxNode declarator,
+        SemanticModel model)
+    {
+        node.MemberCount++;
+        if (symbol?.DeclaredAccessibility == Accessibility.Public) node.PublicMemberCount++;
+
+        var complexity = new ComplexityCollector(model, declarator);
+        complexity.Visit(declarator);
+
+        var hasBody = HasExecutableBody(member);
+        if (hasBody) node.ExecutableMemberCount++;
+
+        AccumulateSurface(node, symbol);
+
+        var memberSpan = declarator.GetLocation().GetLineSpan();
+        node.Members.Add(new Member(
+            MemberSubject(node, symbol, member),
+            MemberName(symbol, member),
+            SignatureOf(symbol, member),
+            KindOf(member),
+            symbol?.DeclaredAccessibility.ToString() ?? "",
+            new SourceLocation(memberSpan.Path ?? "", memberSpan.StartLinePosition.Line + 1),
+            complexity.Cyclomatic + (hasBody ? 1 : 0),
+            complexity.Dsm,
+            complexity.Transform,
+            complexity.StaticMutations,
+            complexity.MaxNesting,
+            ParameterCountOf(member),
+            memberSpan.EndLinePosition.Line - memberSpan.StartLinePosition.Line + 1));
     }
 
     private void CollectReferences(TypeNode node, SyntaxNode syntax, SemanticModel model)
@@ -383,11 +430,41 @@ internal sealed class ModelBuilder
             baseType));
     }
 
+    /// <summary>
+    /// The member's identity: its declaring type, and Roslyn's documentation comment ID.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Decision X14, and <c>docs/DEFECTS.md</c> §39 is what it replaces.</b> The signature used
+    /// to be <c>symbol.ToDisplayString(MemberFormat)</c>, and a display string is not an identity:
+    /// it drops <c>ref</c>, <c>out</c> and <c>in</c>, renders a static constructor exactly like an
+    /// instance one, gives an explicit interface implementation the containing type's name, and —
+    /// where the symbol was <see langword="null"/>, which was every field — was not a signature at
+    /// all. The documentation comment ID separates all four by construction, because it is the form
+    /// the compiler emits for cross-assembly references and has to.
+    /// </para>
+    /// <para>
+    /// <b>The display string is kept as <see cref="Member.Signature"/> rather than dropped.</b>
+    /// <c>M:Nop.Core.WebAppTypeFinder.#cctor</c> is exact and nobody wants to read a column of it.
+    /// </para>
+    /// <para>
+    /// <b>The fallback is the display string, and it is reached only where Roslyn declines to
+    /// answer.</b> <c>GetDocumentationCommentId</c> returns <see langword="null"/> for a symbol
+    /// that cannot be referenced from documentation — and for a member with no symbol at all, which
+    /// after <see cref="DeclaredBy"/> means a declaration this walk did not expect. Falling back
+    /// keeps the model buildable; it does not restore the guarantee, so anything relying on
+    /// uniqueness has to say so.
+    /// </para>
+    /// </remarks>
     private static SubjectRef MemberSubject(TypeNode node, ISymbol? symbol, MemberDeclarationSyntax member) =>
         SubjectRef.ForMember(
             node.Assembly,
             node.FullyQualifiedName,
-            symbol is not null ? symbol.ToDisplayString(MemberFormat) : MemberName(member));
+            symbol?.GetDocumentationCommentId() ?? SignatureOf(symbol, member));
+
+    /// <summary>The member as a developer would write it. Readable, and not unique.</summary>
+    private static string SignatureOf(ISymbol? symbol, MemberDeclarationSyntax member) =>
+        symbol is not null ? symbol.ToDisplayString(MemberFormat) : MemberName(symbol, member);
 
     /// <summary>
     /// Data parameters, two ways: the raw count, and a depth-1 expansion of the shapes crossing
@@ -507,14 +584,28 @@ internal sealed class ModelBuilder
         _ => 0,
     };
 
-    private static string MemberName(MemberDeclarationSyntax member) => member switch
+    /// <summary>
+    /// The member's own name.
+    /// </summary>
+    /// <remarks>
+    /// <b>The symbol first, and the syntax only when there is none.</b> The syntactic list had no
+    /// arm for <c>EventFieldDeclarationSyntax</c>, so every event in a type was named
+    /// <c>EventFieldDeclaration</c> — all 81 of Jellyfin's, collapsed into 15 subjects
+    /// (<c>docs/DEFECTS.md</c> §39). A list of syntax kinds is a list that goes on being incomplete;
+    /// the symbol knows its own name for every kind of member there is.
+    /// </remarks>
+    private static string MemberName(ISymbol? symbol, MemberDeclarationSyntax member) => symbol?.Name switch
     {
-        MethodDeclarationSyntax m => m.Identifier.ValueText,
-        ConstructorDeclarationSyntax => ".ctor",
-        PropertyDeclarationSyntax p => p.Identifier.ValueText,
-        FieldDeclarationSyntax f => f.Declaration.Variables.FirstOrDefault()?.Identifier.ValueText ?? "<field>",
-        EventDeclarationSyntax e => e.Identifier.ValueText,
-        _ => member.Kind().ToString(),
+        null or "" => member switch
+        {
+            MethodDeclarationSyntax m => m.Identifier.ValueText,
+            ConstructorDeclarationSyntax => ".ctor",
+            PropertyDeclarationSyntax p => p.Identifier.ValueText,
+            FieldDeclarationSyntax f => f.Declaration.Variables.FirstOrDefault()?.Identifier.ValueText ?? "<field>",
+            EventDeclarationSyntax e => e.Identifier.ValueText,
+            _ => member.Kind().ToString(),
+        },
+        var name => name,
     };
 
     /// <summary>
