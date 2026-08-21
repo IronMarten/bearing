@@ -33,6 +33,16 @@ internal sealed class ModelBuilder
     private readonly Func<ISymbol?, ExternalOrigin> _originOf;
 
     /// <summary>
+    /// Where the two halves of <see cref="Walk"/> are charged — <see cref="WalkProfile"/>.
+    /// </summary>
+    /// <remarks>
+    /// The builder times itself rather than being timed from outside because the split that
+    /// matters is inside one method: collecting references is the stage A9 changes, and the member
+    /// metrics beside it are not. A caller holding the stopwatch could only report their sum.
+    /// </remarks>
+    private readonly WalkClock _clock;
+
+    /// <summary>
     /// Where each external namespace resolved from — <c>docs/DEFECTS.md</c> §30.
     /// </summary>
     /// <remarks>
@@ -50,11 +60,13 @@ internal sealed class ModelBuilder
     internal ModelBuilder(
         WalkOptions options,
         Func<ISymbol?, bool> isInSolution,
-        Func<ISymbol?, ExternalOrigin>? originOf = null)
+        Func<ISymbol?, ExternalOrigin>? originOf = null,
+        WalkClock? clock = null)
     {
         _originOf = originOf ?? (_ => ExternalOrigin.Unknown);
         _options = options;
         _isInSolution = isInSolution;
+        _clock = clock ?? new WalkClock();
     }
 
     internal int ExcludedTypes { get; private set; }
@@ -91,8 +103,23 @@ internal sealed class ModelBuilder
     /// <summary>Walks one declaration of a type — a partial type has several.</summary>
     internal void Walk(TypeNode node, INamedTypeSymbol type, SyntaxNode syntax, SemanticModel model)
     {
+        var collecting = WalkClock.Now();
         CollectReferences(node, syntax, model);
+        _clock.Add(WalkStage.References, collecting);
 
+        var measuring = WalkClock.Now();
+        WalkMembers(node, syntax, model);
+        _clock.Add(WalkStage.Members, measuring);
+    }
+
+    /// <summary>The per-declaration metrics: how big the declaration is, and what each member costs.</summary>
+    /// <remarks>
+    /// Split out of <see cref="Walk"/> so that the two halves of a declaration's cost can be
+    /// charged separately — see <see cref="_clock"/>. The work is unchanged and the order is the
+    /// order it was in.
+    /// </remarks>
+    private void WalkMembers(TypeNode node, SyntaxNode syntax, SemanticModel model)
+    {
         var span = syntax.GetLocation().GetLineSpan();
         node.LinesOfCode += span.EndLinePosition.Line - span.StartLinePosition.Line + 1;
 

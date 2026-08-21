@@ -146,19 +146,51 @@ public sealed class SolutionWalker
         _options = options;
     }
 
+    /// <summary>
+    /// How long each stage of the last completed walk took.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>On the walker rather than on the model, and that is the point of it.</b> A profile is a
+    /// fact about one run on one machine; the model is the thing two runs over one commit are
+    /// asserted to produce identically. Hanging a wall-clock reading off the model would put a
+    /// number that changes every run inside the artifact whose whole value is that it does not.
+    /// </para>
+    /// <para>
+    /// <see cref="WalkProfile.None"/> until <see cref="WalkAsync"/> returns, and replaced whole
+    /// when it does — a walk that threw leaves the previous answer rather than a partial one.
+    /// </para>
+    /// </remarks>
+    public WalkProfile Profile { get; private set; } = WalkProfile.None;
+
     /// <summary>Loads the solution and walks it.</summary>
     /// <remarks>
+    /// <para>
     /// <b>Five steps, named, and it used to be one method.</b> At cc 25 over 109 lines with four
     /// levels of nesting it was the worst method in this codebase on all three measures at once —
     /// which is the tool's own verdict on itself, and the reason it was split. Nothing about the
     /// order or the work changed; what changed is that each step can be read without the other
     /// four in view. The two closures stay closures because each is a projection of
     /// <c>compilations</c> that the builder holds for the length of the walk.
+    /// </para>
+    /// <para>
+    /// <b>Those five steps are also the five stages of <see cref="Profile"/></b>, which is not a
+    /// coincidence worth preserving by accident: a step that stops being its own method stops
+    /// being its own reading, and A12 exists because "32s" with no seam in it could not be
+    /// argued about.
+    /// </para>
     /// </remarks>
     public async Task<SolutionModel> WalkAsync(CancellationToken cancellationToken = default)
     {
         var diagnostics = new List<string>();
         var skipped = new List<string>();
+        var clock = new WalkClock();
+
+        // Creating the workspace is inside the Open stage rather than before it: it is where
+        // MSBuild's assemblies load, and on a small solution that costs more than opening the
+        // file does. Timed from outside it, the stage understates MSBuild and the difference
+        // lands in the residual, which is the one row that explains nothing.
+        var opened = WalkClock.Now();
 
         using var workspace = MSBuildWorkspace.Create();
         workspace.SkipUnrecognizedProjects = true;
@@ -170,16 +202,25 @@ public sealed class SolutionWalker
 
         var solution = await OpenAsync(workspace, cancellationToken).ConfigureAwait(false);
         var projects = SelectProjects(solution, skipped);
+        clock.Add(WalkStage.Open, opened);
 
+        var compiled = WalkClock.Now();
         var (compilations, projectNodes, notLoaded) =
             await CompileAsync(projects, diagnostics, cancellationToken).ConfigureAwait(false);
+        clock.Add(WalkStage.Compile, compiled);
+        clock.Projects = compilations.Count;
 
+        var indexed = WalkClock.Now();
         var builder = new ModelBuilder(
-            _options, InSolutionOf(compilations), OriginOfAssembly(compilations));
+            _options, InSolutionOf(compilations), OriginOfAssembly(compilations), clock);
+        clock.Add(WalkStage.Index, indexed);
 
-        await WalkTypesAsync(builder, compilations, cancellationToken).ConfigureAwait(false);
+        var walked = WalkClock.Now();
+        await WalkTypesAsync(builder, compilations, clock, cancellationToken).ConfigureAwait(false);
+        clock.Add(WalkStage.Walk, walked);
 
-        return builder.Build(_options.SolutionPath, projectNodes, new Coverage
+        var built = WalkClock.Now();
+        var model = builder.Build(_options.SolutionPath, projectNodes, new Coverage
         {
             ExclusionsApplied = _options.ExcludedPathFragments,
             SkippedProjects = skipped,
@@ -187,6 +228,10 @@ public sealed class SolutionWalker
             ProjectsNotLoaded = notLoaded,
             ExcludedTypes = builder.ExcludedTypes,
         });
+        clock.Add(WalkStage.Build, built);
+
+        Profile = clock.Freeze();
+        return model;
     }
 
     /// <summary>
@@ -316,6 +361,7 @@ public sealed class SolutionWalker
     private async Task WalkTypesAsync(
         ModelBuilder builder,
         List<(Project Project, Compilation Compilation)> compilations,
+        WalkClock clock,
         CancellationToken cancellationToken)
     {
         foreach (var (project, compilation) in compilations)
@@ -327,14 +373,23 @@ public sealed class SolutionWalker
                 if (!ShouldAnalyse(type)) { builder.CountExclusion(); continue; }
 
                 var node = builder.GetOrAdd(type, compilation.Assembly.Name, project.Name);
+                clock.Types++;
 
                 foreach (var declaration in type.DeclaringSyntaxReferences)
                 {
+                    var fetched = WalkClock.Now();
                     var syntax = await declaration.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
+                    clock.Add(WalkStage.Syntax, fetched);
+
                     if (syntax is not TypeDeclarationSyntax and not EnumDeclarationSyntax) continue;
                     if (!compilation.ContainsSyntaxTree(syntax.SyntaxTree)) continue;
 
-                    builder.Walk(node, type, syntax, compilation.GetSemanticModel(syntax.SyntaxTree));
+                    var bound = WalkClock.Now();
+                    var semantics = compilation.GetSemanticModel(syntax.SyntaxTree);
+                    clock.Add(WalkStage.Semantics, bound);
+
+                    clock.Declarations++;
+                    builder.Walk(node, type, syntax, semantics);
                 }
 
                 ModelBuilder.Classify(node, type);
