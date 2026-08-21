@@ -261,9 +261,10 @@ losing one:
 
 ### The leave-one-out verdict table
 
-Run 2026-08-20 after the X14 plant, against 30 guards, and **every verdict is what the run after P9
-gave** — same counts, same `suite-only` set, same single `DEAD` gate. That is the result the plant
-wanted: `MemberIdentityTraps.cs` moves nine snapshots and no gate's observability. The P9 run's
+Run 2026-08-21 after A9's plants, against 30 guards, and **every verdict is what the two runs
+before it gave** — same counts, same `suite-only` set, same single `DEAD` gate. Three plants have
+landed across those runs (`MemberIdentityTraps`, its extension and partial additions, and
+`DeadCodeMemberTraps`) and between them they move sixteen snapshots and no gate's observability. The P9 run's
 predecessor was after P6, and the inventory had drifted onto doc comments in between — see
 `tools/leave-one-out.sh`'s header for what that cost and what it is keyed on now.
 
@@ -329,12 +330,19 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **197 type rows**, **377 edges**, **200 method-like members**, 2 excluded, **zero load
+- **200 type rows**, **380 edges**, **209 method-like members**, 2 excluded, **zero load
   warnings**, **1 skipped project** (`Core.Tests`). Held by
   `StructureTests.Fixture_shape_is_stable` (the first three),
   `StructureTests.Scaffolded_code_is_excluded_by_default` and
   `StructureTests.Solution_loads_with_no_warnings` — every figure on this line has a named test
   beside it, which is the only form in which it is worth writing down.
+
+  > **It went stale twice more on 2026-08-21, within hours of being corrected**, because A9 landed
+  > two plants after the correction. That is the fourth and fifth drift of this line. **The lesson
+  > is not "be careful"** — it is that a figure repeated outside the test that holds it will drift
+  > at exactly the rate the fixture grows, and the only durable fix is to quote fewer of them. This
+  > line survives because all five have a named test beside them and there is nowhere else in this
+  > document that repeats a fixture count.
 
   > These four numbers were **89 / 90 / 88 / 202** in this file until they were checked against
   > the goldens, having drifted through every plant since they were written. Nothing asserted
