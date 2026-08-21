@@ -241,6 +241,24 @@ confirm a plant disturbed nothing but what it aimed at. What replaces them:
 Accepting a snapshot is a claim that the change was intended — §3. **Read the received diff before
 accepting it**, which is what "line by line" always meant.
 
+**One constraint binds every plant** (`Bridges.cs`): **no new fan-in on anything that already
+exists**. ~~No new `ApiBoundary` or `ExternalCall` type~~ — withdrawn by X1, whose premise was
+false; P4 has since taken the fixture from nine boundaries to fifteen with nothing disarmed.
+**Naming is part of the constraint**: calling a plant `*Handler` once pulled `SchemaMigrationHandler`
+into the new suffix cohort and shrank an unrelated peer population 33 → 32. Check the trailing word
+against the fixture before choosing it.
+
+### Three things a `-` in the sweep table can mean
+
+P7 and P8 found all three, and leading with which one is the difference between retiring a gate and
+losing one:
+
+1. **The constant is genuinely dead** — deletable, and the leave-one-out table above is what says so.
+2. **The fixture's distribution cannot reach it.** A plant fixes this, unless it cannot —
+   `GlobalComplexityFloor` below is the case where it cannot.
+3. **The instrument does not measure it.** `MinTangle` gates structure and the sweep fingerprints
+   the finding set, so it reads `-` however well the fixture covers it.
+
 ### The leave-one-out verdict table
 
 Run 2026-08-20, after P9, against 30 guards. **The previous run was after P6**, and the inventory
