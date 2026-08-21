@@ -59,6 +59,9 @@ internal sealed class ModelBuilder
     /// <summary>Inbound member references, keyed on the member they point at — A9's first layer.</summary>
     private readonly Dictionary<string, List<MemberReference>> _memberReferences = new(StringComparer.Ordinal);
 
+    /// <summary>Documentation comment IDs of every project's entry point.</summary>
+    private readonly HashSet<string> _entryPoints = new(StringComparer.Ordinal);
+
     /// <summary>Member subjects already built, so a signature is generated once rather than per reference.</summary>
     private readonly Dictionary<ISymbol, SubjectRef?> _memberSubjects = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<string, SubjectRef> _subjects = new(StringComparer.Ordinal);
@@ -136,7 +139,17 @@ internal sealed class ModelBuilder
             if (member is BaseTypeDeclarationSyntax) continue;   // nested type: its own node
 
             foreach (var (symbol, declarator) in DeclaredBy(member, model))
+            {
+                // A partial method is two declarations and ONE member, and they share an identity
+                // because they are the same member -- so recording both puts two rows under one
+                // subject, which is a contradiction by construction. The definition part is
+                // skipped in favour of the implementation, which is the half with the body and
+                // therefore the half the metrics are about. Measured on nopCommerce: six colliding
+                // subjects, all of them NSwag's generated partial methods.
+                if (symbol is IMethodSymbol { PartialImplementationPart: not null }) continue;
+
                 AddMember(node, member, symbol, declarator, model);
+            }
         }
     }
 
@@ -195,7 +208,7 @@ internal sealed class ModelBuilder
         AccumulateSurface(node, symbol);
 
         var memberSpan = declarator.GetLocation().GetLineSpan();
-        node.Members.Add(new Member(
+        var recorded = new Member(
             MemberSubject(node, symbol, member),
             MemberName(symbol, member),
             SignatureOf(symbol, member),
@@ -208,7 +221,39 @@ internal sealed class ModelBuilder
             complexity.StaticMutations,
             complexity.MaxNesting,
             ParameterCountOf(member),
-            memberSpan.EndLinePosition.Line - memberSpan.StartLinePosition.Line + 1));
+            memberSpan.EndLinePosition.Line - memberSpan.StartLinePosition.Line + 1)
+        {
+            IsExternallyVisible = ExternallyVisible(symbol),
+            IsOverride = symbol is { IsOverride: true },
+        };
+
+        node.Members.Add(recorded);
+    }
+
+    /// <summary>
+    /// Whether a symbol and every type containing it are visible outside the assembly.
+    /// </summary>
+    /// <remarks>
+    /// <c>Protected</c> counts: a protected member of a public unsealed type is part of what a
+    /// consumer can reach, and §5.6's exclusion is about the surface somebody outside might be
+    /// using. <c>ProtectedAndInternal</c> does not — it is reachable only from a derived type in
+    /// this assembly, which is a caller the walk can see.
+    /// </remarks>
+    private static bool ExternallyVisible(ISymbol? symbol)
+    {
+        if (symbol is null) return false;
+
+        for (var current = symbol; current is not null; current = current.ContainingType)
+        {
+            if (current.DeclaredAccessibility is not (Accessibility.Public
+                or Accessibility.Protected
+                or Accessibility.ProtectedOrInternal))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void CollectReferences(TypeNode node, SyntaxNode syntax, SemanticModel model)
@@ -286,6 +331,14 @@ internal sealed class ModelBuilder
     {
         if (symbol is not (IMethodSymbol or IPropertySymbol or IFieldSymbol or IEventSymbol)) return null;
 
+        // An extension method called as one -- dtoOptions.AddClientFields(user) -- resolves to the
+        // REDUCED symbol, whose signature has had the receiver removed, so its documentation
+        // comment ID is not the one the declaration produced and the reference joins nothing.
+        // Measured on Jellyfin before this line existed: AddClientFields is called from a dozen
+        // controllers and read as having no callers at all. Every extension method in both
+        // reference solutions was a dead-code candidate.
+        if (symbol is IMethodSymbol { ReducedFrom: { } unreduced }) symbol = unreduced;
+
         var definition = symbol.OriginalDefinition;
         if (_memberSubjects.TryGetValue(definition, out var cached)) return cached;
 
@@ -326,6 +379,8 @@ internal sealed class ModelBuilder
     /// </remarks>
     internal static void Classify(TypeNode node, INamedTypeSymbol type)
     {
+        MarkInterfaceImplementations(node, type);
+
         var attributes = type.GetAttributes().Select(a => a.AttributeClass?.Name ?? "").ToList();
 
         var bases = new List<string>();
@@ -470,6 +525,11 @@ internal sealed class ModelBuilder
 
         AttachMemberReferences(types, coverage);
 
+        if (_entryPoints.Count > 0)
+            foreach (var type in types)
+                foreach (var member in type.Members)
+                    if (_entryPoints.Contains(SignatureIn(member.Subject))) member.IsEntryPoint = true;
+
         // Projects are canonicalised for the same reason types and edges above them are, and were
         // not until R2 — docs/DEFECTS.md §37. They arrive in workspace load order, which is the
         // order the .sln declares them in, so reversing four lines of a solution file with no
@@ -518,6 +578,54 @@ internal sealed class ModelBuilder
         }
 
         coverage.MemberReferencesToUnanalysedMembers = unresolved;
+    }
+
+    /// <summary>
+    /// Flags the members that exist because an interface asked for them.
+    /// </summary>
+    /// <remarks>
+    /// <b>Asked of the type once, not of each member.</b> Roslyn answers "what implements this
+    /// interface member" and not "does this member implement anything", so the cheap direction is
+    /// to walk the interfaces and collect what comes back — one pass per type against one pass per
+    /// member over every interface it has.
+    /// <para>
+    /// <c>ContainingType</c> is checked because <c>FindImplementationForInterfaceMember</c> answers
+    /// with an inherited member when a base class supplies the implementation. That member is not
+    /// declared here and has its own row on its own type.
+    /// </para>
+    /// </remarks>
+    private static void MarkInterfaceImplementations(TypeNode node, INamedTypeSymbol type)
+    {
+        if (node.Members.Count == 0) return;
+
+        var implementing = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var contract in type.AllInterfaces)
+            foreach (var required in contract.GetMembers())
+            {
+                if (type.FindImplementationForInterfaceMember(required) is not { } implementation) continue;
+                if (!SymbolEqualityComparer.Default.Equals(implementation.ContainingType, type)) continue;
+                if (implementation.GetDocumentationCommentId() is { } id) implementing.Add(id);
+            }
+
+        if (implementing.Count == 0) return;
+
+        foreach (var member in node.Members)
+            if (implementing.Contains(SignatureIn(member.Subject))) member.ImplementsInterface = true;
+    }
+
+    /// <summary>The signature half of a member subject — the last segment of its canonical form.</summary>
+    private static string SignatureIn(SubjectRef subject)
+    {
+        var canonical = subject.Canonical;
+        var cut = canonical.LastIndexOf('|');
+        return cut < 0 ? canonical : canonical[(cut + 1)..];
+    }
+
+    /// <summary>Records a project's entry point, so the member carrying it can say so.</summary>
+    internal void NoteEntryPoint(IMethodSymbol? entryPoint)
+    {
+        if (entryPoint?.GetDocumentationCommentId() is { } id) _entryPoints.Add(id);
     }
 
     /// <summary>Package beats Framework beats Unknown. See <see cref="_externalOrigins"/>.</summary>

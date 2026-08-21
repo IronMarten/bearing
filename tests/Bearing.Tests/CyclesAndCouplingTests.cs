@@ -65,7 +65,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
         Assert.Equal(11, analysed.AbstractTypes);   // P3's four *Facet interfaces, and X14's IIdentityWicket
-        Assert.Equal(190, analysed.TotalTypes);   // …P8 172 → P9 178 → P3 188 → X14 190
+        Assert.Equal(191, analysed.TotalTypes);   // …P8 172 → P9 178 → P3 188 → member identity 191
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 

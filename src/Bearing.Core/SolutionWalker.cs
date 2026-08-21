@@ -368,6 +368,10 @@ public sealed class SolutionWalker
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            // Read here rather than in CompileAsync, which already asks the same question for
+            // ProjectNode: the answer is a symbol there and a boolean by the time it is stored.
+            builder.NoteEntryPoint(compilation.GetEntryPoint(cancellationToken));
+
             foreach (var type in EnumerateTypes(compilation.Assembly.GlobalNamespace))
             {
                 if (!ShouldAnalyse(type)) { builder.CountExclusion(); continue; }

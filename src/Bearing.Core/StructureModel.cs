@@ -200,6 +200,30 @@ public sealed class Member
     /// </remarks>
     public IReadOnlyList<MemberReference> Inbound => _inbound;
 
+    /// <summary>
+    /// Whether this member is reachable from outside the assembly that declares it.
+    /// </summary>
+    /// <remarks>
+    /// <b>The whole containing chain, not the member's own modifier.</b> A public method on an
+    /// internal class is not surface, and counting it as such is the difference between "the public
+    /// API of a library" meaning something and meaning "everything anyone wrote `public` on".
+    /// </remarks>
+    public bool IsExternallyVisible { get; internal set; }
+
+    /// <summary>Whether this member overrides a base member.</summary>
+    public bool IsOverride { get; internal set; }
+
+    /// <summary>Whether this member implements an interface member, implicitly or explicitly.</summary>
+    /// <remarks>
+    /// Computed once per type from <c>FindImplementationForInterfaceMember</c> rather than per
+    /// member, which is the difference between one pass over a type's interfaces and one pass per
+    /// member over all of them.
+    /// </remarks>
+    public bool ImplementsInterface { get; internal set; }
+
+    /// <summary>Whether this member is a project's entry point.</summary>
+    public bool IsEntryPoint { get; internal set; }
+
     /// <summary>How many references point at this member. Zero is the dead-code question.</summary>
     /// <remarks>
     /// <b>Zero is a question and never an answer</b> — <c>TECHREQ-job-a.md</c> §5.6 is the list of

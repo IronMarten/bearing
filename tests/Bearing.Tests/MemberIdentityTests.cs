@@ -168,6 +168,24 @@ public sealed class MemberIdentityTests(CoreWalkFixture core)
         Assert.True(turnstile.ParameterCount > 0, "no contract surface counted at all");
     }
 
+    /// <summary>
+    /// A partial method is two declarations and one member.
+    /// </summary>
+    /// <remarks>
+    /// Both parts carry the same identity, because they are the same member — so recording both
+    /// puts two rows under one subject, which <see cref="No_two_members_share_a_subject"/> catches
+    /// as the contradiction it is. <b>Measured on nopCommerce before the fixture could reach it</b>:
+    /// six colliding subjects, every one a generated partial method. The row that survives is the
+    /// implementation, which is the half with the body and therefore the half the metrics are about.
+    /// </remarks>
+    [Fact]
+    public void A_partial_method_is_one_member()
+    {
+        var only = Assert.Single(MembersOf(Turnstile), m => m.Name == "OnRefused");
+
+        Assert.True(only.Cyclomatic > 0, "the surviving row is the definition, not the implementation");
+    }
+
     private List<Member> MembersOf(string type) =>
         core.Model.Types.Single(t => t.Name == type).Members;
 }

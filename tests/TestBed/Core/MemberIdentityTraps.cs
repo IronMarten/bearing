@@ -3,8 +3,8 @@ using System;
 namespace TestBed.Core;
 
 /// <summary>
-/// The six member shapes whose identity <c>docs/DEFECTS.md</c> §39 got wrong, and which this
-/// fixture did not contain.
+/// The eight member shapes whose identity the model got wrong, and which this fixture did not
+/// contain.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -16,6 +16,15 @@ namespace TestBed.Core;
 /// events into 15 subjects, two real <c>NormalizePath</c> overloads into one, both of
 /// <c>WebAppTypeFinder</c>'s constructors into one. A gate that cannot fail is worse than no gate,
 /// which is <c>docs/TESTING.md</c> §9, and this is the plant that lets it fail.
+/// </para>
+/// <para>
+/// <b>Two more arrived with A9's member graph, and both were found by measuring rather than by
+/// reading.</b> An extension method called as one resolves to the <i>reduced</i> symbol, whose
+/// signature has had the receiver removed — so on Jellyfin <c>AddClientFields</c>, called from a
+/// dozen controllers, read as having no callers at all, and every extension method in both
+/// reference solutions was a dead-code candidate. And a partial method is two declarations of one
+/// member, so recording both put two rows under one subject: six of those on nopCommerce, all
+/// generated. Neither shape existed here.
 /// </para>
 /// <para>
 /// <b>It takes nothing from the rest of the fixture and gives nothing to it.</b> The one
@@ -40,7 +49,7 @@ internal interface IIdentityWicket
 /// <summary>
 /// One type carrying all six shapes, so the plant costs the fixture two types rather than six.
 /// </summary>
-internal sealed class IdentityTurnstile : IIdentityWicket
+internal sealed partial class IdentityTurnstile : IIdentityWicket
 {
     /// <summary>
     /// Two fields on one line. Before X14 this was <b>one</b> member, named <c>_opened</c>.
@@ -131,7 +140,22 @@ internal sealed class IdentityTurnstile : IIdentityWicket
     }
 
     /// <summary>The ordinary member, which also implements the interface implicitly.</summary>
-    public void Admit(string token) => TryAdmit(token, out _);
+    public void Admit(string token)
+    {
+        TryAdmit(token, out _);
+
+        // Called in REDUCED form — the receiver is implicit — which is the form whose symbol does
+        // not carry the declaration's signature. Written as `this.IsWired()` rather than
+        // `TurnstileExtensions.IsWired(this)` on purpose: the unreduced call joins by itself and
+        // proves nothing.
+        if (this.IsWired()) OnRefused(token);
+    }
+
+    /// <summary>
+    /// The definition half of a partial method. Its implementation is the second part of this
+    /// class, below, and the two are one member with one identity.
+    /// </summary>
+    partial void OnRefused(string token);
 
     /// <summary>
     /// And the explicit implementation beside it, which used to render as
@@ -142,4 +166,35 @@ internal sealed class IdentityTurnstile : IIdentityWicket
         Admit(token);
         Closed?.Invoke();
     }
+}
+
+/// <summary>The implementation half of the partial method, in a second part of the same class.</summary>
+internal sealed partial class IdentityTurnstile
+{
+    partial void OnRefused(string token)
+    {
+        if (token.Length > 0) _refused++;
+    }
+}
+
+/// <summary>
+/// One extension method, so that the reduced-symbol case has somewhere to live.
+/// </summary>
+/// <remarks>
+/// <para>
+/// A static class of its own is what an extension method costs; there is no way to write one
+/// without it.
+/// </para>
+/// <para>
+/// <b>It extends the interface rather than the class, and that is the plant constraint rather than
+/// a preference.</b> Extending <see cref="IdentityTurnstile"/> directly made the two types name
+/// each other — the extension takes one as a parameter, the class calls the extension — and a
+/// two-type tangle is a <i>finding</i>. The fixture gained one, which is a plant disturbing
+/// something it did not aim at. Through <see cref="IIdentityWicket"/> the edges run one way.
+/// </para>
+/// </remarks>
+internal static class TurnstileExtensions
+{
+    /// <summary>Called from <see cref="IdentityTurnstile.Admit"/>, in reduced form.</summary>
+    internal static bool IsWired(this IIdentityWicket wicket) => wicket.ToString() is { Length: > 0 };
 }

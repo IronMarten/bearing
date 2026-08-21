@@ -140,7 +140,8 @@ type|Core|global::TestBed.Core.GuaranteedServiceNormalizer,type|Core|global::Tes
 type|Core|global::TestBed.Core.IResponseNormalizer,type|Core|global::TestBed.Core.NormalizationContext,1,Parameter,TestBed/Core/Contracts.cs,5
 type|Core|global::TestBed.Core.IResponseNormalizer,type|Core|global::TestBed.Core.NormalizedResponse,1,ReturnType,TestBed/Core/Contracts.cs,5
 type|Core|global::TestBed.Core.IResponseNormalizer,type|Core|global::TestBed.Core.RawResponse,1,Parameter,TestBed/Core/Contracts.cs,5
-type|Core|global::TestBed.Core.IdentityTurnstile,type|Core|global::TestBed.Core.IIdentityWicket,2,Other;InterfaceImplementation,TestBed/Core/MemberIdentityTraps.cs,43
+type|Core|global::TestBed.Core.IdentityTurnstile,type|Core|global::TestBed.Core.IIdentityWicket,2,Other;InterfaceImplementation,TestBed/Core/MemberIdentityTraps.cs,52
+type|Core|global::TestBed.Core.IdentityTurnstile,type|Core|global::TestBed.Core.TurnstileExtensions,1,Invocation,TestBed/Core/MemberIdentityTraps.cs,151
 type|Core|global::TestBed.Core.IngressMeter,type|Core|global::TestBed.Core.DepthGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,124
 type|Core|global::TestBed.Core.IngressMeter,type|Core|global::TestBed.Core.ErrorGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,125
 type|Core|global::TestBed.Core.IngressMeter,type|Core|global::TestBed.Core.LatencyGauge,2,Field;Invocation,TestBed/Core/Gauges.cs,123
@@ -369,6 +370,7 @@ type|Core|global::TestBed.Core.TransitNormalizer,type|Core|global::TestBed.Core.
 type|Core|global::TestBed.Core.TransitNormalizer,type|Core|global::TestBed.Core.TariffCalculator,2,Field;Invocation,TestBed/Core/TransitNormalizer.cs,5
 type|Core|global::TestBed.Core.TransitReconciler,type|Core|global::TestBed.Core.NormalizeStep,2,Field;Invocation,TestBed/Core/Reconcilers.cs,228
 type|Core|global::TestBed.Core.TransitReconciler,type|Core|global::TestBed.Core.ValidateStep,1,Field,TestBed/Core/Reconcilers.cs,229
+type|Core|global::TestBed.Core.TurnstileExtensions,type|Core|global::TestBed.Core.IIdentityWicket,1,Parameter,TestBed/Core/MemberIdentityTraps.cs,199
 type|Core|global::TestBed.Core.Vaults.PricingVault,type|Core|global::TestBed.Core.NormalizeStep,2,Field;Invocation,TestBed/Core/Vaults/Vaults.cs,45
 type|Core|global::TestBed.Core.Vaults.SessionVault,type|Core|global::TestBed.Core.NormalizeStep,1,Field,TestBed/Core/Vaults/Vaults.cs,76
 type|Core|global::TestBed.Core.Vaults.TokenVault,type|Core|global::TestBed.Core.NormalizeStep,1,Field,TestBed/Core/Vaults/Vaults.cs,69

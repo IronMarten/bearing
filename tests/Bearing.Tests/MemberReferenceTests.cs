@@ -130,6 +130,31 @@ public sealed class MemberReferenceTests(CoreWalkFixture core)
         Assert.Equal([0, 2], overloads.Select(m => m.InboundReferenceCount).Order());
     }
 
+    /// <summary>
+    /// An extension method called as one is a reference to its declaration.
+    /// </summary>
+    /// <remarks>
+    /// <b>The bug this guards was worth the measurement it came out of.</b> A call written
+    /// <c>turnstile.IsWired()</c> resolves to the <i>reduced</i> symbol, whose signature has had the
+    /// receiver removed — so its documentation comment ID is not the one the declaration produced,
+    /// and the reference joined nothing. On Jellyfin that made <c>AddClientFields</c>, called from
+    /// a dozen controllers, read as having no callers, and it made <b>every extension method in
+    /// both reference solutions a dead-code candidate</b>. Unreducing before taking the identity is
+    /// one line; finding it needed a real solution and a look at what survived the filters.
+    /// </remarks>
+    [Fact]
+    public void An_extension_method_called_as_one_is_a_reference_to_its_declaration()
+    {
+        var isWired = Assert.Single(
+            core.Model.Types.Single(t => t.Name == "TurnstileExtensions").Members,
+            m => m.Name == "IsWired");
+
+        Assert.Equal(1, isWired.InboundReferenceCount);
+        Assert.Contains(
+            isWired.Inbound,
+            r => r.From?.Canonical.EndsWith("Admit(System.String)", StringComparison.Ordinal) == true);
+    }
+
     /// <summary>References that name a member the walk recorded no row for are counted, not dropped.</summary>
     /// <remarks>
     /// <para>
