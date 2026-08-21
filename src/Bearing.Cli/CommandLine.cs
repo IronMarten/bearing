@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace IronMarten.Bearing.Cli;
 
@@ -78,6 +78,7 @@ public static class CommandLine
     private static readonly (string Property, Func<AnalysisPolicy, double, AnalysisPolicy> Apply)[] PolicyFlags =
     [
         (nameof(AnalysisPolicy.MinCohort), (p, v) => p with { MinCohort = (int)v }),
+        (nameof(AnalysisPolicy.CohortBasisFloor), (p, v) => p with { CohortBasisFloor = (int)v }),
         (nameof(AnalysisPolicy.OutlierFactor), (p, v) => p with { OutlierFactor = v }),
         (nameof(AnalysisPolicy.MinFanIn), (p, v) => p with { MinFanIn = (int)v }),
         (nameof(AnalysisPolicy.Top), (p, v) => p with { Top = (int)v }),

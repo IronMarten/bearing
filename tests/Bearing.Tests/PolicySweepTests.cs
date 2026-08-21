@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using IronMarten.Bearing;
 
@@ -57,6 +57,7 @@ public sealed class PolicySweepTests(CoreWalkFixture core)
     {
         // Counts and floors — the smallest change that is a different number of things.
         [nameof(AnalysisPolicy.MinCohort)] = 1,
+        [nameof(AnalysisPolicy.CohortBasisFloor)] = 1,
         [nameof(AnalysisPolicy.MinFanIn)] = 1,
         [nameof(AnalysisPolicy.Top)] = 1,
         [nameof(AnalysisPolicy.HighCc)] = 1,
@@ -179,6 +180,7 @@ public sealed class PolicySweepTests(CoreWalkFixture core)
     private static AnalysisPolicy Set(AnalysisPolicy policy, string name, double v) => name switch
     {
         nameof(AnalysisPolicy.MinCohort) => policy with { MinCohort = (int)v },
+        nameof(AnalysisPolicy.CohortBasisFloor) => policy with { CohortBasisFloor = (int)v },
         nameof(AnalysisPolicy.OutlierFactor) => policy with { OutlierFactor = v },
         nameof(AnalysisPolicy.MinFanIn) => policy with { MinFanIn = (int)v },
         nameof(AnalysisPolicy.Top) => policy with { Top = (int)v },

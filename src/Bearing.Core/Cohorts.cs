@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing;
+﻿namespace IronMarten.Bearing;
 
 /// <summary>
 /// One way a type could be grouped with its peers, and how specific that way is.
@@ -93,7 +93,7 @@ public sealed class CohortSet
     /// candidate derivation always yields the namespace, which is what makes assignment total.
     /// </param>
     /// <param name="minCohort">The smallest group that can support a comparative reading.</param>
-    public static CohortSet Assign(IEnumerable<CohortSubject> subjects, int minCohort)
+    public static CohortSet Assign(IEnumerable<CohortSubject> subjects, int basisFloor)
     {
         ArgumentNullException.ThrowIfNull(subjects);
 
@@ -120,7 +120,7 @@ public sealed class CohortSet
             // Most specific basis that still yields a usable group. Largest-group-wins would
             // always pick the namespace, since it is the most inclusive candidate available.
             var viable = s.Candidates
-                .Where(c => candidateCounts[c.Key] >= minCohort)
+                .Where(c => candidateCounts[c.Key] >= basisFloor)
                 .OrderBy(c => c.Precedence)
                 .Take(1)
                 .ToList();
@@ -135,7 +135,7 @@ public sealed class CohortSet
             assignments[s.Id] = new Cohort(best.Key, best.Basis);
         }
 
-        Reconcile(all, assignments, minCohort);
+        Reconcile(all, assignments, basisFloor);
 
         return new CohortSet(assignments, SizesOf(assignments));
     }

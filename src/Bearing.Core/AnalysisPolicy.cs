@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing;
+﻿namespace IronMarten.Bearing;
 
 /// <summary>
 /// Every threshold that decides whether a finding fires, named and in one place.
@@ -39,7 +39,32 @@ public sealed record AnalysisPolicy
     // ------------------------------------------------------------ peer groups ----
 
     /// <summary>Below this many peers, a cohort's percentiles are not meaningful.</summary>
+    /// <remarks>
+    /// <b>Gating only, since X3.</b> This decides whether a cohort supports a comparative claim.
+    /// It used to decide <see cref="CohortBasisFloor"/> as well, which is why
+    /// <c>DEFECTS.md</c> §10 had no local repair: one number was answering two questions that pull
+    /// in opposite directions.
+    /// </remarks>
     public int MinCohort { get; init; } = 5;
+
+    /// <summary>
+    /// The fewest candidates a basis may have and still be chosen to compare a type against.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Specificity, not sufficiency</b> — <see cref="Cohorts.Assign"/> takes the most specific
+    /// basis whose candidate count clears this, so <b>lowering it makes cohorts finer</b>, which is
+    /// the opposite direction from <see cref="MinCohort"/>. Measured on Jellyfin: moving the single
+    /// combined value from 5 to 3 re-based <b>155 of 1,502 types</b>, so any change to the gate was
+    /// silently a change to every percentile in the report.
+    /// </para>
+    /// <para>
+    /// <b>Split from <see cref="MinCohort"/> at the same default</b>, so the report is
+    /// byte-identical the day this lands and the two can then move independently.
+    /// <c>ARCHITECTURE.md</c> §11 carries the decision and the measurements.
+    /// </para>
+    /// </remarks>
+    public int CohortBasisFloor { get; init; } = 5;
 
     /// <summary>The "x times the peer median" bar an outlier has to clear.</summary>
     public double OutlierFactor { get; init; } = 3.0;
@@ -327,6 +352,7 @@ public sealed record AnalysisPolicy
     public IReadOnlyList<(string Name, double Value)> Values =>
     [
         (nameof(MinCohort), MinCohort),
+        (nameof(CohortBasisFloor), CohortBasisFloor),
         (nameof(OutlierFactor), OutlierFactor),
         (nameof(MinFanIn), MinFanIn),
         (nameof(Top), Top),
@@ -427,5 +453,8 @@ public sealed record AnalysisPolicy
             throw new ArgumentOutOfRangeException(nameof(MaxNamedSurfaces), MaxNamedSurfaces, "MaxNamedSurfaces must be at least 1.");
         if (MinCohort < 2)
             throw new ArgumentOutOfRangeException(nameof(MinCohort), MinCohort, "A cohort of fewer than two has no comparative reading at all.");
+
+        if (CohortBasisFloor < 2)
+            throw new ArgumentOutOfRangeException(nameof(CohortBasisFloor), CohortBasisFloor, "A basis yielding fewer than two candidates is not a peer group.");
     }
 }

@@ -4,6 +4,7 @@
 value                          default   notch   down       up
 ------------------------------------------------------------------------
 MinCohort                            5       1   moves      moves
+CohortBasisFloor                     5       1   moves      moves
 OutlierFactor                        3     0.1   -          moves
 MinFanIn                             5       1   -          moves
 Top                                 15       1   -          -

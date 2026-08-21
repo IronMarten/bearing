@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace IronMarten.Bearing;
@@ -485,7 +485,7 @@ internal sealed class ModelBuilder
             if (CohortCandidates.ForArchitecturalKind(type.Classification.Kind) is { } kind)
                 _candidates[type.Subject.Canonical].Add(kind);
 
-        var cohorts = CohortSet.Assign(CohortSubjects(), _options.Policy.MinCohort);
+        var cohorts = CohortSet.Assign(CohortSubjects(), _options.Policy.CohortBasisFloor);
         foreach (var type in _types.Values)
         {
             type.Cohort = cohorts[type.Subject.Canonical];
