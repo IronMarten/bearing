@@ -58,6 +58,31 @@ public readonly record struct Qualifier(string Name, bool Holds, string? Gate = 
 public static class Qualifiers
 {
     /// <summary>
+    /// Several of this type's data members are unreferenced, so the claim is about the type.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The signal that a type is filled by something the walk cannot see, and it is a shape
+    /// rather than a name.</b> Attributes were the obvious candidate and were measured to be
+    /// backwards: <b>none</b> of Jellyfin's forty nominations carried one, because
+    /// <c>System.Text.Json</c> matches on property names, while three of nopCommerce's five did.
+    /// A rule keyed on attributes would fire exactly where the problem is smallest.
+    /// </para>
+    /// <para>
+    /// <b>What separates them is concentration.</b> 17 of <c>SearchResult</c>'s 23 data members
+    /// have no reader, and 1 of <c>MatroskaConstants</c>' 17 does — the first is a carrier nothing
+    /// reads and the second is one unused constant. <b>Stated as "more than one", with no
+    /// threshold</b>, because 74%, 42% and 30% are a continuum and any cut through it would be a
+    /// number nobody could defend. The rule is "say it once per type", which cannot drift.
+    /// </para>
+    /// <para>
+    /// It changes how a renderer <i>groups</i> and never whether the finding fires: Core still
+    /// emits one per member, so <c>--json</c>, <c>--csv</c> and <c>--full</c> keep every one.
+    /// </para>
+    /// </remarks>
+    public const string PartOfAnUnreadGroup = "part-of-an-unread-group";
+
+    /// <summary>
     /// A test project was skipped, so usage from tests was never visible to this walk.
     /// </summary>
     /// <remarks>

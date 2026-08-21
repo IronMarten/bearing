@@ -192,6 +192,60 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
         }
     }
 
+    /// <summary>
+    /// A type whose data members are mostly unread is named once, not once per member.
+    /// </summary>
+    /// <remarks>
+    /// <b>Grouped, never dropped.</b> Core still emits one finding per member — so <c>--json</c>,
+    /// <c>--csv</c> and <c>--full</c> keep every one — and the qualifier decides only how a
+    /// renderer groups them. Asserted on both halves, because a collapse that quietly stopped
+    /// emitting the members would look identical in the terminal.
+    /// </remarks>
+    [Fact]
+    public void An_unread_carrier_is_named_once_and_its_members_are_still_emitted()
+    {
+        var grouped = Findings.OfKind(FindingKind.NoStaticReferences)
+            .Where(f => f.Holds(Qualifiers.PartOfAnUnreadGroup))
+            .ToList();
+
+        // AuditReconciler declares four dependency fields and reads none of them.
+        var audit = grouped
+            .Where(f => f.Subject.Canonical.Contains(".AuditReconciler|", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.Equal(4, audit.Count);
+        Assert.Contains("AuditReconciler — 4 of its 5 data members have no reader", Text, StringComparison.Ordinal);
+
+        // ... and where one of them IS printed on its own — START HERE leads with an exemplar
+        // per kind — the sentence names the group rather than contradicting the row below it.
+        Assert.Contains(
+            "4 of AuditReconciler's 5 data members have no reader, so read them as a group",
+            Text,
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A lone unread data member stays a member-level claim.
+    /// </summary>
+    /// <remarks>
+    /// The half that makes the rule mean something. <c>MatroskaConstants</c> on Jellyfin has one
+    /// unread field of seventeen and is a genuine candidate; <c>SearchResult</c> has seventeen of
+    /// twenty-three and is a carrier. <b>Stated as "more than one" with no threshold</b>, because
+    /// 74%, 42% and 30% are a continuum and any cut through it would be a number nobody could
+    /// defend.
+    /// </remarks>
+    [Fact]
+    public void A_lone_unread_data_member_is_not_collapsed()
+    {
+        var lonely = Findings.OfKind(FindingKind.NoStaticReferences)
+            .Where(f => !f.Holds(Qualifiers.PartOfAnUnreadGroup))
+            .Select(f => f.Subject.Canonical)
+            .ToList();
+
+        // DepthGauge reads none of its one dependency field, and has only the one.
+        Assert.Contains(lonely, s => s.EndsWith("DepthGauge._normalize", StringComparison.Ordinal));
+    }
+
     /// <summary>The exclusion is counted, and the section says so.</summary>
     [Fact]
     public void The_sole_constructor_exclusion_is_counted()

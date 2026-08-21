@@ -1052,6 +1052,8 @@ public static class HtmlReport
         Qualifiers.CarriesRealLogic => "carries real logic",
         Qualifiers.TooLargeToHold => "too large to hold at once",
         Qualifiers.PartOfALayeringPattern => "one of a repeated pattern",
+        Qualifiers.PartOfAnUnreadGroup => "one of several unread on its type",
+        Qualifiers.TestUsageUnobservable => "test usage not visible here",
         Qualifiers.GloballyExtremeFanIn => "extreme fan-in solution-wide",
         Qualifiers.GloballyExtremeComplexity => "extreme complexity solution-wide",
         _ => qualifier,

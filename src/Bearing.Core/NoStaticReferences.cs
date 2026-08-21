@@ -92,9 +92,21 @@ public static class NoStaticReferences
         // visible to this walk. Solution-level, and it qualifies every nomination equally.
         var testsUnobservable = model.Coverage.SkippedProjects.Count > 0;
 
-        foreach (var (type, member) in Considered(model))
+        var nominated = Considered(model).Where(x => Excluding(x.Type, x.Member) is null).ToList();
+
+        // How many data members of each type survived. A member cannot know this about itself, so
+        // the pass is over the whole candidate set — which is why Detect materialises rather than
+        // streaming. See Qualifiers.PartOfAnUnreadGroup for what the count decides.
+        var unreadPerType = nominated
+            .Where(x => IsData(x.Member))
+            .GroupBy(x => x.Type.Subject.Canonical, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+
+        foreach (var (type, member) in nominated)
         {
-            if (Excluding(type, member) is not null) continue;
+            var group = IsData(member)
+                        && unreadPerType.TryGetValue(type.Subject.Canonical, out var siblings)
+                        && siblings > 1;
 
             yield return new Finding(
                 new FindingKey(FindingKind.NoStaticReferences, member.Subject),
@@ -105,13 +117,27 @@ public static class NoStaticReferences
                     // all", and those are different claims with different remedies.
                     Receipt.Of("DeclaringTypeInboundReferences", type.InboundReferenceCount),
                     Receipt.Of("DeclaringTypeMembers", type.Members.Count),
+                    // The denominator of the collapsed row: "17 of its 23 data members". Carried
+                    // rather than recomputed by the renderer, so the sentence and the grouping
+                    // read the same number.
+                    Receipt.Of("DeclaringTypeDataMembers", type.Members.Count(IsData)),
+                    Receipt.Of("UnreadDataMembersInType", unreadPerType.GetValueOrDefault(type.Subject.Canonical)),
                 ],
                 [
                     new Qualifier(Qualifiers.TestUsageUnobservable, testsUnobservable),
+                    new Qualifier(Qualifiers.PartOfAnUnreadGroup, group),
                 ],
                 []);
         }
     }
+
+    /// <summary>Whether a member carries data rather than behaviour.</summary>
+    /// <remarks>
+    /// Properties and fields, which is <c>ShapeBreadth</c>'s definition of breadth and the same
+    /// population the contract surface counts. A method nothing calls is one claim however many
+    /// of its neighbours share the problem; a carrier nothing reads is one claim about the carrier.
+    /// </remarks>
+    private static bool IsData(Member member) => member.Kind is MemberKind.Property or MemberKind.Field;
 
     /// <summary>What the exclusions removed, for the disclosure that ships beside the findings.</summary>
     public static DeadCodeExclusions Excluded(SolutionModel model)

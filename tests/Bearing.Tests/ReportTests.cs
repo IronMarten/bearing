@@ -416,13 +416,15 @@ public sealed class ReportTests(CoreWalkFixture core)
             .Where(line => line.Contains("not shown of", StringComparison.Ordinal))
             .ToList();
 
-        // Two caps bite on this fixture and both say so. It was one until A9: the dead-code
-        // section nominates 78 members and shows --top of them, which is exactly the case
-        // docs/DEFECTS.md §3 is about. Asserted as a pair rather than loosened to "at least one",
-        // because a section that silently stopped disclosing would still pass that.
-        Assert.Equal(2, disclosures.Count);
+        // Three caps bite on this fixture and all three say so. It was one until A9, which added
+        // two: the dead-code section caps its collapsed carriers and its individual members
+        // separately, because they are two lists and one shared cap would let either crowd the
+        // other out. Asserted as a set rather than loosened to "at least one", because a section
+        // that silently stopped disclosing would still pass that — docs/DEFECTS.md §3.
+        Assert.Equal(3, disclosures.Count);
         Assert.Contains(disclosures, d => d.Contains("7 types not shown of 22", StringComparison.Ordinal));
-        Assert.Contains(disclosures, d => d.Contains("nominations not shown of 76", StringComparison.Ordinal));
+        Assert.Contains(disclosures, d => d.Contains("types not shown of 18", StringComparison.Ordinal));
+        Assert.Contains(disclosures, d => d.Contains("nominations not shown of 19", StringComparison.Ordinal));
         Assert.All(disclosures, d => Assert.Contains("raise --top", d, StringComparison.Ordinal));
     }
 

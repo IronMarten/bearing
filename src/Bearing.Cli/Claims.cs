@@ -289,6 +289,25 @@ public static class Claims
         if (type is null || member is null) return Claim.None;
 
         var typeInbound = finding.ValueOf("DeclaringTypeInboundReferences") ?? 0;
+        // A member of an unread carrier says so on its own face, because the terminal section is
+        // not the only place a finding is read: Selection.Exemplars can lead START HERE with one
+        // of these, and a lone member sentence there would contradict the grouped row below it.
+        // A13's rule is that every finding is worded in one place and both renderers read it.
+        if (finding.Holds(Qualifiers.PartOfAnUnreadGroup))
+        {
+            var unread = finding.ValueOf("UnreadDataMembersInType") ?? 0;
+            var data = finding.ValueOf("DeclaringTypeDataMembers") ?? 0;
+
+            return new Claim(
+                Sentences.Member(type.Name, member.Name),
+                $"no static references found — verify before deleting. {Sentences.Whole(unread)} of "
+                + $"{type.Name}'s {Sentences.Plural(data, "data member")} "
+                + $"{Sentences.Do(unread, "has", "have")} no reader, so read them as a group.",
+                $"{member.Accessibility.ToLowerInvariant()} {member.Kind.ToString().ToLowerInvariant()}, "
+                + Sentences.Plural(member.LinesOfCode, "line"),
+                $"{Path.GetFileName(member.Location.File)}:{member.Location.Line}");
+        }
+
         // Two different findings and two different remedies: a live type with a member nothing
         // calls is a member to remove; a type nothing reaches at all is a type to remove, and
         // saying so about each of its members individually would be saying it many times.

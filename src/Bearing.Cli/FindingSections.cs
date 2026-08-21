@@ -183,7 +183,16 @@ internal static class FindingSections
 
         if (found.Count == 0) yield return "   (none)";
 
-        foreach (var line in Rows(model, found, model.Policy.Top)) yield return line;
+        // Collapsed and individual are the same claim grouped two ways, and which one applies is
+        // the qualifier's answer rather than a count taken here — SpansArchitecturalLayers'
+        // precedent, and docs/ARCHITECTURE.md §3's rule that a rule enforced in a renderer is a
+        // rule that does not exist. Seventeen of SearchResult's twenty-three properties having no
+        // reader is one thing worth knowing, not seventeen.
+        var grouped = found.Where(f => f.Holds(Qualifiers.PartOfAnUnreadGroup)).ToList();
+        var separate = found.Where(f => !f.Holds(Qualifiers.PartOfAnUnreadGroup)).ToList();
+
+        foreach (var line in Carriers(model, grouped, model.Policy.Top)) yield return line;
+        foreach (var line in Rows(model, separate, model.Policy.Top)) yield return line;
 
         yield return "";
         yield return $"   {Sentences.Plural(excluded.Considered, "member")} had no inbound reference. "
@@ -195,6 +204,51 @@ internal static class FindingSections
         yield return $"     {excluded.ExternallyVisible,6}  visible outside this assembly — the caller may not be in this solution";
         yield return $"     {excluded.SoleConstructors,6}  the type's only constructor — whatever creates the type calls it";
         yield return "   (a member can be in several of those, so they do not sum to the number set aside)";
+    }
+
+    /// <summary>
+    /// One row per type whose data members are mostly unread, rather than one row per member.
+    /// </summary>
+    /// <remarks>
+    /// <b>Ordered by how much of the type is unread, not by how many members it has.</b> A carrier
+    /// where every field is unread is a stronger claim than one where a third are, and the raw
+    /// count would put a large half-read type above a small wholly-unread one.
+    /// </remarks>
+    private static IEnumerable<string> Carriers(SolutionModel model, IReadOnlyList<Finding> grouped, int top)
+    {
+        var carriers = grouped
+            .GroupBy(f => f.Subject.DeclaringType?.Canonical ?? "", StringComparer.Ordinal)
+            .Select(g => new
+            {
+                Type = model.Find(g.First().Subject.DeclaringType ?? g.First().Subject),
+                Unread = g.Count(),
+                Total = (int)(g.First().ValueOf("DeclaringTypeDataMembers") ?? 0),
+            })
+            .Where(c => c.Type is not null && c.Total > 0)
+            .OrderByDescending(c => (double)c.Unread / c.Total)
+            .ThenByDescending(c => c.Unread)
+            .ThenBy(c => c.Type!.Name, StringComparer.Ordinal)
+            .ToList();
+
+        if (carriers.Count == 0) yield break;
+
+        var (shown, disclosure) = Sentences.Cap(carriers, top, "type");
+
+        // Said once, above the group, because it is true of every row in it. The first draft put
+        // these three lines under each carrier and printed them four times on Jellyfin, which is
+        // the section's own repetition problem one level up.
+        yield return "   Types whose data members are mostly unread, named once rather than per member —";
+        yield return "   something writes them that this analysis cannot see: a serialiser, an ORM, a binder.";
+
+        foreach (var carrier in shown)
+        {
+            yield return $"     {carrier.Type!.Name} — {carrier.Unread} of its "
+                         + $"{Sentences.Plural(carrier.Total, "data member")} "
+                         + $"{Sentences.Do(carrier.Unread, "has", "have")} no reader.";
+        }
+
+        foreach (var line in disclosure) yield return line;
+        yield return "";
     }
 
     internal static IEnumerable<string> SpansArchitecturalLayers(SolutionModel model, FindingSet findings)
