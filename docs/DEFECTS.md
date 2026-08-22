@@ -1693,3 +1693,50 @@ incomplete.
 with the wrong explanation. §42 is the *parse* stage failing silently with no explanation. They sit
 in sequence on one road: without the newer SDK the run stops here, and with it the run proceeds to
 hand C# the pinned Roslyn cannot read to a walker that will not say so.
+
+### 44. Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye
+
+Found by the use the picture is most likely to get: two runs of the same solution, side by side.
+nopCommerce at 2024-08-27 and at 2026-08-21, same tool build, `Nop.Web.Framework`:
+
+| | reach (x) | density (y) | rendered at |
+|---|---|---|---|
+| 2024 | **43.1%** | 15.7% | (840, 264) |
+| 2026 | **33.7%** | 26.0% | (823, 121) |
+
+**Its reach fell nine points and it did not visibly move.** The x-axis is 17.3 px per 1% in the
+first report and 21.6 in the second, so a real improvement — proportionally fewer of the solution's
+types reaching into it — renders as the same far-right position, and a reader concludes nothing
+changed. A first reader of these two reports read the point as having moved *up and to the right*.
+Up was right; right was the axis.
+
+**All three channels are normalised, not just the one that misled.**
+
+```
+var xmax = Bound(points.Max(p => p.Reach));
+var ymax = Bound(points.Max(p => p.Density));
+var biggest = Math.Max(1, points.Max(p => p.Types));
+double R(int types) => Math.Max(5, 34 * Math.Sqrt(types / (double)biggest));
+```
+
+Position on both axes and bubble area are all relative to the extremes of the run being drawn. **The
+y-axis matching across these two reports is luck** — both maxima happened to round to the same
+bound — so the one reading that came out right came out right by accident. A project whose type
+count never changed also draws smaller whenever some other project grows.
+
+**This is not a nitpick, because the metric was chosen to avoid exactly this.** `PlotPoint.Reach` is
+a share rather than a count, and the reason is written on it: *"A count would make the axis a
+property of the solution's size rather than of its shape, and two runs could not be read the same
+way."* The measure was made run-comparable on purpose and the rendering discards it. Same class as
+§34 — the claim is sound and the presentation of it is not.
+
+**It is load-bearing for the paid tier and not only for the free one.** `PRD-paid-tier.md` is
+drift: the product is two runs compared. A picture at the top of the report that cannot survive
+that comparison is a defect in the thing the paid tier sells, and it would have been found by a
+customer rather than by us — this time it was found by a five-minute manual read, which is the
+cheapest possible way to have learned it.
+
+**Candidate remedies, none measured.** A fixed 0–100 domain on both axes, which is honest and wastes
+most of the canvas. A domain shared with the baseline when one is supplied, which fixes the paid
+case and leaves the single-run case unchanged. Or stating the axis range and the area basis on the
+plot, which does not make the pictures comparable but stops a reader believing they are.
