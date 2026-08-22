@@ -207,6 +207,174 @@ public sealed class SolutionLoadFailureTests
         Assert.Contains("project file, not a solution", text, StringComparison.Ordinal);
     }
 
+    // -------------------------------------------------- an SDK the machine does not have ----
+
+    /// <summary>
+    /// The defect, end to end and on a real load: a perfectly good solution pinning an SDK that is
+    /// not installed is not called an unreadable file.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §43. <b>Driven through the walk rather than through a synthesized
+    /// exception</b>, because the whole fix turns on matching words MSBuild chose, and a test that
+    /// supplies those words itself proves only that the constant matches the constant. This one
+    /// fails if MSBuild ever rewords the sentence — which is the point, since the failure mode is
+    /// this arm silently falling back to <i>"check that the file is complete and readable"</i>.
+    /// </para>
+    /// <para>
+    /// <b>Deterministic on any machine.</b> <c>99.0.100</c> with <c>rollForward: disable</c>
+    /// resolves nowhere, so the test does not depend on which SDKs the runner happens to carry —
+    /// unlike the report that found the defect, which needed a machine without .NET 10.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task A_solution_pinning_an_uninstalled_sdk_is_not_reported_as_an_unreadable_file()
+    {
+        using var scratch = new Scratch();
+        scratch.Write("global.json", """{ "sdk": { "version": "99.0.100", "rollForward": "disable" } }""");
+        scratch.Write("App.csproj", MinimalProject);
+        var path = scratch.Write("App.sln", MinimalSolution);
+
+        var failure = await Assert.ThrowsAsync<SolutionLoadException>(
+            () => new SolutionWalker(new WalkOptions { SolutionPath = path }).WalkAsync());
+
+        var text = string.Join(Environment.NewLine, Failure.CouldNotRead(failure));
+
+        Assert.Contains("does not have the .NET SDK", text, StringComparison.Ordinal);
+        Assert.Contains("99.0.100", text, StringComparison.Ordinal);
+
+        // The sentence the defect is named for. The file is well-formed and naming 38 projects on
+        // the run that found this, so sending the user to inspect it is sending them at the one
+        // thing that is not wrong.
+        Assert.DoesNotContain("complete and readable", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The <c>global.json</c> is named, wherever above the solution it sits.
+    /// </summary>
+    /// <remarks>
+    /// The walk up is the half worth pinning: nopCommerce keeps its pin beside the solution, and
+    /// plenty of repositories keep it at the root with the solution a directory or two down. A
+    /// message that only found the adjacent one would be silent in the second case, which is most
+    /// of what it exists to say.
+    /// </remarks>
+    [Theory]
+    [InlineData("")]
+    [InlineData("src")]
+    [InlineData("src/Solution")]
+    public void The_global_json_that_pins_the_sdk_is_named_with_its_version(string below)
+    {
+        using var scratch = new Scratch();
+        var pin = scratch.Write("global.json", """{ "sdk": { "version": "10.0.100" } }""");
+        var path = scratch.WriteUnder(below, "App.sln", MinimalSolution);
+
+        var text = string.Join(Environment.NewLine, Failure.CouldNotRead(Raised(path, SdkResolutionFailure)));
+
+        Assert.Contains($"{pin} pins SDK 10.0.100.", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Both halves of MSBuild's sentence match on their own.
+    /// </summary>
+    /// <remarks>
+    /// <c>hostfxr_resolve_sdk2</c> is the host call and is the stable half; the prose around it is
+    /// MSBuild's and has been reworded before. Either alone is enough, so a rewording of one drops
+    /// the arm loudly here rather than quietly in front of a user.
+    /// </remarks>
+    [Theory]
+    [InlineData("Call to hostfxr_resolve_sdk2. There may be more details in stderr.")]
+    [InlineData("Failed to find all versions of .NET Core MSBuild.")]
+    public void Either_marker_alone_names_the_cause(string cause)
+    {
+        var text = string.Join(Environment.NewLine, Failure.CouldNotRead(Raised(@"C:\work\App.sln", cause)));
+
+        Assert.Contains("does not have the .NET SDK", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// With no <c>global.json</c> anywhere above it, the cause is still named and no file is.
+    /// </summary>
+    /// <remarks>
+    /// The demand can come from somewhere else — an SDK-style project, a pinned MSBuild — and
+    /// inventing a path for the user to open would be worse than the sentence this replaced.
+    /// </remarks>
+    [Fact]
+    public void With_no_global_json_the_advice_names_the_cause_and_no_file()
+    {
+        using var scratch = new Scratch();
+        var path = scratch.Write("App.sln", MinimalSolution);
+
+        var text = string.Join(Environment.NewLine, Failure.CouldNotRead(Raised(path, SdkResolutionFailure)));
+
+        Assert.Contains("does not have the .NET SDK", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("global.json pins", text, StringComparison.Ordinal);
+        Assert.Contains("dotnet --list-sdks", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A <c>global.json</c> that pins nothing readable still gets named, without a version.
+    /// </summary>
+    /// <remarks>
+    /// This runs on the worst run a user has, after something has already gone wrong, so a
+    /// malformed pin is a plausible thing to meet here. Naming the file is most of the value;
+    /// throwing out of an error message is none of it.
+    /// </remarks>
+    [Theory]
+    [InlineData("{ not json at all")]
+    [InlineData("""{ "sdk": { } }""")]
+    [InlineData("""{ "msbuild-sdks": { "X": "1.0.0" } }""")]
+    public void A_global_json_that_pins_no_version_is_named_without_one(string content)
+    {
+        using var scratch = new Scratch();
+        var pin = scratch.Write("global.json", content);
+        var path = scratch.Write("App.sln", MinimalSolution);
+
+        var text = string.Join(Environment.NewLine, Failure.CouldNotRead(Raised(path, SdkResolutionFailure)));
+
+        Assert.Contains($"{pin} pins an SDK this machine does not carry.", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A project file stays diagnosed from the path even when the SDK is the thing that failed.
+    /// </summary>
+    /// <remarks>
+    /// <b>The ordering decision, pinned.</b> Pointing at a <c>.csproj</c> is wrong independently of
+    /// what the machine carries, and it will still be wrong after the install — so the arm that is
+    /// certain from the path runs before the arm that reads a message. The <c>.slnx</c> arm is not
+    /// in that position, because its advice is an inference from a failure that may not be about
+    /// the file at all, and §43 is the case where it is not.
+    /// </remarks>
+    [Fact]
+    public void A_project_file_outranks_the_sdk_and_a_slnx_does_not()
+    {
+        var project = string.Join(
+            Environment.NewLine, Failure.CouldNotRead(Raised(@"C:\work\App.csproj", SdkResolutionFailure)));
+        var container = string.Join(
+            Environment.NewLine, Failure.CouldNotRead(Raised(@"C:\work\App.slnx", SdkResolutionFailure)));
+
+        Assert.Contains("project file, not a solution", project, StringComparison.Ordinal);
+        Assert.Contains("does not have the .NET SDK", container, StringComparison.Ordinal);
+        Assert.DoesNotContain("well-formed", container, StringComparison.Ordinal);
+    }
+
+    /// <summary>MSBuild's own words for a solution asking for an SDK that is not there.</summary>
+    private const string SdkResolutionFailure =
+        "An exception of type System.InvalidOperationException was thrown: Failed to find all "
+        + "versions of .NET Core MSBuild. Call to hostfxr_resolve_sdk2. There may be more details "
+        + "in stderr.";
+
+    private const string MinimalProject =
+        """<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup></Project>""";
+
+    private const string MinimalSolution =
+        """
+        Microsoft Visual Studio Solution File, Format Version 12.00
+        Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "App.csproj", "{11111111-1111-1111-1111-111111111111}"
+        EndProject
+        Global
+        EndGlobal
+        """;
+
     private static SolutionLoadException Raised(string path, string cause = "No file format header found.") =>
         new($"'{path}' could not be read as a solution.", new InvalidOperationException(cause))
         {
@@ -219,9 +387,15 @@ public sealed class SolutionLoadFailureTests
         private readonly string _directory =
             Directory.CreateTempSubdirectory("bearing-load-failure").FullName;
 
-        internal string Write(string name, string content)
+        internal string Write(string name, string content) => WriteUnder("", name, content);
+
+        /// <summary>Writes into a folder below the scratch root, creating it.</summary>
+        internal string WriteUnder(string below, string name, string content)
         {
-            var path = Path.Combine(_directory, name);
+            var folder = Path.Combine(_directory, below.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(folder);
+
+            var path = Path.Combine(folder, name);
             File.WriteAllText(path, content);
             return path;
         }
