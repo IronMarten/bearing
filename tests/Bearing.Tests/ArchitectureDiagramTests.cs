@@ -132,6 +132,72 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
         Assert.Contains(Svg, page, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Every project in a folded box is named inside that box.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §31, reopened 2026-08-22. The first fix put the names in a legend
+    /// beside the diagram <i>instead of</i> in the boxes, and read A11 round 1's T2 result — the
+    /// flat Projects list beating the map at finding tax — as evidence that readers navigate by
+    /// list. <b>Both of nopCommerce's tax projects were inside folded boxes whose labels named
+    /// neither</b>, so the map was graded on a task whose answer it had hidden.
+    /// </para>
+    /// <para>
+    /// <b>Asserted against the drawing, not the legend</b>, because the legend is
+    /// <c>HtmlReport</c>'s and the standalone <c>--diagram</c> export has none — which is where
+    /// hiding a name costs the most, §5.4 asking that file to survive being pasted into Slack.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_project_in_a_folded_box_is_named_in_the_drawing()
+    {
+        var svg = Svg;
+        var folded = core.Model.ProjectGraph.Groups.Where(g => g.Size > 1).ToList();
+
+        Assert.True(folded.Count > 0, "the fixture folds no boxes, so this asserts nothing");
+
+        var members = Regex
+            .Matches(svg, """<text class="mb"[^>]*>([^<]*)</text>""")
+            .Select(m => m.Groups[1].Value)
+            .ToList();
+
+        // One line per project in a folded box, and nothing else drawn as a member.
+        Assert.Equal(folded.Sum(g => g.Size), members.Count);
+        Assert.Equal(members.Count, members.Distinct(StringComparer.Ordinal).Count());
+
+        foreach (var group in folded)
+            foreach (var project in group.Projects)
+                Assert.Contains(
+                    members,
+                    m => project.EndsWith(m.TrimEnd('…'), StringComparison.Ordinal)
+                         || project.StartsWith(m.TrimEnd('…'), StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// A folded box grows downward and never sideways.
+    /// </summary>
+    /// <remarks>
+    /// The measurement §31's reopening turned on. <see cref="ArchitectureDiagram"/> shortens a
+    /// label to twenty characters, so a member line cannot outrun the box it sits in — which is
+    /// why naming everyone costs height and no width. nopCommerce went 580 × 642 to 580 × 841.
+    /// If a future label rule lets a name run wider, this fails rather than the drawing quietly
+    /// overflowing its boxes.
+    /// </remarks>
+    [Fact]
+    public void Naming_the_members_costs_height_and_not_width()
+    {
+        var boxes = Regex
+            .Matches(Svg, """<rect class="[^"]*" x="(\d+)" y="\d+" width="(\d+)" height="(\d+)""")
+            .Select(m => (X: int.Parse(m.Groups[1].Value), W: int.Parse(m.Groups[2].Value),
+                          H: int.Parse(m.Groups[3].Value)))
+            .ToList();
+
+        Assert.NotEmpty(boxes);
+        Assert.Single(boxes.Select(b => b.W).Distinct());
+        Assert.True(boxes.Any(b => b.H > boxes.Min(x => x.H)), "no box grew, so this asserts nothing");
+    }
+
     private static List<string> Labels(string svg) =>
         [.. Regex.Matches(svg, """<text class="nm"[^>]*>([^<]*)</text>""").Select(m => m.Groups[1].Value)];
 }

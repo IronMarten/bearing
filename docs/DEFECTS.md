@@ -1093,7 +1093,7 @@ too narrow in a different direction, and the two want fixing together.
 **Origin does not decide the integration map, and the fixture is why.** The first attempt treated framework-resolved as plumbing and emptied the map: `System.Data` and `System.Net.Http` both resolve from the framework, and both are exactly how TestBed reaches a database and the network. `CyclesAndCouplingTests.The_integration_map_over_the_fixture_is_what_it_should_be` caught it in one run. **The two questions are different** — origin answers *"could somebody change this dependency"*, the filter answers *"does this reach outside the process"* — and the reader asked the first, whose answer is a label on the row rather than a reason to drop it.
 
 Unknown says nothing rather than guessing a third answer, and the name-based filter still applies to those. On nopCommerce: `Newtonsoft.Json` and `FluentValidation` are packages, `System.IO` is framework, and `Microsoft.AspNetCore.Mvc` resolves as a package while `Microsoft.AspNetCore.Http` resolves as framework — a distinction no name list makes.
-### 31. A folded diagram box does not read as containing the projects that are missing — **fixed**
+### 31. A folded diagram box does not read as containing the projects that are missing — **reopened 2026-08-22, fixed again**
 
 *"Why isn't `Nop.Plugin` in the graph above?"* — asked while looking at the Projects list directly
 below the diagram, where the plugin names are.
@@ -1109,6 +1109,78 @@ and everybody found `Nop.Plugin.Tax` by scrolling the list.
 
 
 **Fixed — the names go beside the diagram, not into it.** A picture cannot be searched, and a box that grows to fit its members is the thing the fold exists to prevent. `ArchitectureDiagram.Folded` shares `Title` with the boxes, so a legend cannot disagree with the label it explains. On nopCommerce it answers the question that was actually asked: *"CustomerRoles +6 holds Nop.Plugin.DiscountRules.CustomerRoles, …"*, and `Nop.Plugin.Tax` is findable in it.
+
+**Reopened 2026-08-22. The first fix put the names beside the picture instead of in it, and the
+evidence it leaned on was confounded.** Its argument was that a picture cannot be searched and that
+*"a box that grows to fit its members is the thing the fold exists to prevent"*. The second half is
+measurably false of this drawing: `Labels` already caps a name at twenty characters, so a member
+line is about 123px inside a 144px box interior. **Naming all 27 of nopCommerce's projects took the
+diagram from 580 x 642 to 580 x 841 — the width did not move at all.**
+
+**The confound.** §31 cited round 1's T2 — *"the searchable inventory beat the structural diagram at
+the actual navigation task"*, participants finding tax by scrolling the Projects list — as evidence
+that readers navigate by list. **Both tax projects were inside folded boxes that named neither**:
+`Nop.Plugin.Tax.FixedOrByCountryStateZip` sits in the box labelled `Brevo +5` and
+`Nop.Plugin.Tax.Avalara` in `Omnisend +5`. The map was graded on a task whose answer it had hidden,
+so T2 does not show a list beating a map; it shows a map that had removed the thing being looked
+for. The participants' own question — *"why isn't `Nop.Plugin` in the graph above?"* — was literally
+correct, and the first fix answered it by moving the names further out of the picture.
+
+**What a reader is doing with this map.** Orientation, not navigation — but orientation requires
+locating yourself in it, and a reader arrives holding a name. **The fold's finding is also
+illegible without the members**: *these seven projects are architecturally interchangeable* is a
+statement about how the solution is organised, and `+6` delivers it as an omission instead of as
+the claim. Naming them turns an apology into a finding.
+
+**Fixed again — the names are in the boxes, and the legend stays as the searchable copy.** Height
+grows and width does not, so `MaxPerRow` and the width acceptance criterion are untouched.
+`Every_project_in_a_folded_box_is_named_in_the_drawing` asserts against the **drawing** rather than
+the legend, because `ArchitectureDiagram.Folded` is `HtmlReport`'s and the standalone `--diagram`
+export has no legend at all — which is where hiding a name costs most, §5.4 asking that file to
+survive being pasted into Slack.
+
+> **Still open, and small.** `Labels` shortens to the last unique segment, so
+> `Nop.Plugin.Tax.Avalara` renders as `Avalara` and does not say *tax*. The reader who knows their
+> provider finds it; the reader searching for the category does not, in the SVG. The report's
+> legend carries full names, so this is an export-only gap and it is recorded rather than fixed —
+> changing the label rule reopens §1's identity argument, which is a bigger question than this.
+
+### 45. A layer wider than the cap is drawn as two rows, and nothing says so
+
+`ArchitectureDiagram.MaxPerRow` is 5; a layer holding more wraps onto a second row. Its own remark
+says wrapping *"does misrepresent the layout"*, that *"nothing on the drawing currently says so"*,
+and that it *"ships unexercised on real input"*. **The first two are right and the third is
+wrong** — it fires on Jellyfin, which is a reference solution and the artifact §5.4 calls the
+screenshot.
+
+**Measured from the shipped SVG, not from a model.** Jellyfin's drawing has ten rows for twenty-one
+projects, and two adjacent rows of exactly five sit at y = 344 and y = 452 with **zero edges between
+them** and identical downstream fan-out — 5, 5, 5 and 8 edges into the four rows below. Every other
+adjacent pair of rows on that drawing carries at least one edge.
+
+**That zero is conclusive rather than suggestive.** `ProjectGraph.DepthOf` is a longest path —
+`deepest = max(DepthOf(next) + 1)` — so a node at depth *k* always has a neighbour at *k−1*, and two
+genuinely adjacent layers must therefore share at least one edge. Two adjacent rows with none are
+one layer drawn as two.
+
+**Why it matters more than the ink.** A row means *depends on the row below* everywhere else on the
+drawing, so a wrapped layer reads as a dependency that is not in the code — the same class of
+misrepresentation as §44's axis, and the opposite of what a layered map is for.
+
+**The remedy is not raising the cap**, which moves the threshold rather than removing the class.
+Width-bounded layering does remove it: Coffman–Graham takes a width bound W and guarantees no layer
+exceeds it, so overflow moves *down a layer* rather than across a row. Rendered at W = 5 on
+Jellyfin's used project graph it gives 952 x 892 against the shipped 952 x 1074 — same width, one
+extra layer, no wrap.
+
+> **But it must be conditional, and that is the part with no rule yet.** On nopCommerce the same
+> bound places **22 of 27 projects deeper than their dependency depth**, because 22 of them
+> genuinely sit at depth 0 under a plugin host — the true profile is `[22, 1, 1, 1, 1, 1]`. There
+> width *is* the finding and the fold is the honest compression. **A layer wider than the cap is
+> either a layering the algorithm can improve or a fact about the codebase**, and shipping one
+> treatment for both is how this drawing came to hide a layer in the first place. Specimens:
+> `SPIKE-job-a-prior-art.md` §9.
+
 ### 32. A verb agrees with a number a real solution made singular — **fixed**
 
 *"AzurePictureService — 7 writes to static state, and 1 type call into it."* Three sentences, one

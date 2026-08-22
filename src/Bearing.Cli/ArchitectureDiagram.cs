@@ -30,6 +30,13 @@ namespace IronMarten.Bearing.Cli;
 /// this legible, and <see cref="MaxPerRow"/> is the backstop for when even the folded layer is
 /// wide.
 /// </para>
+/// <para>
+/// <b>Height is not the acceptance criterion, and that is what lets a folded box name its
+/// members</b> — <c>docs/DEFECTS.md</c> §31, reopened. A reader arrives holding a name and
+/// looks for it; on nopCommerce seventeen of twenty-seven projects were not in the picture,
+/// including both tax plugins, which is the task A11 round 1 watched the map lose. Naming them
+/// costs height and no width at all.
+/// </para>
 /// </remarks>
 public static class ArchitectureDiagram
 {
@@ -40,20 +47,38 @@ public static class ArchitectureDiagram
     private const int Margin = 20;
 
     /// <summary>
+    /// One line per project named inside a folded box, and the space under the box's two
+    /// header lines that the list sits in.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §31, reopened. <b>Only the height moves.</b> The names come from
+    /// <see cref="Labels"/>, which is already capped at twenty characters, so the widest member
+    /// line is about 123px inside a 144px box interior — <b>a folded box never grows wider than
+    /// an unfolded one</b>, and the drawing's width is still set by how many boxes sit in a row.
+    /// </remarks>
+    private const int MemberLine = 15;
+
+    private const int MembersTop = 56;
+
+    /// <summary>
     /// How many boxes may sit in one row before a layer wraps onto another.
     /// </summary>
     /// <remarks>
     /// A layer of twenty folded boxes would be 3,700px wide and unreadable at screenshot size, so a
     /// wide layer wraps rather than growing.
     /// <para>
-    /// <b>Wrapping does misrepresent the layout</b> — the second row is the same layer, drawn as
-    /// though it were below one — and nothing on the drawing currently says so. It is reachable
-    /// only above five folded boxes in one layer, which neither reference solution produces
-    /// (nopCommerce's widest folded layer is three), so it ships unexercised on real input and is
-    /// recorded here rather than solved with a band nobody has seen the need for.
+    /// <b>Wrapping misrepresents the layout</b> — the second row is the same layer, drawn as though
+    /// it were below one — and nothing on the drawing says so. <b>It fires on Jellyfin</b>, whose
+    /// widest layer holds ten boxes: <c>docs/DEFECTS.md</c> §45, where the measurement is. The
+    /// remark that stood here until 2026-08-22 said this shipped unexercised on real input, which
+    /// was true of nopCommerce and never checked against the other reference solution.
     /// </para>
     /// </remarks>
     private const int MaxPerRow = 5;
+
+    /// <summary>How tall a box has to be to hold what it says.</summary>
+    private static int HeightOf(ProjectGroup group) =>
+        group.Size <= 1 ? BoxHeight : MembersTop + (group.Size * MemberLine) + 8;
 
     /// <summary>Renders the diagram as a standalone SVG document.</summary>
     public static string Render(SolutionModel model)
@@ -68,7 +93,7 @@ public static class ArchitectureDiagram
 
         var placed = Place(graph);
         var width = placed.Max(p => p.X + BoxWidth) + Margin;
-        var height = placed.Max(p => p.Y + BoxHeight) + Margin;
+        var height = placed.Max(p => p.Y + HeightOf(p.Group)) + Margin;
 
         var svg = new StringBuilder();
         svg.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ad\" viewBox=\"0 0 {width} {height}\" width=\"{width}\" height=\"{height}\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,sans-serif\">\n");
@@ -79,9 +104,10 @@ public static class ArchitectureDiagram
         svg.Append(".ad .bx.cycle{stroke:#b4483c;stroke-dasharray:5 3}\n");
         svg.Append(".ad .nm{font-size:13px;font-weight:600;fill:#1a1a1a}\n");
         svg.Append(".ad .sm{font-size:10.5px;fill:#6b6b6b}\n");
+        svg.Append(".ad .mb{font-size:11px;fill:#3a3a3a}\n");
         svg.Append(".ad .ed{stroke:#c2c0bb;stroke-width:1.2;fill:none}\n");
         svg.Append("@media(prefers-color-scheme:dark){.ad .bx{fill:#1d1e22;stroke:#3c3f47}.ad .bx.pain{fill:#2c2219;stroke:#c88a4a}");
-        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .ed{stroke:#4a4d55}}\n");
+        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .mb{fill:#c9c8c5}.ad .ed{stroke:#4a4d55}}\n");
         svg.Append("</style>\n");
 
         Edges(svg, placed);
@@ -132,7 +158,9 @@ public static class ArchitectureDiagram
                     x += BoxWidth + GapX;
                 }
 
-                y += BoxHeight + GapY;
+                // The row is as tall as its tallest box, so a folded box listing seven projects
+                // pushes the layer below it down rather than overlapping it.
+                y += row.Max(HeightOf) + GapY;
             }
         }
 
@@ -174,7 +202,7 @@ public static class ArchitectureDiagram
                 if (!drawn.Add(key)) continue;
 
                 var x1 = box.X + (BoxWidth / 2);
-                var y1 = box.Y + BoxHeight;
+                var y1 = box.Y + HeightOf(box.Group);
                 var x2 = into.X + (BoxWidth / 2);
                 var y2 = into.Y;
 
@@ -204,13 +232,23 @@ public static class ArchitectureDiagram
 
             if (group.IsCycle) css += " cycle";
 
-            svg.Append(CultureInfo.InvariantCulture, $"<rect class=\"{css}\" x=\"{box.X}\" y=\"{box.Y}\" width=\"{BoxWidth}\" height=\"{BoxHeight}\" rx=\"7\"/>\n");
+            svg.Append(CultureInfo.InvariantCulture, $"<rect class=\"{css}\" x=\"{box.X}\" y=\"{box.Y}\" width=\"{BoxWidth}\" height=\"{HeightOf(group)}\" rx=\"7\"/>\n");
 
             var cx = box.X + (BoxWidth / 2);
             svg.Append(CultureInfo.InvariantCulture, $"<text class=\"nm\" x=\"{cx}\" y=\"{box.Y + 25}\" text-anchor=\"middle\">{Html.Text(Title(group, labels))}</text>\n");
 
             if (Note(group, zone) is { Length: > 0 } note)
                 svg.Append(CultureInfo.InvariantCulture, $"<text class=\"sm\" x=\"{cx}\" y=\"{box.Y + 43}\" text-anchor=\"middle\">{Html.Text(note)}</text>\n");
+
+            // Every project in a folded box is named in it — docs/DEFECTS.md §31, reopened. The
+            // box is the only place a reader looking for their own project will look, and it is
+            // the whole of the standalone --diagram export.
+            if (group.Size <= 1) continue;
+
+            for (var i = 0; i < group.Projects.Count; i++)
+                svg.Append(
+                    CultureInfo.InvariantCulture,
+                    $"<text class=\"mb\" x=\"{box.X + 14}\" y=\"{box.Y + MembersTop + 10 + (i * MemberLine)}\">{Html.Text(labels[group.Projects[i]])}</text>\n");
         }
     }
 
@@ -233,10 +271,13 @@ public static class ArchitectureDiagram
     /// happened; nothing connected a folded box to the names inside it.
     /// </para>
     /// <para>
-    /// Offered as data rather than drawn into the SVG. Names in a picture are unsearchable and
-    /// force the box to grow to fit them, which is the thing the fold exists to prevent — so the
-    /// caller renders these as text beside the diagram. <see cref="Title"/> is shared with the
-    /// boxes, so a legend cannot disagree with the label it explains.
+    /// <b>The names are now in the boxes as well, and this legend is the searchable copy</b> —
+    /// §31 reopened on 2026-08-22. The original fix put them here <i>instead</i>, on the grounds
+    /// that a picture cannot be searched and that a box growing to fit its members is what the
+    /// fold exists to prevent. The second of those was measured and is not true of this drawing:
+    /// <see cref="Labels"/> caps a name at twenty characters, so only the height moves.
+    /// <see cref="Title"/> is still shared with the boxes, so a legend cannot disagree with the
+    /// label it explains.
     /// </para>
     /// </remarks>
     public static IReadOnlyList<(string Label, IReadOnlyList<string> Projects)> Folded(SolutionModel model)
