@@ -287,4 +287,133 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
 
         Assert.Contains(Svg, page, StringComparison.Ordinal);
     }
+
+    // ------------------------------------------------ what the drawing is scaled to ----
+
+    /// <summary>
+    /// The stated scales are the scales the drawing actually used.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §44. <b>Read back off the drawing rather than recomputed</b>, which
+    /// is the rule <see cref="ReachPlot.Unlabelled"/> follows for the same reason: a caption and
+    /// the thing it explains must not be able to disagree. The axis spans come from the last tick
+    /// on each axis and the area basis from the model, so a disclosure that drifted from the
+    /// geometry fails here instead of misleading a reader who trusted it.
+    /// </para>
+    /// <para>
+    /// <b>This is a mitigation and not the fix, and the test says so.</b> Stating a scale does not
+    /// make two reports comparable — it stops a reader assuming they already are. §44 stays open
+    /// for the domain that would.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_drawing_states_the_scale_it_was_drawn_to()
+    {
+        var svg = Svg;
+        var ticks = XDocument.Parse(svg).Root!
+            .Descendants()
+            .Where(e => e.Name.LocalName == "text" && e.Attribute("class")?.Value == "tk")
+            .Select(e => (Anchor: e.Attribute("text-anchor")?.Value ?? "start", Value: e.Value))
+            .ToList();
+
+        // Across is anchored middle under the axis; up is anchored end in the left gutter.
+        var across = ticks.Where(t => t.Anchor == "middle").Select(t => t.Value).Last();
+        var up = ticks.Where(t => t.Anchor == "end").Select(t => t.Value).Last();
+        var biggest = ReachPlot.Points(core.Model, Findings).Max(p => p.Types);
+
+        Assert.Contains($"0–{across} across", svg, StringComparison.Ordinal);
+        Assert.Contains($"0–{up} up", svg, StringComparison.Ordinal);
+        Assert.Contains($"largest project's {Html.Count(biggest)} types", svg, StringComparison.Ordinal);
+
+        // The consequence, said plainly. The spans alone are on the axes already and a reader who
+        // did not know they moved between runs had no reason to read them.
+        Assert.Contains("scaled to its own run", svg, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The strip below the plot fits, and nothing in it lands on anything else in it.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §36 was fixed geometry in the header colliding on every run whatever
+    /// the data, and it was invisible to a suite that checked the SVG was well-formed and complete.
+    /// §44 added a second strip of fixed geometry beside the x-axis title, so it gets the same
+    /// discipline rather than a second lesson — with the same width estimate the layout itself
+    /// uses, so text that grows fails here instead of on a screenshot.
+    /// </remarks>
+    [Fact]
+    public void Nothing_in_the_footer_overruns_the_canvas_or_the_axis_title()
+    {
+        const double CharWidth = 0.56;
+        const double Width = 1000;
+
+        var boxes = XDocument.Parse(Svg).Root!
+            .Descendants()
+            .Where(e => e.Name.LocalName == "text")
+            .Where(e => e.Attribute("transform") is null)
+            .Select(e => new
+            {
+                Text = e.Value,
+                X = double.Parse(e.Attribute("x")!.Value, CultureInfo.InvariantCulture),
+                Y = double.Parse(e.Attribute("y")!.Value, CultureInfo.InvariantCulture),
+                Size = e.Attribute("class")?.Value == "ax" ? 12.0 : 11.0,
+            })
+            // Below the x-axis tick labels, which is the strip §44 added.
+            .Where(t => t.Y > 510)
+            .Select(t => (t.Text, L: t.X, R: t.X + t.Text.Length * t.Size * CharWidth, T: t.Y - t.Size, B: t.Y + 4))
+            .ToList();
+
+        Assert.True(boxes.Count >= 3, "the axis title and both disclosure lines should be in this strip");
+
+        foreach (var box in boxes)
+            Assert.True(box.R <= Width - 4, $"\"{box.Text}\" runs to x {box.R:F0}, past the canvas");
+
+        foreach (var a in boxes)
+            foreach (var b in boxes)
+            {
+                if (ReferenceEquals(a.Text, b.Text) && a.T == b.T) continue;
+
+                Assert.False(
+                    a.L < b.R && b.L < a.R && a.T < b.B && b.T < a.B,
+                    $"Footer text overlaps: \"{a.Text}\" and \"{b.Text}\".");
+            }
+    }
+
+    /// <summary>
+    /// Adding the strip moved nothing that was already drawn.
+    /// </summary>
+    /// <remarks>
+    /// <b>The reason <c>Height</c> and <c>Bottom</c> grew by the same 36.</b> A frozen artifact is
+    /// the instrument <c>PROTOCOL-a11-newcomer.md</c> is derived against, so a disclosure that also
+    /// nudged every dot would have made the picture round 2 grades a different picture from the one
+    /// it was written against. <c>Height - Bottom</c> and <c>Height - Top - Bottom</c> are what the
+    /// two axis maps are built from, and both are unchanged at 484 and 420.
+    /// </remarks>
+    [Fact]
+    public void The_plotting_area_is_where_it_was_before_the_disclosure()
+    {
+        var svg = XDocument.Parse(Svg).Root!;
+
+        var gridlines = svg.Descendants()
+            .Where(e => e.Name.LocalName == "line")
+            .Select(e => (
+                Y1: double.Parse(e.Attribute("y1")!.Value, CultureInfo.InvariantCulture),
+                Y2: double.Parse(e.Attribute("y2")!.Value, CultureInfo.InvariantCulture)))
+            .ToList();
+
+        // The vertical gridlines span the plotting area exactly, top to floor.
+        var verticals = gridlines.Where(g => g.Y1 != g.Y2).ToList();
+
+        Assert.NotEmpty(verticals);
+        Assert.All(verticals, g => Assert.Equal(64, g.Y1));
+        Assert.All(verticals, g => Assert.Equal(484, g.Y2));
+
+        // And the x-axis tick labels still sit 18 below the floor.
+        var ticks = svg.Descendants()
+            .Where(e => e.Name.LocalName == "text" && e.Attribute("class")?.Value == "tk")
+            .Where(e => (e.Attribute("text-anchor")?.Value ?? "start") == "middle")
+            .Select(e => double.Parse(e.Attribute("y")!.Value, CultureInfo.InvariantCulture));
+
+        Assert.All(ticks, y => Assert.Equal(502, y));
+    }
 }

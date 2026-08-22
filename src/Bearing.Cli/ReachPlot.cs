@@ -66,11 +66,24 @@ public readonly record struct PlotPoint(
 public static class ReachPlot
 {
     private const int Width = 1000;
-    private const int Height = 560;
+
+    /// <summary>
+    /// The canvas, and <see cref="Bottom"/> the gutter under the plotting area.
+    /// </summary>
+    /// <remarks>
+    /// <b>Both grew by 36 together, and that is deliberate</b> — <c>docs/DEFECTS.md</c> §44 added
+    /// two lines of scale disclosure below the x-axis title, and moving the canvas floor and the
+    /// gutter by the same amount leaves <c>Height - Bottom</c> and <c>Height - Top - Bottom</c>
+    /// exactly where they were. Every dot, tick and label on every run therefore sits at the
+    /// coordinate it sat at before, and the diff to a frozen artifact is the strip that was added
+    /// rather than the picture that was there.
+    /// </remarks>
+    private const int Height = 596;
+
     private const int Left = 96;
     private const int Right = 40;
     private const int Top = 64;
-    private const int Bottom = 76;
+    private const int Bottom = 112;
 
     /// <summary>Point size, in characters, for the two label lines and the axis furniture.</summary>
     private const double NameSize = 14;
@@ -158,7 +171,7 @@ public static class ReachPlot
         }
 
         svg.Append(CultureInfo.InvariantCulture,
-            $"<text class=\"ax\" x=\"{Left}\" y=\"{Height - 18}\">how much of the rest of the codebase reaches into it →</text>\n");
+            $"<text class=\"ax\" x=\"{Left}\" y=\"{Height - 54}\">how much of the rest of the codebase reaches into it →</text>\n");
         // The y-axis title runs up its own axis — docs/DEFECTS.md §36. Laid out horizontally
         // at x = Left - 78 it began at x = 18 and ran about 215px, straight through the subtitle
         // at x = 96, four pixels of baseline apart: fixed geometry, so it collided on every run
@@ -193,6 +206,9 @@ public static class ReachPlot
         if (leaves > 0)
             svg.Append(CultureInfo.InvariantCulture,
                 $"<text class=\"lg\" x=\"{X(0) + 8:F0}\" y=\"{Top + 16}\">{leaves} {Sentences.Do(leaves, "project", "projects")} nothing depends on</text>\n");
+
+        foreach (var (line, y) in Scale(xmax, ymax, biggest).Zip(new[] { Height - 32, Height - 14 }))
+            svg.Append(CultureInfo.InvariantCulture, $"<text class=\"lg\" x=\"{Left}\" y=\"{y}\">{line}</text>\n");
 
         svg.Append("</svg>\n");
         return svg.ToString();
@@ -336,12 +352,60 @@ public static class ReachPlot
     }
 
     /// <summary>
+    /// What every scale on the drawing is relative to, and what follows from that.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §44. <b>All three channels are normalised to the run being drawn</b>
+    /// — both axes by <see cref="Bound"/> and dot area by the largest project — so the same project
+    /// measured twice can improve and not move. <c>Nop.Web.Framework</c> went from 43.1% reach to
+    /// 33.7% across two nopCommerce vintages and rendered at x = 840 then x = 823, because the
+    /// x-axis is 17.3 px per 1% in one report and 21.6 in the other. The y-axis agreeing across
+    /// those two was luck: both maxima happened to round to the same bound.
+    /// </para>
+    /// <para>
+    /// <b>This states the scales rather than fixing them, and the measurement is why.</b> A domain
+    /// fixed at 0–100 was the obvious remedy and it was measured: on nopCommerce it puts all five
+    /// labelled projects inside x 110–467 and y 393–465, a quarter of the canvas, and it moves
+    /// <c>Nop.Web.Framework</c> out of the top-right corner that
+    /// <c>PROTOCOL-a11-newcomer.md</c> §12 pre-registers as the reading round 2 exists to detect.
+    /// Sharing a domain with a baseline run is the remedy that fits, and it waits on a
+    /// <c>--baseline</c> the CLI does not have yet. So the drawing says what it is scaled to, which
+    /// does not make two pictures comparable but stops a reader believing they already are.
+    /// </para>
+    /// <para>
+    /// <b>The area basis is stated with the axes because it misleads the same way and is not
+    /// visible at all.</b> A tick label at least discloses an axis to a reader who looks for it;
+    /// nothing on the drawing says a dot shrank because some other project grew.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> Scale(int xmax, int ymax, int biggest)
+    {
+        yield return $"Every scale here fits this run: 0–{xmax}% across, 0–{ymax}% up, "
+                     + $"dot area against the largest project's {Html.Count(biggest)} types.";
+
+        yield return "Another report is scaled to its own run, so the two do not line up — "
+                     + "compare the numbers, not the positions.";
+    }
+
+    /// <summary>
     /// The axis bound: the next ten above the largest value, and never zero.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Arithmetic about the canvas rather than a judgement about the codebase — the same kind of
     /// constant as <see cref="Mosaic"/>'s label-fits width. An axis fixed at 100% would put every
     /// project on nopCommerce into the bottom-left corner of the picture.
+    /// </para>
+    /// <para>
+    /// <b>On the y-axis the largest value is routinely the least informative point on the
+    /// drawing</b>, and it is measured: Jellyfin's y-axis is bound at 100% by <c>Emby.Photos</c>,
+    /// <i>1 of 1 named</i>, while every other project there is under 36% — so nine-tenths of the
+    /// vertical canvas is spent on one type. It is a ratio on a denominator too small to mean
+    /// anything, the family of <c>docs/DEFECTS.md</c> §34 and §41, and it is recorded under §44
+    /// rather than repaired here: a floor on the denominator is the same shape of local threshold
+    /// that <b>X16</b> exists to stop being added one at a time.
+    /// </para>
     /// </remarks>
     private static int Bound(double largest) => Math.Max(10, (int)(Math.Ceiling(largest / 10) * 10));
 
