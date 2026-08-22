@@ -1894,11 +1894,12 @@ it moves `Nop.Web.Framework` (43% reach, 29% density) out of the top-right corne
 `PROTOCOL-a11-newcomer.md` §12 pre-registers *"a position — top right"* as the reading round 2
 exists to detect. **The obvious fix would have broken the instrument built to grade the picture.**
 
-**The baseline-shared domain is the right remedy and cannot be built yet.** There is no `--baseline`
-in `CommandLine.cs` — the flag the entry leans on does not exist, so the paid-tier case it fixes is
-not reachable from the tool as it stands. It also would not have caught this: **this was found by a
-manual read of two reports with no baseline between them**, which is the free-tier case and the one
-that stays broken.
+**The baseline-shared domain is ruled out for this tier, not merely unbuilt.** **X7** put drift in
+the paid service — *"not the free tool with a flag on it"* — and `R1` records the free report being
+a section shorter than the probe's as asserted deliberately. So the free tier's own picture cannot
+be fixed by a mechanism that needs a second run, whatever gets built later. It also would not have
+caught this: **this was found by a manual read of two reports with no baseline between them**,
+which is the free-tier case and the one that stays broken.
 
 **What shipped is the disclosure, and the drawing now states all three scales.** Two lines below the
 x-axis title:
@@ -1931,6 +1932,7 @@ does to the remedies above: a fixed 0–100 y-axis costs Jellyfin *nothing*, bec
 what it draws. **It is not repaired with a floor on the denominator**, which would be the sixth
 local threshold of exactly the kind **X16** exists to stop being added one at a time.
 
-**What is left.** A domain that does not depend on the run, that survives the top-right reading, and
-that is not set by a project with one type in it. `--baseline` is one road to it and X16 is the
-other; neither is this entry's to build alone.
+**What is left, and it has to work from one run.** A domain that does not depend on the run's own
+extremes, that survives the top-right reading, and that is not set by a project with one type in
+it. X16 is the road that remains — the baseline road is closed by X7, not merely unpaved — and it
+is not this entry's to build alone.
