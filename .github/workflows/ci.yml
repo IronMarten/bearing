@@ -1,9 +1,10 @@
 # The gate. Conventions are build errors (CONTRIBUTING.md) and the golden baselines are
 # compared on every run (docs/TESTING.md), so a green build here means both held.
 #
-# Note the workflow filename: NuGet trusted publishing (GitHub Actions OIDC) needs the
-# repository and the workflow file name in its policy, which is why the policy could not be
-# set up before this file existed. See nuget-prefix-request.md.
+# This workflow does NOT publish, and must not gain the ability to. NuGet trusted publishing
+# names one workflow file in its policy and only that file can mint a publishing credential;
+# that file is release.yml. Packing here is proof the package still builds, nothing more, and
+# this job has no id-token permission. See release.yml and nuget-prefix-request.md.
 
 name: ci
 
@@ -88,8 +89,8 @@ jobs:
         with:
           global-json-file: global.json
 
-      # Proves the package still builds with its metadata intact. Publishing stays manual
-      # until the NuGet ID prefix is granted.
+      # Proves the package still builds with its metadata intact. The prefix was granted in
+      # Aug 2026; publishing is release.yml's, by manual dispatch.
       - name: Pack
         run: dotnet pack src/Bearing.Cli/Bearing.Cli.csproj --configuration Release --output artifacts
 

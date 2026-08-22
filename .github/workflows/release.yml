@@ -1,0 +1,129 @@
+# Publishing, and it is the only thing here that reaches the outside world.
+#
+# Separate from ci.yml on purpose. NuGet trusted publishing names ONE workflow file in its
+# policy, and that file is the only one that can ever mint a publishing credential — so the
+# file that publishes is small, manual, and does nothing else. ci.yml keeps packing on every
+# push as proof the package still builds; it has no id-token permission and cannot publish.
+#
+# Trusted publishing replaced the API key deliberately: nuget-prefix-request.md records that
+# the temporary key was deleted after the prefix was granted, which left no publish path at
+# all. NuGet has since capped new API keys at 30 days and expires older ones on 2026-11-01,
+# so this is now the only durable route rather than merely the tidier one.
+#
+# The nuget.org policy this pairs with — Account -> Trusted Publishing, owner IronMarten:
+#
+#   Repository Owner  IronMarten
+#   Repository        bearing
+#   Workflow File     release.yml      <- this file's name, no path
+#   Environment       (leave empty)    <- nothing here sets `environment:`
+#
+# Renaming this file breaks publishing until the policy is edited to match.
+
+name: release
+
+on:
+  # Manual only. There is no tag or branch trigger, because every automatic trigger is a way
+  # to publish something nobody meant to publish, and this package installs a tool that reads
+  # a user's entire source tree.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish, exactly as it appears in Bearing.Cli.csproj (e.g. 0.1.0-beta.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DiffEngine_Disabled: true
+
+jobs:
+  # Everything that can fail, failing before any credential exists.
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Source Link embeds commit information; a shallow clone gives it nothing to work
+          # with and the symbols point nowhere.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Bearing.sln
+
+      - name: Build
+        run: dotnet build Bearing.sln --configuration Release --no-restore
+
+      # The package is not published unless the suite that guards it passed on this commit.
+      - name: Test
+        run: dotnet test Bearing.sln --configuration Release --no-build --verbosity normal
+
+      - name: Pack
+        run: dotnet pack src/Bearing.Cli/Bearing.Cli.csproj --configuration Release --output artifacts
+
+      # The version is typed by a human at dispatch and set by the csproj; if they disagree,
+      # say so here rather than publishing whatever happened to be in the file.
+      - name: Check the packed version is the one that was asked for
+        run: |
+          expected="IronMarten.Bearing.${{ inputs.version }}.nupkg"
+          if [ ! -f "artifacts/$expected" ]; then
+            echo "::error::Asked to publish ${{ inputs.version }}, but pack produced:"
+            ls -1 artifacts/*.nupkg
+            echo "::error::Set <Version> in src/Bearing.Cli/Bearing.Cli.csproj and commit before dispatching."
+            exit 1
+          fi
+          echo "Publishing $expected"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # The whole reason this job is separate. Microsoft's guidance is explicit that build and
+      # test jobs must not carry it.
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # A NuGet temporary key lives one hour and is single-use to obtain, so it is requested
+      # immediately before the push rather than at the top of the job.
+      - name: Exchange the OIDC token for a short-lived NuGet key
+        id: login
+        uses: NuGet/login@v1
+        with:
+          # The nuget.org profile name, NOT an email address. Held as a secret because it is
+          # account identity rather than something this file should assert.
+          user: ${{ secrets.NUGET_USER }}
+
+      # No --skip-duplicate. Publishing a version that already exists is a mistake about which
+      # commit is being shipped, and it should stop the run rather than report success. The
+      # .snupkg alongside goes up with it.
+      - name: Push
+        run: >
+          dotnet nuget push artifacts/IronMarten.Bearing.${{ inputs.version }}.nupkg
+          --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
