@@ -1654,7 +1654,7 @@ is wrong data, and drift comparison cannot tell the second from a real change.
 exist; upgrading moves the cliff rather than removing it. What removes the class is the tool
 knowing when it could not read something. See `TASKS.md` Track D.
 
-### 43. A solution needing a newer SDK is reported as an unreadable file
+### 43. A solution needing a newer SDK is reported as an unreadable file — **fixed**
 
 Running against current nopCommerce, whose `global.json` pins `10.0.100`, on a machine carrying
 only 8.0.423:
@@ -1693,6 +1693,44 @@ incomplete.
 with the wrong explanation. §42 is the *parse* stage failing silently with no explanation. They sit
 in sequence on one road: without the newer SDK the run stops here, and with it the run proceeds to
 hand C# the pinned Roslyn cannot read to a walker that will not say so.
+
+**Fixed 2026-08-21.** `Failure` grew a fourth arm, and it says:
+
+```
+This machine does not have the .NET SDK the solution asks for. That is a missing
+prerequisite rather than a problem with the file, which is fine as it stands.
+
+C:\...\src\global.json pins SDK 99.0.100.
+
+Run 'dotnet --list-sdks' to see what is installed and install the version that
+is pinned; 'dotnet --info' names the one Bearing would otherwise have used.
+```
+
+**It names the file rather than describing it.** A `global.json` can sit any number of directories
+above the solution — nopCommerce keeps its pin beside the solution, plenty of repositories keep it
+at the root — and sending a user to go and find one is most of the work the message exists to save.
+The lookup walks up from the solution and takes the nearest, because that is what the SDK host
+obeys; a message naming a different file would send the user to edit something with no effect.
+Every failure to read one is swallowed and the file is still named without its version: this runs
+on the worst run a user has, a malformed pin is plausible there, and throwing out of an error
+message is worth nothing.
+
+**Ordering, which is the part that could quietly reopen §23.** Certain-from-the-path first, then
+the cause that names itself, then the guesses. A `.csproj` is not a solution whatever the machine
+carries and will still not be one after an install, so it is settled before anything reads a
+message. The `.slnx` arm is *not* in that position — its advice is an inference drawn from a
+failure that may not be about the file at all, and this defect is the case where it is not, so a
+`.slnx` on a machine short an SDK now gets told about the SDK instead of being told to check that
+it is well-formed.
+
+**Pinned by a real load, not a synthesized exception.** The whole fix turns on matching words
+MSBuild chose, and a test supplying those words itself proves only that a constant matches a
+constant. `A_solution_pinning_an_uninstalled_sdk_is_not_reported_as_an_unreadable_file` writes a
+`global.json` pinning `99.0.100` with `rollForward: disable`, walks it, and asserts the advice names
+the SDK and never says *"complete and readable"*. It is deterministic on any machine — unlike the
+report that found this, which needed one without .NET 10 — and it fails if MSBuild rewords the
+sentence, which is the failure mode: this arm silently falling back to the fallback. Both markers
+are matched independently, `hostfxr_resolve_sdk2` being the stable half.
 
 ### 44. Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye
 
@@ -1740,3 +1778,57 @@ cheapest possible way to have learned it.
 most of the canvas. A domain shared with the baseline when one is supplied, which fixes the paid
 case and leaves the single-run case unchanged. Or stating the axis range and the area basis on the
 plot, which does not make the pictures comparable but stops a reader believing they are.
+
+---
+
+**Measured 2026-08-21, and two of those three are gone.** The third shipped. **The entry stays
+open**, because what shipped is a mitigation and the headline is still true: two reports cannot be
+compared by eye.
+
+**The fixed 0–100 domain is dead, and it is the one that looked right.** Rendered against
+nopCommerce it puts all five labelled projects inside x 110–467 and y 393–465 — a quarter of the
+canvas, with the two densest dots merging. That was the expected cost. The unexpected one is that
+it moves `Nop.Web.Framework` (43% reach, 29% density) out of the top-right corner, and
+`PROTOCOL-a11-newcomer.md` §12 pre-registers *"a position — top right"* as the reading round 2
+exists to detect. **The obvious fix would have broken the instrument built to grade the picture.**
+
+**The baseline-shared domain is the right remedy and cannot be built yet.** There is no `--baseline`
+in `CommandLine.cs` — the flag the entry leans on does not exist, so the paid-tier case it fixes is
+not reachable from the tool as it stands. It also would not have caught this: **this was found by a
+manual read of two reports with no baseline between them**, which is the free-tier case and the one
+that stays broken.
+
+**What shipped is the disclosure, and the drawing now states all three scales.** Two lines below the
+x-axis title:
+
+> Every scale here fits this run: 0–50% across, 0–30% up, dot area against the largest project's
+> 1,218 types.
+> Another report is scaled to its own run, so the two do not line up — compare the numbers, not the
+> positions.
+
+Across the pair that found the defect those read **0–50% / 1,218 types** and **0–40% / 1,281
+types**, so the disagreement a reader was previously not given is now on both pages. The area basis
+is stated beside the axes because it misleads the same way and is worse: a tick label at least
+discloses an axis to a reader who looks for it, and nothing said a dot shrank because some other
+project grew.
+
+**It cost nothing that was already drawn.** `Height` and `Bottom` grew by the same 36, so
+`Height - Bottom` and `Height - Top - Bottom` — the two numbers both axis maps are built from — are
+unchanged at 484 and 420. The diff against the frozen artifact is four lines: the viewBox, the
+background rect, and the two new sentences. Every dot, tick, gridline and label sits where it sat.
+`The_plotting_area_is_where_it_was_before_the_disclosure` holds that, and the footer gets §36's
+collision discipline rather than a second lesson about fixed geometry.
+
+**A second face of the same defect, found on Jellyfin and folded in here rather than filed apart.**
+Its y-axis is bound at **100%, set entirely by `Emby.Photos` — 1 of 1 named**. Every other project
+on that drawing is under 36%, so **nine-tenths of the vertical canvas is spent on one type**, and
+the axis of the whole picture is set by the least informative point on it. It is the family of §34
+and §41 — a ratio on a denominator too small to mean anything — and it is the same defect wearing a
+second face: the axis is a function of the run, and here the run's extreme is noise. Note what it
+does to the remedies above: a fixed 0–100 y-axis costs Jellyfin *nothing*, because that is already
+what it draws. **It is not repaired with a floor on the denominator**, which would be the sixth
+local threshold of exactly the kind **X16** exists to stop being added one at a time.
+
+**What is left.** A domain that does not depend on the run, that survives the top-right reading, and
+that is not set by a project with one type in it. `--baseline` is one road to it and X16 is the
+other; neither is this entry's to build alone.
