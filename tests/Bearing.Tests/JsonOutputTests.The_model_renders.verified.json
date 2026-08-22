@@ -62,7 +62,8 @@
     "loadDiagnostics": [],
     "projectsNotLoaded": [],
     "excludedTypes": 2,
-    "edgesToUnanalysedTypes": 0
+    "edgesToUnanalysedTypes": 0,
+    "unreadableFiles": []
   },
   "projects": [
     {

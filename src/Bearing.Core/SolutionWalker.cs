@@ -206,7 +206,7 @@ public sealed class SolutionWalker
         clock.Add(WalkStage.Open, opened);
 
         var compiled = WalkClock.Now();
-        var (compilations, projectNodes, notLoaded) =
+        var (compilations, projectNodes, notLoaded, unreadable) =
             await CompileAsync(projects, diagnostics, cancellationToken).ConfigureAwait(false);
         clock.Add(WalkStage.Compile, compiled);
         clock.Projects = compilations.Count;
@@ -228,6 +228,7 @@ public sealed class SolutionWalker
             LoadDiagnostics = diagnostics,
             ProjectsNotLoaded = notLoaded,
             ExcludedTypes = builder.ExcludedTypes,
+            UnreadableFiles = unreadable,
         });
         clock.Add(WalkStage.Build, built);
 
@@ -270,15 +271,23 @@ public sealed class SolutionWalker
     /// A project that will not compile is dropped and disclosed, never guessed at: its types
     /// would be missing either way, and a reader who sees no diagnostic is entitled to assume
     /// the graph is complete.
+    /// <para>
+    /// <b>The same rule one level down, for a file rather than a project</b> —
+    /// <c>docs/DEFECTS.md</c> §42. A tree that did not parse is removed from the compilation
+    /// before anything walks it, because what came out of walking one was not a missing type but a
+    /// type recorded under the wrong namespace.
+    /// </para>
     /// </remarks>
     private static async Task<(List<(Project Project, Compilation Compilation)> Compilations,
                               List<ProjectNode> Nodes,
-                              List<string> NotLoaded)> CompileAsync(
+                              List<string> NotLoaded,
+                              List<string> Unreadable)> CompileAsync(
         List<Project> projects, List<string> diagnostics, CancellationToken cancellationToken)
     {
         var compilations = new List<(Project Project, Compilation Compilation)>();
         var nodes = new List<ProjectNode>();
         var notLoaded = new List<string>();
+        var unreadable = new List<string>();
 
         foreach (var project in projects)
         {
@@ -294,6 +303,22 @@ public sealed class SolutionWalker
                 continue;
             }
 
+            // Syntax diagnostics only. A project whose packages did not restore is full of
+            // semantic errors and parses perfectly; refusing on those would refuse most real
+            // solutions, and none of them puts a type under the wrong namespace.
+            var broken = compilation.SyntaxTrees
+                .Where(tree => tree.GetDiagnostics(cancellationToken)
+                    .Any(d => d.Severity == DiagnosticSeverity.Error))
+                .ToList();
+
+            if (broken.Count > 0)
+            {
+                compilation = compilation.RemoveSyntaxTrees(broken);
+                unreadable.AddRange(broken
+                    .Select(tree => tree.FilePath)
+                    .Where(path => !string.IsNullOrEmpty(path)));
+            }
+
             compilations.Add((project, compilation));
             nodes.Add(new ProjectNode(
                 project.Name,
@@ -301,7 +326,7 @@ public sealed class SolutionWalker
                 compilation.Options.OutputKind == OutputKind.DynamicallyLinkedLibrary));
         }
 
-        return (compilations, nodes, notLoaded);
+        return (compilations, nodes, notLoaded, unreadable);
     }
 
     /// <summary>Whether a symbol is declared by one of the assemblies being analysed.</summary>

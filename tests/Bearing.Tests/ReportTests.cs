@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -211,6 +211,7 @@ public sealed class ReportTests(CoreWalkFixture core)
             LoadDiagnostics = ["Project 'A.csproj' failed to restore.", "SDK 'X' not found."],
             ProjectsNotLoaded = [],
             ExcludedTypes = 0,
+            UnreadableFiles = [],
         }));
 
         Assert.Contains("2 diagnostics while loading", text, StringComparison.Ordinal);
@@ -248,6 +249,7 @@ public sealed class ReportTests(CoreWalkFixture core)
             LoadDiagnostics = ["No compilation for Widgets"],
             ProjectsNotLoaded = ["Widgets"],
             ExcludedTypes = 0,
+            UnreadableFiles = [],
         }));
 
         Assert.Contains("1 project did not load: Widgets.", text, StringComparison.Ordinal);
@@ -278,6 +280,7 @@ public sealed class ReportTests(CoreWalkFixture core)
             LoadDiagnostics = many,
             ProjectsNotLoaded = [],
             ExcludedTypes = 0,
+            UnreadableFiles = [],
         }));
 
         Assert.Contains("diagnostic 10", text, StringComparison.Ordinal);

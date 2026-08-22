@@ -207,6 +207,102 @@ public sealed class SolutionLoadFailureTests
         Assert.Contains("project file, not a solution", text, StringComparison.Ordinal);
     }
 
+    // ------------------------------------------------- a file the parser did not accept ----
+
+    /// <summary>
+    /// A file that does not parse is refused, disclosed, and its neighbours survive.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §42. <b>The damage was never a missing type — it was a wrong
+    /// one.</b> A type in a broken file was collected as <c>global::NeighbourInSameFile</c> rather
+    /// than under its own namespace, because the namespace declaration was part of what failed to
+    /// parse: a wrong <c>SubjectRef</c>, which <c>--baseline</c> reads as a delete plus an add,
+    /// and an edge that vanished while the type count stayed right and the report went on saying
+    /// every project compiled.
+    /// </para>
+    /// <para>
+    /// <b>Walked rather than asserted against a hand-built <c>Coverage</c>.</b> The claim is about
+    /// what Roslyn does with a tree it could not parse, so a test that supplies the answer proves
+    /// nothing. The good file in the same project is what makes this a refusal rather than a
+    /// project-level failure.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task A_file_that_does_not_parse_is_refused_rather_than_walked()
+    {
+        using var scratch = new Scratch();
+        scratch.Write("App.csproj", MinimalProject);
+        scratch.Write("Good.cs", "namespace Lib; public class Sound { public int Keep() => 1; }");
+        // Unterminated: the namespace and the class header parse, the body does not.
+        scratch.Write("Broken.cs", "namespace Lib; public class Torn { public int Slip() => ");
+        var path = scratch.Write("App.sln", MinimalSolution);
+
+        var model = await new SolutionWalker(new WalkOptions { SolutionPath = path }).WalkAsync();
+
+        var names = model.Types.Select(t => t.Subject.Canonical).ToList();
+
+        Assert.Contains(names, n => n.Contains("Sound", StringComparison.Ordinal));
+        Assert.DoesNotContain(names, n => n.Contains("Torn", StringComparison.Ordinal));
+
+        // Absent is the honest outcome; absent and unmentioned is the defect.
+        Assert.Contains(
+            model.Coverage.UnreadableFiles,
+            f => f.EndsWith("Broken.cs", StringComparison.Ordinal));
+        Assert.DoesNotContain(
+            model.Coverage.UnreadableFiles,
+            f => f.EndsWith("Good.cs", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// A project that merely does not compile is still walked.
+    /// </summary>
+    /// <remarks>
+    /// <b>The line §42 must not cross.</b> Semantic errors are the ordinary condition of a project
+    /// whose packages did not restore — an unresolved type is <c>CS0246</c> and parses perfectly —
+    /// and refusing those would refuse most of the real world for a problem none of them has. Only
+    /// a syntax error puts a type under the wrong namespace, so only a syntax error refuses a
+    /// tree.
+    /// </remarks>
+    [Fact]
+    public async Task A_semantic_error_does_not_refuse_the_file()
+    {
+        using var scratch = new Scratch();
+        scratch.Write("App.csproj", MinimalProject);
+        // Parses cleanly; NoSuchType does not exist, so this is CS0246 and nothing more.
+        scratch.Write("Semantic.cs", "namespace Lib; public class Held { public NoSuchType? Gap; }");
+        var path = scratch.Write("App.sln", MinimalSolution);
+
+        var model = await new SolutionWalker(new WalkOptions { SolutionPath = path }).WalkAsync();
+
+        Assert.Contains(model.Types, t => t.Subject.Canonical.Contains("Held", StringComparison.Ordinal));
+        Assert.Empty(model.Coverage.UnreadableFiles);
+    }
+
+    /// <summary>Healthy code says nothing about parsing, because the tripwire is not a feature.</summary>
+    /// <remarks>
+    /// The section states the clean case for a project that did not load — invariant 8, silence is
+    /// not a clean bill of health. This one deliberately does not, and the difference is that a
+    /// project failing to load is a thing a reader might reasonably suspect, where "the parser
+    /// accepted your C#" is a sentence nobody needs on a report already called a wall of text.
+    /// Recorded in §42 so the next reader knows it was a choice.
+    /// </remarks>
+    [Fact]
+    public void A_run_with_nothing_unreadable_says_nothing_about_parsing()
+    {
+        var text = string.Join(Environment.NewLine, Report.NotAnalysed(new Coverage
+        {
+            ExclusionsApplied = [],
+            SkippedProjects = [],
+            LoadDiagnostics = [],
+            ProjectsNotLoaded = [],
+            ExcludedTypes = 0,
+            UnreadableFiles = [],
+        }));
+
+        Assert.DoesNotContain("could not be parsed", text, StringComparison.Ordinal);
+    }
+
     // -------------------------------------------------- an SDK the machine does not have ----
 
     /// <summary>

@@ -505,6 +505,25 @@ internal static class StructureSections
             yield return "   referenced, so read every number above as a lower bound.";
         }
 
+        // docs/DEFECTS.md §42. A tripwire rather than a feature: silent when nothing failed to
+        // parse, which is every run on healthy code and both reference solutions. It sits above
+        // the load diagnostics because it bounds the numbers the same way ProjectsNotLoaded does
+        // — a file that was not read is types and edges that are not there.
+        if (coverage.UnreadableFiles.Count > 0)
+        {
+            yield return "";
+            yield return $"   {Sentences.Plural(coverage.UnreadableFiles.Count, "file")} could not be parsed and "
+                         + "were not read:";
+
+            var (files, capped) = Sentences.Cap(coverage.UnreadableFiles, DiagnosticsShown, "file", "     ");
+
+            foreach (var file in files) yield return $"     {file}";
+            foreach (var line in capped) yield return line;
+
+            yield return "   Their types and edges are absent, so fan-in understates wherever they";
+            yield return "   reached. This is a C# the parser did not accept, not a build error.";
+        }
+
         if (coverage.LoadDiagnostics.Count > 0)
         {
             yield return "";

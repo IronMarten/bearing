@@ -114,7 +114,8 @@ public static class JsonOutput
             coverage.LoadDiagnostics,
             coverage.ProjectsNotLoaded,
             coverage.ExcludedTypes,
-            coverage.EdgesToUnanalysedTypes);
+            coverage.EdgesToUnanalysedTypes,
+            coverage.UnreadableFiles);
 
     /// <summary>
     /// Projects, with Martin's metrics folded in where there are any.
@@ -316,7 +317,10 @@ public static class JsonOutput
         IReadOnlyList<string> LoadDiagnostics,
         IReadOnlyList<string> ProjectsNotLoaded,
         int ExcludedTypes,
-        int EdgesToUnanalysedTypes);
+        int EdgesToUnanalysedTypes,
+        // docs/DEFECTS.md §42. Additive, so SchemaVersion does not move: the rule above is about
+        // renames. Empty on healthy code, which is every run on both reference solutions.
+        IReadOnlyList<string> UnreadableFiles);
 
     private sealed record ProjectBlock(
         string Name,

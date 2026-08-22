@@ -1686,7 +1686,7 @@ plant's contribution and what it did not disturb are in `docs/TESTING.md` §6.
 `members.csv` and the JSON now publish a readable `Signature` beside the id, and `SchemaVersion` is
 `2.0` — a key changing value is a major, where a field being added is not.
 
-### 42. A file Roslyn cannot parse is walked anyway, and the report says it read everything
+### 42. A file Roslyn cannot parse is walked anyway, and the report says it read everything — **fixed**
 
 The walk reacts only when `GetCompilationAsync` returns null. A file whose *syntax* fails to parse
 still produces a compilation — with errors — so `CompileAsync` records nothing, the walkers run
@@ -1725,6 +1725,36 @@ is wrong data, and drift comparison cannot tell the second from a real change.
 **Not an argument for chasing Roslyn versions.** Any version has a language ceiling and C# 15 will
 exist; upgrading moves the cliff rather than removing it. What removes the class is the tool
 knowing when it could not read something. See `TASKS.md` Track D.
+
+
+**Fixed 2026-08-22, in `CompileAsync`.** A syntax tree carrying an error diagnostic is removed from
+the compilation before anything walks it, and the file is named in `Coverage.UnreadableFiles`. The
+refusal is the fix and the disclosure is the tripwire: **a missing type is an honest gap, a type
+under the wrong namespace is wrong data.**
+
+**Syntax only, and that is the line the fix must not cross.** Semantic errors are the ordinary
+condition of a project whose packages did not restore — an unresolved type is `CS0246` and parses
+perfectly — so refusing on those would refuse most of the real world for a problem none of them
+has. Only a syntax error can put a type under the wrong namespace, because only a syntax error can
+eat the namespace declaration. `A_semantic_error_does_not_refuse_the_file` pins that half.
+
+**Driven through a real walk rather than a hand-built `Coverage`.** The claim is about what Roslyn
+does with a tree it could not parse, so a test supplying the answer proves nothing. The fixture
+writes a good file and a torn one into one project: the good type survives, the torn one is absent,
+and only the torn file is named.
+
+**Re-measured on three solutions after the change, and the exposure is still zero** — nopCommerce
+at the 2024 commit (3,209 types), Jellyfin (1,545) and **current nopCommerce (3,802)**, which is the
+`net10` era one and the likeliest to use C# the pinned Roslyn cannot read. So this ships as
+insurance, and the report on healthy code is unchanged.
+
+> **It says nothing when nothing failed, which is a deliberate departure from this section's own
+> habit.** Invariant 8 — silence is not a clean bill of health — is why the section states *"every
+> project selected for analysis produced a compilation"* even when it did. The difference is that a
+> project failing to load is something a reader might reasonably suspect, where *"the parser
+> accepted your C#"* is a sentence nobody needs on a report round 1 already called a wall of text.
+> `A_run_with_nothing_unreadable_says_nothing_about_parsing` pins the choice so the next reader
+> knows it was one.
 
 ### 43. A solution needing a newer SDK is reported as an unreadable file — **fixed**
 

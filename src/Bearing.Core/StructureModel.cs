@@ -564,6 +564,28 @@ public sealed class Coverage
     public required int ExcludedTypes { get; init; }
 
     /// <summary>
+    /// Source files Roslyn could not parse, which were therefore not walked.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §42. <b>A file with syntax errors used to be walked anyway</b>, and
+    /// the damage was not a missing type but a wrong one: a type in a broken file was collected as
+    /// <c>global::NeighbourInSameFile</c> rather than under its own namespace, because the
+    /// namespace declaration was part of what failed to parse. That is a wrong
+    /// <c>SubjectRef</c> — <c>--baseline</c> reads it as a delete plus an add — and one of its
+    /// edges vanished, with the type count still correct and the report still saying every project
+    /// compiled.
+    /// </para>
+    /// <para>
+    /// <b>A missing type is an honest gap; a type under the wrong namespace is wrong data.</b> So
+    /// the tree is refused rather than repaired, and the file is named here. Syntax only:
+    /// semantic errors are the ordinary condition of a project whose packages did not restore, and
+    /// refusing those would refuse most of the real world.
+    /// </para>
+    /// </remarks>
+    public required IReadOnlyList<string> UnreadableFiles { get; init; }
+
+    /// <summary>
     /// Dependencies whose endpoint the walk never declared, and which are therefore absent from
     /// the graph.
     /// </summary>
