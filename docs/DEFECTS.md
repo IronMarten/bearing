@@ -1990,3 +1990,47 @@ is exercised in `CyclesAndCouplingTests` through `ShapeReading`, which takes han
 weights precisely because `Cycle` cannot be constructed outside Core — so the **judgement** is gated
 and **neither renderer's rendering of it** is. Planting a two-namespace coupling in `TestBed` is what
 would close it, and it moves the frozen golden regime, so it is a decision and not a chore.
+
+### 47. The report tells the reader the exports carry the findings, and no export carries any
+
+Found while writing `BEARING-OUTPUT-CONTRACT.md` — reading the output surface for a consumer rather
+than for a reader, which is a third pair of eyes on the same page and turned this up on the first
+pass.
+
+`Everything else` closes with this, on every HTML report (`HtmlReport.cs:441`):
+
+```
+None of them is hidden and none is summarised away — every one is in the exports,
+which carry every finding, every type, every member and every dependency:
+  --json  — the whole model, with a schema version, for anything that reads it back.
+  --csv   — types.csv, members.csv and edges.csv, which join on identity rather than on a name.
+  --full  — this page with every section enumerated, capped at --top (15) per kind.
+```
+
+**It is false in each of the three things it lists.**
+
+| listed | carries findings |
+|---|---|
+| `--json` | **no** — the document's twelve top-level keys are `schemaVersion, tool, generatedAt, solutionPath, policy, coverage, projects, types, edges, cycles, externalDependencies, boundary`, and `grep -i finding src/Bearing.Cli/JsonOutput.cs` returns nothing |
+| `--csv` | **no** — same grep over `CsvOutput.cs` returns nothing; the three files are model rows |
+| `--full` | prose, and **capped at `--top`** — 15 of this run's 117 hubs, so it is the summarising-away the sentence denies |
+
+**The exports carry the model. The findings are rendered and never serialised.** That is a defensible
+scope decision — `TECHREQ-job-a.md` §1 defers the finding record on purpose — but the page states
+the opposite of it as reassurance, in the one paragraph whose whole job is to promise nothing was
+hidden. The comment above the `--full` branch (`HtmlReport.cs:62`) tells the next maintainer the same
+untruth: *"every row of it is still reachable — in `--json`, in `--csv`, and here behind a flag."*
+
+**Same family as §40, §41 and the D2 sentence in the A11 protocol §11**: the page asserting a
+property of itself that is not true, in each case a property nothing on the page lets a reader check.
+Four now, which makes it a class rather than a run of bad luck — and the class is *claims the report
+makes about the report*, which no fixture can hold, because the fixture renders the same claim.
+
+**Live in the A11 round 2 artifact.** `a13-materials/nop-v12.html` carries it, immediately under the
+per-kind census a participant reads for T3, and it is the sentence that would answer a participant
+asking where the other 102 hubs are.
+
+**Not fixed.** Two ways to close it and they are not the same size: reword to what is true — the
+exports carry the model, `--full` enumerates to `--top` — or **make the sentence true** by serialising
+findings, which is `PRD-paid-tier.md`'s seam and not a wording change. Wording now does not foreclose
+the export later. Either way it costs a recut of the round 2 artifact.
