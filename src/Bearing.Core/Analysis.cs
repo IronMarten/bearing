@@ -27,6 +27,21 @@ namespace IronMarten.Bearing;
 /// <c>PRD-free-tier.md</c> §7.2 decision, not an oversight here.
 /// </para>
 /// </remarks>
+/// <summary>
+/// One claim, and the suppression row that silenced it — or <see langword="null"/> if none did.
+/// </summary>
+/// <param name="Finding">The claim.</param>
+/// <param name="SilencedBy">
+/// The first row that applied, or <see langword="null"/> when the finding survives. First rather
+/// than every row: <see cref="Suppression.Silencing"/> stops at the first match, and a finding is
+/// removed once however many reasons there are to remove it.
+/// </param>
+public sealed record Judged(Finding Finding, SuppressionRule? SilencedBy)
+{
+    /// <summary>Whether this claim survived the suppression matrix.</summary>
+    public bool IsReported => SilencedBy is null;
+}
+
 public static class Analysis
 {
     /// <summary>
@@ -55,14 +70,44 @@ public static class Analysis
     ];
 
     /// <summary>The claims this model supports, with the suppression matrix applied.</summary>
-    public static FindingSet FindingsFor(SolutionModel model)
+    /// <remarks>
+    /// A projection of <see cref="Judge"/>, kept because it is what every renderer reads and
+    /// because the reported set is the common question. Nothing about its result has changed.
+    /// </remarks>
+    public static FindingSet FindingsFor(SolutionModel model) =>
+        FindingSet.Of(Judge(model).Where(j => j.IsReported).Select(j => j.Finding));
+
+    /// <summary>
+    /// Every claim the detectors made, each with the row that silenced it or <see langword="null"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The rule was already computed and then thrown away.</b> <see cref="FindingsFor"/> called
+    /// <see cref="Suppression.Silencing"/> for its truth value and discarded which row answered,
+    /// which is the one thing that method's own remark says must not happen: <i>"a finding removed
+    /// for the wrong reason and a finding removed for the right one are indistinguishable from the
+    /// surviving set alone."</i> They were indistinguishable, because nothing downstream could see
+    /// the difference.
+    /// </para>
+    /// <para>
+    /// <b>Two things need what was discarded.</b> The report's <c>Mutually dependent, not
+    /// reported</c> list says why each component was set aside, and reconstructing that in a
+    /// renderer is the rule-in-a-renderer that <c>docs/ARCHITECTURE.md</c> §3 forbids. And a
+    /// consumer of the export cannot otherwise tell a finding that was <i>muted</i> from one that
+    /// was <i>fixed</i> — which reads as an improvement it did not earn.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<Judged> Judge(SolutionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
 
         var detected = Detected(model);
 
-        return FindingSet.Of(
-            detected.All.Where(finding => Suppression.Silencing(finding, detected, model) is null));
+        return
+        [
+            .. detected.All.Select(finding =>
+                new Judged(finding, Suppression.Silencing(finding, detected, model)))
+        ];
     }
 
     /// <summary>

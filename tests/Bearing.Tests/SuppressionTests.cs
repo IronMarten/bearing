@@ -69,6 +69,47 @@ public sealed class SuppressionTests(CoreWalkFixture core)
     /// answer to suit the suite.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// <c>Judge</c> keeps the row that silenced each finding, and agrees with <c>FindingsFor</c>
+    /// about which survived.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The attribution used to be computed and dropped on the floor.</b> <c>FindingsFor</c>
+    /// called <c>Silencing</c> for its truth value and discarded the row, so nothing downstream
+    /// could tell a finding removed for the right reason from one removed for the wrong reason —
+    /// which is the failure <c>Silencing</c>'s own remark exists to warn about, and it was live.
+    /// </para>
+    /// <para>
+    /// Asserted in three parts, because each fails differently: the reported halves agree, so
+    /// adding <c>Judge</c> changed no output; something is actually suppressed, so the second half
+    /// is not vacuous; and every silenced entry names a row that is really in the matrix, so an
+    /// attribution cannot be invented.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Judge_reports_the_same_set_and_says_why_the_rest_went()
+    {
+        var judged = Analysis.Judge(core.Model);
+
+        Assert.Equal(
+            Analysis.FindingsFor(core.Model).All.Select(f => f.Key.Canonical).Order(StringComparer.Ordinal),
+            judged.Where(j => j.IsReported).Select(j => j.Finding.Key.Canonical).Order(StringComparer.Ordinal));
+
+        Assert.Equal(Analysis.Detected(core.Model).Count, judged.Count);
+
+        var silenced = judged.Where(j => !j.IsReported).ToList();
+
+        Assert.NotEmpty(silenced);
+        Assert.All(silenced, j => Assert.Contains(j.SilencedBy!, Suppression.Rules));
+
+        // A silenced finding names the row that took it, and the row is the one Silencing gives
+        // when asked directly. Row 3's case is the one no earlier row would have claimed.
+        var detention = silenced.Single(j => j.Finding.Subject.Canonical.EndsWith("DetentionEvaluator", StringComparison.Ordinal));
+
+        Assert.Equal("breaks-alone-is-unreferenced", detention.SilencedBy!.Name);
+    }
+
     [Fact]
     public void Every_suppression_row_silences_something()
     {

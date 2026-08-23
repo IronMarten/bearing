@@ -54,6 +54,42 @@ public readonly record struct Receipt(string Name, double Value, string? Gate = 
 /// </remarks>
 public readonly record struct Qualifier(string Name, bool Holds, string? Gate = null);
 
+/// <summary>
+/// Two of a finding's participants, and how much runs between them.
+/// </summary>
+/// <param name="From">The end the references run from.</param>
+/// <param name="To">The end they run to.</param>
+/// <param name="Weight">How many of them there are.</param>
+/// <remarks>
+/// <para>
+/// <b>A receipt measures the subject; a relation measures a pair inside it.</b> Some claims are
+/// about a component rather than a component's number — a cycle's evidence is not "size 30", it is
+/// <i>which two of the thirty hold each other and by how much</i>, because that is the pair someone
+/// breaks first. <see cref="Receipt"/> is <c>(name, value, gate)</c> and
+/// <see cref="Finding.Participants"/> is a bare list, so neither can carry it.
+/// </para>
+/// <para>
+/// <b>It consolidates three types rather than adding a fourth.</b> <c>HeldPair</c>,
+/// <c>ProjectLink</c> and <c>TanglePair</c> were each written for one cycle kind and each invented
+/// this shape again — two of them keying their members on bare strings, which is
+/// <c>docs/DEFECTS.md</c> §13 and §39's mistake in a third place. Measured before being proposed:
+/// every kind that needed a weighted pair was a cycle kind, and all three needed it.
+/// </para>
+/// <para>
+/// <b>Always directed, with no flag.</b> An unordered pair that holds both ways is two relations,
+/// and a renderer that wants one number sums them — which is what <c>HeldPair.Weight</c> already
+/// did behind the scenes. Encoding directedness as a boolean would make every consumer branch on
+/// it; encoding it in the data makes the two cases the same case, and says more than the report
+/// shows today: <i>Common → Orders 5, Orders → Common 4</i> rather than a flat 9.
+/// </para>
+/// <para>
+/// <b>Members are <see cref="SubjectRef"/>, not names.</b> Identity is the whole reason the finding
+/// model exists, and a relation whose ends cannot be joined to a type row is evidence a consumer
+/// has to re-resolve by string matching.
+/// </para>
+/// </remarks>
+public readonly record struct Relation(SubjectRef From, SubjectRef To, int Weight);
+
 /// <summary>The qualifying facts findings can carry.</summary>
 public static class Qualifiers
 {
@@ -214,11 +250,16 @@ public sealed class Finding
     /// The named specifics — invariant 7. <i>"Spans 3 architectural kinds"</i> is arguable;
     /// <i>"why is authentication calling TenantStore?"</i> is not.
     /// </param>
+    /// <param name="relations">
+    /// Weighted pairs inside <paramref name="participants"/>, heaviest first. Optional because most
+    /// claims are about one subject and have none — a cycle is the case that does.
+    /// </param>
     public Finding(
         FindingKey key,
         IReadOnlyList<Receipt> receipts,
         IReadOnlyList<Qualifier> qualifiers,
-        IReadOnlyList<SubjectRef> participants)
+        IReadOnlyList<SubjectRef> participants,
+        IReadOnlyList<Relation>? relations = null)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(receipts);
@@ -229,6 +270,7 @@ public sealed class Finding
         Receipts = receipts;
         Qualifiers = qualifiers;
         Participants = participants;
+        Relations = relations ?? [];
     }
 
     /// <summary>Identity: what kind of claim, about which subject.</summary>
@@ -248,6 +290,12 @@ public sealed class Finding
 
     /// <summary>The specifics the claim names.</summary>
     public IReadOnlyList<SubjectRef> Participants { get; }
+
+    /// <summary>
+    /// Weighted pairs inside <see cref="Participants"/>, heaviest first. Empty for every claim
+    /// whose evidence is about the subject rather than about a pair inside it.
+    /// </summary>
+    public IReadOnlyList<Relation> Relations { get; }
 
     /// <summary>One receipt's value, or <see langword="null"/> when the finding does not carry it.</summary>
     public double? ValueOf(string receiptName)
