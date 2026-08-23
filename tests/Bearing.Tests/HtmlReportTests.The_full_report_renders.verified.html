@@ -67,11 +67,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="wrap">
 <h1>TestBed.sln</h1>
 <p class="sub">Bearing 0.0.0 · 2026-01-01 00:00 UTC</p>
-<p class="sub">200 types — classes and interfaces — in 3 projects, 380 dependencies between them.</p>
+<p class="sub">204 types — classes and interfaces — in 3 projects, 384 dependencies between them.</p>
 <p class="lede">A map of this solution and a short list of the components that are unusual <em>for what they are</em> — measured against their structural peers, never scored. Start with the picture; the findings are further down and they assume it.</p>
 <div class="tiles">
 <div class="tile"><b>21</b><span class="tl">Widest reach</span><span class="tn">types depend on NormalizeStep</span></div>
-<div class="tile"><b>71%</b><span class="tl">Clean</span><span class="tn">of 200 types, no finding names them</span></div>
+<div class="tile"><b>72%</b><span class="tl">Clean</span><span class="tn">of 204 types, no finding names them</span></div>
 <div class="tile"><b>1.04x</b><span class="tl">Concentration</span><span class="tn">findings in Core, against its share of the types</span></div>
 <div class="tile"><b>cc 22</b><span class="tl">Most intricate</span><span class="tn">TariffCalculator.Apply, the most complex member in this solution</span></div>
 </div>
@@ -108,28 +108,28 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <line class="gr" x1="96" y1="484" x2="960" y2="484"/>
 <text class="tk" x="86" y="488" text-anchor="end">0%</text>
 <line class="gr" x1="96" y1="400" x2="960" y2="400"/>
-<text class="tk" x="86" y="404" text-anchor="end">8%</text>
+<text class="tk" x="86" y="404" text-anchor="end">6%</text>
 <line class="gr" x1="96" y1="316" x2="960" y2="316"/>
-<text class="tk" x="86" y="320" text-anchor="end">16%</text>
+<text class="tk" x="86" y="320" text-anchor="end">12%</text>
 <line class="gr" x1="96" y1="232" x2="960" y2="232"/>
-<text class="tk" x="86" y="236" text-anchor="end">24%</text>
+<text class="tk" x="86" y="236" text-anchor="end">18%</text>
 <line class="gr" x1="96" y1="148" x2="960" y2="148"/>
-<text class="tk" x="86" y="152" text-anchor="end">32%</text>
+<text class="tk" x="86" y="152" text-anchor="end">24%</text>
 <line class="gr" x1="96" y1="64" x2="960" y2="64"/>
-<text class="tk" x="86" y="68" text-anchor="end">40%</text>
+<text class="tk" x="86" y="68" text-anchor="end">30%</text>
 <text class="ax" x="96" y="542">how much of the rest of the codebase reaches into it →</text>
 <text class="ax" transform="rotate(-90 30 274)" x="30" y="274" text-anchor="middle">how much of it a finding names →</text>
-<circle class="lf" cx="96.0" cy="484.0" r="5.5"/>
+<circle class="lf" cx="96.0" cy="484.0" r="5.4"/>
 <circle class="lf" cx="96.0" cy="484.0" r="5.0"/>
-<circle class="dot" cx="918.9" cy="168.5" r="34.0"/>
-<text class="nm" x="875" y="126" text-anchor="end">Core</text>
-<text class="sb" x="875" y="141" text-anchor="end">58 of 193 named</text>
+<circle class="dot" cx="918.9" cy="71.8" r="34.0"/>
+<text class="nm" x="875" y="128" text-anchor="end">Core</text>
+<text class="sb" x="875" y="143" text-anchor="end">58 of 197 named</text>
 <text class="lg" x="104" y="80">2 projects nothing depends on</text>
-<text class="lg" x="96" y="564">Every scale here fits this run: 0–30% across, 0–40% up, dot area against the largest project's 193 types.</text>
+<text class="lg" x="96" y="564">Every scale here fits this run: 0–30% across, 0–30% up, dot area against the largest project's 197 types.</text>
 <text class="lg" x="96" y="582">Another report is scaled to its own run, so the two do not line up — compare the numbers, not the positions.</text>
 </svg>
 </div>
-<p class="lede"><strong>71% of this codebase has nothing said about it</strong> — the pale dots, and most of the picture. <strong>What is named clusters rather than spreading</strong>: Core carries 1.04x its share of them. <strong>Core is what the most of it rests on</strong> — 2 types outside it reach in, and 30% of its own 193 are named, which is the dot furthest right and how high it sits. </p>
+<p class="lede"><strong>72% of this codebase has nothing said about it</strong> — the pale dots, and most of the picture. <strong>What is named clusters rather than spreading</strong>: Core carries 1.04x its share of them. <strong>Core is what the most of it rests on</strong> — 2 types outside it reach in, and 29% of its own 197 are named, which is the dot furthest right and how high it sits. </p>
 <p class="sub">One dot per project. Across, how much of the rest of the solution reaches into it; up, how much of it some finding below names; the area of the dot is how many types it declares. <strong>There is no bad corner and nothing is shaded</strong> — both axes are measurements, and which trade-off matters is the reader's call, because the tool has no severity model to make it with.</p>
 <h2>Top finding</h2>
 <p class="lede">The strongest row of the rarest kind this run found. 11 kinds fired and each has one claim below, <em>ordered by how uncommon each kind is in this codebase</em> — an ordering and not a severity, because this tool has no way to say a hub is worse than a cycle.</p>
@@ -215,7 +215,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </div>
 <p class="sub"><strong>Data +1</strong> holds Data, Tools</p>
 <h3>All of it, at once</h3>
-<p class="sub">Every one of the 200 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding is about 58 of them, which is the tint; the 9 outlined in red are the types the claims above are about, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
+<p class="sub">Every one of the 204 types this run analysed, one cell each, sized by how many lines it spans and grouped into the project that declares it — biggest project first. Some finding is about 58 of them, which is the tint; the 9 outlined in red are the types the claims above are about, in the same order. Both marks are a yes or a no and never a degree — a mosaic shaded by <em>how</em> unusual a component is would be a score, and this tool does not have one.</p>
 <div class="picture">
 <svg xmlns="http://www.w3.org/2000/svg" class="mo" viewBox="0 0 1000 656" width="1000" height="656" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 <style>
@@ -231,14 +231,14 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </style>
 <rect class="bg" width="1000" height="656"/>
 <text class="ti" x="2" y="18">TestBed</text>
-<text class="lg" x="998" y="18" text-anchor="end">200 types in 3 projects · one cell each, sized by lines</text>
-<rect class="bl" x="2" y="32" width="945.5295124037638" height="596" rx="2"/>
+<text class="lg" x="998" y="18" text-anchor="end">204 types in 3 projects · one cell each, sized by lines</text>
+<rect class="bl" x="2" y="32" width="946.7101086048453" height="596" rx="2"/>
 <text class="pn" x="6" y="44">Core</text>
-<rect class="bl" x="951.5295124037638" y="32" width="46.47048759623624" height="377.3559322033887" rx="2"/>
-<rect class="bl" x="951.5295124037638" y="413.3559322033887" width="46.47048759623624" height="214.64406779660956" rx="2"/>
-<path class="c" d="M136 342h89v93h-89zM136 436h89v93h-89zM227 136h90v85h-90zM227 222h90v85h-90zM227 308h90v82h-90zM227 472h90v76h-90zM318 469h77v77h-77zM625 48h71v76h-71zM698 48h62v76h-62zM761 48h62v76h-62zM825 48h59v76h-59zM885 48h59v76h-59zM397 125h66v64h-66zM397 255h66v60h-66zM397 317h66v60h-66zM397 379h66v60h-66zM397 440h66v60h-66zM397 502h66v60h-66zM464 125h65v61h-65zM657 125h58v61h-58zM716 125h58v61h-58zM776 125h58v61h-58zM890 125h54v61h-54zM464 187h53v57h-53zM464 246h53v53h-53zM464 354h53v53h-53zM464 409h53v53h-53zM464 463h53v53h-53zM518 187h55v51h-55zM575 187h55v51h-55zM800 187h50v51h-50zM851 187h45v51h-45zM898 187h45v51h-45zM518 239h44v53h-44zM518 294h44v53h-44zM518 348h44v47h-44zM518 495h44v42h-44zM860 239h41v45h-41zM564 331h42v44h-42zM564 376h42v44h-42zM564 467h42v38h-42zM564 586h42v38h-42zM607 286h43v37h-43zM651 286h43v37h-43zM696 286h43v37h-43zM741 286h43v37h-43zM785 286h43v37h-43zM830 286h37v37h-37zM868 286h37v37h-37zM907 286h37v37h-37zM607 399h38v36h-38zM607 475h38v36h-38zM607 512h38v36h-38zM607 550h38v36h-38zM607 588h38v36h-38zM646 324h36v38h-36zM683 324h36v38h-36zM721 324h36v38h-36zM833 324h36v38h-36zM870 324h36v38h-36zM908 324h36v38h-36zM646 363h38v36h-38zM646 401h38v36h-38zM646 438h38v36h-38zM646 476h38v36h-38zM646 513h38v36h-38zM646 551h38v36h-38zM646 588h38v36h-38zM685 363h36v38h-36zM722 363h36v38h-36zM759 363h36v38h-36zM796 363h36v38h-36zM834 363h36v38h-36zM871 363h36v38h-36zM908 363h36v38h-36zM685 403h36v38h-36zM685 521h36v38h-36zM685 560h36v31h-36zM685 593h36v31h-36zM723 403h36v32h-36zM760 403h36v32h-36zM797 403h36v32h-36zM908 403h36v32h-36zM723 474h31v36h-31zM723 512h31v36h-31zM723 550h31v36h-31zM723 588h31v36h-31zM755 436h31v36h-31zM755 512h31v36h-31zM755 550h31v36h-31zM755 588h31v36h-31zM787 436h36v31h-36zM825 436h29v31h-29zM855 436h29v31h-29zM885 436h29v31h-29zM915 436h29v31h-29zM787 469h30v30h-30zM787 500h30v30h-30zM787 531h30v30h-30zM787 563h30v30h-30zM787 594h30v30h-30zM818 469h30v29h-30zM850 469h30v29h-30zM882 469h30v29h-30zM913 469h30v29h-30zM818 500h30v30h-30zM818 531h30v30h-30zM818 563h30v30h-30zM818 594h30v30h-30zM850 500h30v29h-30zM881 500h30v29h-30zM913 500h30v29h-30zM850 530h29v30h-29zM850 562h29v30h-29zM850 594h29v30h-29zM881 530h35v25h-35zM917 530h26v25h-26zM881 557h15v14h-15zM897 557h15v14h-15zM913 557h15v14h-15zM929 557h15v14h-15zM881 572h12v16h-12zM881 590h12v16h-12zM881 608h12v16h-12zM894 572h15v13h-15zM911 572h15v13h-15zM928 572h15v13h-15zM894 587h17v11h-17zM894 600h17v11h-17zM894 613h17v11h-17zM913 587h14v14h-14zM929 587h14v14h-14zM913 602h20v10h-20zM913 614h20v10h-20zM934 602h9v22h-9zM952 33h43v204h-43zM952 238h43v49h-43zM952 288h43v44h-43zM952 333h43v39h-43zM952 373h43v34h-43zM952 414h43v162h-43zM952 577h43v48h-43z"/>
-<path class="n" d="M4 278h131v150h-131zM4 548h131v76h-131zM136 48h89v98h-89zM136 147h89v96h-89zM227 48h90v87h-90zM227 392h90v79h-90zM227 550h90v74h-90zM318 48h77v83h-77zM318 301h77v83h-77zM318 385h77v83h-77zM397 48h78v76h-78zM476 48h75v76h-75zM552 48h71v76h-71zM397 564h66v60h-66zM531 125h62v61h-62zM594 125h62v61h-62zM835 125h54v61h-54zM464 300h53v53h-53zM464 517h53v53h-53zM464 571h53v53h-53zM631 187h55v51h-55zM687 187h55v51h-55zM743 187h55v51h-55zM518 397h44v47h-44zM518 446h44v47h-44zM518 538h44v42h-44zM518 582h44v42h-44zM564 239h41v45h-41zM606 239h41v45h-41zM648 239h41v45h-41zM691 239h41v45h-41zM733 239h41v45h-41zM775 239h41v45h-41zM818 239h41v45h-41zM903 239h41v45h-41zM564 286h42v44h-42zM564 422h42v44h-42zM564 507h42v38h-42zM564 546h42v38h-42zM607 324h38v36h-38zM607 362h38v36h-38zM607 437h38v36h-38zM758 324h36v38h-36zM795 324h36v38h-36zM685 442h36v38h-36zM685 481h36v38h-36zM834 403h36v32h-36zM871 403h36v32h-36zM755 474h31v36h-31z"/>
-<path class="f" d="M4 48h131v229h-131zM4 430h131v117h-131zM136 245h89v96h-89zM136 531h89v93h-89zM318 132h77v83h-77zM318 216h77v83h-77zM318 547h77v77h-77zM397 190h66v64h-66zM723 436h31v36h-31z"/>
+<rect class="bl" x="952.7101086048453" y="32" width="45.289891395154655" height="377.35593220338905" rx="2"/>
+<rect class="bl" x="952.7101086048453" y="413.35593220338905" width="45.289891395154655" height="214.64406779660973" rx="2"/>
+<path class="c" d="M133 342h87v93h-87zM133 436h87v93h-87zM222 136h88v85h-88zM222 222h88v85h-88zM222 308h88v82h-88zM222 472h88v76h-88zM311 469h75v77h-75zM387 48h76v76h-76zM687 48h70v76h-70zM758 48h63v76h-63zM823 48h60v76h-60zM884 48h60v76h-60zM387 125h66v65h-66zM387 192h66v65h-66zM387 259h66v62h-66zM387 386h66v58h-66zM387 446h66v58h-66zM387 506h66v58h-66zM387 566h66v58h-66zM455 125h64v61h-64zM586 125h64v61h-64zM774 125h56v61h-56zM831 125h56v61h-56zM889 125h56v61h-56zM455 248h54v59h-54zM455 309h54v55h-54zM455 365h54v51h-54zM455 469h54v51h-54zM455 521h54v51h-54zM455 573h54v51h-54zM621 187h54v51h-54zM676 187h54v51h-54zM896 187h49v51h-49zM511 240h45v50h-45zM511 291h45v50h-45zM511 343h45v50h-45zM511 394h45v50h-45zM511 445h45v45h-45zM511 584h45v40h-45zM602 240h43v42h-43zM735 240h43v42h-43zM780 240h43v42h-43zM868 240h37v42h-37zM602 326h37v42h-37zM602 370h37v42h-37zM602 414h37v42h-37zM602 457h37v42h-37zM602 501h37v42h-37zM602 544h37v42h-37zM602 588h37v36h-37zM640 283h37v36h-37zM678 283h37v36h-37zM793 283h37v36h-37zM870 283h37v36h-37zM908 283h37v36h-37zM640 320h36v37h-36zM640 358h36v37h-36zM640 397h36v37h-36zM640 435h36v37h-36zM640 473h36v37h-36zM640 587h36v37h-36zM678 320h37v36h-37zM716 320h37v36h-37zM755 320h37v36h-37zM793 320h37v36h-37zM831 320h37v36h-37zM870 320h37v36h-37zM908 320h37v36h-37zM678 358h36v37h-36zM678 396h36v37h-36zM678 434h36v37h-36zM678 473h36v37h-36zM678 511h36v37h-36zM678 549h36v37h-36zM678 587h36v37h-36zM715 358h37v36h-37zM754 358h37v36h-37zM792 358h37v36h-37zM908 358h37v36h-37zM715 395h35v31h-35zM715 428h35v31h-35zM715 461h35v31h-35zM715 494h35v31h-35zM715 527h35v31h-35zM752 395h31v35h-31zM817 395h31v35h-31zM849 395h31v35h-31zM881 395h31v35h-31zM914 395h31v35h-31zM752 432h36v31h-36zM752 497h36v31h-36zM752 529h36v31h-36zM752 561h36v31h-36zM752 593h36v31h-36zM789 432h34v32h-34zM825 432h34v32h-34zM860 432h27v32h-27zM889 432h27v32h-27zM918 432h27v32h-27zM789 466h30v29h-30zM820 466h30v29h-30zM852 466h30v29h-30zM883 466h30v29h-30zM915 466h30v29h-30zM789 496h28v31h-28zM789 528h28v31h-28zM789 561h28v31h-28zM789 593h28v31h-28zM819 496h30v29h-30zM850 496h30v29h-30zM882 496h30v29h-30zM914 496h30v29h-30zM819 526h27v32h-27zM819 559h27v32h-27zM819 592h27v32h-27zM847 526h31v28h-31zM880 526h31v28h-31zM913 526h31v28h-31zM847 555h26v34h-26zM847 590h26v34h-26zM875 555h19v34h-19zM875 590h19v10h-19zM875 602h19v10h-19zM875 614h19v10h-19zM895 555h16v13h-16zM912 555h16v13h-16zM929 555h16v13h-16zM895 569h16v13h-16zM912 569h16v13h-16zM929 569h16v13h-16zM895 583h16v13h-16zM895 597h16v13h-16zM895 611h16v13h-16zM912 583h16v13h-16zM929 583h16v13h-16zM912 597h16v13h-16zM912 611h16v13h-16zM929 597h16v13h-16zM929 611h16v13h-16zM953 33h42v204h-42zM953 238h42v49h-42zM953 288h42v44h-42zM953 333h42v39h-42zM953 373h42v34h-42zM953 414h42v162h-42zM953 577h42v48h-42z"/>
+<path class="n" d="M4 278h128v150h-128zM4 548h128v76h-128zM133 48h87v98h-87zM133 147h87v96h-87zM222 48h88v87h-88zM222 392h88v79h-88zM222 550h88v74h-88zM311 48h75v83h-75zM311 301h75v83h-75zM311 385h75v83h-75zM465 48h76v76h-76zM542 48h73v76h-73zM616 48h70v76h-70zM521 125h64v61h-64zM651 125h60v61h-60zM712 125h60v61h-60zM455 187h54v59h-54zM455 417h54v51h-54zM511 187h54v51h-54zM566 187h54v51h-54zM731 187h54v51h-54zM786 187h54v51h-54zM841 187h54v51h-54zM511 492h45v45h-45zM511 538h45v45h-45zM557 240h43v41h-43zM557 283h43v41h-43zM557 325h43v41h-43zM557 368h43v41h-43zM557 411h43v41h-43zM557 454h43v41h-43zM557 497h43v41h-43zM557 540h43v41h-43zM557 583h43v41h-43zM646 240h43v42h-43zM691 240h43v42h-43zM824 240h43v42h-43zM907 240h37v42h-37zM602 283h37v42h-37zM717 283h37v36h-37zM755 283h37v36h-37zM831 283h37v36h-37zM640 511h36v37h-36zM640 549h36v37h-36zM831 358h37v36h-37zM869 358h37v36h-37zM715 560h35v31h-35zM715 593h35v31h-35zM752 464h36v31h-36z"/>
+<path class="f" d="M4 48h128v229h-128zM4 430h128v117h-128zM133 245h87v96h-87zM133 531h87v93h-87zM311 132h75v83h-75zM311 216h75v83h-75zM311 547h75v77h-75zM387 322h66v62h-66zM784 395h31v35h-31z"/>
 <rect class="f" x="2" y="638" width="10" height="10"/>
 <text class="lg" x="17" y="647">the findings lead with this</text>
 <rect class="n" x="188" y="638" width="10" height="10"/>
@@ -248,13 +248,13 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <text class="lg" x="998" y="647" text-anchor="end">Bearing · github.com/ironmarten/bearing</text>
 </svg>
 </div>
-<p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 48% of this drawing and 29% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
+<p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 47% of this drawing and 28% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
 <p class="sub">2 project(s) are on the picture but too small to hold a name at this size: Data, Tools.</p>
 <h3>Projects</h3>
 <p class="sub">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are abstract or interfaces. D = distance from the main sequence. <em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>
 <div class="scroll"><table>
 <tr><th>Project</th><th class="n">Types</th><th class="n">Ca</th><th class="n">Ce</th><th class="n">A</th><th class="n">I</th><th class="n">D</th><th>Zone</th></tr>
-<tr><td>Core</td><td class="n">193</td><td class="n">2</td><td class="n">0</td><td class="n">0.062</td><td class="n">0</td><td class="n">0.938</td><td>zone of pain — stable and concrete</td></tr>
+<tr><td>Core</td><td class="n">197</td><td class="n">2</td><td class="n">0</td><td class="n">0.071</td><td class="n">0</td><td class="n">0.929</td><td>zone of pain — stable and concrete</td></tr>
 <tr><td>Data <span class="tag">nothing depends on it</span></td><td class="n">5</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td>near the main sequence</td></tr>
 <tr><td>Tools <span class="tag">nothing depends on it</span></td><td class="n">2</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td>near the main sequence</td></tr>
 </table></div>
@@ -268,7 +268,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <p class="sub">26 reference(s) to language and framework plumbing were filtered out of that list rather than dropped silently.</p>
 <h3>Circular references</h3>
 <p><strong>Namespaces</strong> — <span class="sub">Sibling namespaces that hold each other as state, so neither can be layered, understood or extracted without the other.</span></p>
-<p class="empty">None.</p>
+<p class="claim">2: TestBed.Core.Tariffs, TestBed.Core.Weighing</p>
+<p class="loop">loop: TestBed.Core.Tariffs → TestBed.Core.Weighing → TestBed.Core.Tariffs</p>
+<p class="sub">TestBed.Core.Tariffs ↔ TestBed.Core.Weighing — 2 held reference(s)</p>
 <p><strong>Mutually dependent, not reported</strong> — <span class="sub">these components are real, and none of them is a layering problem. The assembly is what gets extracted.</span></p>
 <ul class="sub">
 <li>TestBed.Core — 4 namespace(s), one assembly&#39;s own folders, all in Core</li>
@@ -1093,9 +1095,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>FanIn</td><td class="n">20</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
 <tr><td>FanInSolutionRank</td><td class="n">2</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
-<tr><td>FanInSolutionRankLimit</td><td class="n">10.5</td><td><span class="empty">context</span></td></tr>
-<tr><td>FanInSolutionPctl</td><td class="n">99.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">10.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">99.265</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 <tr><td>DataShape</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
 <tr><td>InboundReferenceCount</td><td class="n">47</td><td><span class="empty">context</span></td></tr>
 </table>
@@ -1112,9 +1114,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>FanIn</td><td class="n">19</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
 <tr><td>FanInSolutionRank</td><td class="n">3</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
-<tr><td>FanInSolutionRankLimit</td><td class="n">10.5</td><td><span class="empty">context</span></td></tr>
-<tr><td>FanInSolutionPctl</td><td class="n">98.75</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">10.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">98.775</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 <tr><td>DataShape</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
 <tr><td>InboundReferenceCount</td><td class="n">51</td><td><span class="empty">context</span></td></tr>
 </table>
@@ -1131,9 +1133,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>FanIn</td><td class="n">15</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
 <tr><td>FanInSolutionRank</td><td class="n">4</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
-<tr><td>FanInSolutionRankLimit</td><td class="n">10.5</td><td><span class="empty">context</span></td></tr>
-<tr><td>FanInSolutionPctl</td><td class="n">98.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">10.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">98.284</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 <tr><td>DataShape</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
 <tr><td>InboundReferenceCount</td><td class="n">85</td><td><span class="empty">context</span></td></tr>
 </table>
@@ -1150,9 +1152,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>FanIn</td><td class="n">8</td><td><span class="mono">MinFanIn</span> = 5</td></tr>
 <tr><td>FanInSolutionRank</td><td class="n">9</td><td><span class="mono">ChangeCostTopFraction</span> = 0.05</td></tr>
-<tr><td>FanInSolutionRankLimit</td><td class="n">10.5</td><td><span class="empty">context</span></td></tr>
-<tr><td>FanInSolutionPctl</td><td class="n">95.75</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionRankLimit</td><td class="n">10.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanInSolutionPctl</td><td class="n">95.833</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 <tr><td>DataShape</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
 <tr><td>InboundReferenceCount</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
 </table>
@@ -1219,7 +1221,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </div>
 <h3>Breaks alone — 3</h3>
 <p class="sub">Structurally isolated and unstable — it can break on its own, without anything else changing.</p>
-<p class="note">3 types of 200 — 1.5%. This threshold is a fixed count rather than a share, so the percentage differs between codebases: compare what is named, not how many.</p>
+<p class="note">3 types of 204 — 1.5%. This threshold is a fixed count rather than a share, so the percentage differs between codebases: compare what is named, not how many.</p>
 <div class="card" id="c3d091116">
 <h4>RoutingDepot</h4>
 <p class="where">Core · Depots.cs:49</p>
@@ -1273,7 +1275,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </div>
 <h3>Hub or god object — 3</h3>
 <p class="sub">Depends on, and is depended on by, much of the system.</p>
-<p class="note">3 types of 200 — 1.5%. This threshold is a fixed count rather than a share, so the percentage differs between codebases: compare what is named, not how many.</p>
+<p class="note">3 types of 204 — 1.5%. This threshold is a fixed count rather than a share, so the percentage differs between codebases: compare what is named, not how many.</p>
 <div class="card" id="ce8cc5e45">
 <h4>ShipmentCoordinator</h4>
 <p class="where">Core · ShipmentCoordinator.cs:5</p>
@@ -1689,7 +1691,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </details>
 </div>
 <p class="note">Showing 15 of 80. Raise <span class="mono">--top</span> to see more, or read the JSON or CSV export, which carry every one.</p>
-<h3>No peer group — 22</h3>
+<h3>No peer group — 25</h3>
 <p class="sub">Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.</p>
 <div class="card" id="c8ae4520d">
 <h4>LayeringArchive</h4>
@@ -1705,12 +1707,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">95.75</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">71.25</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">95.833</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">71.324</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1728,12 +1730,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">95.75</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">71.25</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">95.833</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">71.324</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1751,12 +1753,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">1</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">95.75</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">95.833</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">42.157</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1774,12 +1776,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">94.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.186</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">94.853</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1797,12 +1799,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">1</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">15.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">98.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">15.441</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">98.775</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">18</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1820,12 +1822,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">15.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">97</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">15.441</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">97.059</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">13</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1840,12 +1842,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">88</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">88.235</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">42.157</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1860,12 +1862,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">88</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">88.235</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">42.157</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1879,12 +1881,32 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">83</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">8.75</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">83.333</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">9.069</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
+</table>
+</details>
+</div>
+<div class="card" id="caa5e0d21">
+<h4>ITariffWindow</h4>
+<p class="where">Core · TariffWindow.cs:9</p>
+<p class="sub">Compared against the 2 types whose name ends in Window</p>
+<p class="claim sub">Most complex member: ITariffWindow.RateFor</p>
+<details>
+<summary>The receipts behind this claim</summary>
+<p class="sub">The tool's own field names, unchanged, so a number here can be matched to the thresholds at the foot of the page and checked against the code. These are evidence rather than an explanation — the sentence above is the claim, and nothing in this table adds to it.</p>
+<table class="receipts">
+<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
+<tr><td>CohortSize</td><td class="n">2</td><td><span class="mono">MinCohort</span> = 5</td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">78.922</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">9.069</td><td><span class="empty">context</span></td></tr>
+<tr><td>FanIn</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomatic</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1899,12 +1921,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.186</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">42.157</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1919,12 +1941,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.186</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">42.157</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1939,12 +1961,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">1</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">82.5</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.186</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">82.843</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1959,12 +1981,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">89.25</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.186</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">89.461</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">8</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
@@ -1979,38 +2001,18 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <table class="receipts">
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalFanInPctl</td><td class="n">53.186</td><td><span class="empty">context</span></td></tr>
+<tr><td>GlobalMaxCcPctl</td><td class="n">42.157</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
+<tr><td>SolutionTypeCount</td><td class="n">204</td><td><span class="empty">context</span></td></tr>
 </table>
 </details>
 </div>
-<div class="card" id="c3555f3f3">
-<h4>TokenVault</h4>
-<p class="where">Core · Vaults.cs:67</p>
-<p class="sub">Compared against the 3 types whose name ends in Vault</p>
-<p class="claim sub">Most complex member: TokenVault.Read</p>
-<details>
-<summary>The receipts behind this claim</summary>
-<p class="sub">The tool's own field names, unchanged, so a number here can be matched to the thresholds at the foot of the page and checked against the code. These are evidence rather than an explanation — the sentence above is the claim, and nothing in this table adds to it.</p>
-<table class="receipts">
-<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
-<tr><td>CohortSize</td><td class="n">3</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>GlobalFanInPctl</td><td class="n">53.25</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalMaxCcPctl</td><td class="n">42</td><td><span class="empty">context</span></td></tr>
-<tr><td>FanIn</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>MaxMemberCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>GlobalComplexityFloor</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>SolutionTypeCount</td><td class="n">200</td><td><span class="empty">context</span></td></tr>
-</table>
-</details>
-</div>
-<p class="note">Showing 15 of 22. Raise <span class="mono">--top</span> to see more, or read the JSON or CSV export, which carry every one.</p>
+<p class="note">Showing 15 of 25. Raise <span class="mono">--top</span> to see more, or read the JSON or CSV export, which carry every one.</p>
 <h2>Components named above</h2>
-<p class="lede">The 54 component(s) the findings above are <em>about</em>. Types those findings merely <em>name</em> are named in the card that names them and do not get a row here. <strong>This is not every type</strong> — the solution has 200, and a row each would make this file too large to send. The CSV and JSON exports carry every type, every member and every dependency.</p>
+<p class="lede">The 54 component(s) the findings above are <em>about</em>. Types those findings merely <em>name</em> are named in the card that names them and do not get a row here. <strong>This is not every type</strong> — the solution has 204, and a row each would make this file too large to send. The CSV and JSON exports carry every type, every member and every dependency.</p>
 <div class="scroll"><table>
 <tr><th>Component</th><th>Project</th><th>Role</th><th class="n">Fan-in</th><th class="n">Fan-out</th><th class="n">Cc</th><th class="n">Max member</th><th class="n">Members</th><th class="n">Lines</th></tr>
 <tr><td id="c615dc7fc">AuditReconciler<br><span class="where">Reconcilers.cs:146</span></td><td>Core</td><td>Internal</td><td class="n">0</td><td class="n">5</td><td class="n">11</td><td class="n">11<br><span class="where">Reconcile</span></td><td class="n">6</td><td class="n">27</td></tr>
@@ -2059,12 +2061,12 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><td id="cbce93030">ShipmentLedger<br><span class="where">Ledgers.cs:36</span></td><td>Core</td><td>Internal</td><td class="n">11</td><td class="n">0</td><td class="n">18</td><td class="n">16<br><span class="where">Record</span></td><td class="n">3</td><td class="n">36</td></tr>
 <tr><td id="cbcca41e1">TariffCalculator<br><span class="where">TariffCalculator.cs:5</span></td><td>Core</td><td>Internal</td><td class="n">7</td><td class="n">1</td><td class="n">22</td><td class="n">22<br><span class="where">Apply</span></td><td class="n">2</td><td class="n">35</td></tr>
 <tr><td id="cc0427ad3">TariffReconciler<br><span class="where">Reconcilers.cs:81</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">5</td><td class="n">11</td><td class="n">11<br><span class="where">Reconcile</span></td><td class="n">6</td><td class="n">27</td></tr>
+<tr><td id="caa5e0d21">ITariffWindow<br><span class="where">TariffWindow.cs:9</span></td><td>Core</td><td>Internal</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">0<br><span class="where">RateFor</span></td><td class="n">1</td><td class="n">5</td></tr>
 <tr><td id="ce9fa6c94">ThroughputGauge<br><span class="where">Gauges.cs:58</span></td><td>Core</td><td>Internal</td><td class="n">5</td><td class="n">1</td><td class="n">9</td><td class="n">9<br><span class="where">Sample</span></td><td class="n">2</td><td class="n">25</td></tr>
 <tr><td id="c12b89a4e">TrackingController<br><span class="where">Controllers.cs:34</span></td><td>Core</td><td>ApiBoundary</td><td class="n">0</td><td class="n">7</td><td class="n">1</td><td class="n">1<br><span class="where">Get</span></td><td class="n">4</td><td class="n">8</td></tr>
 <tr><td id="c4acee6c4">CustomsTrait<br><span class="where">Traits.cs:89</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">0</td><td class="n">6</td><td class="n">6<br><span class="where">DutyBand</span></td><td class="n">3</td><td class="n">17</td></tr>
 <tr><td id="ce94c9d9e">PricingVault<br><span class="where">Vaults.cs:43</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">8</td><td class="n">8<br><span class="where">Price</span></td><td class="n">2</td><td class="n">20</td></tr>
 <tr><td id="c89f8aef4">SessionVault<br><span class="where">Vaults.cs:74</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1<br><span class="where">Read</span></td><td class="n">2</td><td class="n">6</td></tr>
-<tr><td id="c3555f3f3">TokenVault<br><span class="where">Vaults.cs:67</span></td><td>Core</td><td>Internal</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1<br><span class="where">Read</span></td><td class="n">2</td><td class="n">6</td></tr>
 <tr><td id="c7b57e93f">OrderRepository<br><span class="where">OrderRepository.cs:8</span></td><td>Data</td><td>DataAccess</td><td class="n">0</td><td class="n">1</td><td class="n">19</td><td class="n">18<br><span class="where">BuildQuery</span></td><td class="n">2</td><td class="n">41</td></tr>
 <tr><td id="c7a8a3a4d">PayloadTag<br><span class="where">PayloadTag.cs:12</span></td><td>Tools</td><td>Internal</td><td class="n">0</td><td class="n">0</td><td class="n">14</td><td class="n">13<br><span class="where">Score</span></td><td class="n">4</td><td class="n">33</td></tr>
 </table></div>

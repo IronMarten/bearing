@@ -338,6 +338,8 @@ type|Core|global::TestBed.Core.TariffReconciler,type|Core|global::TestBed.Core.N
 type|Core|global::TestBed.Core.TariffReconciler,type|Core|global::TestBed.Core.PriceStep,1,Field,TestBed/Core/Reconcilers.cs,86
 type|Core|global::TestBed.Core.TariffReconciler,type|Core|global::TestBed.Core.RouteStep,1,Field,TestBed/Core/Reconcilers.cs,87
 type|Core|global::TestBed.Core.TariffReconciler,type|Core|global::TestBed.Core.ValidateStep,1,Field,TestBed/Core/Reconcilers.cs,84
+type|Core|global::TestBed.Core.Tariffs.TariffWindow,type|Core|global::TestBed.Core.Tariffs.ITariffWindow,1,InterfaceImplementation,TestBed/Core/Tariffs/TariffWindow.cs,23
+type|Core|global::TestBed.Core.Tariffs.TariffWindow,type|Core|global::TestBed.Core.Weighing.IScaleHead,3,Other;Field;Parameter,TestBed/Core/Tariffs/TariffWindow.cs,27
 type|Core|global::TestBed.Core.ThroughputGauge,type|Core|global::TestBed.Core.NormalizeStep,2,Field;Invocation,TestBed/Core/Gauges.cs,60
 type|Core|global::TestBed.Core.TrackingController,type|Core|global::TestBed.Core.CarrierGateway,1,Field,TestBed/Core/Controllers.cs,38
 type|Core|global::TestBed.Core.TrackingController,type|Core|global::TestBed.Core.ControllerBase,1,Inheritance,TestBed/Core/Controllers.cs,34
@@ -375,6 +377,8 @@ type|Core|global::TestBed.Core.TurnstileExtensions,type|Core|global::TestBed.Cor
 type|Core|global::TestBed.Core.Vaults.PricingVault,type|Core|global::TestBed.Core.NormalizeStep,2,Field;Invocation,TestBed/Core/Vaults/Vaults.cs,45
 type|Core|global::TestBed.Core.Vaults.SessionVault,type|Core|global::TestBed.Core.NormalizeStep,1,Field,TestBed/Core/Vaults/Vaults.cs,76
 type|Core|global::TestBed.Core.Vaults.TokenVault,type|Core|global::TestBed.Core.NormalizeStep,1,Field,TestBed/Core/Vaults/Vaults.cs,69
+type|Core|global::TestBed.Core.Weighing.ScaleHead,type|Core|global::TestBed.Core.Tariffs.ITariffWindow,3,Field;Parameter;Invocation,TestBed/Core/Weighing/ScaleHead.cs,44
+type|Core|global::TestBed.Core.Weighing.ScaleHead,type|Core|global::TestBed.Core.Weighing.IScaleHead,1,InterfaceImplementation,TestBed/Core/Weighing/ScaleHead.cs,40
 type|Core|global::TestBed.Interop.TwinRelay,type|Core|global::TestBed.Interop.CarrierTwin,3,Other;Field;Invocation,TestBed/Core/Shared/CarrierTwin.cs,58
 type|Data|global::TestBed.Data.OrderRepository,type|Core|global::TestBed.Core.NormalizationContext,3,Other;Parameter,TestBed/Data/OrderRepository.cs,10
 type|Data|global::TestBed.Interop.CarrierTwin,type|Data|global::TestBed.Interop.TagArchive,2,Field;Invocation,TestBed/Data/CarrierTwin.cs,22

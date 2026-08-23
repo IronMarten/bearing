@@ -1,4 +1,4 @@
-﻿using IronMarten.Bearing;
+using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -64,8 +64,10 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         var analysed = coupling["Core"];
         Assert.Equal(2, analysed.TypesElsewhereReachingIn);      // Data and Tools each reach in
         Assert.Equal(0, analysed.TypesHereReachingOut);          // and it reaches out to neither
-        Assert.Equal(12, analysed.AbstractTypes);   // P3's four *Facet interfaces, X14's IIdentityWicket, A9's TallyProbe
-        Assert.Equal(193, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193
+        // P10 adds two interfaces, IScaleHead and ITariffWindow — the abstractions its two
+        // namespaces hold each other by, which is what makes the cycle Coupling.
+        Assert.Equal(14, analysed.AbstractTypes);   // P3's four *Facet interfaces, X14's IIdentityWicket, A9's TallyProbe, P10's two
+        Assert.Equal(197, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193 → P10 197
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
@@ -130,16 +132,21 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     // ------------------------------------------------------- circular references ----
 
     /// <summary>
-    /// The fixture's one namespace cycle, stated rather than parsed.
+    /// The fixture's two namespace cycles, stated rather than parsed.
     /// </summary>
     /// <remarks>
-    /// The golden pins the probe's rendering of the same four namespaces, so agreement here is
-    /// agreement with the probe. <c>GraphTests</c> is where the algorithms are compared directly.
+    /// <b>One of each shape, which is the arrangement P10 exists to create.</b> The four-namespace
+    /// component is the folder layout the fixture always had; the two-namespace one is the plant,
+    /// and it is the only <c>Coupling</c> cycle here. Asserting both together is what makes the
+    /// section's split observable — a classifier that collapsed the two shapes would keep every
+    /// count in this file correct and be caught here.
     /// </remarks>
     [Fact]
     public void Namespace_cycles_over_the_fixture_are_what_they_should_be()
     {
-        var cycle = Assert.Single(core.Model.NamespaceCycles);
+        Assert.Equal(2, core.Model.NamespaceCycles.Count);
+
+        var folders = core.Model.NamespaceCycles.Single(c => c.Size == 4);
 
         Assert.Equal(
             [
@@ -148,26 +155,80 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
                 SubjectRef.ForNamespace("TestBed.Core.Pricing"),
                 SubjectRef.ForNamespace("TestBed.Core.Vaults"),
             ],
-            cycle.Members);
+            folders.Members);
+
+        var planted = core.Model.NamespaceCycles.Single(c => c.Size == 2);
+
+        Assert.Equal(
+            [
+                SubjectRef.ForNamespace("TestBed.Core.Tariffs"),
+                SubjectRef.ForNamespace("TestBed.Core.Weighing"),
+            ],
+            planted.Members);
     }
 
     /// <summary>
-    /// The fixture's one namespace cycle is a folder layout, and the section is right to say so.
+    /// The four-namespace component is a folder layout, and the section is right to silence it.
     /// </summary>
     /// <remarks>
     /// <c>TestBed.Core</c> contains the other three, they are all one assembly, and nothing in
     /// them holds anything in another. That is the shape a plugin has — a root beside its own
-    /// folders — and it is why the reported list over the fixture is empty rather than broken.
+    /// folders. <b>This used to assert <c>Single</c></b>, which quietly also asserted that nothing
+    /// here was ever reportable; P10 is the plant that made the second half false, and
+    /// <see cref="The_planted_cycle_is_coupling_and_carries_its_pair"/> is the half that was
+    /// missing.
     /// </remarks>
     [Fact]
-    public void The_fixtures_namespace_cycle_is_folder_layout_not_coupling()
+    public void The_folder_layout_cycle_is_not_coupling()
     {
-        var shaped = Assert.Single(core.Model.ShapedNamespaceCycles);
+        var shaped = core.Model.ShapedNamespaceCycles.Single(c => c.Cycle.Size == 4);
 
         Assert.Equal(CycleShape.FolderLayout, shaped.Shape);
         Assert.False(shaped.IsReportable);
         Assert.Equal("TestBed.Core", shaped.Anchor);
         Assert.Empty(shaped.Pairs);
+    }
+
+    /// <summary>
+    /// P10's cycle is <c>Coupling</c>, is reportable, and carries the held pair as its evidence.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This is the gate the fixture never had, and its absence is how <c>docs/DEFECTS.md</c>
+    /// §46 shipped.</b> Every namespace cycle here was a folder layout, so <c>IsReportable</c> was
+    /// false for all of them, the reportable branch was unreachable from the fixture, and both
+    /// renderers' cycle output was ungated — the HTML dropped the pair evidence entirely and the
+    /// whole suite stayed green.
+    /// </para>
+    /// <para>
+    /// <c>Peers_that_hold_each_other_are_coupling</c> exercises the same judgement through
+    /// <c>CycleShapes.Read</c> over hand-written members, which is the unit. This is the end of the
+    /// walk: real types, real fields, real edges, a real classification. Both are wanted — the unit
+    /// says the rule is right, and this says the rule is reachable.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_planted_cycle_is_coupling_and_carries_its_pair()
+    {
+        var shaped = core.Model.ShapedNamespaceCycles.Single(c => c.Cycle.Size == 2);
+
+        Assert.Equal(CycleShape.Coupling, shaped.Shape);
+        Assert.True(shaped.IsReportable);
+
+        // Siblings, so neither contains the other and there is no anchor to report.
+        Assert.Null(shaped.Anchor);
+
+        var pair = Assert.Single(shaped.Pairs);
+
+        Assert.Equal("TestBed.Core.Tariffs", pair.First);
+        Assert.Equal("TestBed.Core.Weighing", pair.Second);
+
+        // One held field each way. Held means a field whose type is abstract or an interface, so
+        // the constructor parameters and the calls alongside them do not count -- which is the
+        // distinction that separates this shape from SharedTypes.
+        Assert.Equal(1, pair.FirstHolds);
+        Assert.Equal(1, pair.SecondHolds);
+        Assert.Equal(2, pair.Weight);
     }
 
     /// <summary>
@@ -420,8 +481,12 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     [Fact]
     public void The_fixture_exercises_both_arms_of_the_loop_sentence()
     {
-        // The partial arm, which is what the fixture always had.
-        Assert.All(core.Model.NamespaceCycles, c => Assert.False(c.PathCoversEveryMember));
+        // The partial arm, which is what the fixture always had. Read off the four-namespace
+        // component specifically rather than All: P10's two-namespace cycle covers both its
+        // members, because a pair has exactly one way round it, so the namespace side now
+        // exercises BOTH arms too and an All here would be asserting the fixture had not improved.
+        Assert.False(core.Model.NamespaceCycles.Single(c => c.Size == 4).PathCoversEveryMember);
+        Assert.True(core.Model.NamespaceCycles.Single(c => c.Size == 2).PathCoversEveryMember);
         Assert.Contains(core.Model.TypeTangles, c => !c.PathCoversEveryMember);
 
         // And the covering arm, which is P8's. Two of them, at different sizes, because the

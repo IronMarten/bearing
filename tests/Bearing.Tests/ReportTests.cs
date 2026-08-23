@@ -1,4 +1,4 @@
-﻿using IronMarten.Bearing;
+using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -124,7 +124,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         // Keyed on (assembly, FQN), so both PayloadTag declarations are counted — docs/DEFECTS.md
         // §1. StructureTests.Fixture_shape_is_stable owns this number and its history; the point
         // here is only that the header renders it from the model rather than recounting.
-        Assert.Contains("200 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
+        Assert.Contains("204 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -425,7 +425,11 @@ public sealed class ReportTests(CoreWalkFixture core)
         // other out. Asserted as a set rather than loosened to "at least one", because a section
         // that silently stopped disclosing would still pass that — docs/DEFECTS.md §3.
         Assert.Equal(3, disclosures.Count);
-        Assert.Contains(disclosures, d => d.Contains("7 types not shown of 22", StringComparison.Ordinal));
+        // P10 takes the peerless population 22 -> 25: ScaleHead alone under suffix:Head, and the
+        // two *Window types under a suffix cohort of two. IScaleHead is NOT among them — it is
+        // cohorted by architectural kind, into kind:Contract, which is the one existing cohort
+        // this plant moves.
+        Assert.Contains(disclosures, d => d.Contains("10 types not shown of 25", StringComparison.Ordinal));
         Assert.Contains(disclosures, d => d.Contains("types not shown of 18", StringComparison.Ordinal));
         Assert.Contains(disclosures, d => d.Contains("nominations not shown of 23", StringComparison.Ordinal));
         Assert.All(disclosures, d => Assert.Contains("raise --top", d, StringComparison.Ordinal));

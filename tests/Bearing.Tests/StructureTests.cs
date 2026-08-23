@@ -101,12 +101,35 @@ public sealed class StructureTests(CoreWalkFixture core)
         // carry the member-level dead-code categories, and every member on them is NON-PUBLIC on
         // purpose — the type-level plants in DeadCodeTraps.cs all pass by being externally
         // visible, so a public member-level trap would test nothing.
-        Assert.Equal(200, core.Model.Types.Count);
+        //
+        // P10 adds four: IScaleHead and ScaleHead in TestBed.Core.Weighing, ITariffWindow and
+        // TariffWindow in TestBed.Core.Tariffs. They are the fixture's first namespace cycle that
+        // is NOT a folder layout — two sibling namespaces each holding the other's interface in a
+        // field, which is CycleShape.Coupling and therefore the first cycle IsReportable has ever
+        // returned true for here. Every cycle before it was TestBed.Core over its own subfolders,
+        // so the reportable branch was unreachable and both renderers' cycle output was ungated:
+        // that is how docs/DEFECTS.md §46 shipped and stayed green. Nothing that already existed
+        // gains fan-in — the four reference only each other — and Head, Window, Scale and Tariff
+        // were each checked against the fixture's trailing words before being chosen, so no suffix
+        // cohort changes size.
+        //
+        // One cohort does, and it is worth stating rather than leaving to be found: IScaleHead
+        // lands in kind:Contract, 8 -> 9, because an interface is cohorted by architectural kind
+        // before name and only ScaleHead ends up under suffix:Head. The naming constraint in
+        // docs/TESTING.md is about suffixes and does not reach this. The other three are peerless
+        // — suffix:Head at 1 and suffix:Window at 2, both under MinCohort — which is the whole of
+        // NO PEER GROUP's move from 22 to 25.
+        Assert.Equal(204, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
         // which node an edge lands on without changing how many pairs there are.
-        Assert.Equal(380, core.Model.Edges.Count);
+        // P10's four: each concrete type to the interface it implements, and each to the interface
+        // it holds in a field. An Edge is a (from, to) pair however many references it carries, so
+        // ScaleHead -> ITariffWindow is one edge although the constructor parameter, the field and
+        // the RateFor call are three references — and the field is the only one of the three that
+        // CycleShape.IsHeld counts.
+        Assert.Equal(384, core.Model.Edges.Count);
 
         // Methods are counted per declaration, so unlike Types this was never distorted by the
         // planted collisions: Describe, Score and Weight are all three present. Core holds
@@ -121,7 +144,14 @@ public sealed class StructureTests(CoreWalkFixture core)
         // six colliding subjects on nopCommerce.
         // Seven more with layer 3's plant: the virtual and its override, a constructor, a wired
         // handler, a serialisation callback, a string-dispatched method and the one that names it.
-        Assert.Equal(209, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        // P10 adds five, and which five is worth stating because the plant declares eleven members:
+        // two constructors, and three methods — ITariffWindow.RateFor, its implementation, and
+        // ScaleHead.Settle. The four fields and the two SettledKilograms properties are members but
+        // not method-like, and IScaleHead contributes nothing here because its only member is that
+        // property. The two held fields are the whole point of the plant and neither is counted by
+        // this line, which is why the count is not the thing that proves the plant landed —
+        // CyclesAndCouplingTests is.
+        Assert.Equal(214, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------
