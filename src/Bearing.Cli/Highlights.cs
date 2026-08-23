@@ -74,7 +74,8 @@ internal static class Highlights
 
         yield return "";
         yield return "   Each one is the strongest row of its section. The rest of that section is";
-        yield return "   below, and every finding this run made is in --json and --csv.";
+        yield return "   below. --json and --csv carry the model every claim was computed from —";
+        yield return "   each type, member and dependency — rather than the claims themselves.";
     }
 
     /// <summary>

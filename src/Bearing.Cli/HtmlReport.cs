@@ -59,9 +59,14 @@ public static class HtmlReport
         Risks(page, model, findings);
         Orientation(page, model, findings);
 
-        // Tier 4. The enumeration is the artifact A11 round 1 called "a wall of text", and every
-        // row of it is still reachable — in --json, in --csv, and here behind a flag for CI and for
-        // whoever wants it. `PRD-free-tier.md` §9's anti-metric is that more findings is worse.
+        // Tier 4. The enumeration is the artifact A11 round 1 called "a wall of text", and it lives
+        // behind a flag for CI and for whoever wants it. `PRD-free-tier.md` §9's anti-metric is that
+        // more findings is worse.
+        //
+        // docs/DEFECTS.md §47: this comment used to say every row was "still reachable — in --json,
+        // in --csv, and here behind a flag", which is three untruths. The exports carry the model
+        // and not the findings, and --full is capped at --top like every other section. Closing
+        // that for real is the findings export (`SCHEMA-findings-export.md`), not a wording change.
         if (full)
         {
             Findings(page, model, findings);
@@ -438,13 +443,17 @@ public static class HtmlReport
         }
         page.Append("</ul>\n");
 
-        page.Append("<p class=\"lede\"><strong>None of them is hidden and none is summarised away</strong> — every ");
-        page.Append("one is in the exports, which carry every finding, every type, every member and every ");
-        page.Append("dependency:</p>\n");
+        // docs/DEFECTS.md §47. This said the exports carry "every finding", and no export carries
+        // any: the JSON document's twelve top-level keys are model, and --full is prose capped at
+        // --top. What is complete is the counting above, so that is what the sentence claims now.
+        page.Append("<p class=\"lede\"><strong>Nothing above is a quiet subset</strong> — the count beside each ");
+        page.Append("kind is every finding of it this run made. What is capped is the enumeration, not the ");
+        page.Append("counting:</p>\n");
 
         page.Append("<ul class=\"sub\">\n");
-        page.Append("<li><span class=\"mono\">--json</span> — the whole model, with a schema version, ")
-            .Append("for anything that reads it back.</li>\n");
+        page.Append("<li><span class=\"mono\">--json</span> — the model every claim was computed from: ")
+            .Append("each type, member and dependency, with a schema version. It carries the model ")
+            .Append("rather than the claims.</li>\n");
         page.Append("<li><span class=\"mono\">--csv</span> — <span class=\"mono\">types.csv</span>, ")
             .Append("<span class=\"mono\">members.csv</span> and <span class=\"mono\">edges.csv</span>, which join ")
             .Append("on identity rather than on a name.</li>\n");

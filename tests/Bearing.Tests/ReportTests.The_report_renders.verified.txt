@@ -35,7 +35,8 @@ Every claim shows the numbers behind it.
      Core · MemberIdentityTraps.cs:80 · no static references found, 1 of 80
 
    Each one is the strongest row of its section. The rest of that section is
-   below, and every finding this run made is in --json and --csv.
+   below. --json and --csv carry the model every claim was computed from —
+   each type, member and dependency — rather than the claims themselves.
 
 -- CONCEALED DECISION ------------------------------------------
    (complexity far above peers, connectivity ordinary)

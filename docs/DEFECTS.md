@@ -1991,7 +1991,7 @@ weights precisely because `Cycle` cannot be constructed outside Core — so the 
 and **neither renderer's rendering of it** is. Planting a two-namespace coupling in `TestBed` is what
 would close it, and it moves the frozen golden regime, so it is a decision and not a chore.
 
-### 47. The report tells the reader the exports carry the findings, and no export carries any
+### 47. The report tells the reader the exports carry the findings, and no export carries any — **reworded; the export itself is `SCHEMA-findings-export.md` step 5**
 
 Found while writing `BEARING-OUTPUT-CONTRACT.md` — reading the output surface for a consumer rather
 than for a reader, which is a third pair of eyes on the same page and turned this up on the first
@@ -2034,3 +2034,27 @@ asking where the other 102 hubs are.
 exports carry the model, `--full` enumerates to `--top` — or **make the sentence true** by serialising
 findings, which is `PRD-paid-tier.md`'s seam and not a wording change. Wording now does not foreclose
 the export later. Either way it costs a recut of the round 2 artifact.
+
+**Both renderers carried it, and that is worth its own line.** §46 is the two renderers *drifting*;
+this is the two renderers **agreeing and both being wrong** — the HTML in `Everything else`, the
+terminal in `Highlights.cs:77` (*"every finding this run made is in --json and --csv"*), different
+words for the same untruth. A parity check between the renderers would have caught §46 and would have
+passed this. What catches this is `SCHEMA-findings-export.md` §1's rule — *the export is a superset of
+every judgement the free tool renders* — asserted against the export rather than between renderers.
+
+**Reworded 2026-08-23, and the wording says only what is true now.** What is complete is the
+*counting*, so that is what is claimed: *"Nothing above is a quiet subset — the count beside each kind
+is every finding of it this run made. What is capped is the enumeration, not the counting."* `--json`
+is described as *"the model every claim was computed from … It carries the model rather than the
+claims"*, which is both honest and the thing a user reaching for `--json` needs to know before they
+open it. The terminal line matches. The comment at the `--full` branch now records what it used to
+claim rather than repeating it.
+
+**Gated, unlike §46.** Both report snapshots failed on the change — `ReportTests.The_report_renders`
+and `HtmlReportTests.The_report_renders` — and the diff was exactly the two sentences and nothing
+else. Goldens accepted under `CONTRIBUTING.md`'s rule. `The_full_report_renders` did **not** move,
+correctly: the paragraph lives in the `else` branch and `--full` does not render it.
+
+**Still open, and deliberately: the sentence is true rather than strong.** Making it strong again —
+*every finding is in the exports* — is the findings export, `SCHEMA-findings-export.md` step 5. This
+entry closes when the export ships and the wording can go back.
