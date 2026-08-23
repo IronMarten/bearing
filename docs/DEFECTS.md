@@ -1,4 +1,4 @@
-﻿# Known defects
+# Known defects
 
 Behaviour that is wrong today, recorded rather than fixed. Every entry names what supersedes it.
 
@@ -1981,15 +1981,22 @@ count of what was not shown. Six because the text report shows six, and the rema
 rather than dropped. Cut as `nop-v12.html`: the terminal report and the plot are byte-identical to
 v11, and the HTML differs by the timestamp and seven lines.
 
-**Not gated, and that is recorded rather than claimed.** The suite is 467 green **both before and
-after** the fix, which for this repo is a question and not a result: nothing asserted the section
-either way. **The fixture cannot reach this code at all** — `TestBed`'s only namespace cycle is
-`TestBed.Core`, a `FolderLayout`, so `IsReportable` is false, the HTML golden renders `None.` for
-the namespace group, and `grep -c "held reference"` is **0** in both HTML goldens. `CycleShape.Coupling`
-is exercised in `CyclesAndCouplingTests` through `ShapeReading`, which takes hand-written members and
-weights precisely because `Cycle` cannot be constructed outside Core — so the **judgement** is gated
-and **neither renderer's rendering of it** is. Planting a two-namespace coupling in `TestBed` is what
-would close it, and it moves the frozen golden regime, so it is a decision and not a chore.
+**Was not gated, and the green suite was the evidence for it.** 467 passed **both before and after**
+the fix, because nothing asserted the section either way: `TestBed`'s only namespace cycle was
+`TestBed.Core`, a `FolderLayout`, so `IsReportable` was false, the HTML golden rendered `None.` for
+the namespace group, and `grep -c "held reference"` was **0** in both HTML goldens. `CycleShape.Coupling`
+was exercised in `CyclesAndCouplingTests` through `ShapeReading`, which takes hand-written members and
+weights precisely because `Cycle` cannot be constructed outside Core — so the **judgement** was gated
+and **neither renderer's rendering of it** was.
+
+**Closed 2026-08-23 by plant P10** (`95ed129`), two sibling namespaces holding each other's interface
+in a field — the fixture's first `Coupling` cycle and the first time `IsReportable` has returned true
+here. The HTML golden now carries the line this defect was about:
+*"TestBed.Core.Tariffs ↔ TestBed.Core.Weighing — 2 held reference(s)"*, and
+`The_planted_cycle_is_coupling_and_carries_its_pair` asserts the shape, the pair and both hold
+counts. `docs/TESTING.md` carries the plant's cost: four types, one existing cohort moved
+(`kind:Contract`, 8 → 9), no nomination changed, `PolicySweepTests` green and the leave-one-out
+verdicts unchanged at 25 / 4 / 1.
 
 ### 47. The report tells the reader the exports carry the findings, and no export carries any — **reworded; the export itself is `SCHEMA-findings-export.md` step 5**
 

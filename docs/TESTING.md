@@ -221,8 +221,13 @@ line by line"*, and the goldens went with the probe — along with the equivalen
 confirm a plant disturbed nothing but what it aimed at. What replaces them:
 
 1. **`StructureTests.Fixture_shape_is_stable`** — types, edges and method-like members, currently
-   **179 / 362 / 186**. It fails first, and its numbers must be updated deliberately, with the
+   **204 / 384 / 214**. It fails first, and its numbers must be updated deliberately, with the
    plant's own contribution stated in the comment the way P6, P7 and P8 each did.
+
+   > **These three numbers were `179 / 362 / 186` here until 2026-08-23 and had been wrong for
+   > several plants** — the test said 200 / 380 / 209 when P10 first ran against it. The counts live
+   > in the assertion and its comment; this line is a second copy, and a second copy of a number is
+   > the thing that goes stale. Read the test.
 2. **The ten Verify snapshots** — three CSVs, the JSON, two HTML reports, the terminal report, the
    diagram, the mosaic, and `PolicySweepTests`. **`PolicySweepTests` is the one that matters most**:
    it fingerprints the finding set under all 28 policy values one notch each way, so a plant that
@@ -260,6 +265,13 @@ losing one:
    the finding set, so it reads `-` however well the fixture covers it.
 
 ### The leave-one-out verdict table
+
+**Re-run 2026-08-23 after P10, against the same 30 guards, and every verdict is unchanged again** —
+25 / 4 / 1, the same `suite-only` four and the same single `DEAD` gate. That is now four consecutive
+runs with identical verdicts across four plants. P10 adds four types, two of them interfaces, and
+moves one existing cohort (`kind:Contract`, 8 → 9) without moving any gate's observability. The
+sanity check the box below asks for passes: there are `suite-only` rows, so the run measured
+something.
 
 Run 2026-08-21 after A9's plants, against 30 guards, and **every verdict is what the two runs
 before it gave** — same counts, same `suite-only` set, same single `DEAD` gate. Three plants have
