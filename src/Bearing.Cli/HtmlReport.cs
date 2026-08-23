@@ -625,11 +625,14 @@ public static class HtmlReport
         page.Append("<h3>Circular references</h3>\n");
 
         var shaped = model.ShapedNamespaceCycles;
+        var reportable = shaped.Where(c => c.IsReportable).ToList();
+        var held = reportable.ToDictionary(c => c.Cycle, c => c);
 
-        CycleGroup(page, "Namespaces", [.. shaped.Where(c => c.IsReportable).Select(c => c.Cycle)],
+        CycleGroup(page, "Namespaces", [.. reportable.Select(c => c.Cycle)],
             "Sibling namespaces that hold each other as state, so neither can be layered, "
             + "understood or extracted without the other.",
-            id => Name(model, id));
+            id => Name(model, id),
+            cycle => held.TryGetValue(cycle, out var shapedCycle) ? Holding(shapedCycle) : []);
 
         NotLayering(page, [.. shaped.Where(c => !c.IsReportable)], id => Name(model, id));
 
@@ -691,6 +694,38 @@ public static class HtmlReport
         }
 
         page.Append("</ul>\n");
+    }
+
+    /// <summary>
+    /// The sibling pairs that hold a namespace cycle together, heaviest first.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The cycle above this is a membership — thirty names and one example loop on nopCommerce —
+    /// and a membership is not somewhere to start. These pairs are, and they are the reason
+    /// <see cref="ShapedCycle.Pairs"/> is computed at all: the heaviest two namespaces are where
+    /// the entanglement actually is, and breaking one pair is a Monday-morning-sized piece of work
+    /// where breaking a thirty-namespace component is not.
+    /// </para>
+    /// <para>
+    /// <b>Why this exists at all, which is worth recording.</b> The commit that set the folder-layout
+    /// cycles aside as not-findings touched both renderers, and gave the pairs to the text report
+    /// only. So this section lost twenty-one entries here and gained nothing back, while the text
+    /// report lost the same twenty-one and gained the evidence — and the HTML is the artifact a
+    /// newcomer is handed with the <c>.txt</c> withheld. A suppression is allowed to make a section
+    /// shorter; it is not allowed to make it emptier in one renderer than the other.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> Holding(ShapedCycle cycle)
+    {
+        // Six, as the text report shows six: enough to see where the weight sits without the pair
+        // list outgrowing the membership it is evidence for. The remainder is stated rather than
+        // dropped, which is docs/DEFECTS.md §3's rule.
+        foreach (var pair in cycle.Pairs.Take(6))
+            yield return $"{pair.First} ↔ {pair.Second} — {pair.Weight} held reference(s)";
+
+        if (cycle.Pairs.Count > 6)
+            yield return $"({cycle.Pairs.Count - 6} more mutually-holding pairs in this cycle)";
     }
 
     /// <summary>
