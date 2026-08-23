@@ -1936,3 +1936,57 @@ local threshold of exactly the kind **X16** exists to stop being added one at a 
 extremes, that survives the top-right reading, and that is not set by a project with one type in
 it. X16 is the road that remains — the baseline road is closed by X7, not merely unpaved — and it
 is not this entry's to build alone.
+
+### 46. A suppression emptied the HTML cycles section, because the evidence replacing it went to one renderer — **fixed**
+
+Found by re-deriving `PROTOCOL-a11-newcomer.md` §§11–12 against a fresh cut, which is the fifth
+re-derivation to turn something up and the fifth time it was not the thing being looked for.
+
+The cycles rework set the folder-layout components aside as not-findings. On nopCommerce that took
+the HTML's namespace group **from 22 cycles to one**, and what remained of the finding was a
+thirty-name membership, one example loop, and a list of twenty-one components that are fine:
+
+```
+30: Nop.Services, Nop.Services.Affiliates, Nop.Services.Attributes, … (30 names)
+loop: Nop.Services → Nop.Services.Localization → Nop.Services.ExportImport → Nop.Services
+Mutually dependent, not reported — …
+```
+
+**A membership is not somewhere to start.** The pairs are, and they existed: `ffb4415` computed
+`ShapedCycle.Pairs` for exactly this, and `83e4675` rendered them — in the text report only.
+
+| | text report | HTML |
+|---|---|---|
+| cycles in the findings group, v9 → v12 | 22 → 1 | 22 → 1 |
+| held-pair lines added back | 6, plus the remainder | **0** |
+
+**The commit that removed the population is the commit that added the evidence, and it touched both
+renderers**: `83e4675` is `HtmlReport.cs` +49, `StructureSections.cs` +98. The HTML got the
+subtraction and not the addition. `git log -S Pairs -- src/Bearing.Cli/HtmlReport.cs` returns
+nothing, in any commit — the pairs were never there to lose.
+
+**This is a general shape, not a one-off, and it is the reason this entry is worth its length.** A
+suppression is allowed to make a section *shorter*; it is not allowed to make it **emptier in one
+renderer than in the other**. Look for it wherever a change removes a population and adds evidence
+in its place — the removal is easy to apply twice and the addition is easy to apply once.
+
+**Live in the A11 round 2 artifact until 2026-08-23.** `a13-materials/nop-v11.html` carries it. T3
+asks a participant to pick something the report flags and say what they would do about it on Monday
+morning; the largest circular-reference finding on the page had no answer to that, and §6 withholds
+the `.txt` unless they ask for it.
+
+**The fix.** `Cycles` builds the same `Cycle`-keyed lookup the type tangles already use and passes
+`CycleGroup`'s existing `annotate` seam a `Holding` lambda — six pairs, heaviest first, then the
+count of what was not shown. Six because the text report shows six, and the remainder is stated
+rather than dropped. Cut as `nop-v12.html`: the terminal report and the plot are byte-identical to
+v11, and the HTML differs by the timestamp and seven lines.
+
+**Not gated, and that is recorded rather than claimed.** The suite is 467 green **both before and
+after** the fix, which for this repo is a question and not a result: nothing asserted the section
+either way. **The fixture cannot reach this code at all** — `TestBed`'s only namespace cycle is
+`TestBed.Core`, a `FolderLayout`, so `IsReportable` is false, the HTML golden renders `None.` for
+the namespace group, and `grep -c "held reference"` is **0** in both HTML goldens. `CycleShape.Coupling`
+is exercised in `CyclesAndCouplingTests` through `ShapeReading`, which takes hand-written members and
+weights precisely because `Cycle` cannot be constructed outside Core — so the **judgement** is gated
+and **neither renderer's rendering of it** is. Planting a two-namespace coupling in `TestBed` is what
+would close it, and it moves the frozen golden regime, so it is a decision and not a chore.
