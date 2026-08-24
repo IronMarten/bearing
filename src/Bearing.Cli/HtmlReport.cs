@@ -416,9 +416,19 @@ public static class HtmlReport
     {
         page.Append("<h2>Everything else</h2>\n");
 
-        var kinds = findings.All.Select(f => f.Kind).Distinct().Count();
+        // One derivation, and that is the point of computing it this way rather than the shorter
+        // way. This read `findings.All.Select(f => f.Kind).Distinct().Count()` for the kind count
+        // and `findings.Count` for the total, while the list immediately below enumerated
+        // Selection.Exemplars — two derivations of one population, agreeing by coincidence. That
+        // is docs/DEFECTS.md §40 and §41's shape exactly: a caption asserting a correspondence
+        // with the thing under it that nothing guarantees. Both numbers now come off the same
+        // enumeration the list does, so the sentence cannot describe a different set from the one
+        // it introduces.
+        var enumerated = Selection.Exemplars(findings);
+        var kinds = enumerated.Count;
+        var counted = enumerated.Sum(exemplar => findings.OfKind(exemplar.Kind).Count);
 
-        page.Append($"<p class=\"lede\">This run made {Html.Count(findings.Count)} findings across ");
+        page.Append($"<p class=\"lede\">This run made {Html.Count(counted)} findings across ");
         page.Append($"{Html.Count(kinds)} kinds, and the page above leads with the strongest of each.</p>\n");
 
         // A13 tier 3's headline: per-kind counts and what each kind means, which is where the
@@ -434,7 +444,7 @@ public static class HtmlReport
         page.Append("above use, and for the same reason it is not a severity.</p>\n");
 
         page.Append("<ul class=\"sub\">\n");
-        foreach (var exemplar in Selection.Exemplars(findings))
+        foreach (var exemplar in enumerated)
         {
             var total = findings.OfKind(exemplar.Kind).Count;
 
