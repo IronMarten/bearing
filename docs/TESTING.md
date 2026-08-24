@@ -275,9 +275,18 @@ losing one:
 
 ### The leave-one-out verdict table
 
-**Re-run 2026-08-23 after P10, against the same 30 guards, and every verdict is unchanged again** —
-25 / 4 / 1, the same `suite-only` four and the same single `DEAD` gate. That is now four consecutive
-runs with identical verdicts across four plants. P10 adds four types, two of them interfaces, and
+**Re-run 2026-08-24 after P11, against the same 30 guards, and every verdict is unchanged again** —
+25 / 4 / 1, the same `suite-only` four and the same single `DEAD` gate (`BlastRadius.cs:41`,
+`MinCohort`). **Five consecutive runs, identical verdicts, across five plants.** The sanity check
+this box asks for passes: there are `suite-only` rows, so the run measured something.
+
+> **P11 is the plant that tests this table's own premise, and it holds.** It landed alongside three
+> new detectors and a new predicate — the largest change to the finding set since the track began —
+> and moved no gate's observability at all. The one thing it *did* move is recorded above: the sweep
+> can now see `MinTangle`, which is a gate becoming observable rather than a verdict changing, and
+> the leave-one-out guards are a different instrument from the sweep.
+
+**Previously, re-run 2026-08-23 after P10**, against the same 30 guards: 25 / 4 / 1, unchanged. P10 adds four types, two of them interfaces, and
 moves one existing cohort (`kind:Contract`, 8 → 9) without moving any gate's observability. The
 sanity check the box below asks for passes: there are `suite-only` rows, so the run measured
 something.
