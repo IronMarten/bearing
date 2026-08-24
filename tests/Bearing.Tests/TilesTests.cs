@@ -93,6 +93,57 @@ public sealed class TilesTests(CoreWalkFixture core)
     }
 
     /// <summary>
+    /// A cycle is a risk claim and still names no type, so it cannot move the clean tile, the
+    /// mosaic's tint or the plot's density axis.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This holds by construction and nothing said so, which is the reason to say it.</b> The
+    /// named population is <c>Subjects.Named</c>, which filters on
+    /// <see cref="Claims.IsRiskClaim"/> — and <c>IsRiskClaim</c> is <b>true</b> for all three cycle
+    /// kinds, deliberately, because a cycle is a claim. What keeps them out is the other half of
+    /// that line: <c>Subjects.Of</c> resolves a finding to a <c>TypeNode</c> through
+    /// <c>model.Find</c> and a member's declaring type, and a cycle's subject is a
+    /// <see cref="SubjectKind.Set"/>, which is neither. So the filter lets a cycle through and the
+    /// resolution drops it.
+    /// </para>
+    /// <para>
+    /// <b>That is one line away from being wrong.</b> Teaching <c>Subjects.Of</c> to walk a set's
+    /// members — an obvious enough thing to want, since a tangle's members <i>are</i> types —
+    /// would silently charge every tangle member to the named population and move the number in
+    /// the largest glyph on the page. That is <c>docs/DEFECTS.md</c> §41 exactly, which took the
+    /// clean tile from 88% to 85% on nopCommerce and was found by reading the page rather than by
+    /// the suite. This is the assertion §41 did not have.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_cycle_is_a_claim_and_still_names_no_type()
+    {
+        var findings = Findings;
+
+        var cycles = findings.All.Where(f => !Claims.CompetesForLead(f.Kind)).ToList();
+
+        // The fixture produces them, or the rest of this asserts nothing.
+        Assert.NotEmpty(cycles);
+
+        // Claims, every one — this is the half that must NOT be fixed by calling them disclosures.
+        Assert.All(cycles, f => Assert.True(Claims.IsRiskClaim(f.Kind)));
+
+        // And none of them names a type. Asserted through what a reader sees rather than through
+        // Subjects.Named itself: the tile is the number this protects, and a test that reads the
+        // internal would keep passing if the renderer stopped using it.
+        var without = FindingSet.Of(findings.All.Where(f => Claims.CompetesForLead(f.Kind)));
+
+        Assert.Equal(
+            Single(Tiles.For(core.Model, without), TileKind.Clean).Value,
+            Single(Tiles.For(core.Model, findings), TileKind.Clean).Value);
+
+        Assert.Equal(
+            Mosaic.Render(core.Model, without),
+            Mosaic.Render(core.Model, findings), StringComparer.Ordinal);
+    }
+
+    /// <summary>
     /// Concentration names a project that holds more findings than its size accounts for.
     /// </summary>
     /// <remarks>

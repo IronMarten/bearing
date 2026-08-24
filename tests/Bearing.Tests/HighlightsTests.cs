@@ -30,9 +30,19 @@ public sealed class HighlightsTests(CoreWalkFixture core)
     {
         var findings = Findings;
 
+        // CompetesForLead, not IsRiskClaim, and the difference is the whole reason there are two
+        // predicates. A cycle IS a risk claim — IsRiskClaim is true for all three cycle kinds —
+        // and it does not lead, because it renders in Circular references. This assertion counted
+        // twelve where the rail has ten the day the cycle kinds arrived, which is the conflation
+        // SCHEMA-findings-export.md §6 warned would happen wherever the wrong one was reached for.
+        // Both predicates, because the rail is the intersection and each excludes something the
+        // other keeps. Coverage COMPETES — it is counted by the census and has a row in the kind
+        // list — and is not a risk claim, so it is not on the rail. A cycle IS a risk claim and
+        // does not compete. Reaching for either one alone gives twelve where the page has eleven,
+        // and it did: this line said IsRiskClaim and was wrong the day the cycle kinds landed.
         var expected = findings.All
             .Select(f => f.Kind)
-            .Where(Claims.IsRiskClaim)
+            .Where(k => Claims.CompetesForLead(k) && Claims.IsRiskClaim(k))
             .Distinct()
             .Count();
 
@@ -134,7 +144,13 @@ public sealed class HighlightsTests(CoreWalkFixture core)
 
         Assert.Contains("<h2>Everything else</h2>", brief, StringComparison.Ordinal);
         Assert.Contains("--full", brief, StringComparison.Ordinal);
-        Assert.Contains($"{findings.Count} findings", brief, StringComparison.Ordinal);
+        // The census counts what it enumerates, so the expected number is derived the way the
+        // page derives it rather than from findings.Count — which now includes the cycle findings
+        // the page counts in its own section instead.
+        var counted = Selection.Exemplars(findings).Sum(e => findings.OfKind(e.Kind).Count);
+
+        Assert.Contains($"{counted} findings", brief, StringComparison.Ordinal);
+        Assert.True(counted < findings.Count, "the cycle kinds fired, so the census is a subset");
         Assert.DoesNotContain("<h2>Findings</h2>", brief, StringComparison.Ordinal);
 
         Assert.Contains("<h2>Findings</h2>", full, StringComparison.Ordinal);

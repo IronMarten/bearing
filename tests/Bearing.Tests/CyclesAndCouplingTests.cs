@@ -67,7 +67,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         // P10 adds two interfaces, IScaleHead and ITariffWindow — the abstractions its two
         // namespaces hold each other by, which is what makes the cycle Coupling.
         Assert.Equal(14, analysed.AbstractTypes);   // P3's four *Facet interfaces, X14's IIdentityWicket, A9's TallyProbe, P10's two
-        Assert.Equal(197, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193 → P10 197
+        Assert.Equal(199, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193 → P10 197 → P11 199
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 
@@ -144,7 +144,14 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     [Fact]
     public void Namespace_cycles_over_the_fixture_are_what_they_should_be()
     {
-        Assert.Equal(2, core.Model.NamespaceCycles.Count);
+        // Three, and the third is P11: one FolderLayout, one Coupling, one SharedTypes. All three
+        // shapes now have a specimen, which is what makes the classifier's split observable in all
+        // of its arms rather than in two of them — and it is why cycle-is-shared-types can be
+        // observed to withhold something at all.
+        Assert.Equal(3, core.Model.NamespaceCycles.Count);
+        Assert.Equal(
+            [CycleShape.Coupling, CycleShape.FolderLayout, CycleShape.SharedTypes],
+            core.Model.ShapedNamespaceCycles.Select(c => c.Shape).Order());
 
         var folders = core.Model.NamespaceCycles.Single(c => c.Size == 4);
 
@@ -157,14 +164,23 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
             ],
             folders.Members);
 
-        var planted = core.Model.NamespaceCycles.Single(c => c.Size == 2);
+        // Both pairs, by shape, because P11 made size ambiguous. Naming the members of each is
+        // what stops a classifier that swapped the two readings from passing every count above.
+        var byShape = core.Model.ShapedNamespaceCycles.ToDictionary(c => c.Shape, c => c.Cycle);
 
         Assert.Equal(
             [
                 SubjectRef.ForNamespace("TestBed.Core.Tariffs"),
                 SubjectRef.ForNamespace("TestBed.Core.Weighing"),
             ],
-            planted.Members);
+            byShape[CycleShape.Coupling].Members);
+
+        Assert.Equal(
+            [
+                SubjectRef.ForNamespace("TestBed.Core.Berths"),
+                SubjectRef.ForNamespace("TestBed.Core.Yards"),
+            ],
+            byShape[CycleShape.SharedTypes].Members);
     }
 
     /// <summary>
@@ -210,7 +226,11 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     [Fact]
     public void The_planted_cycle_is_coupling_and_carries_its_pair()
     {
-        var shaped = core.Model.ShapedNamespaceCycles.Single(c => c.Cycle.Size == 2);
+        // Named rather than sized: P11 planted a second two-namespace cycle, so size no longer
+        // identifies this one. Selecting by the members keeps the shape assertion below meaningful
+        // — selecting by Shape == Coupling would have made it assert itself.
+        var shaped = core.Model.ShapedNamespaceCycles.Single(
+            c => c.Cycle.Members.Any(m => m.Canonical.EndsWith("TestBed.Core.Tariffs", StringComparison.Ordinal)));
 
         Assert.Equal(CycleShape.Coupling, shaped.Shape);
         Assert.True(shaped.IsReportable);
@@ -486,7 +506,12 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         // members, because a pair has exactly one way round it, so the namespace side now
         // exercises BOTH arms too and an All here would be asserting the fixture had not improved.
         Assert.False(core.Model.NamespaceCycles.Single(c => c.Size == 4).PathCoversEveryMember);
-        Assert.True(core.Model.NamespaceCycles.Single(c => c.Size == 2).PathCoversEveryMember);
+
+        // Both pairs now, P10's and P11's: a pair has exactly one way round it whatever its shape,
+        // so All is the honest assertion here and Single stopped being available when P11 landed.
+        Assert.All(
+            core.Model.NamespaceCycles.Where(c => c.Size == 2),
+            c => Assert.True(c.PathCoversEveryMember));
         Assert.Contains(core.Model.TypeTangles, c => !c.PathCoversEveryMember);
 
         // And the covering arm, which is P8's. Two of them, at different sizes, because the
@@ -532,7 +557,10 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
 
         // Lowered, the mutual pair arrives — which is the judgement the floor exists to make, and
         // the reason it is not 2. Two types that reference each other are not a tangle.
-        Assert.Equal([9, 8, 4, 2], TangleSizesUnder(core.Model.Policy with { MinTangle = 2 }));
+        // Two pairs at the floor, not one: P11's SharedTypes plant is also two types referencing
+        // each other, and at MinTangle 2 it is a tangle like P8's mutual pair. That it is not one
+        // at the shipped floor of 4 is the judgement this test exists for.
+        Assert.Equal([9, 8, 4, 2, 2], TangleSizesUnder(core.Model.Policy with { MinTangle = 2 }));
     }
 
     private static List<int> TangleSizesUnder(AnalysisPolicy policy)

@@ -119,7 +119,14 @@ public sealed class StructureTests(CoreWalkFixture core)
         // docs/TESTING.md is about suffixes and does not reach this. The other three are peerless
         // — suffix:Head at 1 and suffix:Window at 2, both under MinCohort — which is the whole of
         // NO PEER GROUP's move from 22 to 25.
-        Assert.Equal(204, core.Model.Types.Count);
+        // P11 adds two of each, and the pair is the smallest plant the fixture has taken:
+        // YardDocket and BerthPlacard, one edge each way, one method-like member each. It exists
+        // so that cycle-is-shared-types can be observed to withhold something — TestBed's other
+        // two namespace cycles are a Coupling and a FolderLayout, so the third shape had no
+        // specimen and its suppression row could not fail. The two properties are members and are
+        // not method-like, which is why this line moves by two rather than by four. Nothing that
+        // already existed gains fan-in: the pair references only itself.
+        Assert.Equal(206, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
@@ -129,7 +136,7 @@ public sealed class StructureTests(CoreWalkFixture core)
         // ScaleHead -> ITariffWindow is one edge although the constructor parameter, the field and
         // the RateFor call are three references — and the field is the only one of the three that
         // CycleShape.IsHeld counts.
-        Assert.Equal(384, core.Model.Edges.Count);
+        Assert.Equal(386, core.Model.Edges.Count);
 
         // Methods are counted per declaration, so unlike Types this was never distorted by the
         // planted collisions: Describe, Score and Weight are all three present. Core holds
@@ -151,7 +158,7 @@ public sealed class StructureTests(CoreWalkFixture core)
         // property. The two held fields are the whole point of the plant and neither is counted by
         // this line, which is why the count is not the thing that proves the plant landed —
         // CyclesAndCouplingTests is.
-        Assert.Equal(214, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        Assert.Equal(216, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------

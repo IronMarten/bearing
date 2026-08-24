@@ -64,6 +64,23 @@ public enum FindingKind
 
     /// <summary>§3.11. What the run could not see. Part of the output, not a footnote.</summary>
     Coverage,
+
+    /// <summary>§3.12. Sibling namespaces that hold each other as state. Subject is a set.</summary>
+    /// <remarks>
+    /// <b>The three cycle kinds are claims that do not compete for the lead or the census</b>, and
+    /// those are two different questions — <see cref="Cli.Claims.IsRiskClaim"/> answers the first
+    /// and is true for all three, <see cref="Cli.Claims.CompetesForLead"/> answers the second and
+    /// is false. They are appended after <see cref="Coverage"/> rather than placed with their
+    /// siblings because the enum's order is the <c>--full</c> section order, and a cycle's section
+    /// is not in that enumeration.
+    /// </remarks>
+    NamespaceCycle,
+
+    /// <summary>§3.12. Two projects each naming a type in the other. Subject is a set.</summary>
+    ProjectCycle,
+
+    /// <summary>§3.12. <c>MinTangle</c> or more types that all reach each other. Subject is a set.</summary>
+    TypeTangle,
 }
 
 /// <summary>

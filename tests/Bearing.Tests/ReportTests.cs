@@ -124,7 +124,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         // Keyed on (assembly, FQN), so both PayloadTag declarations are counted — docs/DEFECTS.md
         // §1. StructureTests.Fixture_shape_is_stable owns this number and its history; the point
         // here is only that the header renders it from the model rather than recounting.
-        Assert.Contains("204 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
+        Assert.Contains("206 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -429,7 +429,11 @@ public sealed class ReportTests(CoreWalkFixture core)
         // two *Window types under a suffix cohort of two. IScaleHead is NOT among them — it is
         // cohorted by architectural kind, into kind:Contract, which is the one existing cohort
         // this plant moves.
-        Assert.Contains(disclosures, d => d.Contains("10 types not shown of 25", StringComparison.Ordinal));
+        // P11 takes it 25 -> 27, and that both of its types land here is the ordinary cost of a
+        // plant with fresh trailing words: BerthPlacard and YardDocket are each alone in a suffix
+        // cohort of one. Moving no existing cohort is the point of choosing words nothing else
+        // ends in, and the peerless count is where that choice shows up.
+        Assert.Contains(disclosures, d => d.Contains("12 types not shown of 27", StringComparison.Ordinal));
         Assert.Contains(disclosures, d => d.Contains("types not shown of 18", StringComparison.Ordinal));
         Assert.Contains(disclosures, d => d.Contains("nominations not shown of 23", StringComparison.Ordinal));
         Assert.All(disclosures, d => Assert.Contains("raise --top", d, StringComparison.Ordinal));

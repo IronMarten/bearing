@@ -83,7 +83,11 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     [Fact]
     public void Every_finding_the_fixture_makes_has_a_sentence()
     {
-        foreach (var finding in Findings.All)
+        // Every kind that competes, which is every kind this pane is made of. The cycle kinds
+        // render in Circular references and have no card, so requiring a Claim of them would be
+        // requiring a sentence for a shape that is never asked for one — and writing three to
+        // satisfy this would put unread prose in Claims.For for a test to find.
+        foreach (var finding in Findings.All.Where(f => Claims.CompetesForLead(f.Kind)))
         {
             var claim = Claims.For(core.Model, finding);
 

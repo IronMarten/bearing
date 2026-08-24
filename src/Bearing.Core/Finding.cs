@@ -220,6 +220,15 @@ public static class Qualifiers
     /// #8.
     /// </remarks>
     public const string GloballyExtremeComplexity = "globally-extreme-complexity";
+
+    /// <summary>A namespace cycle that is one assembly's own folders. §3.12.</summary>
+    public const string OneAssemblysOwnFolders = "one-assemblys-own-folders";
+
+    /// <summary>A namespace cycle of peers naming each other's entities, holding none of them.</summary>
+    public const string PeersNamingSharedTypes = "peers-naming-shared-types";
+
+    /// <summary>A type tangle that is a base and its implementations rather than a knot.</summary>
+    public const string ATypeHierarchy = "a-type-hierarchy";
 }
 
 /// <summary>

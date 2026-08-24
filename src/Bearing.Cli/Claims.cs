@@ -109,6 +109,36 @@ public static class Claims
     public static bool IsRiskClaim(FindingKind kind) => kind is not FindingKind.Coverage;
 
     /// <summary>
+    /// Whether this kind competes for the leading rail and enters the per-kind census.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Two questions, two predicates, and conflating them would put a lie in a file to achieve a
+    /// layout.</b> <see cref="IsRiskClaim"/> answers <i>claim or disclosure</i>, and it feeds the
+    /// named population in <see cref="Subjects"/> and the export's class. This answers <i>does it
+    /// compete for the lead and the census</i>. A cycle is unambiguously a <b>claim</b>, so
+    /// <c>IsRiskClaim</c> is true for it; marking it a disclosure to keep it off the rail would
+    /// have been the cheap way here and would have made the export say something false.
+    /// <c>SCHEMA-findings-export.md</c> §6.
+    /// </para>
+    /// <para>
+    /// <b>Why cycles do not compete.</b> They have rendered in their own <c>Circular references</c>
+    /// section since Job A, and selection is rarest-first: on nopCommerce <c>NamespaceCycle</c> and
+    /// <c>TypeTangle</c> fire <b>once each</b> against load-bearing's four, so competing would hand
+    /// a cycle the <c>Top finding</c> card on the strength of being rare rather than being worse.
+    /// The decision is recorded, not derived here.
+    /// </para>
+    /// <para>
+    /// <b>The two must be able to disagree or the split is decorative</b>, and
+    /// <c>ClaimsTests</c> asserts that they do. The one selector answering two questions is
+    /// <c>docs/DEFECTS.md</c> §40 and §41's family, which is why this is a second predicate rather
+    /// than another arm on the first.
+    /// </para>
+    /// </remarks>
+    public static bool CompetesForLead(FindingKind kind) =>
+        kind is not (FindingKind.NamespaceCycle or FindingKind.ProjectCycle or FindingKind.TypeTangle);
+
+    /// <summary>
     /// The claim a kind makes, in the reader's words.
     /// </summary>
     /// <remarks>
@@ -132,6 +162,9 @@ public static class Claims
         FindingKind.WidestContractSurface => "Widest contract surface",
         FindingKind.NoStaticReferences => "No static references found",
         FindingKind.Coverage => "No peer group",
+        FindingKind.NamespaceCycle => "Namespace cycle",
+        FindingKind.ProjectCycle => "Project cycle",
+        FindingKind.TypeTangle => "Type tangle",
         _ => kind.ToString(),
     };
 
@@ -204,6 +237,12 @@ public static class Claims
             "Nothing in this solution refers to these. Verify before deleting — the categories this analysis cannot see are named beside each one.",
         FindingKind.Coverage =>
             "Nothing comparable enough to judge these against. Recorded so silence is not mistaken for a clean bill.",
+        FindingKind.NamespaceCycle =>
+            "Sibling namespaces holding each other as state. Namespaces are how .NET expresses layering, so this is the architectural one.",
+        FindingKind.ProjectCycle =>
+            "Two projects each naming a type in the other. Legal MSBuild, and still the unit anyone extracts.",
+        FindingKind.TypeTangle =>
+            "Types that all reach each other, so none of them can be understood or moved on its own.",
         _ => "",
     };
 

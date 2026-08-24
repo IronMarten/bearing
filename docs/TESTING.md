@@ -261,8 +261,17 @@ losing one:
 1. **The constant is genuinely dead** — deletable, and the leave-one-out table above is what says so.
 2. **The fixture's distribution cannot reach it.** A plant fixes this, unless it cannot —
    `GlobalComplexityFloor` below is the case where it cannot.
-3. **The instrument does not measure it.** `MinTangle` gates structure and the sweep fingerprints
-   the finding set, so it reads `-` however well the fixture covers it.
+3. **The instrument does not measure it.** A gate on something the sweep does not fingerprint reads
+   `-` however well the fixture covers it.
+
+   > **`MinTangle` was this case and stopped being it on 2026-08-24.** It read *"MinTangle gates
+   > structure and the sweep fingerprints the finding set"* — true until type tangles became
+   > findings (`TECHREQ-job-b.md` §3.12), at which point the gate started moving the set it is
+   > fingerprinted against. The sweep now reads `MinTangle 4 1 - moves`, and that one line was the
+   > **entire** diff the sweep showed for a change that touched three detectors, two suppression
+   > rows, a predicate and a fixture plant — which is the sweep doing the job this section claims
+   > for it. **The category is still real**; it just has no example in this fixture at present, and
+   > a `-` should not be read as this case without checking that the sweep can see the gate at all.
 
 ### The leave-one-out verdict table
 

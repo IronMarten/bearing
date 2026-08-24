@@ -67,6 +67,11 @@ public static class Analysis
         BoundaryMarking.WidestSurfaces,
         NoStaticReferences.Detect,
         NoPeerGroup.Detect,
+        // TECHREQ-job-b.md §3.12. Last because the enum is, and for the same reason: these are
+        // claims that render in their own section rather than in the enumeration above it.
+        CircularReferences.AmongNamespaces,
+        CircularReferences.AmongProjects,
+        CircularReferences.AmongTypes,
     ];
 
     /// <summary>The claims this model supports, with the suppression matrix applied.</summary>

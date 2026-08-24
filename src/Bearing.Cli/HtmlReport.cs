@@ -873,7 +873,12 @@ public static class HtmlReport
         page.Append("the tool does not have a severity model, and a list sorted by an invented one reads as though ");
         page.Append("it did.</p>\n");
 
+        // Claims.CompetesForLead, for the same reason the census above uses it: --full enumerates
+        // the kinds this pane is the enumeration of, and a cycle's section is Circular references.
+        // Without the filter the pane would render each cycle kind twice over — once here as a
+        // list of set subjects with no card shape to put them in, and once in its own section.
         foreach (var group in findings.All
+                     .Where(f => Claims.CompetesForLead(f.Kind))
                      .GroupBy(f => f.Kind)
                      .OrderBy(g => g.Key))
         {
@@ -1026,6 +1031,7 @@ public static class HtmlReport
         // pane dropped has nothing on this page pointing at it, and a row for it would be an
         // answer to a question the reader was never shown.
         foreach (var finding in findings.All
+                     .Where(f => Claims.CompetesForLead(f.Kind))
                      .GroupBy(f => f.Kind)
                      .SelectMany(g => g.Take(model.Policy.Top)))
         {

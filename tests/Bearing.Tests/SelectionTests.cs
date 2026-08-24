@@ -38,8 +38,15 @@ public sealed class SelectionTests(CoreWalkFixture core)
         var exemplars = Selection.Exemplars(findings);
 
         Assert.Equal(
-            findings.All.Select(f => f.Kind).Distinct().OrderBy(k => k.ToString(), StringComparer.Ordinal),
+            findings.All.Select(f => f.Kind).Where(Claims.CompetesForLead).Distinct()
+                .OrderBy(k => k.ToString(), StringComparer.Ordinal),
             exemplars.Select(f => f.Kind).OrderBy(k => k.ToString(), StringComparer.Ordinal));
+
+        // And the exclusion is real on this fixture rather than vacuous: the cycle kinds fired,
+        // and none of them is here. Without this line the assertion above would still pass if
+        // CompetesForLead were `=> true` and the cycle detectors were never wired in.
+        Assert.Contains(findings.All, f => !Claims.CompetesForLead(f.Kind));
+        Assert.DoesNotContain(exemplars, f => !Claims.CompetesForLead(f.Kind));
     }
 
     /// <summary>Rarest kind first — ascending count on this run.</summary>

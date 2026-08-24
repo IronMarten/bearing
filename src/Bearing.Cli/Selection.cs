@@ -59,6 +59,12 @@ public static class Selection
         return
         [
             .. findings.All
+                // The enumeration the page leads with and counts, which is not every kind that
+                // fired: Claims.CompetesForLead carries why the cycle kinds render in their own
+                // section instead. The filter is here rather than in the four callers for the
+                // reason Subjects gives in full -- one derivation, because two of them disagree
+                // silently, and docs/DEFECTS.md §41 is what that costs.
+                .Where(f => Claims.CompetesForLead(f.Kind))
                 .GroupBy(f => f.Kind)
                 .OrderBy(g => g.Count())
                 .ThenBy(g => g.Key.ToString(), StringComparer.Ordinal)

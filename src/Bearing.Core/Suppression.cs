@@ -140,6 +140,29 @@ public static class Suppression
             Applies = (_, detected, model) =>
                 detected.OfKind(FindingKind.WidestContractSurface).Count > model.Policy.MaxNamedSurfaces,
         },
+        new SuppressionRule(
+            "cycle-is-folder-layout",
+            FindingKind.NamespaceCycle,
+            Invariant: "2",
+            "one assembly's own folders — the assembly is the unit anyone extracts, so a loop " +
+            "inside one has nothing to break")
+        {
+            // TECHREQ-job-b.md §3.12. This was a classification that returned early, and turning
+            // it into a row is most of why cycles became findings: CycleShape decided what the
+            // report showed, nothing recorded that it had decided, and §4's rule is that a
+            // suppression which cannot be observed to withhold anything is worse than none. The
+            // shape now arrives as a qualifier and the withholding is a row with a reason on it.
+            Applies = (finding, _, _) => finding.Holds(Qualifiers.OneAssemblysOwnFolders),
+        },
+        new SuppressionRule(
+            "cycle-is-shared-types",
+            FindingKind.NamespaceCycle,
+            Invariant: "2",
+            "peers naming each other's entities and holding none of them — reporting it asks a " +
+            "reader to break a dependency that costs nothing to keep")
+        {
+            Applies = (finding, _, _) => finding.Holds(Qualifiers.PeersNamingSharedTypes),
+        },
     ];
 
     /// <summary>
