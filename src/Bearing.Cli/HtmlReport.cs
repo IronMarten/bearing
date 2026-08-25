@@ -500,7 +500,7 @@ public static class HtmlReport
 
         Projects(page, model);
         Integrations(page, model);
-        Cycles(page, model);
+        Cycles(page, model, findings);
         Coverage(page, model);
     }
 
@@ -639,7 +639,7 @@ public static class HtmlReport
                 .Append("framework plumbing were filtered out of that list rather than dropped silently.</p>\n");
     }
 
-    private static void Cycles(StringBuilder page, SolutionModel model)
+    private static void Cycles(StringBuilder page, SolutionModel model, FindingSet findings)
     {
         page.Append("<h3>Circular references</h3>\n");
 
@@ -655,16 +655,18 @@ public static class HtmlReport
 
         NotLayering(page, [.. shaped.Where(c => !c.IsReportable)], id => Name(model, id));
 
-        var typeProjects = model.Types.Select(t => (t.Subject.Canonical, t.Project)).ToList();
-
+        // Off the finding, through CycleEvidence, exactly as the terminal renderer does it. Both
+        // used to recompute this from model.Edges independently, which is the arrangement
+        // docs/DEFECTS.md §46 came out of.
         CycleGroup(page, "Projects", model.ProjectCycles,
             "Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.",
             id => Name(model, id),
-            cycle => ProjectLinks.Closing(cycle, typeProjects, model.Edges)
+            cycle => CycleEvidence
+                .ProjectLinks(model, Relations(findings, FindingKind.ProjectCycle, cycle))
                 .Take(6)
                 .Select(link => $"{link.From} → {link.To}: {link.Weight} reference(s)"
-                                + (link.Example is { } e
-                                    ? $" — heaviest: {Name(model, e.From)} → {Name(model, e.To)}"
+                                + (link.Example is { } via
+                                    ? $" — heaviest: {Name(model, via.From)} → {Name(model, via.To)}"
                                     : "")));
 
         var holds = model.ShapedTypeTangles.ToDictionary(t => t.Tangle, t => t);
@@ -673,7 +675,7 @@ public static class HtmlReport
             "Groups of types that all reach each other, so none of them can be tested or changed alone.",
             id => Name(model, id),
             cycle => holds.TryGetValue(cycle, out var shaped)
-                ? [Holds(shaped, id => Name(model, id))]
+                ? [Holds(shaped, Relations(findings, FindingKind.TypeTangle, cycle), id => Name(model, id))]
                 : []);
     }
 
@@ -756,7 +758,15 @@ public static class HtmlReport
     /// must not drift is the judgement, which is in Core. If these sentences diverge in phrasing
     /// nothing breaks; if the shape did, that would be two reports disagreeing about the code.
     /// </remarks>
-    private static string Holds(ShapedTangle tangle, Func<SubjectRef, string> name)
+    /// <summary>
+    /// A cycle finding's relations, or empty when it was suppressed and is not in the reported set.
+    /// <c>StructureSections</c> carries the same helper and the same reason.
+    /// </summary>
+    private static IReadOnlyList<Relation> Relations(FindingSet findings, FindingKind kind, Cycle cycle) =>
+        findings.OfKind(kind).FirstOrDefault(f => f.Subject.Equals(cycle.Subject))?.Relations ?? [];
+
+    private static string Holds(
+        ShapedTangle tangle, IReadOnlyList<Relation> relations, Func<SubjectRef, string> name)
     {
         if (tangle.Shape == TangleShape.Hierarchy)
             return "A type hierarchy: set the inheritance aside and nothing mutually dependent "
@@ -765,7 +775,7 @@ public static class HtmlReport
         var kinds = string.Join(", ", tangle.Kinds.Take(3));
         var held = kinds.Length == 0 ? "Held by references the walk could not attribute" : $"Held by {kinds}";
 
-        return tangle.Heaviest is { } pair
+        return CycleEvidence.HeaviestPair(relations) is { } pair
             ? $"{held}; heaviest: {name(pair.First)} ↔ {name(pair.Second)}, {pair.Weight} reference(s)."
             : held + ".";
     }

@@ -59,7 +59,7 @@ public static class Report
         // someone's first impression, which is an argument for placement as much as for wording.
         foreach (var line in FindingSections.NoStaticReferencesFound(model, findings)) yield return line;
 
-        foreach (var line in StructureSections.CircularReferences(model)) yield return line;
+        foreach (var line in StructureSections.CircularReferences(model, findings)) yield return line;
         foreach (var line in FindingSections.SharedMutableState(model, findings)) yield return line;
         foreach (var line in StructureSections.ProjectStability(model)) yield return line;
         foreach (var line in StructureSections.UnreferencedProjects(model)) yield return line;

@@ -84,13 +84,14 @@ public static class CircularReferences
 
         if (model.ProjectCycles.Count == 0) return [];
 
-        var typeProjects = model.Types.Select(t => (t.Subject.Canonical, t.Project)).ToList();
+        var projectOf = model.Types.ToDictionary(
+            t => t.Subject.Canonical, t => t.Project, StringComparer.Ordinal);
         var found = new List<(int Weight, Finding Finding)>();
 
         foreach (var cycle in model.ProjectCycles)
         {
-            var links = ProjectLinks.Closing(cycle, typeProjects, model.Edges);
-            var carried = links.Sum(link => link.Weight);
+            var crossing = Crossing(cycle, projectOf, model.Edges);
+            var carried = crossing.Sum(r => r.Weight);
 
             found.Add((carried, new Finding(
                 new FindingKey(FindingKind.ProjectCycle, cycle.Subject),
@@ -100,12 +101,7 @@ public static class CircularReferences
                 ],
                 [],
                 [],
-                [
-                    .. links.Select(link => new Relation(
-                        SubjectRef.ForProject(link.From),
-                        SubjectRef.ForProject(link.To),
-                        link.Weight))
-                ])));
+                crossing)));
         }
 
         return Nomination.Ranked(found.OrderByDescending(f => f.Weight), f => f.Finding);
@@ -140,6 +136,37 @@ public static class CircularReferences
     }
 
     /// <summary>
+    /// Every type-level reference that crosses a project boundary inside the cycle.
+    /// </summary>
+    /// <remarks>
+    /// <b>Type level, not project level, and that is the decision.</b> <i>ProjA → ProjB: 4
+    /// references, heaviest TypeX → TypeY</i> is a reading of these rather than a thing to store:
+    /// storing it would need either a fourth field on <see cref="Relation"/> that is null for every
+    /// other kind, or an ordering contract between a link and its exemplar that nothing enforces.
+    /// <see cref="CycleEvidence.ProjectLinks"/> is the reading, and it has one home.
+    /// </remarks>
+    private static IReadOnlyList<Relation> Crossing(
+        Cycle cycle,
+        Dictionary<string, string> projectOf,
+        IReadOnlyList<Edge> edges)
+    {
+        var members = cycle.Members
+            .Select(m => m.Canonical.Replace("project|", "", StringComparison.Ordinal))
+            .ToHashSet(StringComparer.Ordinal);
+
+        return
+        [
+            .. edges
+                .Where(e =>
+                    projectOf.TryGetValue(e.From.Canonical, out var from) &&
+                    projectOf.TryGetValue(e.To.Canonical, out var to) &&
+                    !string.Equals(from, to, StringComparison.Ordinal) &&
+                    members.Contains(from) && members.Contains(to))
+                .Select(e => new Relation(e.From, e.To, e.Weight))
+        ];
+    }
+
+    /// <summary>
     /// A held pair becomes <b>two</b> directed relations rather than one flagged as mutual.
     /// </summary>
     /// <remarks>
@@ -162,7 +189,7 @@ public static class CircularReferences
     /// </summary>
     /// <remarks>
     /// <b>Wider than what the section prints, and that is the point of carrying it here.</b> The
-    /// renderers name only the heaviest pair (<see cref="ShapedTangle.Heaviest"/>), which is a
+    /// renderers name only the heaviest pair (<see cref="CycleEvidence.HeaviestPair"/>), which is a
     /// display choice; the finding carries the evidence the choice was made from, so a second
     /// renderer cannot arrive at a different one. That is <c>docs/DEFECTS.md</c> §46's mechanism
     /// removed rather than repaired.

@@ -85,7 +85,21 @@ internal static class StructureSections
     /// beside it, not whether it appears.
     /// </para>
     /// </remarks>
-    private static string Holds(ShapedTangle tangle, Func<SubjectRef, string> name)
+    /// <summary>
+    /// A cycle finding's relations, or empty when the cycle was suppressed and has no finding in
+    /// the reported set.
+    /// </summary>
+    /// <remarks>
+    /// <b>Empty is a real answer here and not a miss.</b> The namespace group renders suppressed
+    /// cycles in its <i>not reported</i> list, and a suppressed finding is not in the set the
+    /// renderers are handed — so this returns nothing for those, which is why the namespace side
+    /// still reads its held pairs off the shape rather than off a finding.
+    /// </remarks>
+    private static IReadOnlyList<Relation> Relations(FindingSet findings, FindingKind kind, Cycle cycle) =>
+        findings.OfKind(kind).FirstOrDefault(f => f.Subject.Equals(cycle.Subject))?.Relations ?? [];
+
+    private static string Holds(
+        ShapedTangle tangle, IReadOnlyList<Relation> relations, Func<SubjectRef, string> name)
     {
         if (tangle.Shape == TangleShape.Hierarchy)
             return "a type hierarchy: set the inheritance aside and nothing mutually "
@@ -94,7 +108,7 @@ internal static class StructureSections
         var kinds = string.Join(", ", tangle.Kinds.Take(KindsPerTangle));
         var held = kinds.Length == 0 ? "held by references the walk could not attribute" : $"held by {kinds}";
 
-        return tangle.Heaviest is { } pair
+        return CycleEvidence.HeaviestPair(relations) is { } pair
             ? $"{held}; heaviest: {name(pair.First)} <-> {name(pair.Second)}, "
               + Sentences.Plural(pair.Weight, "reference")
             : held;
@@ -212,7 +226,7 @@ internal static class StructureSections
             yield return $"     ({map.PlumbingReferences} language/runtime references omitted as plumbing)";
     }
 
-    internal static IEnumerable<string> CircularReferences(SolutionModel model)
+    internal static IEnumerable<string> CircularReferences(SolutionModel model, FindingSet findings)
     {
         yield return "";
         yield return "-- CIRCULAR REFERENCES -----------------------------------------";
@@ -270,8 +284,6 @@ internal static class StructureSections
 
         string ProjectName(SubjectRef id) => projectNames.GetValueOrDefault(id, id.Canonical);
 
-        var typeProjects = model.Types.Select(t => (t.Subject.Canonical, t.Project)).ToList();
-
         foreach (var cycle in shownProjects)
         {
             yield return "     " + Members(cycle, "projects", ProjectsPerCycle, " <-> ", ProjectName);
@@ -280,10 +292,16 @@ internal static class StructureSections
             // No suppression here, unlike the namespace cycles: the assembly is the unit anyone
             // extracts, so two of them naming each other is a finding at any weight. What was
             // missing is where to start, which is the heaviest link and the type that carries it.
-            foreach (var link in ProjectLinks.Closing(cycle, typeProjects, model.Edges).Take(ProjectLinksPerCycle))
+            //
+            // Read off the finding rather than recomputed from model.Edges, and derived by
+            // CycleEvidence rather than here — docs/DEFECTS.md §46 was one renderer keeping
+            // evidence the other lost, so neither of these two may hold its own copy of either.
+            foreach (var link in CycleEvidence
+                         .ProjectLinks(model, Relations(findings, FindingKind.ProjectCycle, cycle))
+                         .Take(ProjectLinksPerCycle))
             {
-                var carrier = link.Example is { } edge
-                    ? $" — heaviest: {TypeName(edge.From)} -> {TypeName(edge.To)}"
+                var carrier = link.Example is { } via
+                    ? $" — heaviest: {TypeName(via.From)} -> {TypeName(via.To)}"
                     : "";
 
                 yield return $"       {link.From} -> {link.To}: "
@@ -310,7 +328,8 @@ internal static class StructureSections
             var tangle = shapedTangle.Tangle;
             yield return "     " + Members(tangle, "types", TypesPerTangle, ", ", TypeName);
             yield return "       " + Loop(tangle, TypeName);
-            yield return "       " + Holds(shapedTangle, TypeName);
+            yield return "       " + Holds(
+                shapedTangle, Relations(findings, FindingKind.TypeTangle, tangle), TypeName);
         }
 
         foreach (var line in tangleDisclosure) yield return line;

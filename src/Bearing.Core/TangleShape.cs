@@ -54,16 +54,16 @@ public enum TangleShape
 /// <param name="Kinds">
 /// The reference kinds closing it, heaviest first — what a reader would have to unpick.
 /// </param>
-/// <param name="Heaviest">
-/// The two members with the most references between them, or <see langword="null"/> when the
-/// tangle has no internal edge the walk attributed. The loop line says the tangle exists; this
-/// says where to start.
-/// </param>
+/// <remarks>
+/// <b>The heaviest pair used to be a fourth component here and is not any more.</b> It moved to
+/// <see cref="CycleEvidence.HeaviestPair"/>, over the finding's relations, when cycles became
+/// findings — leaving it here as well would have been two derivations of one reading, which is
+/// what this consolidation exists to remove rather than to add to.
+/// </remarks>
 public sealed record ShapedTangle(
     Cycle Tangle,
     TangleShape Shape,
-    IReadOnlyList<EdgeKind> Kinds,
-    TanglePair? Heaviest);
+    IReadOnlyList<EdgeKind> Kinds);
 
 /// <summary>Two members of a tangle and how many references run between them, both ways.</summary>
 /// <param name="First">The ordinally lower member.</param>
@@ -118,17 +118,7 @@ public static class TangleShapes
             .Select(g => g.Key)
             .ToList();
 
-        var byId = tangle.Members.ToDictionary(m => m.Canonical, m => m, StringComparer.Ordinal);
-
-        var heaviest = inner
-            .GroupBy(e => Unordered(e.From.Canonical, e.To.Canonical))
-            .Select(g => new TanglePair(byId[g.Key.Low], byId[g.Key.High], g.Sum(e => e.Weight)))
-            .OrderByDescending(p => p.Weight)
-            .ThenBy(p => p.First.Canonical, StringComparer.Ordinal)
-            .Cast<TanglePair?>()
-            .FirstOrDefault();
-
-        return new ShapedTangle(tangle, Read(members, Uses(inner)), kinds, heaviest);
+        return new ShapedTangle(tangle, Read(members, Uses(inner)), kinds);
     }
 
     /// <summary>
@@ -187,97 +177,19 @@ public static class TangleShapes
         return adjacency.ToDictionary(
             kv => kv.Key, kv => (IReadOnlyList<string>)kv.Value, StringComparer.Ordinal);
     }
-
-    private static (string Low, string High) Unordered(string a, string b) =>
-        string.CompareOrdinal(a, b) <= 0 ? (a, b) : (b, a);
 }
 
 /// <summary>
-/// The types that actually close a project cycle, in one direction.
+/// A project-to-project link inside a project cycle — the aggregate
+/// <see cref="CycleEvidence.ProjectLinks"/> reads out of a finding's relations, and what both
+/// renderers print.
 /// </summary>
 /// <param name="From">The project the references are written in.</param>
 /// <param name="To">The project they name.</param>
 /// <param name="Weight">How many references there are.</param>
-/// <param name="Example">The heaviest single type-to-type dependency among them.</param>
-public readonly record struct ProjectLink(string From, string To, int Weight, Edge? Example);
-
-/// <summary>
-/// Which types hold a project cycle together.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <b>Evidence, and deliberately not a suppression.</b> Namespaces and type tangles both needed a
-/// reading that could set an instance aside; this does not, and the difference is not a judgement
-/// call. The assembly is the unit anyone extracts, deploys and versions, so two of them naming
-/// each other is a finding at any weight — there is no "it is all one component really" available
-/// the way there is for a plugin's own folders.
-/// </para>
-/// <para>
-/// <b>What was missing is where to start.</b> The section names the projects and one walk between
-/// them and stops, so a cycle closed by a single enum reference and one closed by forty service
-/// fields read identically. Both are findings; they are not the same morning's work.
-/// </para>
-/// <para>
-/// <b>Unexercised on both measured solutions, and that is expected rather than untested.</b>
-/// nopCommerce and Jellyfin each report no project cycle at all, because an ordinary cross-project
-/// edge follows a project reference and MSBuild forbids those from cycling. See
-/// <see cref="Cycles.AmongProjects(IEnumerable{ValueTuple{string, string}},
-/// IEnumerable{ValueTuple{string, string}})"/> for why the primitives overload exists: this is
-/// tested against a constructed cycle, because neither real solution can supply one.
-/// </para>
-/// </remarks>
-public static class ProjectLinks
-{
-    /// <summary>
-    /// Each ordered pair inside <paramref name="cycle"/> that carries at least one reference,
-    /// heaviest first.
-    /// </summary>
-    /// <param name="cycle">A project cycle, from <see cref="Cycles.AmongProjects"/>.</param>
-    /// <param name="types">Each analysed type's identity and the project that declares it.</param>
-    /// <param name="edges">Every dependency, aggregated per type pair.</param>
-    public static IReadOnlyList<ProjectLink> Closing(
-        Cycle cycle,
-        IEnumerable<(string TypeId, string Project)> types,
-        IReadOnlyList<Edge> edges)
-    {
-        ArgumentNullException.ThrowIfNull(cycle);
-        ArgumentNullException.ThrowIfNull(types);
-        ArgumentNullException.ThrowIfNull(edges);
-
-        var projectOf = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var (typeId, project) in types) projectOf[typeId] = project;
-
-        var members = cycle.Members
-            .Select(m => m.Canonical.Replace("project|", "", StringComparison.Ordinal))
-            .ToHashSet(StringComparer.Ordinal);
-
-        var links = new Dictionary<(string, string), List<Edge>>();
-
-        foreach (var edge in edges)
-        {
-            // Both endpoints analysed, exactly as AmongProjects requires. An edge to a type the
-            // walk never declared has no project, and inventing one is docs/DEFECTS.md §1.
-            if (!projectOf.TryGetValue(edge.From.Canonical, out var from)) continue;
-            if (!projectOf.TryGetValue(edge.To.Canonical, out var to)) continue;
-
-            if (string.Equals(from, to, StringComparison.Ordinal)) continue;
-            if (!members.Contains(from) || !members.Contains(to)) continue;
-
-            if (!links.TryGetValue((from, to), out var carrying)) links[(from, to)] = carrying = [];
-            carrying.Add(edge);
-        }
-
-        return links
-            .Select(kv => new ProjectLink(
-                kv.Key.Item1,
-                kv.Key.Item2,
-                kv.Value.Sum(e => e.Weight),
-                kv.Value.OrderByDescending(e => e.Weight)
-                    .ThenBy(e => e.From.Canonical, StringComparer.Ordinal)
-                    .First()))
-            .OrderByDescending(l => l.Weight)
-            .ThenBy(l => l.From, StringComparer.Ordinal)
-            .ThenBy(l => l.To, StringComparer.Ordinal)
-            .ToList();
-    }
-}
+/// <param name="Example">
+/// The single heaviest type-level reference carrying it — a <see cref="Relation"/> rather than an
+/// <see cref="Edge"/>, because that is what the finding carries and what both renderers print from
+/// it: two type endpoints and nothing else.
+/// </param>
+public readonly record struct ProjectLink(string From, string To, int Weight, Relation? Example);

@@ -390,12 +390,17 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         var cycle = Assert.Single(Cycles.AmongProjects(
             types, [("core|A", "web|B"), ("web|C", "core|A")]));
 
-        var links = ProjectLinks.Closing(cycle, types, core.Model.Edges);
+        // CycleEvidence.ProjectLinks replaced ProjectLinks.Closing when cycles became findings:
+        // the aggregation reads a finding's relations rather than re-walking model.Edges, and it
+        // has one home because both renderers call it. The property under test is unchanged.
+        var links = CycleEvidence.ProjectLinks(
+            core.Model,
+            [new Relation(SubjectRef.ForType("core", "A"), SubjectRef.ForType("web", "B"), 3)]);
 
-        // The fixture's edges know nothing of these projects, so the cycle is real and the
-        // evidence for it is empty. That is the honest pairing: Closing reports what the edge
-        // list contains, and inventing a link for a cycle found over different inputs is the
-        // failure docs/DEFECTS.md §1 is about.
+        // The fixture's model knows nothing of these types, so the cycle is real and the evidence
+        // for it is empty. That is the honest pairing: the aggregation reports what it can resolve
+        // against the model, and inventing a link for a relation whose endpoints the walk never
+        // declared is the failure docs/DEFECTS.md §1 is about.
         Assert.Empty(links);
         Assert.Equal(["Core", "Web"], cycle.Members.Select(m => m.Canonical.Replace("project|", "", StringComparison.Ordinal)));
     }
