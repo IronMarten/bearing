@@ -292,6 +292,47 @@ layer is a fact about the codebase rather than a layering to fix.
 interior of a box rect that is not one of its own endpoints. `TestBed` already has a
 three-project chain, so this is reachable without a plant, which is rare for a picture defect.
 
+### 54. `--top`, a display cap, decides a judgement
+
+`AnalysisPolicy.RollCallThreshold` is `Top / RollCallDivisor` — 15 / 3, so 5 by default — and
+`SpansArchitecturalLayers` tests a nomination's group size against it to decide whether the finding
+carries the `part-of-a-layering-pattern` qualifier. **`Top` is the display cap**, applied everywhere
+else through `Sentences.Cap` to decide how many rows a section prints.
+
+So the same code at the same commit says different things about itself depending on how many rows
+the reader asked to see. Measured on `TestBed`, through the shipped CLI:
+
+| run | findings | keys | layer-span findings claiming a layering pattern |
+|---|---|---|---|
+| `--top 1` | 180 | identical | **all of them** — the threshold is `1 / 3` = 0, and every group size exceeds 0 |
+| `--top 15` | 180 | identical | 8 fewer |
+
+**The population does not move — only the claim about it does.** That is what makes this worse than
+a cap and not better: nothing appears or vanishes, so a consumer diffing two runs sees a qualifier
+flip with no cause anywhere in the code, which is the *"real architectural event"* reading
+`SCHEMA-findings-export.md` §3 worries about in a different setting.
+
+**Invariant 2 is the thing being decided.** *Anomaly, not roll-call* is a judgement about the
+codebase — four controllers reaching into data access is one fact about your layering rather than
+four findings. Deriving its threshold from the display budget makes it a judgement about the
+terminal instead, and the qualifier is model-level: it reaches both renderers and now the export.
+
+**Found by `SCHEMA-findings-export.md` §8.3's test**, which asserts the export is uncapped because
+*"a persistence format must not depend on a presentation flag."* It fails, and the reason it fails
+is not the export.
+
+**§4 of that document is wrong where it explains the omission** — *"`--top` is not represented. It
+is applied by the renderers through `Sentences.Cap`; **Core has no notion of it**"*. Core has one.
+Corrected there, with a pointer here.
+
+**`Top` is two settings wearing one name**, and that is the shape of the fix rather than the fix
+itself: the number of rows to print and the group size above which detail collapses are unrelated
+quantities that happen to be one ratio apart today. **Not repaired here, and deliberately** — the
+remedies are an absolute group-size floor or a share of the nominated set, neither is measured, and
+this register's own discipline is that a threshold proposed without measuring both solutions is the
+next entry rather than the fix for this one. It is X16's family in a different layer: a constant
+that looks calibrated and is coupled to something it has no relationship with.
+
 ### 48. The project map tints two boxes and labels them *stable and concrete*, and nothing on the map says what either means
 
 `Nop.Web.Framework` and `Nop.Core` render as `class="bx pain"` — an orange fill and a `stable and

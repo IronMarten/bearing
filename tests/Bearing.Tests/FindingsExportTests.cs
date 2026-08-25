@@ -201,4 +201,268 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
         Assert.NotEqual(0, sets);
         Assert.NotEqual(0, members);
     }
+
+    /// <summary>
+    /// §8.5 — <c>class</c> is <see cref="Claims.IsRiskClaim"/> and cannot drift from it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Asserted for every kind in the enum, not for every kind in the file.</b> A kind that stops
+    /// firing on the fixture would quietly stop being checked, and the field's whole job is to stop
+    /// a consumer counting a disclosure as a claim — a job it can only do if the mapping is total.
+    /// The <see cref="Claims.CompetesForLead"/> arm is deliberately absent: <c>class</c> answers
+    /// <i>claim or disclosure</i>, and a cycle is a claim that happens not to lead the page.
+    /// </remarks>
+    [Fact]
+    public void Class_says_claim_exactly_where_the_kind_is_one()
+    {
+        var classOf = Findings.ToDictionary(KeyOf, f => f.GetProperty("class").GetString()!, StringComparer.Ordinal);
+
+        foreach (var judgement in Judged)
+        {
+            Assert.Equal(
+                Claims.IsRiskClaim(judgement.Finding.Kind) ? "claim" : "disclosure",
+                classOf[judgement.Finding.Key.Canonical]);
+        }
+
+        // Both values occur, or this is one string compared with itself.
+        Assert.Contains("claim", classOf.Values);
+        Assert.Contains("disclosure", classOf.Values);
+    }
+
+    /// <summary>
+    /// §8.7 — every <c>gate</c> names a policy value that exists.
+    /// </summary>
+    /// <remarks>
+    /// <b>A gate is a join, not a label.</b> It is how a consumer asks <i>what would have to change
+    /// for this to stop firing</i>, and the answer is a lookup into <c>policy</c> in the same file.
+    /// A gate naming something <c>AnalysisPolicy</c> does not have is a dangling reference that
+    /// reads perfectly — which is why <c>nameof</c> at the call site is not enough on its own: it
+    /// survives a rename of the property it names only because the compiler rewrites it, and says
+    /// nothing about a receipt whose gate was typed as a string.
+    /// </remarks>
+    [Fact]
+    public void Every_gate_resolves_against_the_policy()
+    {
+        var known = core.Model.Policy.Values.Select(v => v.Name).ToHashSet(StringComparer.Ordinal);
+
+        var gates = Findings
+            .SelectMany(f => f.GetProperty("receipts").EnumerateArray()
+                .Concat(f.GetProperty("qualifiers").EnumerateArray()))
+            .Select(r => r.GetProperty("gate"))
+            .Where(g => g.ValueKind is not JsonValueKind.Null)
+            .Select(g => g.GetString()!)
+            .ToList();
+
+        Assert.NotEmpty(gates);
+
+        foreach (var gate in gates.Distinct(StringComparer.Ordinal))
+            Assert.True(known.Contains(gate), $"{gate} is named as a gate and is not a policy value.");
+    }
+
+    /// <summary>
+    /// §8.6 — two renders of one model differ nowhere.
+    /// </summary>
+    /// <remarks>
+    /// <b>Ordering is the thing this catches</b>, and the export has more of it to get wrong than
+    /// the rest of the document: a finding carries four lists, and any of them arriving from a
+    /// hash-ordered source would make two runs over one commit diff as though something had moved.
+    /// <c>OrderingTests</c> makes the same claim about the document as a whole; this one is here so
+    /// that a finding-shaped regression fails in the file that owns findings.
+    /// </remarks>
+    [Fact]
+    public void Two_renders_of_one_model_are_identical()
+    {
+        Assert.Equal(
+            JsonOutput.Render(core.Model, Analysis.Judge(core.Model), Instant),
+            JsonOutput.Render(core.Model, Analysis.Judge(core.Model), Instant),
+            StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// §8.8 — <c>configuration</c> covers every non-policy member of <see cref="WalkOptions"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Asserted over the record's members rather than over a list of the three that exist
+    /// today</b>, which is the entire point of the block. §3 argues for mirroring
+    /// <see cref="WalkOptions"/> so that <i>a fourth walk setting added later is a compile-visible
+    /// gap in a record rather than something a writer must remember</i> — and a test naming
+    /// <c>includeTests</c>, <c>defaultExcludesCleared</c> and <c>excludedPathFragments</c> would
+    /// hold none of that. It would pass forever while the fourth setting went unexported.
+    /// </para>
+    /// <para>
+    /// <b>Three members are excluded and each for its own reason.</b> <c>Policy</c> is the
+    /// <c>policy</c> dictionary and would be said twice. <c>SolutionPath</c> is already
+    /// <c>solutionPath</c> at the top of the document. <c>ToolVersion</c> is already <c>tool</c>.
+    /// They are named here rather than filtered by a predicate, because a reader deciding whether a
+    /// new member belongs in the block needs the reasons, not the outcome.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Configuration_covers_every_non_policy_walk_setting()
+    {
+        var saidElsewhere = new[]
+        {
+            nameof(WalkOptions.Policy),
+            nameof(WalkOptions.SolutionPath),
+            nameof(WalkOptions.ToolVersion),
+        };
+
+        var expected = typeof(WalkOptions)
+            .GetProperties()
+            .Select(p => p.Name)
+            .Except(saidElsewhere, StringComparer.Ordinal)
+            .Select(n => char.ToLowerInvariant(n[0]) + n[1..])
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToList();
+
+        var actual = Root.GetProperty("configuration")
+            .EnumerateObject()
+            .Select(p => p.Name)
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(expected, actual);
+    }
+
+    /// <summary>
+    /// §8.3 — the export is uncapped: <c>--top</c> does not reach it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A presentation flag must not decide what a persistence format contains.</b> §4: two runs
+    /// at different <c>--top</c> would diff as though findings had appeared and vanished, and
+    /// nothing in the file would say why. It is also what makes <c>docs/DEFECTS.md</c> §47's
+    /// sentence true rather than merely reworded — the page claims the exports carry every finding,
+    /// and a cap here would make that a second wrong version of the same claim.
+    /// </para>
+    /// <para>
+    /// <b>A real second walk, because <c>Top</c> lives on the model.</b> Rendering the same model
+    /// twice would assert nothing: the writer would have to go out of its way to read a value it
+    /// was handed once. <see cref="CoreWalkFixture.WalkWith"/> memoises, so the second walk is paid
+    /// for once across the suite.
+    /// </para>
+    /// <para>
+    /// <b>Compared as the <c>findings</c> array alone and not as the document</b>, because the rest
+    /// of the file legitimately moves: <c>policy</c> reports the run's own thresholds, so a
+    /// document comparison would fail on the very value being varied and prove nothing about the
+    /// findings.
+    /// </para>
+    /// <para>
+    /// <b>It found that §8.3 is half true, and the half that is not is <c>docs/DEFECTS.md</c>
+    /// §54.</b> The population is uncapped — same keys, same count, at either <c>--top</c>. The
+    /// <i>content</i> is not: <c>RollCallThreshold</c> is <c>Top / RollCallDivisor</c>, so the
+    /// display cap decides whether a layer-span finding carries
+    /// <c>part-of-a-layering-pattern</c>. <c>SCHEMA-findings-export.md</c> §4 says Core has no
+    /// notion of <c>--top</c>; it has one, and this is where that was found.
+    /// </para>
+    /// <para>
+    /// <b>Asserted as the defect rather than skipped.</b> The inequality below fails the day §54 is
+    /// fixed, which is what a test of a known-wrong behaviour is for — a skip records the gap
+    /// somewhere nothing reads, and a deleted test records it nowhere.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_findings_are_the_same_at_every_top()
+    {
+        static string FindingsOf(SolutionModel model) =>
+            JsonDocument.Parse(JsonOutput.Render(model, Analysis.Judge(model), Instant))
+                .RootElement.GetProperty("findings").GetRawText();
+
+        var narrow = core.WalkWith(core.Model.Policy with { Top = 1 });
+        var wide = core.WalkWith(core.Model.Policy with { Top = 15 });
+
+        // The runs really do differ where the cap bites, or this compares a model with itself.
+        Assert.NotEqual(narrow.Policy.Top, wide.Policy.Top);
+
+        // The POPULATION is uncapped, which is the half of §8.3 that holds today: same keys, same
+        // count, nothing appearing or vanishing with the flag.
+        Assert.Equal(Keys(narrow), Keys(wide));
+
+        // And the half that does not, asserted as the defect rather than left as a silence.
+        // docs/DEFECTS.md §54: RollCallThreshold is Top / RollCallDivisor, so --top decides whether
+        // a layer-span finding carries part-of-a-layering-pattern. A display cap reaching a
+        // judgement is the defect; this line fails the day it is fixed, which is the point of
+        // writing it this way round rather than skipping the test.
+        Assert.NotEqual(FindingsOf(narrow), FindingsOf(wide));
+
+        var flipped = Differing(narrow, wide);
+
+        Assert.All(flipped, k => Assert.StartsWith(nameof(FindingKind.SpansArchitecturalLayers), k, StringComparison.Ordinal));
+        Assert.NotEmpty(flipped);
+    }
+
+    private static IReadOnlyList<string> Keys(SolutionModel model) =>
+        [.. Rows(model).Select(KeyOf).OrderBy(k => k, StringComparer.Ordinal)];
+
+    /// <summary>Keys whose entry is not identical between two runs.</summary>
+    private static IReadOnlyList<string> Differing(SolutionModel a, SolutionModel b)
+    {
+        var left = Rows(a).ToDictionary(KeyOf, r => r.GetRawText(), StringComparer.Ordinal);
+        var right = Rows(b).ToDictionary(KeyOf, r => r.GetRawText(), StringComparer.Ordinal);
+
+        return [.. left.Where(kv => right[kv.Key] != kv.Value).Select(kv => kv.Key).Order(StringComparer.Ordinal)];
+    }
+
+    private static IReadOnlyList<JsonElement> Rows(SolutionModel model) =>
+    [
+        .. JsonDocument.Parse(JsonOutput.Render(model, Analysis.Judge(model), Instant))
+            .RootElement.GetProperty("findings").EnumerateArray()
+    ];
+
+    /// <summary>
+    /// §8.4 — a suppressed finding names the row that silenced it, and the file moves when the
+    /// matrix does.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Two claims, and the second is the one that could rot.</b> That the attribution is correct
+    /// is checkable against <c>Suppression.Rules</c> directly. That the file is <i>sensitive</i> to
+    /// the matrix at all is not — a writer that hard-coded <c>suppressedBy</c> to null would pass
+    /// every other test in this file, because nothing else reads it.
+    /// </para>
+    /// <para>
+    /// <b>The mutation is applied to the judgement rather than to the source.</b>
+    /// <c>tools/leave-one-out.sh</c> deletes a gate and re-runs, which is the right instrument for
+    /// asking whether a gate is observable and the wrong one for a test: it edits the working tree.
+    /// Re-judging one finding as unsuppressed and re-rendering asks the narrower question this
+    /// needs — does the row reach the file — without a second walk or a mutated checkout.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_suppressed_finding_names_its_row_and_the_file_follows_the_matrix()
+    {
+        var judged = Judged;
+        var silenced = judged.Where(j => !j.IsReported).ToList();
+
+        Assert.NotEmpty(silenced);
+
+        var attribution = Findings
+            .Where(f => f.GetProperty("status").GetString() == "suppressed")
+            .ToDictionary(KeyOf, f => f.GetProperty("suppressedBy"), StringComparer.Ordinal);
+
+        foreach (var judgement in silenced)
+        {
+            var named = attribution[judgement.Finding.Key.Canonical];
+            var rule = judgement.SilencedBy!;
+
+            Assert.Equal(rule.Name, named.GetProperty("rule").GetString());
+            Assert.Equal(rule.Invariant, named.GetProperty("invariant").GetString());
+
+            // Verbatim, so four surfaces do not each write their own version of why it went quiet.
+            Assert.Equal(rule.Reason, named.GetProperty("reason").GetString());
+
+            // And the row is one the matrix actually holds, rather than a string the writer made.
+            Assert.Contains(Suppression.Rules, r => r.Name == rule.Name);
+        }
+
+        // The file follows the matrix: re-judge one silenced finding as reported and it moves.
+        var loosened = judged
+            .Select(j => ReferenceEquals(j, silenced[0]) ? new Judged(j.Finding, null) : j)
+            .ToList();
+
+        Assert.NotEqual(
+            JsonOutput.Render(core.Model, judged, Instant),
+            JsonOutput.Render(core.Model, loosened, Instant));
+    }
 }
