@@ -423,113 +423,9 @@ declares a type in it. It reads as the framework being part of the cycle.
 component this large is either a layering problem or a fact about the codebase, and there is nothing
 that tells them apart.
 
-### 60. `framework` and `package` read as a category and mean a provenance
-
-`Microsoft.AspNetCore.Mvc (package)` prints directly above `Microsoft.AspNetCore.Http (framework)`,
-and `System.Security.Claims (package)` beside `System.Data (framework)`. On nopCommerce too, and on
-both the round-1 and round-2 artifacts.
-
-**The rule is not wrong.** `SolutionWalker` decides it by where the assembly resolved from --
-`/.nuget/packages/` is a package, `/packs/` or `/shared/microsoft.` is the framework -- which is a
-true and useful fact. It is the *label* that reads as a statement about the kind of dependency, so
-two halves of ASP.NET Core landing on opposite sides looks like a misclassification.
-
-**This is a wording decision rather than a mechanical defect**, and it is recorded as one for a
-reader rather than for a test. Defect 30 is its ancestor and had the same shape.
-
-### 48. The project map tints two boxes and labels them *stable and concrete*, and nothing on the map says what either means
-
-`Nop.Web.Framework` and `Nop.Core` render as `class="bx pain"` — an orange fill and a `stable and
-concrete` sub-label. The map's own caption explains the direction convention and the folded boxes
-and **says nothing about the tint**. The definition is 170 lines further down the page, under
-`Projects`: *"I = Ce/(Ce+Ca) … D = distance from the main sequence. Stable and concrete is the zone
-of pain: hard to change, hard to extend."*
-
-A reader who does not scroll to the projects table meets a colour with no key. **Asked directly, by
-name, immediately after T1 in A11 round 2** — *"I was asked about the colouring of
-`Nop.Web.Framework` and `Nop.Core`."*
-
-The `useless` tint has the same problem and did not fire on this solution, so it is unobserved
-rather than fine.
-
-**One fix with D49.** The map should carry a key for whatever it tints, in the caption that already
-explains its other two conventions.
-
-### 49. *main sequence* is used twenty-five times and is never defined
-
-The nearest thing to a definition defines a *column* in terms of it — *"D = distance from the main
-sequence"* — and twenty-four of twenty-seven rows of the projects table then read *near the main
-sequence*. The term itself is never unpacked.
-
-**Raised unprompted in A11 round 2's debrief**, and the tell is what happened next: it *"led to a
-good discussion on the term"*. The concept is teachable in one sentence and the report does not
-spend one.
-
-**Pairs with D48, and they are one fix.** The map says *stable and concrete*; the table says *near
-the main sequence*. **Two vocabularies for one measure, neither glossed where it appears.**
-`PRD-free-tier.md` §4 is the standard both miss: a number that does not end in a sentence someone
-changes their behaviour over does not ship, and a reader who cannot define the axis never reaches
-the sentence.
-
-### 50. Both of the mosaic's marks are per *type*, and readers count both as *findings*
-
-Two faces, one cause.
-
-**The outline.** Eleven cells are outlined, one per leading claim. Against a page whose plot label
-reads `Nop.Services` **118 of 547 named** and whose tile row reads **1.86x concentration**, a reader
-arrives expecting the red to be proportional and finds four. *"Why don't the red boxes add up to the
-numbers in the top graph?"* — and the count is right: the eleven fall 4 in `Nop.Services`, 2 in
-`Nop.Web`, 2 in `Nop.Web.Framework`, 1 in `Nop.Core`, 1 in `Nop.Plugin.Shipping.UPS`, 1 in
-`Nop.Plugin.Tax.Avalara`.
-
-**The tint.** *"Counts of findings across types"* and *"I guess just counts"* — **two of five in
-A11 round 2's T9, answering independently and in writing.** A cell is one type, tinted yes or no; a
-type with five findings and a type with one are the same cell. **Counting tinted cells counts types
-named, never findings.**
-
-**The legend is the common cause and the caption is not.** The caption is correct in both cases —
-*"Some finding is about 373 of them, which is the tint; the 11 outlined in red are the types the
-claims above are about"* — and it is the second thing read. The legend is what sits beside the
-marks, and it reads *the findings lead with this / a finding names it / no finding names it*: no
-counts, and ***a finding*** as the subject of a per-type mark.
-
-**Fix at the legend, for both marks**, naming the population and the count on each swatch — *373
-types some finding names*, *11 types the claims above are about*. Then the arithmetic is answered
-where the reader is looking.
-
-**This is D40's family and not D40's defect.** D40 was a caption that miscounted; this is a legend
-that is accurate and reads as something else.
-
-### 51. `fan-in 28, fan-out 24` opens a first-screen claim with no gloss
-
-The rail's `ProductModel` claim begins with the two terms and never defines either. They otherwise
-appear on the page only as threshold *names* inside the collapsed `Show all thresholds` table —
-`MinFanIn`, `ConcealedFanInCeiling`, `GlobalFanInPercentile` — which is D27's surface, not a
-glossary.
-
-**In A11 round 2 the participants explained fan-in and fan-out to each other** to get through T3.
-That worked because five people were in one room. **A lone reader does not have that**, and
-`PRD-free-tier.md` §2 defines the target user as explicitly not the architect who thinks in
-coupling metrics.
-
-The claim already spends a clause explaining *bottleneck*. The two measures it leads with get none.
-
-### 52. The `Most intricate` tile names a member without its project
-
-The tile reads *"cc 176 — `ImportManager.ImportProductsFromXlsxAsync`, the most complex member in
-this solution."* Every other rendering of a subject on the page carries `project · file:line`.
-
-**In A11 round 2 participants placed it by guessing** — *"almost assuredly in either
-`Nop.Services` or `Nop.Core`"* — then scrolled to other findings to confirm it was `Nop.Services`.
-The tile row is the first screen; the confirmation is several screens down.
-
-**This is X14's identity work stopping one element short.** D39 made a member subject an identity
-rather than a display string precisely so a member could be located; the tile renders the
-identity's name and drops the rest of it.
-
 ## Closed
 
-**Index only — the prose is in git.** Forty-six entries: forty-four removed 2026-08-24, plus D55 and D59, closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Fifty-two entries: forty-four removed 2026-08-24, plus D55 and D59, and then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -581,6 +477,27 @@ forty-seven in full is the commit before this one.
 | 47 | The report tells the reader the exports carry the findings, and no export carries any | reworded; the export itself is `SCHEMA-findings-export.md` step 5 |
 | 55 | A count-bearing sentence disagrees with its own number | fixed 2026-08-25 |
 | 59 | An MSBuild diagnostic is pasted into the report verbatim | fixed 2026-08-25 |
+| 48 | The project map tints two boxes and nothing on the map says what the tint means | fixed 2026-08-25 |
+| 49 | *main sequence* is used twenty-five times and is never defined | fixed 2026-08-25, with §48 |
+| 50 | Both of the mosaic's marks are per *type*, and readers count both as *findings* | fixed 2026-08-25 |
+| 51 | `fan-in 28, fan-out 24` opens a first-screen claim with no gloss | fixed 2026-08-25 |
+| 52 | The `Most intricate` tile names a member without its project | fixed 2026-08-25 |
+| 60 | `framework` and `package` read as a category and mean a provenance | reworded 2026-08-25 to state the resolution |
+
+> **The six of 2026-08-25 were one session and three pieces of work**, and two of them changed
+> shape when the words were rendered rather than reasoned about. **§50's legend wording came from
+> the register and did not survive contact**: *"N types the claims above are about"* says *above*,
+> which is false in the one place the mosaic is designed to end up — pasted where the report is
+> not — and at a count of one it reads *1 types*, which `Prose` then flags. It ships as *N types
+> the report leads with*. **§51's first attempt printed every digit twice** — *"fan-in 7, fan-out 7
+> — 7 types use it, and it uses 7 types"* — and became a parenthesis after each number instead.
+> Neither was visible until the received diff was read.
+
+> **§48 left one thing unobserved and it is now asserted instead.** The `useless` tint fires on
+> none of nopCommerce, Jellyfin, Umbraco or TestBed, so the key's two-zone branch has never been
+> rendered. `ArchitectureDiagramTests.Every_tint_the_map_can_draw_is_keyed` states the property
+> over the enum rather than over a run: a zone a box can be tinted for that carries no name or no
+> gloss is a keyless colour shipping again, and no golden would say so.
 
 > **D3 and D17 are listed as *closed at R1*, which is what `DONE.md` says and what this file never
 > did.** Their behaviour was also verified against the shipped run before removal. They are why the
