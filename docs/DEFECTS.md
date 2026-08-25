@@ -333,6 +333,158 @@ this register's own discipline is that a threshold proposed without measuring bo
 next entry rather than the fix for this one. It is X16's family in a different layer: a constant
 that looks calibrated and is coupled to something it has no relationship with.
 
+### 55. A count-bearing sentence disagrees with its own number — **fixed as a rule, and held by a property**
+
+Two sites, found on Umbraco:
+
+```
+1 file could not be parsed and were not read:
+Their types and edges are absent, so fan-in understates wherever they reached.
+(37 boundarys not shown of 52 - raise --top to see them.)
+```
+
+The first is `Sentences.Plural(count, "file")` -- correct -- followed by a hardcoded *"were"* and a
+hardcoded *"Their"*. The second is naive pluralisation: `boundary` + `s`.
+
+**The helper for this already exists.** Defect 32 built `Sentences.Do` and `Sentences.Surface`
+precisely because *"removing the verb was the right fix once and the wrong fix three times"*, and
+these two sites do not call it. **That entry also predicted this**: *"the next such number is a
+defect waiting on the right input"* -- it was three of them then, it is five now.
+
+**Neither site is reachable from the fixture, and one has never rendered anywhere.** `TestBed` has
+no unparseable file, and neither does nopCommerce or Jellyfin, so the first sentence had never been
+printed by any run before 2026-08-25. **`boundarys` has been on the nopCommerce terminal report since round 1**, and
+is in the round-2 run too.
+
+> **Corrected on the day it was filed.** This first said five developers had read that page without
+> mentioning it. They had not: both are **terminal-only** -- neither `boundarys` nor the unparseable-
+> file sentence appears in either HTML report, and the A11 protocol hands the participant the HTML
+> with the `.txt` beside it only if they ask. The point that survives is smaller and still worth
+> having: the terminal report is the operator's surface, nobody has been asked to read it closely,
+> and a defect can sit in it indefinitely.
+
+**Do not fix these two on their own.** The class has recurred five times and the instance fix is
+what keeps it recurring. What closes it is a property: every count-bearing sentence the report
+renders, checked at n = 0, 1 and 2, over real solutions rather than the fixture.
+
+### 56. Nothing tells the reader that a project's references did not resolve
+
+`README.md` says it: *"The target solution must restore before analysis, or projects load with
+missing references and the results are silently understated."* **The artifact does not.** What it
+prints is:
+
+```
+Every project selected for analysis produced a compilation.
+```
+
+True, and it reads as reassurance. A compilation with unresolved references is still a compilation.
+
+**Measured on Umbraco**, where three of twenty-five analysed projects had no `project.assets.json`:
+
+| | unrestored | restored |
+|---|---|---|
+| types | 6,230 | 6,230 |
+| edges | 37,118 | **37,241** (+123, +0.33%) |
+| findings | 2,025 | 2,029 |
+
+Types do not move -- Roslyn parses syntax without references. **Every change is upward**, because a
+missing reference is a missing edge and never a spurious one: `StringExtensions` 362 to 363 callers,
+`IContentTypeBaseService` 89 to 92 and 178 to 191 call sites, boundaries 52 to 54, external contact
+points 1,125 to 1,128.
+
+**This is invariant 8, and it is the one the tool is otherwise best at.** Every other way the
+analysis can be incomplete is disclosed -- skipped test projects, excluded paths, unreadable files,
+dangling edges, capped lists. This one is not, and it is the only one that silently moves every
+number rather than a named subset.
+
+**The signal has to be built before it can be disclosed.** `Coverage` carries `SkippedProjects`,
+`LoadDiagnostics`, `UnreadableFiles` and `ExcludedTypes`, and has nowhere to put *this project's
+references did not resolve*. Roslyn knows -- a compilation missing assemblies emits `CS0246`,
+`CS0234` and `CS0012` in quantity -- so the work is a count per project, a `Coverage` member, and a
+sentence.
+
+### 57. Two types with one fully-qualified name render as one type contradicting itself
+
+Umbraco ships two ImageSharp integrations, and both declare the same namespace:
+
+```
+type|Umbraco.Cms.Imaging.ImageSharp2|global::Umbraco.Cms.Imaging.ImageSharp.ConfigureImageSharpMiddlewareOptions
+type|Umbraco.Cms.Imaging.ImageSharp |global::Umbraco.Cms.Imaging.ImageSharp.ConfigureImageSharpMiddlewareOptions
+```
+
+**The model is right, and this is defect 1's scenario occurring in the wild for the first time.**
+Keyed on `(assembly, FQN)`, two rows, correct measurements each -- which is exactly what defect 1
+was fixed to do, on the argument that *"plugin architectures use it deliberately"*. Here is a real
+one doing it.
+
+**The report then prints both as `ConfigureImageSharpMiddlewareOptions.Configure`**, so the
+concealed-decision section nominates the same name twice with different receipts -- dsm 11 and dsm
+12 -- and reads as one type disagreeing with itself.
+
+**Defect 1 was fixed in the model and never in the renderer**, and nothing caught it because the
+fixture's planted collisions (`PayloadTag`, `CarrierTwin`) are never nominated, so they never reach
+a claim. The property is that no two rendered findings print the same identity.
+
+### 58. A namespace cycle's shape is decided by one arm and applied to the whole component
+
+Umbraco's namespace graph has a single strongly-connected component of **363 namespaces**, rendered
+as:
+
+```
+NAMESPACE CYCLES - sibling namespaces that hold each other as state,
+so neither can be layered, understood or extracted without the other:
+  363 namespaces: Microsoft.Extensions.Hosting <-> ... - 6 of 363 shown
+```
+
+**The component is real and the sentence is not.** 363 namespaces are not *siblings*, and the
+section itself lists only **14 mutually-holding pairs** inside it -- `CycleShapes.Read` labels the
+whole component `Coupling` because *at least one* sibling pair holds, and the label then describes
+all 363.
+
+**Verified at source rather than argued from the graph.** Exactly one Umbraco file declares
+`namespace Microsoft.Extensions.Hosting` -- an extension class following the ordinary .NET
+convention of putting extensions in the namespace of the thing they extend -- and
+`Umbraco.Extensions` spans 175 files across projects. Those catch-all namespaces reach everything
+and are reached by everything, which collapses the projection into one component. **The finding is
+true and unactionable**, which is invariant 2: a flag that fires on 363 of a codebase's namespaces
+conveys nothing.
+
+**A second face, folded in here rather than numbered separately**: `Microsoft.Extensions.Hosting` is
+presented as a component of Umbraco's architecture. It is, by the model's definition -- Umbraco
+declares a type in it. It reads as the framework being part of the cycle.
+
+**Defect 45's missing rule is the same rule**, in the namespace layer instead of the map layer: a
+component this large is either a layering problem or a fact about the codebase, and there is nothing
+that tells them apart.
+
+### 59. An MSBuild diagnostic is pasted into the report verbatim — **fixed**
+
+`WHAT WAS NOT ANALYSED` printed twenty lines of a `Nerdbank.GitVersioning` exception, including
+frames from the package author's build machine, because the Umbraco clone was shallow and the
+versioning task needs history.
+
+The section's own framing is right -- *"MSBuild raises a package vulnerability advisory this way, so
+these are usually not failures"* -- and it then hands the reader a stack trace to prove it. Three
+more lines in the same block are MSBuild misreading launch-settings URLs as project paths:
+`Project file not found: '...\umbraco\http:\localhost:3961'`.
+
+A diagnostic should be summarised to its first line, with the rest available and not printed. The
+property is that no line of the report carries a stack frame.
+
+### 60. `framework` and `package` read as a category and mean a provenance
+
+`Microsoft.AspNetCore.Mvc (package)` prints directly above `Microsoft.AspNetCore.Http (framework)`,
+and `System.Security.Claims (package)` beside `System.Data (framework)`. On nopCommerce too, and on
+both the round-1 and round-2 artifacts.
+
+**The rule is not wrong.** `SolutionWalker` decides it by where the assembly resolved from --
+`/.nuget/packages/` is a package, `/packs/` or `/shared/microsoft.` is the framework -- which is a
+true and useful fact. It is the *label* that reads as a statement about the kind of dependency, so
+two halves of ASP.NET Core landing on opposite sides looks like a misclassification.
+
+**This is a wording decision rather than a mechanical defect**, and it is recorded as one for a
+reader rather than for a test. Defect 30 is its ancestor and had the same shape.
+
 ### 48. The project map tints two boxes and labels them *stable and concrete*, and nothing on the map says what either means
 
 `Nop.Web.Framework` and `Nop.Core` render as `class="bx pain"` — an orange fill and a `stable and

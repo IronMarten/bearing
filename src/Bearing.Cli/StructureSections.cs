@@ -86,6 +86,33 @@ internal static class StructureSections
     /// </para>
     /// </remarks>
     /// <summary>
+    /// A load diagnostic's first line, with the rest counted rather than printed.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §59.</b> An MSBuild diagnostic is one string and can carry an
+    /// entire exception inside it. On Umbraco this section printed twenty lines of a
+    /// <c>Nerdbank.GitVersioning</c> stack trace, including frames from the package author's build
+    /// machine, immediately after telling the reader these are usually not failures.
+    /// </para>
+    /// <para>
+    /// <b>The first line is the diagnostic; the rest is the thrower's business.</b> Nothing is
+    /// hidden that a reader could act on — the count says how much was set aside, and the whole
+    /// text is still in <c>--json</c>, which is where a consumer that wants a stack trace should
+    /// be looking.
+    /// </para>
+    /// </remarks>
+    private static string Summarised(string diagnostic)
+    {
+        var lines = diagnostic.Split('\n');
+        var first = lines[0].TrimEnd('\r').TrimEnd();
+
+        return lines.Length == 1
+            ? first
+            : $"{first} ({Sentences.Plural(lines.Length - 1, "more line")} not shown)";
+    }
+
+    /// <summary>
     /// A cycle finding's relations, or empty when the cycle was suppressed and has no finding in
     /// the reported set.
     /// </summary>
@@ -531,15 +558,20 @@ internal static class StructureSections
         if (coverage.UnreadableFiles.Count > 0)
         {
             yield return "";
-            yield return $"   {Sentences.Plural(coverage.UnreadableFiles.Count, "file")} could not be parsed and "
-                         + "were not read:";
+            // docs/DEFECTS.md §55. Sentences.Do for the verb, because Plural gets the number right
+            // and the sentence after it used to be written as though the answer were always plural.
+            var unreadable = coverage.UnreadableFiles.Count;
+
+            yield return $"   {Sentences.Plural(unreadable, "file")} could not be parsed and "
+                         + Sentences.Do(unreadable, "was", "were") + " not read:";
 
             var (files, capped) = Sentences.Cap(coverage.UnreadableFiles, DiagnosticsShown, "file", "     ");
 
             foreach (var file in files) yield return $"     {file}";
             foreach (var line in capped) yield return line;
 
-            yield return "   Their types and edges are absent, so fan-in understates wherever they";
+            yield return $"   {Sentences.Do(unreadable, "Its", "Their")} types and edges are absent, so "
+                         + $"fan-in understates wherever {Sentences.Do(unreadable, "it", "they")}";
             yield return "   reached. This is a C# the parser did not accept, not a build error.";
         }
 
@@ -553,7 +585,7 @@ internal static class StructureSections
             var (shown, disclosure) = Sentences.Cap(
                 coverage.LoadDiagnostics, DiagnosticsShown, "diagnostic", "     ");
 
-            foreach (var diagnostic in shown) yield return $"     {diagnostic}";
+            foreach (var diagnostic in shown) yield return $"     {Summarised(diagnostic)}";
             foreach (var line in disclosure) yield return line;
         }
 

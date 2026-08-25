@@ -35,9 +35,40 @@ public static class Sentences
     public static string Whole(double value) =>
         value.ToString("0", CultureInfo.InvariantCulture);
 
-    /// <summary><c>1 type</c> / <c>3 types</c>.</summary>
+    /// <summary><c>1 type</c> / <c>3 types</c> / <c>34 boundaries</c>.</summary>
+    /// <remarks>
+    /// <b>English, not <c>+ "s"</c> — <c>docs/DEFECTS.md</c> §55.</b> This appended an <c>s</c> to
+    /// whatever it was given, which produced <c>39 boundarys</c> on every solution with more
+    /// boundaries than <c>--top</c>, including both A11 artifacts. Fixed as a rule rather than at
+    /// the call site because the call site was never wrong: it passed the singular noun, which is
+    /// this method's contract, and there is no reading of that contract under which the caller owes
+    /// the plural too.
+    /// </remarks>
     public static string Plural(double count, string noun) =>
-        count == 1 ? $"1 {noun}" : $"{Whole(count)} {noun}s";
+        count == 1 ? $"1 {noun}" : $"{Whole(count)} {Plurals(noun)}";
+
+    /// <summary>The plural of <paramref name="noun"/>, for the English this tool writes.</summary>
+    /// <remarks>
+    /// Two rules beyond the default, which is all the tool's vocabulary needs: a consonant before a
+    /// final <c>y</c> becomes <c>ies</c>, and a sibilant ending takes <c>es</c>. Irregulars are not
+    /// handled and are not reachable — nothing here is counted in <i>people</i> or <i>indices</i> —
+    /// and a rule that guessed at them would be inventing a problem to solve.
+    /// </remarks>
+    private static string Plurals(string noun)
+    {
+        if (noun.Length > 1
+            && noun.EndsWith('y')
+            && !"aeiou".Contains(char.ToLowerInvariant(noun[^2]), StringComparison.Ordinal))
+        {
+            return string.Concat(noun.AsSpan(0, noun.Length - 1), "ies");
+        }
+
+        return noun.EndsWith('s') || noun.EndsWith('x') || noun.EndsWith('z')
+               || noun.EndsWith("ch", StringComparison.Ordinal)
+               || noun.EndsWith("sh", StringComparison.Ordinal)
+            ? noun + "es"
+            : noun + "s";
+    }
 
     /// <summary>
     /// The verb that agrees with a counted noun — <c>1 type <b>calls</b></c>, <c>3 types
