@@ -80,7 +80,24 @@ public static class Analysis
     /// because the reported set is the common question. Nothing about its result has changed.
     /// </remarks>
     public static FindingSet FindingsFor(SolutionModel model) =>
-        FindingSet.Of(Judge(model).Where(j => j.IsReported).Select(j => j.Finding));
+        FindingsFor(Judge(model));
+
+    /// <summary>
+    /// The reported half of a judgement already made.
+    /// </summary>
+    /// <remarks>
+    /// <b>So a caller that needs both does not analyse twice.</b> The findings export takes the
+    /// judgements and the report takes the survivors, and they are the same run: calling
+    /// <see cref="Judge"/> and <see cref="FindingsFor(SolutionModel)"/> beside each other would run
+    /// every detector and the whole suppression matrix a second time to arrive at a subset of what
+    /// the first call already held.
+    /// </remarks>
+    public static FindingSet FindingsFor(IReadOnlyList<Judged> judged)
+    {
+        ArgumentNullException.ThrowIfNull(judged);
+
+        return FindingSet.Of(judged.Where(j => j.IsReported).Select(j => j.Finding));
+    }
 
     /// <summary>
     /// Every claim the detectors made, each with the row that silenced it or <see langword="null"/>.

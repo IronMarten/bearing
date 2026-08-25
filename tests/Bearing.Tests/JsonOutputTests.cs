@@ -29,7 +29,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
     /// </summary>
     private static readonly DateTimeOffset Instant = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-    private string Json => JsonOutput.Render(core.Model, Instant);
+    private string Json => JsonOutput.Render(core.Model, Analysis.Judge(core.Model), Instant);
 
     private JsonElement Root => JsonDocument.Parse(Json).RootElement;
 
@@ -60,7 +60,9 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
     [Fact]
     public void Two_renders_of_one_model_are_identical()
     {
-        Assert.Equal(JsonOutput.Render(core.Model, Instant), JsonOutput.Render(core.Model, Instant));
+        Assert.Equal(
+            JsonOutput.Render(core.Model, Analysis.Judge(core.Model), Instant),
+            JsonOutput.Render(core.Model, Analysis.Judge(core.Model), Instant));
     }
 
     /// <summary>
@@ -80,7 +82,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
         try
         {
             var path = Path.Combine(directory.FullName, "model.json");
-            JsonOutput.Write(path, core.Model, Instant);
+            JsonOutput.Write(path, core.Model, Analysis.Judge(core.Model), Instant);
 
             var first = File.ReadAllBytes(path).Take(3).ToArray();
 
@@ -124,7 +126,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
         Assert.Equal(Shipped, model.ToolVersion);
         Assert.Equal(
             Shipped,
-            JsonDocument.Parse(JsonOutput.Render(model, Instant))
+            JsonDocument.Parse(JsonOutput.Render(model, Analysis.Judge(model), Instant))
                 .RootElement.GetProperty("tool").GetProperty("version").GetString());
     }
 

@@ -247,6 +247,7 @@ public static class CommandLine
                 SolutionPath = solutionPath,
                 Policy = policy,
                 IncludeTests = includeTests,
+                DefaultExcludesCleared = clearDefaultExcludes,
                 ExcludedPathFragments = fragments,
             },
             ShowHelp: false,

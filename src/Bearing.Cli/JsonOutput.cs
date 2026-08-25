@@ -58,7 +58,7 @@ public static class JsonOutput
     /// <c>id</c> used to look like. It is not a key and §39 says which members share one.
     /// </para>
     /// </remarks>
-    public const string SchemaVersion = "2.0";
+    public const string SchemaVersion = "2.1";
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -75,24 +75,48 @@ public static class JsonOutput
     /// its input — the same rule <see cref="ToolInfo.ReadVersion"/> is written to, and the reason
     /// this file can be snapshotted at all.
     /// </param>
-    public static string Render(SolutionModel model, DateTimeOffset generatedAt)
+    /// <param name="judged">
+    /// Every judgement the run made, reported and suppressed alike — <c>Analysis.Judge</c>.
+    /// <c>SCHEMA-findings-export.md</c> §1: the export is a superset of what the report renders, so
+    /// it takes the judgements rather than the surviving set.
+    /// </param>
+    /// <param name="options">
+    /// How the run was configured, for the <c>configuration</c> block. Optional because a caller
+    /// with a model and no options gets a faithful projection of the defaults.
+    /// </param>
+    public static string Render(
+        SolutionModel model,
+        IReadOnlyList<Judged> judged,
+        DateTimeOffset generatedAt,
+        WalkOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(judged);
 
-        return JsonSerializer.Serialize(DocumentFor(model, generatedAt), Options);
+        return JsonSerializer.Serialize(DocumentFor(model, judged, generatedAt, options), Options);
     }
 
     /// <summary>Renders the model and writes it to <paramref name="path"/>.</summary>
-    public static void Write(string path, SolutionModel model, DateTimeOffset generatedAt)
+    public static void Write(
+        string path,
+        SolutionModel model,
+        IReadOnlyList<Judged> judged,
+        DateTimeOffset generatedAt,
+        WalkOptions? options = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
         // UTF-8 with no BOM. A BOM is what makes a JSON file that parses everywhere except in
         // the one tool the user reaches for first.
-        File.WriteAllText(path, Render(model, generatedAt), new System.Text.UTF8Encoding(false));
+        File.WriteAllText(
+            path, Render(model, judged, generatedAt, options), new System.Text.UTF8Encoding(false));
     }
 
-    private static Document DocumentFor(SolutionModel model, DateTimeOffset generatedAt) =>
+    private static Document DocumentFor(
+        SolutionModel model,
+        IReadOnlyList<Judged> judged,
+        DateTimeOffset generatedAt,
+        WalkOptions? options) =>
         new(
             SchemaVersion,
             new Tool("bearing", model.ToolVersion),
@@ -105,7 +129,9 @@ public static class JsonOutput
             [.. model.Edges.Select(Edge)],
             Cycles(model),
             [.. model.ExternalDependencies.Select(d => new External(d.Namespace, d.TypesTouching))],
-            Boundary(model));
+            Boundary(model),
+            [.. judged.Select(Finding)],
+            Configuration(options ?? new WalkOptions { SolutionPath = model.SolutionPath }));
 
     private static CoverageBlock Coverage(Coverage coverage) =>
         new(
@@ -274,7 +300,9 @@ public static class JsonOutput
         IReadOnlyList<EdgeBlock> Edges,
         CycleBlocks Cycles,
         IReadOnlyList<External> ExternalDependencies,
-        BoundaryBlock Boundary);
+        BoundaryBlock Boundary,
+        IReadOnlyList<FindingBlock> Findings,
+        ConfigurationBlock Configuration);
 
     private sealed record Tool(string Name, string Version);
 
@@ -438,6 +466,154 @@ public static class JsonOutput
         int PlumbingReferences);
 
     private sealed record External(string Namespace, int TypesTouching);
+
+    // ---------------------------------------------------------------------- findings ----
+
+    /// <summary>
+    /// One judgement — <c>SCHEMA-findings-export.md</c> §3 and §4.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A <see cref="Judged"/> and not a <c>Finding</c>, which is the whole of §1 in one
+    /// parameter.</b> The export is a superset of what the report renders, and the report renders
+    /// the surviving set — so taking the survivors would make the file a subset of the judgements
+    /// by construction, and a consumer could not tell a claim that was <i>silenced</i> from one
+    /// that was <i>never made</i>. That distinction is what <c>status</c> and
+    /// <c>suppressedBy</c> carry, and §7's ageing needs both.
+    /// </para>
+    /// <para>
+    /// <b><c>class</c> comes from <see cref="Claims.IsRiskClaim"/> and not from
+    /// <see cref="Claims.CompetesForLead"/>.</b> They are different questions and the file wants
+    /// the first one: a cycle is a <i>claim</i> that happens not to lead the page, and writing
+    /// <c>"disclosure"</c> here to describe a layout decision would be the lie §6 spent a section
+    /// refusing.
+    /// </para>
+    /// </remarks>
+    private static FindingBlock Finding(Judged judged) =>
+        new(
+            judged.Finding.Key.Canonical,
+            // By name, never ordinal: §4. An enum insert must not re-point a stored acknowledgment,
+            // and FindingKind gained three members the day before this shipped.
+            judged.Finding.Kind.ToString(),
+            Claims.IsRiskClaim(judged.Finding.Kind) ? "claim" : "disclosure",
+            judged.IsReported ? "reported" : "suppressed",
+            judged.SilencedBy is { } rule
+                ? new SuppressedByBlock(rule.Name, rule.Invariant, rule.Reason)
+                : null,
+            Subject(judged.Finding.Subject),
+            [.. judged.Finding.Receipts.Select(Receipt)],
+            [.. judged.Finding.Qualifiers.Select(q => new QualifierBlock(q.Name, q.Holds, q.Gate))],
+            [.. judged.Finding.Participants.Select(p => p.Canonical)],
+            [.. judged.Finding.Relations.Select(
+                r => new RelationBlock(r.From.Canonical, r.To.Canonical, r.Weight))]);
+
+    /// <summary>
+    /// A subject, carrying whichever of its two optional parts it actually has.
+    /// </summary>
+    /// <remarks>
+    /// <b>Members and declaringType are <c>null</c> rather than empty when they do not apply.</b>
+    /// Null, not omitted — this document writes its nulls, as <c>CycleBlock.Holds</c> already does,
+    /// and a writer that dropped keys here would make the finding shape vary by subject kind. What
+    /// matters is that they are not <b>empty</b>: an empty members array would read as <i>a set of
+    /// nothing</i> rather than <i>not a set</i>, which is invariant 6's distinction in the one place
+    /// a consumer joins on. Only <see cref="SubjectKind.Set"/> has members and only
+    /// <see cref="SubjectKind.Member"/> has a declaring type, and <c>FindingsExportTests</c> asserts
+    /// that correspondence rather than trusting it.
+    /// </remarks>
+    private static SubjectBlock Subject(SubjectRef subject) =>
+        new(
+            subject.Kind,
+            subject.Canonical,
+            subject.Members.Count > 0 ? [.. subject.Members.Select(m => m.Canonical)] : null,
+            subject.DeclaringType?.Canonical);
+
+    /// <summary>
+    /// How the run was configured — the settings that change what was analysed and are not
+    /// thresholds.
+    /// </summary>
+    /// <remarks>
+    /// <b>A block beside <c>policy</c> and not a widened <c>policy</c>.</b> The policy dictionary is
+    /// a faithful projection of <c>AnalysisPolicy</c>, where every value is numeric and carries a
+    /// flag; these are its siblings on <see cref="WalkOptions"/> and are neither. Widening would
+    /// make the export's <c>policy</c> mean something the model's does not, which is the drift
+    /// <c>BEARING-OUTPUT-CONTRACT.md</c> §9 is about. Mirroring the record instead makes the
+    /// omission structural: a fourth walk setting is a compile-visible gap here rather than
+    /// something a writer has to remember.
+    /// </remarks>
+    private static ConfigurationBlock Configuration(WalkOptions options) =>
+        new(options.IncludeTests, options.DefaultExcludesCleared, options.ExcludedPathFragments);
+
+    private sealed record FindingBlock(
+        string Key,
+        string Kind,
+        string Class,
+        string Status,
+        SuppressedByBlock? SuppressedBy,
+        SubjectBlock Subject,
+        IReadOnlyList<ReceiptBlock> Receipts,
+        IReadOnlyList<QualifierBlock> Qualifiers,
+        IReadOnlyList<string> Participants,
+        IReadOnlyList<RelationBlock> Relations);
+
+    private sealed record SubjectBlock(
+        SubjectKind Kind,
+        string Canonical,
+        IReadOnlyList<string>? Members,
+        string? DeclaringType);
+
+    /// <summary>
+    /// A receipt, with a non-finite measurement written as an absence.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A ratio against a zero median is undefined, not infinite, and this is the third place
+    /// that has had to say so.</b> <c>docs/DEFECTS.md</c> §28 was the report printing <c>∞</c> as a
+    /// measured value; <c>CohortStatistics.TimesMedian</c> answers <see langword="null"/> for the
+    /// same reason and states it — <i>infinity sorts to the top of a column as though it were the
+    /// largest measurement rather than the missing one</i>. <see cref="Receipt.Value"/> is a bare
+    /// <c>double</c> and carries the infinity through, because until there was an export nothing
+    /// downstream of it had to be a number a machine reads.
+    /// </para>
+    /// <para>
+    /// <b>The value is still right for the gate it fed.</b> <c>BlastRadius</c> tests
+    /// <c>TimesMedian &lt; BlastFanInMultiple</c> and an infinite multiple correctly fails to be
+    /// less than anything — the quantity is meaningful as a comparison and meaningless as a
+    /// published number, which is exactly the split invariant 6 draws. So this withholds the number
+    /// and keeps the <c>gate</c> that names what it was tested against.
+    /// </para>
+    /// <para>
+    /// <b>It also cannot be serialised.</b> <c>System.Text.Json</c> refuses non-finite doubles
+    /// outright, and the alternative — <c>AllowNamedFloatingPointLiterals</c> — writes the string
+    /// <c>"Infinity"</c> where the schema declares a number, which moves the problem into every
+    /// consumer instead of solving it here.
+    /// </para>
+    /// </remarks>
+    private static ReceiptBlock Receipt(Receipt receipt) =>
+        new(receipt.Name, double.IsFinite(receipt.Value) ? receipt.Value : null, receipt.Gate);
+
+    /// <param name="Value">
+    /// The measurement, or null where it is undefined — see <see cref="Receipt"/>.
+    /// </param>
+    /// <param name="Gate">
+    /// The policy value this was tested against, or null when the receipt is ungated. Every
+    /// non-null one resolves against <c>AnalysisPolicy.Values</c>, which §8.7 asserts.
+    /// </param>
+    private sealed record ReceiptBlock(string Name, double? Value, string? Gate);
+
+    private sealed record QualifierBlock(string Name, bool Holds, string? Gate);
+
+    private sealed record RelationBlock(string From, string To, int Weight);
+
+    /// <param name="Reason">
+    /// The rule's own <c>Reason</c> string, verbatim — so four surfaces do not each re-derive why
+    /// something went quiet.
+    /// </param>
+    private sealed record SuppressedByBlock(string Rule, string Invariant, string Reason);
+
+    private sealed record ConfigurationBlock(
+        bool IncludeTests,
+        bool DefaultExcludesCleared,
+        IReadOnlyList<string> ExcludedPathFragments);
 
     private sealed record SiteBlock(string File, int Line);
 }

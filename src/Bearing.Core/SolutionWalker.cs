@@ -18,6 +18,28 @@ public sealed record WalkOptions
     public bool IncludeTests { get; init; }
 
     /// <summary>
+    /// Whether the built-in exclusions were dropped rather than added to — <c>--no-default-excludes</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The walk does not read this, and it is configuration all the same.</b> The host resolves
+    /// the flag into <see cref="ExcludedPathFragments"/> before the walk is handed anything, so by
+    /// the time Core sees a run there is only a list and no record of how it was arrived at.
+    /// <see cref="ToolVersion"/> is carried here for the same reason and is read by nothing in the
+    /// walk either: this record is <i>how the run was configured</i>, not <i>what the walker
+    /// branches on</i>.
+    /// </para>
+    /// <para>
+    /// <b>It is here because the findings export needs it and must not infer it.</b> It is
+    /// recoverable from the fragment list — the defaults are absent when it is set — and
+    /// <c>SCHEMA-findings-export.md</c> §3 rejects exactly that move: reading configuration off a
+    /// side effect is the same mistake as reading a suppression off a finding's absence, which is
+    /// what <c>suppressedBy</c> exists to stop.
+    /// </para>
+    /// </remarks>
+    public bool DefaultExcludesCleared { get; init; }
+
+    /// <summary>
     /// The version of the tool doing the analysing, which the host supplies because Core cannot
     /// know it.
     /// </summary>

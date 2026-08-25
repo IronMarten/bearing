@@ -133,7 +133,11 @@ internal static class Program
         Lap();
         stages.AddRange(ProfileReport.StagesOf(walker.Profile));
 
-        var findings = Analysis.FindingsFor(model);
+        // Judged once, and the report reads the surviving half of it. The export needs the
+        // suppressed rows too -- SCHEMA-findings-export.md §1 -- and asking Analysis twice would
+        // re-run every detector to reach a subset of what the first answer already carried.
+        var judged = Analysis.Judge(model);
+        var findings = Analysis.FindingsFor(judged);
         stages.Add(new ProfileStage("analysis", Lap(), Sentences.Plural(findings.All.Count, "finding")));
 
         // Rendering and writing are one stage because they are one act: Report.For is lazy, so
@@ -145,7 +149,7 @@ internal static class Program
         // land in the middle of output somebody is piping.
         if (invocation.JsonPath is { } json)
         {
-            JsonOutput.Write(json, model, DateTimeOffset.UtcNow);
+            JsonOutput.Write(json, model, judged, DateTimeOffset.UtcNow, options);
             Console.Error.WriteLine($"Wrote {json}");
             stages.Add(new ProfileStage("json", Lap()));
         }

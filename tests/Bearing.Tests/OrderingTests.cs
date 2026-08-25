@@ -80,7 +80,7 @@ public sealed class OrderingTests(CoreWalkFixture core)
     {
         var stamp = new DateTimeOffset(2026, 8, 20, 0, 0, 0, TimeSpan.Zero);
 
-        AssertStable(model => JsonOutput.Render(model, stamp));
+        AssertStable(model => JsonOutput.Render(model, Analysis.Judge(model), stamp));
     }
 
     /// <summary>
