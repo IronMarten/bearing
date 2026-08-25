@@ -52,7 +52,7 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Nine open. Roughly severity-ordered, and the numbers are identity — they are never reused and
+*Fourteen open. Roughly severity-ordered, and the numbers are identity — they are never reused and
 never renumbered.*
 
 ### 10. The cohort floor strips a suppression it was never meant to touch
@@ -333,40 +333,6 @@ this register's own discipline is that a threshold proposed without measuring bo
 next entry rather than the fix for this one. It is X16's family in a different layer: a constant
 that looks calibrated and is coupled to something it has no relationship with.
 
-### 55. A count-bearing sentence disagrees with its own number — **fixed as a rule, and held by a property**
-
-Two sites, found on Umbraco:
-
-```
-1 file could not be parsed and were not read:
-Their types and edges are absent, so fan-in understates wherever they reached.
-(37 boundarys not shown of 52 - raise --top to see them.)
-```
-
-The first is `Sentences.Plural(count, "file")` -- correct -- followed by a hardcoded *"were"* and a
-hardcoded *"Their"*. The second is naive pluralisation: `boundary` + `s`.
-
-**The helper for this already exists.** Defect 32 built `Sentences.Do` and `Sentences.Surface`
-precisely because *"removing the verb was the right fix once and the wrong fix three times"*, and
-these two sites do not call it. **That entry also predicted this**: *"the next such number is a
-defect waiting on the right input"* -- it was three of them then, it is five now.
-
-**Neither site is reachable from the fixture, and one has never rendered anywhere.** `TestBed` has
-no unparseable file, and neither does nopCommerce or Jellyfin, so the first sentence had never been
-printed by any run before 2026-08-25. **`boundarys` has been on the nopCommerce terminal report since round 1**, and
-is in the round-2 run too.
-
-> **Corrected on the day it was filed.** This first said five developers had read that page without
-> mentioning it. They had not: both are **terminal-only** -- neither `boundarys` nor the unparseable-
-> file sentence appears in either HTML report, and the A11 protocol hands the participant the HTML
-> with the `.txt` beside it only if they ask. The point that survives is smaller and still worth
-> having: the terminal report is the operator's surface, nobody has been asked to read it closely,
-> and a defect can sit in it indefinitely.
-
-**Do not fix these two on their own.** The class has recurred five times and the instance fix is
-what keeps it recurring. What closes it is a property: every count-bearing sentence the report
-renders, checked at n = 0, 1 and 2, over real solutions rather than the fixture.
-
 ### 56. Nothing tells the reader that a project's references did not resolve
 
 `README.md` says it: *"The target solution must restore before analysis, or projects load with
@@ -456,20 +422,6 @@ declares a type in it. It reads as the framework being part of the cycle.
 **Defect 45's missing rule is the same rule**, in the namespace layer instead of the map layer: a
 component this large is either a layering problem or a fact about the codebase, and there is nothing
 that tells them apart.
-
-### 59. An MSBuild diagnostic is pasted into the report verbatim — **fixed**
-
-`WHAT WAS NOT ANALYSED` printed twenty lines of a `Nerdbank.GitVersioning` exception, including
-frames from the package author's build machine, because the Umbraco clone was shallow and the
-versioning task needs history.
-
-The section's own framing is right -- *"MSBuild raises a package vulnerability advisory this way, so
-these are usually not failures"* -- and it then hands the reader a stack trace to prove it. Three
-more lines in the same block are MSBuild misreading launch-settings URLs as project paths:
-`Project file not found: '...\umbraco\http:\localhost:3961'`.
-
-A diagnostic should be summarised to its first line, with the rest available and not printed. The
-property is that no line of the report carries a stack frame.
 
 ### 60. `framework` and `package` read as a category and mean a provenance
 
@@ -577,7 +529,7 @@ identity's name and drops the rest of it.
 
 ## Closed
 
-**Index only — the prose is in git.** Forty-four entries, removed 2026-08-24. Status is as the
+**Index only — the prose is in git.** Forty-six entries: forty-four removed 2026-08-24, plus D55 and D59, closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -627,6 +579,8 @@ forty-seven in full is the commit before this one.
 | 43 | A solution needing a newer SDK is reported as an unreadable file | fixed |
 | 46 | A suppression emptied the HTML cycles section, because the evidence replacing it went to one renderer | fixed |
 | 47 | The report tells the reader the exports carry the findings, and no export carries any | reworded; the export itself is `SCHEMA-findings-export.md` step 5 |
+| 55 | A count-bearing sentence disagrees with its own number | fixed 2026-08-25 |
+| 59 | An MSBuild diagnostic is pasted into the report verbatim | fixed 2026-08-25 |
 
 > **D3 and D17 are listed as *closed at R1*, which is what `DONE.md` says and what this file never
 > did.** Their behaviour was also verified against the shipped run before removal. They are why the
