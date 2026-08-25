@@ -18,11 +18,19 @@ namespace IronMarten.Bearing.Cli;
 /// apiece and every one of them resolves — which is exactly why
 /// <see cref="Named"/> had to say what it counts rather than rely on a subject failing to resolve.
 /// </para>
+/// <para>
+/// <b>Public for the reason <see cref="Sentences"/> is public, and §57 is the reason it changed.</b>
+/// The property that no two subjects share a rendered identity is about what
+/// <see cref="Where"/> produces, so it cannot be asserted without calling it — and the case it
+/// guards is unreachable from the fixture, which is how §57 survived §1 being fixed in the model.
+/// <c>Bearing.Cli</c> packs as a tool and not as a library, so nothing about its surface is a
+/// contract.
+/// </para>
 /// </remarks>
-internal static class Subjects
+public static class Subjects
 {
     /// <summary>The analysed type a finding is about, or null where its subject is not one.</summary>
-    internal static TypeNode? Of(SolutionModel model, Finding finding) =>
+    public static TypeNode? Of(SolutionModel model, Finding finding) =>
         model.Find(finding.Subject)
         ?? (finding.Subject.DeclaringType is { } declaring ? model.Find(declaring) : null);
 
@@ -38,7 +46,7 @@ internal static class Subjects
     /// line number is unformatted on purpose: this is an address a reader retypes, and
     /// <c>Program.cs:1,204</c> is not one.
     /// </remarks>
-    internal static string Where(SolutionModel model, Finding finding, string trailer)
+    public static string Where(SolutionModel model, Finding finding, string trailer)
     {
         if (Of(model, finding) is not { } type) return "";
 
@@ -78,7 +86,7 @@ internal static class Subjects
     /// findings pane already use, so <i>named</i> now means what <i>claim</i> means everywhere.
     /// </para>
     /// </remarks>
-    internal static IReadOnlySet<string> Named(SolutionModel model, FindingSet findings)
+    public static IReadOnlySet<string> Named(SolutionModel model, FindingSet findings)
     {
         var named = new HashSet<string>(StringComparer.Ordinal);
 

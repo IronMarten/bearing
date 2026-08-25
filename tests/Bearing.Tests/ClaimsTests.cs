@@ -226,4 +226,98 @@ public sealed class ClaimsTests(CoreWalkFixture core)
                     claim.Evidence, StringComparison.Ordinal);
         }
     }
+
+    // ------------------------------------------------------------------ defect 57 ----
+
+    /// <summary>
+    /// Two different subjects never render an identity a reader cannot tell apart.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §57.</b> Umbraco ships two ImageSharp integrations declaring one
+    /// namespace, so <c>ConfigureImageSharpMiddlewareOptions</c> is two types with one
+    /// fully-qualified name. The model is right — §1 was fixed to key on <c>(assembly, FQN)</c>
+    /// precisely because <i>"plugin architectures use it deliberately"</i> — and the renderer then
+    /// printed one name twice with different receipts.
+    /// </para>
+    /// <para>
+    /// <b>The identity is the name AND the location, because that is what the page prints.</b>
+    /// Asserting on the name alone would fail the fixture for behaviour that is correct:
+    /// <c>TestBed.Interop.CarrierTwin</c> is declared in both <c>Core</c> and <c>Data</c>, both
+    /// declarations are nominated, and the two rows separate cleanly because
+    /// <see cref="Subjects.Where"/> leads with the project. <b>That is §57's scenario handled, not
+    /// §57 occurring</b> — and it corrects the entry, which recorded the planted collisions as
+    /// never reaching a claim. They reach one; nothing looked wrong because nothing was.
+    /// </para>
+    /// <para>
+    /// <b>Keyed on the declaring type, not on the finding's subject.</b> A type-level concealed
+    /// decision and its method-level counterpart carry different subjects and describe one method;
+    /// they print one identity twice on purpose. Keying on the subject fails all six of the
+    /// fixture's, which is how this wording was arrived at rather than guessed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_two_subjects_share_a_rendered_identity()
+    {
+        var ambiguous = Findings.All
+            .Select(f => (Finding: f, Claim: Claims.For(core.Model, f)))
+            .Where(r => r.Claim.Subject.Length > 0)
+            .Select(r => (
+                // The TYPE the finding resolves to, not the finding's own subject. A type-level
+                // concealed decision and its method-level counterpart have different subjects and
+                // are about one method -- they print one identity twice on purpose, and keying on
+                // the subject would forbid the page saying two things about one method.
+                Type: Subjects.Of(core.Model, r.Finding)?.Subject.Canonical ?? "",
+                Identity: r.Claim.Subject + "  @  " + Subjects.Where(core.Model, r.Finding, r.Claim.Trailer)))
+            .Where(r => r.Type.Length > 0)
+            .GroupBy(r => r.Identity, StringComparer.Ordinal)
+            .Where(g => g.Select(r => r.Type).Distinct(StringComparer.Ordinal).Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+        Assert.True(
+            ambiguous.Count == 0,
+            "two subjects render one identity: " + string.Join("; ", ambiguous));
+    }
+
+    /// <summary>
+    /// A claim that names a member sends the reader to that member, not to its declaring type.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §57's live face, found on Umbraco 2026-08-25.</b> The
+    /// concealed-decision claim titles itself with the type's most complex <i>member</i> and passed
+    /// no trailer, so <see cref="Subjects.Where"/> fell back to the declaring <i>type</i>'s line.
+    /// The page then printed <c>Utf8ToAsciiConverter.ToAscii</c> at <c>:12</c> — the class
+    /// declaration — beside a tile printing the same name at <c>:131</c>, the method. One page, one
+    /// name, two addresses.
+    /// </para>
+    /// <para>
+    /// <b>And the type really does declare two <c>ToAscii</c> overloads</b>, at lines 76 and 131 —
+    /// cc 3 and cc 1312 — so a reader had no way to tell whether they were looking at two methods
+    /// or at one method described twice. <b>§39 made a member subject an identity rather than a
+    /// display string so that a member could be located</b>; this is the same work stopping one
+    /// element short, which is the shape §52 had on the tile.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_claim_naming_a_member_addresses_that_member()
+    {
+        var concealed = Findings.OfKind(FindingKind.ConcealedDecisionType);
+
+        Assert.NotEmpty(concealed);
+
+        foreach (var finding in concealed)
+        {
+            if (core.Model.Find(finding.Subject) is not { } type) continue;
+            if (type.MostComplexMember is not { Location.IsKnown: true } member) continue;
+
+            var where = Subjects.Where(core.Model, finding, Claims.For(core.Model, finding).Trailer);
+
+            Assert.EndsWith(
+                $"{Path.GetFileName(member.Location.File)}:{member.Location.Line}",
+                where,
+                StringComparison.Ordinal);
+        }
+    }
 }

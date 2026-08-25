@@ -26,7 +26,7 @@ Every claim shows the numbers behind it.
    NormalizationContext — 20 internal callers depend on this contract (2 fields/params of surface). Changing it is a distributed edit, not a local one. EXTERNAL consumers are not visible to this analysis.
      Core · Contracts.cs:25 · change cost, 1 of 4
    ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.
-     Core · Controllers.cs:52 · concealed decision, 1 of 7
+     Core · Controllers.cs:56 · concealed decision, 1 of 7
    TariffCalculator.Apply — the most complex of the 49 methods in the 33 types in TestBed.Core.
      Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 14
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
@@ -40,13 +40,13 @@ Every claim shows the numbers behind it.
 
 -- CONCEALED DECISION ------------------------------------------
    (complexity far above peers, connectivity ordinary)
-   ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase. (top 6%; cc 12, dsm 4, fan-in 0, fan-out 5)
-   ThroughputGauge.Sample — connectivity is unremarkable for its peers, but it is 9x the median internal complexity of the 5 types whose name ends in Gauge. (top 10%; cc 9, dsm 0, fan-in 5, fan-out 1)
-   AuthenticationMiddleware.Authenticate — looks like plumbing but is 5x the median internal complexity of the 8 types deriving from ControllerBase. (top 31%; cc 5, dsm 2, fan-in 0, fan-out 5)
-   RateReconciler.Reconcile — looks like plumbing but is 4.33x the median internal complexity of the 9 types whose name ends in Reconciler. (top 11%; cc 13, dsm 0, fan-in 1, fan-out 4)
-   GuaranteedServiceNormalizer.Normalize — looks like plumbing but is 3.5x the median internal complexity of the 7 implementations of IResponseNormalizer. (top 7%; cc 21, dsm 16, fan-in 1, fan-out 5)
-   DriftSonde.Correct — looks like plumbing but is 3x the median internal complexity of the 5 types whose name ends in Sonde. (top 10%; cc 6, dsm 0, fan-in 2, fan-out 0)
-   CustomsTrait.DutyBand — looks like plumbing but is the only complexity among the 6 types whose name ends in Trait. (top 8%; cc 6, dsm 0, fan-in 1, fan-out 0)
+   ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase. (top 6%; cc 12, dsm 4, fan-in 0, fan-out 5) — Controllers.cs:56
+   ThroughputGauge.Sample — connectivity is unremarkable for its peers, but it is 9x the median internal complexity of the 5 types whose name ends in Gauge. (top 10%; cc 9, dsm 0, fan-in 5, fan-out 1) — Gauges.cs:62
+   AuthenticationMiddleware.Authenticate — looks like plumbing but is 5x the median internal complexity of the 8 types deriving from ControllerBase. (top 31%; cc 5, dsm 2, fan-in 0, fan-out 5) — AuthenticationMiddleware.cs:13
+   RateReconciler.Reconcile — looks like plumbing but is 4.33x the median internal complexity of the 9 types whose name ends in Reconciler. (top 11%; cc 13, dsm 0, fan-in 1, fan-out 4) — Reconcilers.cs:120
+   GuaranteedServiceNormalizer.Normalize — looks like plumbing but is 3.5x the median internal complexity of the 7 implementations of IResponseNormalizer. (top 7%; cc 21, dsm 16, fan-in 1, fan-out 5) — GuaranteedServiceNormalizer.cs:6
+   DriftSonde.Correct — looks like plumbing but is 3x the median internal complexity of the 5 types whose name ends in Sonde. (top 10%; cc 6, dsm 0, fan-in 2, fan-out 0) — Sondes.cs:54
+   CustomsTrait.DutyBand — looks like plumbing but is the only complexity among the 6 types whose name ends in Trait. (top 8%; cc 6, dsm 0, fan-in 1, fan-out 0) — Traits.cs:96
 
 -- CONCEALED DECISION, METHOD LEVEL ----------------------------
    TariffCalculator.Apply — the most complex of the 49 methods in the 33 types in TestBed.Core. (cc 22 against a peer median of 1; dsm 0, nesting 2, 30 lines) — TariffCalculator.cs:9

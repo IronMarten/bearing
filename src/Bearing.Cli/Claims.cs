@@ -270,12 +270,22 @@ public static class Claims
             ? "the only complexity among "
             : $"{Sentences.Number(times)}x the median internal complexity of ";
 
+        // docs/DEFECTS.md §57. The title names a MEMBER and the trailer was empty, so Subjects.Where
+        // fell back to the declaring TYPE's line -- on Umbraco that printed
+        // "Utf8ToAsciiConverter.ToAscii" at :12, the class declaration, while the tile beside it
+        // printed the same name at :131, the method. One page, one name, two addresses, and the
+        // type really does declare two ToAscii overloads, so a reader cannot tell whether they are
+        // looking at two methods or one. The member knows where it is; say so.
+        var at = type.MostComplexMember?.Location;
+
         return new Claim(
             Sentences.Member(type.Name, type.MostComplexMember?.Name ?? ""),
             $"{opening}{basis}{Sentences.PeerGroup(type.Cohort, type.CohortSize)}.",
             $"top {Sentences.TopPercent(percentile)}; cc {type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
             + $"fan-in {type.FanIn}, fan-out {type.FanOut}",
-            "");
+            at is { IsKnown: true } known
+                ? $"{Path.GetFileName(known.File)}:{known.Line}"
+                : "");
     }
 
     /// <summary>
