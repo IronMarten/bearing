@@ -21,10 +21,10 @@
 <path class="n" d="M4 278h127v150h-127zM4 548h127v76h-127zM132 48h86v98h-86zM132 147h86v96h-86zM220 48h87v87h-87zM220 392h87v79h-87zM220 550h87v74h-87zM308 48h75v83h-75zM308 301h75v83h-75zM308 385h75v83h-75zM462 48h76v75h-76zM540 48h73v75h-73zM614 48h70v75h-70zM517 124h64v60h-64zM649 124h60v60h-60zM711 124h60v60h-60zM452 185h53v60h-53zM452 416h53v51h-53zM506 185h50v54h-50zM506 241h50v54h-50zM506 408h50v54h-50zM506 463h50v54h-50zM506 519h50v54h-50zM901 185h44v46h-44zM557 232h46v43h-46zM648 232h41v43h-41zM691 232h41v43h-41zM733 232h41v43h-41zM776 232h41v43h-41zM819 232h41v43h-41zM861 232h41v43h-41zM904 232h41v43h-41zM557 277h42v42h-42zM557 321h42v42h-42zM557 408h42v42h-42zM557 451h42v42h-42zM557 582h42v42h-42zM644 277h42v37h-42zM687 277h42v37h-42zM601 474h36v36h-36zM601 512h36v36h-36zM601 588h36v36h-36zM908 315h37v36h-37zM639 352h35v38h-35zM675 586h35v38h-35zM711 389h37v36h-37zM711 427h34v32h-34zM711 460h34v32h-34zM747 526h34v32h-34z"/>
 <path class="f" d="M4 48h127v229h-127zM4 430h127v117h-127zM132 245h86v96h-86zM132 531h86v93h-86zM308 132h75v83h-75zM308 216h75v83h-75zM308 547h75v77h-75zM384 322h66v62h-66zM711 526h34v32h-34z"/>
 <rect class="f" x="2" y="638" width="10" height="10"/>
-<text class="lg" x="17" y="647">the findings lead with this</text>
-<rect class="n" x="188" y="638" width="10" height="10"/>
-<text class="lg" x="203" y="647">a finding names it</text>
-<rect class="c" x="320" y="638" width="10" height="10"/>
-<text class="lg" x="335" y="647">no finding names it</text>
+<text class="lg" x="17" y="647">9 types the report leads with</text>
+<rect class="n" x="200" y="638" width="10" height="10"/>
+<text class="lg" x="215" y="647">58 types some finding names</text>
+<rect class="c" x="386" y="638" width="10" height="10"/>
+<text class="lg" x="401" y="647">148 types no finding names</text>
 <text class="lg" x="998" y="647" text-anchor="end">Bearing · github.com/ironmarten/bearing</text>
 </svg>

@@ -425,7 +425,17 @@ internal static class StructureSections
         yield return "";
         yield return "-- PROJECT STABILITY vs ABSTRACTNESS ---------------------------";
         yield return "   I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are";
-        yield return "   abstract or interfaces. D = |A + I - 1|, distance from the main sequence.";
+        yield return "   abstract or interfaces.";
+
+        // docs/DEFECTS.md §49. The term ran twenty-five times across the nopCommerce report and was
+        // never unpacked; the nearest thing to a definition defined D in terms of it, which sends a
+        // reader who does not already know the axis away with nothing.
+        var gloss = $"The MAIN SEQUENCE is {Sentences.MainSequence}: a project much depended on "
+                    + "earns that by being abstract, and one that depends on much can afford to be "
+                    + "concrete. D = |A + I - 1| is how far off that balance a project sits.";
+
+        foreach (var line in Sentences.Wrap(gloss, "   ")) yield return line;
+
         yield return "   Stable AND concrete is the zone of pain: hard to change, hard to extend.";
 
         foreach (var coupling in model.ProjectCouplings)
@@ -463,11 +473,13 @@ internal static class StructureSections
         }
     }
 
+    // docs/DEFECTS.md §48/§49. The words come from Sentences.Zone so that the terminal, the HTML
+    // table and the box on the map cannot spell one measure three ways -- which is what they did.
     private static string Zone(MainSequenceZone zone) => zone switch
     {
-        MainSequenceZone.Pain => "  <-- ZONE OF PAIN (stable and concrete)",
-        MainSequenceZone.Uselessness => "  <-- zone of uselessness (abstract, unused)",
-        MainSequenceZone.NearMainSequence => "  (near the main sequence)",
+        MainSequenceZone.Pain => $"  <-- ZONE OF PAIN ({Sentences.Zone(zone)})",
+        MainSequenceZone.Uselessness => $"  <-- zone of uselessness ({Sentences.Zone(zone)})",
+        MainSequenceZone.NearMainSequence => $"  ({Sentences.Zone(zone)})",
         _ => "",
     };
 

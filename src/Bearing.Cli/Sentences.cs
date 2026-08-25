@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 
 namespace IronMarten.Bearing.Cli;
 
@@ -166,18 +167,120 @@ public static class Sentences
 
     /// <summary>Where an external namespace came from, as a trailing phrase, or nothing.</summary>
     /// <remarks>
+    /// <para>
     /// <c>docs/DEFECTS.md</c> §30. Worded rather than coloured, because the terminal has no colour
     /// to spend and the HTML should say the same thing as the text it was generated beside.
     /// <see cref="ExternalOrigin.Unknown"/> says nothing at all: a row with no marker is one this
     /// tool could not place, and inventing a third label for it would be the guess the origin
     /// exists to avoid.
+    /// </para>
+    /// <para>
+    /// <b>The label states the resolution and not a kind — <c>docs/DEFECTS.md</c> §60.</b> It read
+    /// <c>(framework)</c> and <c>(package)</c>, which are the names of <i>categories</i>, so
+    /// <c>Microsoft.AspNetCore.Mvc (package)</c> printing directly above
+    /// <c>Microsoft.AspNetCore.Http (framework)</c> looked like a misclassification of one product.
+    /// The rule underneath is right and useful — the assembly resolved out of the NuGet cache or
+    /// out of the shared framework — and it is a <i>provenance</i>, which is a fact two halves of
+    /// ASP.NET Core are perfectly entitled to disagree about. Saying <i>where it came from</i>
+    /// leaves nothing for the reader to reconcile.
+    /// </para>
     /// </remarks>
     public static string Origin(ExternalOrigin origin) => origin switch
     {
-        ExternalOrigin.Framework => "  (framework)",
-        ExternalOrigin.Package => "  (package)",
+        ExternalOrigin.Framework => "  (ships with .NET)",
+        ExternalOrigin.Package => "  (NuGet)",
         _ => "",
     };
+
+    /// <summary>What a main-sequence zone is called, in the one wording every surface uses.</summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §48 and §49, which are one defect.</b> The map tinted a box
+    /// <i>stable and concrete</i>, the HTML table said <i>zone of pain — stable and concrete</i>
+    /// and the terminal said <i>ZONE OF PAIN (stable and concrete)</i>: three sites spelling one
+    /// measure, none of them glossed, and nothing stopping a fourth from inventing a fourth
+    /// wording. The phrase is decided here so the picture and the table cannot drift apart, and
+    /// <see cref="MainSequence"/> is the sentence that has to accompany it wherever it appears.
+    /// </remarks>
+    public static string Zone(MainSequenceZone zone) => zone switch
+    {
+        MainSequenceZone.Pain => "stable and concrete",
+        MainSequenceZone.Uselessness => "abstract and unused",
+        MainSequenceZone.NearMainSequence => "near the main sequence",
+        _ => "",
+    };
+
+    /// <summary>What a zone means for the reader, in one clause.</summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §48. A tint with no key is a colour a reader has to scroll 170 lines
+    /// to decode, and the two zones are opposite failures rather than two shades of one.
+    /// </remarks>
+    public static string ZoneMeans(MainSequenceZone zone) => zone switch
+    {
+        MainSequenceZone.Pain =>
+            "much depends on it and little of it is abstract, so it is hard to change and hard to extend",
+        MainSequenceZone.Uselessness =>
+            "it is mostly abstraction and almost nothing depends on it",
+        _ => "",
+    };
+
+    /// <summary>
+    /// The main sequence, defined once, in the sentence the report never spent.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §49.</b> The term was used twenty-five times on nopCommerce and
+    /// defined nowhere; the nearest thing to a definition defined a <i>column</i> in terms of it —
+    /// <i>"D = distance from the main sequence"</i> — and twenty-four rows then read <i>near the
+    /// main sequence</i>. A11 round 2 raised it unprompted and the debrief <i>"led to a good
+    /// discussion on the term"</i>, which is five people supplying what the page owed them.
+    /// <c>PRD-free-tier.md</c> §4 is the standard it misses: a reader who cannot define the axis
+    /// never reaches the sentence they were supposed to change their behaviour over.
+    /// </remarks>
+    public const string MainSequence =
+        "the balance where how abstract a project is matches how much depends on it";
+
+    /// <summary>The same phrase, opening a sentence.</summary>
+    /// <remarks>
+    /// The zone names are written lower-case because they are mostly used mid-sentence and on a
+    /// box on the map. A key that starts a sentence with one needs the capital, and doing that
+    /// here rather than keeping a second spelling of each phrase is the whole point of §48's fix.
+    /// </remarks>
+    public static string Capitalise(string phrase)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(phrase);
+
+        return char.ToUpperInvariant(phrase[0]) + phrase[1..];
+    }
+
+    /// <summary>One sentence broken across terminal lines at a column, each line indented.</summary>
+    /// <remarks>
+    /// <b>Because a paragraph the tool composes has no natural line breaks in it.</b> The terminal
+    /// report's prose sits inside about seventy columns, and one long line in the middle of it
+    /// reads as a different document — <see cref="FindingSections"/> wrapped its share caveat for
+    /// exactly that reason and this is that loop, shared rather than copied. It matters more now
+    /// that <see cref="MainSequence"/> is a constant two surfaces spell: hand-splitting the clause
+    /// at the call site would put half a definition in the terminal the day the clause is reworded.
+    /// </remarks>
+    public static IEnumerable<string> Wrap(string text, string indent, int width = 70)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(indent);
+
+        var line = new StringBuilder(indent);
+
+        foreach (var word in text.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (line.Length > indent.Length && line.Length + 1 + word.Length > width)
+            {
+                yield return line.ToString();
+                line.Clear().Append(indent);
+            }
+
+            if (line.Length > indent.Length) line.Append(' ');
+            line.Append(word);
+        }
+
+        if (line.Length > indent.Length) yield return line.ToString();
+    }
 
     /// <summary>A member named under its declaring type, in words a reader can search for.</summary>
     /// <remarks>

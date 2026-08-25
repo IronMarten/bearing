@@ -536,6 +536,8 @@ public static class HtmlReport
 
         page.Append($"{Html.Count(graph.Depth)} layer(s) deep.</p>\n");
 
+        Key(page, model);
+
         page.Append("<div class=\"scroll\">\n").Append(ArchitectureDiagram.Render(model)).Append("</div>\n");
 
         // docs/DEFECTS.md §31. Saying that folding happened is not the same as saying what is
@@ -550,11 +552,52 @@ public static class HtmlReport
         }
     }
 
+    /// <summary>
+    /// What the map's tints mean, beside the map.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §48 and §49, which are one fix.</b> The caption above already
+    /// explains the direction convention and the folded boxes and said nothing about the colour;
+    /// the definition sat 170 lines down under <c>Projects</c>, and <i>main sequence</i> — the
+    /// measure both surfaces spell — was used twenty-five times on nopCommerce and never unpacked
+    /// once. This is that sentence, at the first place the vocabulary appears.
+    /// <para>
+    /// <b>Only the tints that fired.</b> <see cref="ArchitectureDiagram.Tinted"/> reads the layout
+    /// rather than the enum, so the key cannot define a colour that is not on the page — the
+    /// <c>useless</c> tint is absent on nopCommerce, and a reader hunting a described colour they
+    /// cannot find concludes they missed something.
+    /// </para>
+    /// </remarks>
+    private static void Key(StringBuilder page, SolutionModel model)
+    {
+        var tinted = ArchitectureDiagram.Tinted(model);
+        if (tinted.Count == 0) return;
+
+        // The measure first and the colour second. Opening on the tint name asks a reader to
+        // hold a phrase they cannot yet place; opening on the balance gives them somewhere to
+        // put it. Singular throughout -- "a tinted box" reads correctly whether one zone fired
+        // or both, so the sentence needs no count and cannot disagree with one.
+        page.Append("<p class=\"sub\">A tinted box sits at an extreme of the <em>main sequence</em>, ");
+        page.Append(Html.Text(Sentences.MainSequence)).Append(". ");
+
+        foreach (var zone in tinted)
+            page.Append("<em>").Append(Html.Text(Sentences.Capitalise(Sentences.Zone(zone)))).Append("</em> — ")
+                .Append(Html.Text(Sentences.ZoneMeans(zone))).Append(". ");
+
+        page.Append("The numbers behind the tint are in <em>Projects</em>, below.</p>\n");
+    }
+
     private static void Projects(StringBuilder page, SolutionModel model)
     {
         page.Append("<h3>Projects</h3>\n");
+        // docs/DEFECTS.md §49. The caption used to define a COLUMN in terms of the main sequence
+        // and leave the term itself alone, so twenty-four of twenty-seven rows read "near the main
+        // sequence" against no definition anywhere on the page.
         page.Append("<p class=\"sub\">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are ");
-        page.Append("abstract or interfaces. D = distance from the main sequence. ");
+        page.Append("abstract or interfaces. The <em>main sequence</em> is ");
+        page.Append(Html.Text(Sentences.MainSequence));
+        page.Append(" — a project much depended on earns that by being abstract, and one that depends on much ");
+        page.Append("can afford to be concrete. D = |A + I - 1|, how far off that balance it sits. ");
         page.Append("<em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>\n");
 
         var unreferenced = model.UnreferencedProjects.Select(p => p.Name).ToHashSet(StringComparer.Ordinal);
@@ -602,10 +645,9 @@ public static class HtmlReport
     /// </remarks>
     private static string Zone(MainSequenceZone zone) => zone switch
     {
-        MainSequenceZone.Pain => "zone of pain — stable and concrete",
-        MainSequenceZone.Uselessness => "zone of uselessness — abstract, unused",
-        MainSequenceZone.NearMainSequence => "near the main sequence",
-        _ => "",
+        MainSequenceZone.Pain => $"zone of pain — {Sentences.Zone(zone)}",
+        MainSequenceZone.Uselessness => $"zone of uselessness — {Sentences.Zone(zone)}",
+        _ => Sentences.Zone(zone),
     };
 
     private static void Integrations(StringBuilder page, SolutionModel model)
@@ -1123,11 +1165,14 @@ public static class HtmlReport
 
     // ------------------------------------------------------------------------ words ----
 
-    /// <summary><c>docs/DEFECTS.md</c> §30 — what a reader could change, said in the row.</summary>
+    /// <summary>
+    /// <c>docs/DEFECTS.md</c> §30 — what a reader could change, said in the row — and §60, which
+    /// is the same row saying it as a provenance rather than as a category.
+    /// </summary>
     private static string Provider(ExternalOrigin origin) => origin switch
     {
-        ExternalOrigin.Framework => "the framework",
-        ExternalOrigin.Package => "a package",
+        ExternalOrigin.Framework => "ships with .NET",
+        ExternalOrigin.Package => "a NuGet package",
         _ => "not determined",
     };
 

@@ -200,4 +200,47 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
 
     private static List<string> Labels(string svg) =>
         [.. Regex.Matches(svg, """<text class="nm"[^>]*>([^<]*)</text>""").Select(m => m.Groups[1].Value)];
+
+    /// <summary>
+    /// Every tint the map can draw has a name and a meaning to key it with.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §48, asserted rather than observed.</b> The defect was an orange
+    /// box with no key; the fix is a caption built from <see cref="ArchitectureDiagram.Tinted"/>,
+    /// which reports what was drawn. That caption is only as good as the words behind each zone,
+    /// and <b>the <c>useless</c> tint fires on none of nopCommerce, Jellyfin, Umbraco or TestBed</b>
+    /// — §48 filed it as <i>unobserved rather than fine</i>, and it still is. So the property is
+    /// stated over the enum instead of over a run: a zone a box can be tinted for that has no name
+    /// or no gloss would ship a keyless colour again, and nothing in a golden would say so.
+    /// </remarks>
+    [Fact]
+    public void Every_tint_the_map_can_draw_is_keyed()
+    {
+        foreach (var zone in new[] { MainSequenceZone.Pain, MainSequenceZone.Uselessness })
+        {
+            Assert.False(string.IsNullOrWhiteSpace(Sentences.Zone(zone)), $"{zone} has no name");
+            Assert.False(string.IsNullOrWhiteSpace(Sentences.ZoneMeans(zone)), $"{zone} has no gloss");
+        }
+    }
+
+    /// <summary>The key describes the tints that were drawn, and no others.</summary>
+    /// <remarks>
+    /// A fixed two-entry key would define a colour that is not on the page, and a reader hunting
+    /// for a described colour they cannot find concludes they missed something rather than that
+    /// the key is over-complete. TestBed tints one zone, so this holds it to one.
+    /// </remarks>
+    [Fact]
+    public void The_key_lists_only_the_tints_that_fired()
+    {
+        var tinted = ArchitectureDiagram.Tinted(core.Model);
+
+        Assert.NotEmpty(tinted);
+        Assert.All(tinted, zone => Assert.Contains($"bx {Css(zone)}", Svg, StringComparison.Ordinal));
+
+        foreach (var absent in new[] { MainSequenceZone.Pain, MainSequenceZone.Uselessness }.Except(tinted))
+            Assert.DoesNotContain($"bx {Css(absent)}", Svg, StringComparison.Ordinal);
+    }
+
+    private static string Css(MainSequenceZone zone) =>
+        zone == MainSequenceZone.Pain ? "pain" : "useless";
 }

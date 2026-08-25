@@ -510,13 +510,36 @@ public static class Claims
             "");
     }
 
+    /// <summary>
+    /// The hub claim, which opens the rail — and opens it on two terms it has to define.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §51.</b> The sentence led with <c>fan-in 28, fan-out 24</c> and
+    /// defined neither. The two words appear nowhere else on the page as anything but threshold
+    /// <i>names</i> inside the collapsed <c>Show all thresholds</c> table — <c>MinFanIn</c>,
+    /// <c>ConcealedFanInCeiling</c> — which is §27's surface and not a glossary.
+    /// <para>
+    /// <b>A11 round 2's participants explained the two to each other to get through T3</b>, and it
+    /// worked because five people were in one room. <c>PRD-free-tier.md</c> §2 defines the target
+    /// reader as explicitly not the architect who thinks in coupling metrics, and that reader is
+    /// alone. The claim already spent a clause explaining <i>bottleneck</i>; the two measures it
+    /// leads with got none.
+    /// </para>
+    /// <para>
+    /// <b>In place, and not as a second sentence restating the numbers.</b> <i>"fan-in 7, fan-out
+    /// 7 — 7 types use it, and it uses 7 types"</i> was the first attempt and it prints every digit
+    /// twice, which reads as arithmetic rather than as a definition. A parenthesis after each
+    /// number defines the term where the reader meets it and costs four words.
+    /// </para>
+    /// </remarks>
     private static Claim Hub(SolutionModel model, Finding finding)
     {
         if (model.Find(finding.Subject) is not { } type) return Claim.None;
 
         return new Claim(
             $"{type.Name} [{type.Classification.Kind}]",
-            $"fan-in {type.FanIn}, fan-out {type.FanOut}. "
+            $"fan-in {type.FanIn} (types that use it), "
+            + $"fan-out {type.FanOut} (types it uses). "
             + Verdict(finding, type),
             "",
             "");

@@ -354,4 +354,62 @@ public sealed class MosaicTests(CoreWalkFixture core)
             $"{Math.Round(100.0 * marks.Named / core.Model.Types.Count):0}% of the types",
             page, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// The legend's three counts partition the analysed types, and say so in <i>types</i>.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §50.</b> Both of the mosaic's marks are per type and readers
+    /// counted both as findings — <i>"counts of findings across types"</i>, two of five in A11
+    /// round 2's T9, answering independently and in writing. The remedy is counts and a named
+    /// population on every swatch, and the property that keeps it honest is that the tinted count
+    /// plus the plain count is the whole population: a legend whose numbers do not add up to the
+    /// picture is <c>docs/DEFECTS.md</c> §40 with better manners.
+    /// </remarks>
+    [Fact]
+    public void The_legend_partitions_the_types_it_draws()
+    {
+        var marks = Mosaic.Marked(core.Model, Findings);
+        var total = core.Model.Types.Count;
+
+        var named = Number("some finding names");
+        var plain = Number("no finding names");
+        var leading = Number("the report leads with");
+
+        Assert.Equal(marks.Named, named);
+        Assert.Equal(marks.Leading, leading);
+        Assert.Equal(total, named + plain);
+    }
+
+    /// <summary>
+    /// Every swatch names its population, so a mark cannot be read as a count of findings.
+    /// </summary>
+    /// <remarks>
+    /// The wording is what <c>docs/DEFECTS.md</c> §50 diagnosed: the old legend had <i>a
+    /// finding</i> as the subject of a per-<i>type</i> mark. <i>type</i> or <i>types</i> on each
+    /// swatch is the half of the fix a golden would not notice going away.
+    /// </remarks>
+    [Fact]
+    public void Every_swatch_names_a_population_of_types()
+    {
+        var labels = Regex.Matches(Svg, @"<text class=""lg""[^>]*>([^<]*)</text>")
+            .Select(m => m.Groups[1].Value)
+            .Where(text => text.Contains("finding", StringComparison.Ordinal)
+                           || text.Contains("leads with", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.Equal(3, labels.Count);
+        Assert.All(labels, label => Assert.Matches(@"^[\d,]+ types? ", label));
+    }
+
+    /// <summary>The number on a swatch, read back off the rendered picture.</summary>
+    private int Number(string tail)
+    {
+        var match = Regex.Match(Svg, @">([\d,]+) types? " + Regex.Escape(tail) + "<");
+
+        Assert.True(match.Success, $"no swatch reading '... {tail}'");
+
+        return int.Parse(match.Groups[1].Value.Replace(",", "", StringComparison.Ordinal),
+            System.Globalization.CultureInfo.InvariantCulture);
+    }
 }

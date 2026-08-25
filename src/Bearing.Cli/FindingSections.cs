@@ -148,21 +148,8 @@ internal static class FindingSections
 
         // Wrapped rather than emitted whole: this section's other lines sit inside about seventy
         // columns and one 137-character line in the middle of them reads as a different document.
-        var words = Claims.ShareCaveat(found.Count, model.Types.Count).Split(' ');
-        var line = new System.Text.StringBuilder("  ");
-
-        foreach (var word in words)
-        {
-            if (line.Length + 1 + word.Length > 70)
-            {
-                yield return line.ToString();
-                line.Clear().Append("  ");
-            }
-
-            line.Append(' ').Append(word);
-        }
-
-        if (line.Length > 2) yield return line.ToString();
+        foreach (var line in Sentences.Wrap(Claims.ShareCaveat(found.Count, model.Types.Count), "   "))
+            yield return line;
     }
 
     internal static IEnumerable<string> SharedMutableState(SolutionModel model, FindingSet findings)

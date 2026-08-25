@@ -210,6 +210,14 @@ public static class ArchitectureDiagram
             }
     }
 
+    /// <summary>The zone a box is tinted for: the first extreme any project inside it sits in.</summary>
+    private static MainSequenceZone ZoneOf(
+        ProjectGroup group,
+        IReadOnlyDictionary<string, MainSequenceZone> zones) =>
+        group.Projects
+            .Select(p => zones.GetValueOrDefault(p, MainSequenceZone.None))
+            .FirstOrDefault(z => z is MainSequenceZone.Pain or MainSequenceZone.Uselessness);
+
     private static void Boxes(
         StringBuilder svg,
         List<Placed> placed,
@@ -219,9 +227,7 @@ public static class ArchitectureDiagram
         foreach (var box in placed)
         {
             var group = box.Group;
-            var zone = group.Projects
-                .Select(p => zones.GetValueOrDefault(p, MainSequenceZone.None))
-                .FirstOrDefault(z => z is MainSequenceZone.Pain or MainSequenceZone.Uselessness);
+            var zone = ZoneOf(group, zones);
 
             var css = zone switch
             {
@@ -305,12 +311,39 @@ public static class ArchitectureDiagram
         if (group.IsCycle) return $"{group.Size} projects, mutually dependent";
         if (group.Size > 1) return $"{group.Size} projects, same shape";
 
-        return zone switch
-        {
-            MainSequenceZone.Pain => "stable and concrete",
-            MainSequenceZone.Uselessness => "abstract, unused",
-            _ => "",
-        };
+        // docs/DEFECTS.md §48/§49. The words are Sentences.Zone's, so the box and the caption that
+        // keys it cannot come to spell one measure two ways -- which is what they were doing.
+        return zone is MainSequenceZone.Pain or MainSequenceZone.Uselessness ? Sentences.Zone(zone) : "";
+    }
+
+    /// <summary>
+    /// The zones this map actually tinted, in reading order.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §48.</b> A reader met an orange box with no key: the definition
+    /// lived 170 lines further down under <c>Projects</c>, and A11 round 2 asked about it by name
+    /// immediately after T1. The caption already explains the direction convention and the folded
+    /// boxes, so the key belongs beside them.
+    /// <para>
+    /// <b>What fired rather than what exists.</b> The <c>useless</c> tint did not appear on
+    /// nopCommerce, so a fixed two-entry key would spend a sentence defining a colour that is not
+    /// on the page — and a reader looking for it would conclude they had missed something. The
+    /// layout is recomputed here rather than cached for the same reason
+    /// <see cref="Folded"/> recomputes: a key and the drawing it explains must not be able to
+    /// disagree about which boxes got tinted.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<MainSequenceZone> Tinted(SolutionModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        var graph = model.ProjectGraph;
+        if (graph.Groups.Count == 0) return [];
+
+        var zones = model.ProjectCouplings.ToDictionary(c => c.Project, c => c.Zone, StringComparer.Ordinal);
+        var drawn = graph.Groups.Select(g => ZoneOf(g, zones)).ToHashSet();
+
+        return [.. new[] { MainSequenceZone.Pain, MainSequenceZone.Uselessness }.Where(drawn.Contains)];
     }
 
     /// <summary>

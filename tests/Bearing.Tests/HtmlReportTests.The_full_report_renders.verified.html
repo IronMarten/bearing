@@ -73,7 +73,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="tile"><b>21</b><span class="tl">Widest reach</span><span class="tn">types depend on NormalizeStep</span></div>
 <div class="tile"><b>72%</b><span class="tl">Clean</span><span class="tn">of 206 types, no finding names them</span></div>
 <div class="tile"><b>1.04x</b><span class="tl">Concentration</span><span class="tn">findings in Core, against its share of the types</span></div>
-<div class="tile"><b>cc 22</b><span class="tl">Most intricate</span><span class="tn">TariffCalculator.Apply, the most complex member in this solution</span></div>
+<div class="tile"><b>cc 22</b><span class="tl">Most intricate</span><span class="tn">TariffCalculator.Apply, the most complex member in this solution — Core · TariffCalculator.cs:9</span></div>
 </div>
 <div class="picture">
 <svg xmlns="http://www.w3.org/2000/svg" class="rp" viewBox="0 0 1000 596" width="1000" height="596" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
@@ -159,7 +159,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </div>
 <div class="row">
 <div class="lbl"><span class="kind">Hub or god object</span><span class="rank">1 of 3</span></div>
-<div class="fld"><b class="name">ShipmentCoordinator [Internal]</b><p class="where">Core · ShipmentCoordinator.cs:5</p><p class="claim">fan-in 7, fan-out 7. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (19 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.</p></div>
+<div class="fld"><b class="name">ShipmentCoordinator [Internal]</b><p class="where">Core · ShipmentCoordinator.cs:5</p><p class="claim">fan-in 7 (types that use it), fan-out 7 (types it uses). Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (19 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.</p></div>
 </div>
 <div class="row">
 <div class="lbl"><span class="kind">Load-bearing and intricate</span><span class="rank">1 of 3</span></div>
@@ -189,6 +189,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <h2>Orientation</h2>
 <h3>The shape of it</h3>
 <p class="sub">Projects, and what depends on what. Dependencies run downward, so the bottom row is what everything rests on. 1 box(es) hold several projects that are the same shape — same dependencies and same dependents — because that is one fact rather than several. 2 layer(s) deep.</p>
+<p class="sub">A tinted box sits at an extreme of the <em>main sequence</em>, the balance where how abstract a project is matches how much depends on it. <em>Stable and concrete</em> — much depends on it and little of it is abstract, so it is hard to change and hard to extend. The numbers behind the tint are in <em>Projects</em>, below.</p>
 <div class="scroll">
 <svg xmlns="http://www.w3.org/2000/svg" class="ad" viewBox="0 0 208 242" width="208" height="242" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 <style>
@@ -240,18 +241,18 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <path class="n" d="M4 278h127v150h-127zM4 548h127v76h-127zM132 48h86v98h-86zM132 147h86v96h-86zM220 48h87v87h-87zM220 392h87v79h-87zM220 550h87v74h-87zM308 48h75v83h-75zM308 301h75v83h-75zM308 385h75v83h-75zM462 48h76v75h-76zM540 48h73v75h-73zM614 48h70v75h-70zM517 124h64v60h-64zM649 124h60v60h-60zM711 124h60v60h-60zM452 185h53v60h-53zM452 416h53v51h-53zM506 185h50v54h-50zM506 241h50v54h-50zM506 408h50v54h-50zM506 463h50v54h-50zM506 519h50v54h-50zM901 185h44v46h-44zM557 232h46v43h-46zM648 232h41v43h-41zM691 232h41v43h-41zM733 232h41v43h-41zM776 232h41v43h-41zM819 232h41v43h-41zM861 232h41v43h-41zM904 232h41v43h-41zM557 277h42v42h-42zM557 321h42v42h-42zM557 408h42v42h-42zM557 451h42v42h-42zM557 582h42v42h-42zM644 277h42v37h-42zM687 277h42v37h-42zM601 474h36v36h-36zM601 512h36v36h-36zM601 588h36v36h-36zM908 315h37v36h-37zM639 352h35v38h-35zM675 586h35v38h-35zM711 389h37v36h-37zM711 427h34v32h-34zM711 460h34v32h-34zM747 526h34v32h-34z"/>
 <path class="f" d="M4 48h127v229h-127zM4 430h127v117h-127zM132 245h86v96h-86zM132 531h86v93h-86zM308 132h75v83h-75zM308 216h75v83h-75zM308 547h75v77h-75zM384 322h66v62h-66zM711 526h34v32h-34z"/>
 <rect class="f" x="2" y="638" width="10" height="10"/>
-<text class="lg" x="17" y="647">the findings lead with this</text>
-<rect class="n" x="188" y="638" width="10" height="10"/>
-<text class="lg" x="203" y="647">a finding names it</text>
-<rect class="c" x="320" y="638" width="10" height="10"/>
-<text class="lg" x="335" y="647">no finding names it</text>
+<text class="lg" x="17" y="647">9 types the report leads with</text>
+<rect class="n" x="200" y="638" width="10" height="10"/>
+<text class="lg" x="215" y="647">58 types some finding names</text>
+<rect class="c" x="386" y="638" width="10" height="10"/>
+<text class="lg" x="401" y="647">148 types no finding names</text>
 <text class="lg" x="998" y="647" text-anchor="end">Bearing · github.com/ironmarten/bearing</text>
 </svg>
 </div>
 <p class="sub"><strong>Read it by count and not by area.</strong> Cells are sized by lines of code and the components a finding names are the large ones, so the tinted cells are 47% of this drawing and 28% of the types. The plot at the top of this page is drawn in counts, which is what every claim here is measured in.</p>
 <p class="sub">2 project(s) are on the picture but too small to hold a name at this size: Data, Tools.</p>
 <h3>Projects</h3>
-<p class="sub">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are abstract or interfaces. D = distance from the main sequence. <em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>
+<p class="sub">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are abstract or interfaces. The <em>main sequence</em> is the balance where how abstract a project is matches how much depends on it — a project much depended on earns that by being abstract, and one that depends on much can afford to be concrete. D = |A + I - 1|, how far off that balance it sits. <em>Stable and concrete</em> is the zone of pain: hard to change, hard to extend.</p>
 <div class="scroll"><table>
 <tr><th>Project</th><th class="n">Types</th><th class="n">Ca</th><th class="n">Ce</th><th class="n">A</th><th class="n">I</th><th class="n">D</th><th>Zone</th></tr>
 <tr><td>Core</td><td class="n">199</td><td class="n">2</td><td class="n">0</td><td class="n">0.07</td><td class="n">0</td><td class="n">0.93</td><td>zone of pain — stable and concrete</td></tr>
@@ -262,8 +263,8 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <p class="sub">16 way(s) in and 3 way(s) out. The map below counts what this solution <em>calls into</em>, which is not the same question.</p>
 <div class="scroll"><table>
 <tr><th>External system</th><th class="n">Types touching it</th><th>Provided by</th></tr>
-<tr><td class="mono">System.Data</td><td class="n">3</td><td>the framework</td></tr>
-<tr><td class="mono">System.Net.Http</td><td class="n">3</td><td>the framework</td></tr>
+<tr><td class="mono">System.Data</td><td class="n">3</td><td>ships with .NET</td></tr>
+<tr><td class="mono">System.Net.Http</td><td class="n">3</td><td>ships with .NET</td></tr>
 </table></div>
 <p class="sub">26 reference(s) to language and framework plumbing were filtered out of that list rather than dropped silently.</p>
 <h3>Circular references</h3>

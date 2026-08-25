@@ -19,7 +19,7 @@ Every claim shows the numbers behind it.
      Core · Depots.cs:49 · breaks alone, 1 of 3
    ShipmentLedger — 11 distinct callers (11x its peer median) and internally complex. A bug here propagates widely.
      Core · Ledgers.cs:36 · bug blast radius, 1 of 3
-   ShipmentCoordinator [Internal] — fan-in 7, fan-out 7. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (19 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
+   ShipmentCoordinator [Internal] — fan-in 7 (types that use it), fan-out 7 (types it uses). Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (19 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
      Core · ShipmentCoordinator.cs:5 · hub or god object, 1 of 3
    ShipmentLedger — 11 types depend on it, it depends on nothing. And Record is cc 16. Hard to change safely, and intricate enough to hide a bug.
      Core · Ledgers.cs:36 · load-bearing and intricate, 1 of 3
@@ -83,8 +83,8 @@ Every claim shows the numbers behind it.
 
    INTEGRATION MAP — external systems this solution calls into,
    by how many of its types touch them:
-     System.Data                                3 types  (framework)
-     System.Net.Http                            3 types  (framework)
+     System.Data                                3 types  (ships with .NET)
+     System.Net.Http                            3 types  (ships with .NET)
      (26 language/runtime references omitted as plumbing)
 
    BOUNDARIES CARRYING REAL LOGIC — decisions made at the edge:
@@ -110,9 +110,9 @@ Every claim shows the numbers behind it.
    (fan-in AND fan-out both >= 5 — a ratio cannot see these, since
     high-in + high-out lands mid-range, same as a trivial one-in one-out leaf.
     Ordered by the smaller of the two: a thing is only as much a hub as its narrower side.)
-   ShipmentCoordinator [Internal] — fan-in 7, fan-out 7. Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (19 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
-   DispatchRegistry [Internal] — fan-in 5, fan-out 5. Architectural bottleneck: it both depends on and is depended on by much of the system, AND is broad rather than deep (23 members, no method above cc 1) — a lot to hold at once, but nothing intricate inside it. Cross-domain orchestration and shared state tend to collect here.
-   Router [Internal] — fan-in 5, fan-out 11. Wiring hub: high coupling both ways but little logic inside (worst method cc 2). Risky to re-route, not to reason about.
+   ShipmentCoordinator [Internal] — fan-in 7 (types that use it), fan-out 7 (types it uses). Architectural bottleneck: it both depends on and is depended on by much of the system, AND carries real logic (19 members, worst method Coordinate at cc 13, dsm 15). Cross-domain orchestration and shared state tend to collect here.
+   DispatchRegistry [Internal] — fan-in 5 (types that use it), fan-out 5 (types it uses). Architectural bottleneck: it both depends on and is depended on by much of the system, AND is broad rather than deep (23 members, no method above cc 1) — a lot to hold at once, but nothing intricate inside it. Cross-domain orchestration and shared state tend to collect here.
+   Router [Internal] — fan-in 5 (types that use it), fan-out 11 (types it uses). Wiring hub: high coupling both ways but little logic inside (worst method cc 2). Risky to re-route, not to reason about.
    3 types of 206 — 1.5%. This threshold is a fixed count rather than
    a share, so the percentage differs between codebases: compare what
    is named, not how many.
@@ -250,7 +250,12 @@ Every claim shows the numbers behind it.
 
 -- PROJECT STABILITY vs ABSTRACTNESS ---------------------------
    I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are
-   abstract or interfaces. D = |A + I - 1|, distance from the main sequence.
+   abstract or interfaces.
+   The MAIN SEQUENCE is the balance where how abstract a project is
+   matches how much depends on it: a project much depended on earns
+   that by being abstract, and one that depends on much can afford to
+   be concrete. D = |A + I - 1| is how far off that balance a project
+   sits.
    Stable AND concrete is the zone of pain: hard to change, hard to extend.
      Core — I 0, A 0.07, D 0.93  (Ca 2 depend on it, Ce 0 reach out, 14/199 abstract)  <-- ZONE OF PAIN (stable and concrete)
      Data — I 1, A 0, D 0  (Ca 0 depend on it, Ce 1 reach out, 0/5 abstract)  (near the main sequence)

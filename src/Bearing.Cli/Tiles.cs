@@ -226,6 +226,16 @@ public static class Tiles
     /// intricate member is a fact about the codebase whether or not a finding fired on it, and
     /// <c>TypeNode.MostComplexMember</c> is where the model already holds it.
     /// </para>
+    /// <para>
+    /// <b>And it says where the member is — <c>docs/DEFECTS.md</c> §52.</b> Every other rendering
+    /// of a subject on the page carries <c>project · file:line</c>; this one rendered the name and
+    /// dropped the rest of the identity. <b>A11 round 2's participants placed it by guessing</b> —
+    /// <i>"almost assuredly in either Nop.Services or Nop.Core"</i> — and then scrolled to another
+    /// finding to confirm. The tile row is the first screen and the confirmation was several
+    /// screens down, which is <c>X14</c>'s identity work stopping one element short: §39 made a
+    /// member subject an identity rather than a display string <i>precisely</i> so a member could
+    /// be located.
+    /// </para>
     /// </remarks>
     private static Tile? MostIntricate(SolutionModel model)
     {
@@ -239,12 +249,20 @@ public static class Tiles
 
         var named = Sentences.Member(worst.Name, member.Name);
 
+        // docs/DEFECTS.md §52. The member's own location, not its declaring type's -- the same rule
+        // Subjects.Where follows and for the same reason: a type line sends a reader to the top of
+        // a 3,000-line file to hunt for a method 800 lines down. The line number is unformatted
+        // because it is an address somebody retypes.
+        var at = member.Location.IsKnown
+            ? $"{worst.Project} · {Path.GetFileName(member.Location.File)}:{member.Location.Line}"
+            : worst.Project;
+
         return new Tile(
             TileKind.MostIntricate,
             $"cc {worst.MaxMemberCyclomatic}",
             "Most intricate",
             named,
-            $"{named}, the most complex member in this solution");
+            $"{named}, the most complex member in this solution — {at}");
     }
 
     /// <summary>

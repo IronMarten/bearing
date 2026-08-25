@@ -138,7 +138,7 @@ public static class Mosaic
         }
 
         Cells(svg, blocks, marks);
-        Legend(svg, height);
+        Legend(svg, height, model, marks);
 
         svg.Append("</svg>\n");
         return svg.ToString();
@@ -477,17 +477,58 @@ public static class Mosaic
             + $"{Html.Count(model.Types.Count)} types in {Html.Count(projects)} projects · one cell each, sized by lines</text>\n");
     }
 
-    /// <summary>What the three states mean, so the file explains itself when it is pasted alone.</summary>
-    private static void Legend(StringBuilder svg, int height)
+    /// <summary>
+    /// What the three states mean, so the file explains itself when it is pasted alone.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §50, and the legend is the common cause of both halves of it.</b>
+    /// The caption under the mosaic was correct in both cases and is the <i>second</i> thing read;
+    /// the legend is what sits beside the marks. It read <i>the findings lead with this / a finding
+    /// names it / no finding names it</i> — no counts, and <b><i>a finding</i> as the subject of a
+    /// per-<i>type</i> mark</b>. Two of five in A11 round 2's T9 answered, independently and in
+    /// writing, that the tint was <i>"counts of findings across types"</i>; a reader who saw eleven
+    /// outlined cells against a plot label reading <i>118 of 547 named</i> asked why the red boxes
+    /// did not add up.
+    /// </para>
+    /// <para>
+    /// <b>The population and the count, on every swatch.</b> Naming the noun as <i>types</i> is the
+    /// half that stops a tinted cell being counted as a finding; carrying the count is the half
+    /// that answers the arithmetic where the reader is already looking, rather than several screens
+    /// down. All three swatches carry both, because a key where one entry has a number and the
+    /// others do not invites the reader to work out what is different about that one.
+    /// </para>
+    /// <para>
+    /// <b>Two departures from the wording §50 drafted, and both were found by rendering it.</b>
+    /// The register proposed <i>11 types the claims above are about</i>. It says <i>above</i>,
+    /// which is true on the page and false in the one place this file is designed to end up —
+    /// pasted somewhere the report is not, where there is nothing above it. And at a count of one
+    /// it reads <i>1 types … are about</i>: <see cref="Sentences.Plural"/> fixes the noun, but
+    /// <i>1 type the claims above are about</i> then trips <see cref="Prose"/>'s §55 rule, and
+    /// <see cref="Prose"/>'s standing instruction for that is to reword the sentence rather than
+    /// weaken the rule. <i>The report leads with</i> is true standalone, correct at one, and puts
+    /// all three swatches in one grammatical shape — <i>N types … name(s)</i>.
+    /// </para>
+    /// <para>
+    /// <b>Counted off the same <see cref="Marking"/> the cells were drawn from</b>, not recomputed
+    /// — the legend and the picture it explains cannot be handed different sets.
+    /// </para>
+    /// </remarks>
+    private static void Legend(StringBuilder svg, int height, SolutionModel model, Marking marks)
     {
         var y = height - 9;
         var x = 2;
 
+        // The plain cells are what is left, and it is stated rather than left as a subtraction:
+        // the tint's population is types SOME finding names, so the remainder is types no finding
+        // names, and a reader should not have to do the arithmetic to learn the third swatch's.
+        var plain = model.Types.Count - marks.Named.Count;
+
         foreach (var (css, label) in new[]
         {
-            ("f", "the findings lead with this"),
-            ("n", "a finding names it"),
-            ("c", "no finding names it"),
+            ("f", $"{Count(marks.Leading.Count)} the report leads with"),
+            ("n", $"{Count(marks.Named.Count)} some finding names"),
+            ("c", $"{Count(plain)} no finding names"),
         })
         {
             svg.Append(CultureInfo.InvariantCulture,
@@ -501,6 +542,17 @@ public static class Mosaic
         svg.Append(CultureInfo.InvariantCulture,
             $"<text class=\"lg\" x=\"{Width - 2}\" y=\"{y}\" text-anchor=\"end\">Bearing · github.com/ironmarten/bearing</text>\n");
     }
+
+    /// <summary><c>1 type</c> / <c>2,836 types</c> — separated like the strip above, agreed like English.</summary>
+    /// <remarks>
+    /// <see cref="Sentences.Plural"/> gets the noun right and formats the number without a
+    /// separator, which would put <c>2836 types</c> in the legend under a title strip reading
+    /// <c>3,209 types in 27 projects</c> — one picture, two number formats. This is the pairing the
+    /// report already uses everywhere else: <see cref="Html.Count"/> for the digits,
+    /// <see cref="Sentences.Do"/> for the noun.
+    /// </remarks>
+    private static string Count(int types) =>
+        $"{Html.Count(types)} {Sentences.Do(types, "type", "types")}";
 
     private readonly record struct Rect(double X, double Y, double W, double H);
 
