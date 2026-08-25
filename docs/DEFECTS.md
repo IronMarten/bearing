@@ -333,64 +333,6 @@ this register's own discipline is that a threshold proposed without measuring bo
 next entry rather than the fix for this one. It is X16's family in a different layer: a constant
 that looks calibrated and is coupled to something it has no relationship with.
 
-### 56. Nothing tells the reader that a project's references did not resolve
-
-`README.md` says it: *"The target solution must restore before analysis, or projects load with
-missing references and the results are silently understated."* **The artifact does not.** What it
-prints is:
-
-```
-Every project selected for analysis produced a compilation.
-```
-
-True, and it reads as reassurance. A compilation with unresolved references is still a compilation.
-
-**Measured on Umbraco**, where three of twenty-five analysed projects had no `project.assets.json`:
-
-| | unrestored | restored |
-|---|---|---|
-| types | 6,230 | 6,230 |
-| edges | 37,118 | **37,241** (+123, +0.33%) |
-| findings | 2,025 | 2,029 |
-
-Types do not move -- Roslyn parses syntax without references. **Every change is upward**, because a
-missing reference is a missing edge and never a spurious one: `StringExtensions` 362 to 363 callers,
-`IContentTypeBaseService` 89 to 92 and 178 to 191 call sites, boundaries 52 to 54, external contact
-points 1,125 to 1,128.
-
-**This is invariant 8, and it is the one the tool is otherwise best at.** Every other way the
-analysis can be incomplete is disclosed -- skipped test projects, excluded paths, unreadable files,
-dangling edges, capped lists. This one is not, and it is the only one that silently moves every
-number rather than a named subset.
-
-**The signal has to be built before it can be disclosed.** `Coverage` carries `SkippedProjects`,
-`LoadDiagnostics`, `UnreadableFiles` and `ExcludedTypes`, and has nowhere to put *this project's
-references did not resolve*. Roslyn knows -- a compilation missing assemblies emits `CS0246`,
-`CS0234` and `CS0012` in quantity -- so the work is a count per project, a `Coverage` member, and a
-sentence.
-
-### 57. Two types with one fully-qualified name render as one type contradicting itself
-
-Umbraco ships two ImageSharp integrations, and both declare the same namespace:
-
-```
-type|Umbraco.Cms.Imaging.ImageSharp2|global::Umbraco.Cms.Imaging.ImageSharp.ConfigureImageSharpMiddlewareOptions
-type|Umbraco.Cms.Imaging.ImageSharp |global::Umbraco.Cms.Imaging.ImageSharp.ConfigureImageSharpMiddlewareOptions
-```
-
-**The model is right, and this is defect 1's scenario occurring in the wild for the first time.**
-Keyed on `(assembly, FQN)`, two rows, correct measurements each -- which is exactly what defect 1
-was fixed to do, on the argument that *"plugin architectures use it deliberately"*. Here is a real
-one doing it.
-
-**The report then prints both as `ConfigureImageSharpMiddlewareOptions.Configure`**, so the
-concealed-decision section nominates the same name twice with different receipts -- dsm 11 and dsm
-12 -- and reads as one type disagreeing with itself.
-
-**Defect 1 was fixed in the model and never in the renderer**, and nothing caught it because the
-fixture's planted collisions (`PayloadTag`, `CarrierTwin`) are never nominated, so they never reach
-a claim. The property is that no two rendered findings print the same identity.
-
 ### 58. A namespace cycle's shape is decided by one arm and applied to the whole component
 
 Umbraco's namespace graph has a single strongly-connected component of **363 namespaces**, rendered
@@ -425,7 +367,7 @@ that tells them apart.
 
 ## Closed
 
-**Index only — the prose is in git.** Fifty-two entries: forty-four removed 2026-08-24, plus D55 and D59, and then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Fifty-four entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -483,6 +425,44 @@ forty-seven in full is the commit before this one.
 | 51 | `fan-in 28, fan-out 24` opens a first-screen claim with no gloss | fixed 2026-08-25 |
 | 52 | The `Most intricate` tile names a member without its project | fixed 2026-08-25 |
 | 60 | `framework` and `package` read as a category and mean a provenance | reworded 2026-08-25 to state the resolution |
+| 56 | Nothing tells the reader that a project's references did not resolve | fixed 2026-08-25 |
+| 57 | Two types with one fully-qualified name render as one type contradicting itself | fixed 2026-08-25; the entry's reason for surviving was wrong, see below |
+
+> **D56 shipped with a wider meaning than it was filed with, and the widening was measured.** The
+> entry proposed counting `CS0246`/`CS0234`/`CS0012` as *"this project's references did not
+> resolve"*, which is restore failure. It is restore failure **and one other thing**:
+> `Umbraco.JsonSchema` has no `project.assets.json` and cannot find `CommandLine`, `Namotion` or
+> `NJsonSchema`, which restore fixes — and `Umbraco.Core` is fully restored, emits one, and the one
+> is `UmbracoBuilder.cs:325` registering `AddUnique<IElementContainerService,
+> ElementContainerService>()` **against a type no file in the solution declares.** Both are missing
+> edges and the consequence is identical, so both are counted; the sentence reports the consequence
+> and says the cause is usually restore rather than asserting it. The first draft said *"restore the
+> solution and re-run to close the gap"*, which is false on the second case.
+
+> **The cost was measured on both reference solutions before it shipped, and it is not what it
+> looks like.** `GetDiagnostics` binds every method body, which reads as a second semantic pass and
+> is mostly a rescheduled one — the walk was paying for that binding lazily, one question at a time.
+> With `--profile`, before and after: nopCommerce `compile 10.5s → 16.4s, walk 15.5s → 12.1s, total
+> 33.7s → 35.2s`; Umbraco `compile 3.5s → 8.2s, walk 21.1s → 12.4s, total 30.4s → 26.5s`. **+1.5s on
+> one and −3.9s on the other**, against a 60s cold budget.
+
+> **D57's entry was wrong about why it survived, and the property is what found that out.** It
+> recorded the fixture's planted collisions — `PayloadTag`, `CarrierTwin` — as *"never nominated, so
+> they never reach a claim"*. `TestBed.Interop.CarrierTwin` is declared in both `Core` and `Data`,
+> **both declarations are nominated**, and the two rows separate cleanly because `Subjects.Where`
+> leads with the project. That is §57's scenario handled rather than §57 occurring, and it is why
+> nothing ever looked wrong. The first draft of the property asserted *one name, one address* and
+> failed on exactly that pair — correct behaviour, flagged as a defect. It is keyed on the declaring
+> type instead.
+
+> **What was actually broken was a second face, found on Umbraco on 2026-08-25 and not in the
+> entry.** The concealed-decision claim titles itself with the type's most complex *member* and
+> passed no trailer, so `Subjects.Where` fell back to the declaring *type*'s line: the page printed
+> `Utf8ToAsciiConverter.ToAscii` at `:12`, the class declaration, beside a tile printing the same
+> name at `:131`, the method. **And the type declares two `ToAscii` overloads**, at 76 and 131, cc 3
+> and cc 1312 — so a reader could not tell whether they were looking at two methods or one method
+> described twice. §39 made a member subject an identity *precisely* so a member could be located;
+> this was that work stopping one element short, which is the shape §52 had on the tile.
 
 > **The six of 2026-08-25 were one session and three pieces of work**, and two of them changed
 > shape when the words were rendered rather than reasoned about. **§50's legend wording came from
