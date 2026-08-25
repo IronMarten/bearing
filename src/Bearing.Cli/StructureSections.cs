@@ -475,6 +475,57 @@ internal static class StructureSections
 
     // docs/DEFECTS.md §48/§49. The words come from Sentences.Zone so that the terminal, the HTML
     // table and the box on the map cannot spell one measure three ways -- which is what they did.
+
+    /// <summary>
+    /// Whether every project compiled against everything it names — <c>docs/DEFECTS.md</c> §56.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Stated either way, because this is the one incompleteness that moves every number.</b>
+    /// A skipped test project or an excluded path understates a named subset; references that did
+    /// not resolve understate <i>everything</i>, and always downward — a missing reference is a
+    /// missing edge and never a spurious one. Silence here would be the §4 mistake in a new place:
+    /// the absence of a warning read as the presence of an assurance.
+    /// </para>
+    /// <para>
+    /// <b>The count is printed and nothing is decided by it.</b> Nine errors is one package or one
+    /// conditional target; nine thousand is a project that never restored. The reader can tell
+    /// those apart and the tool cannot, so it prints the number and says which way the bias runs.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> UnresolvedReferenceLines(Coverage coverage)
+    {
+        var unresolved = coverage.ProjectsWithUnresolvedReferences;
+
+        if (unresolved.Count == 0)
+        {
+            yield return "   Every project resolved every reference it names.";
+            yield break;
+        }
+
+        yield return "";
+
+        // Two wordings were wrong before this one, and both were found by reading the rendered
+        // rows rather than by reasoning about them. "2 projects ... every type IT names" is
+        // docs/DEFECTS.md §55 in the mirror -- a plural count against a singular pronoun, which
+        // Prose's rule does not look for. And "restore the solution to close the gap" asserts a
+        // cause: Umbraco.Core is restored and still has one, because the source names a type it
+        // never declares. The consequence is the same either way; the remedy is not.
+        var lead = $"{Sentences.Plural(unresolved.Count, "project")} did NOT resolve every type "
+                   + $"{Sentences.Do(unresolved.Count, "it names", "they name")}, so edges are MISSING "
+                   + "and every number below is a lower bound. Usually an unrestored solution; "
+                   + "sometimes a name the source uses and does not declare:";
+
+        foreach (var line in Sentences.Wrap(lead, "   ")) yield return line;
+
+        var (shown, disclosure) = Sentences.Cap(unresolved, DiagnosticsShown, "project", "     ");
+
+        foreach (var project in shown)
+            yield return $"     {project.Project} — {Sentences.Plural(project.Diagnostics, "unresolved type name")}";
+
+        foreach (var line in disclosure) yield return line;
+    }
+
     private static string Zone(MainSequenceZone zone) => zone switch
     {
         MainSequenceZone.Pain => $"  <-- ZONE OF PAIN ({Sentences.Zone(zone)})",
@@ -609,6 +660,11 @@ internal static class StructureSections
             if (coverage.LoadDiagnostics.Count > 0) yield return "";
             yield return "   Every project selected for analysis produced a compilation.";
         }
+
+        // docs/DEFECTS.md §56, and it goes directly under that sentence because that sentence is
+        // what it qualifies: a compilation with unresolved references IS a compilation, so
+        // "produced a compilation" is true and reads as a clean bill of health it cannot give.
+        foreach (var line in UnresolvedReferenceLines(coverage)) yield return line;
 
         yield return "";
 

@@ -228,7 +228,7 @@ public sealed class SolutionWalker
         clock.Add(WalkStage.Open, opened);
 
         var compiled = WalkClock.Now();
-        var (compilations, projectNodes, notLoaded, unreadable) =
+        var (compilations, projectNodes, notLoaded, unreadable, unresolved) =
             await CompileAsync(projects, diagnostics, cancellationToken).ConfigureAwait(false);
         clock.Add(WalkStage.Compile, compiled);
         clock.Projects = compilations.Count;
@@ -251,6 +251,7 @@ public sealed class SolutionWalker
             ProjectsNotLoaded = notLoaded,
             ExcludedTypes = builder.ExcludedTypes,
             UnreadableFiles = unreadable,
+            ProjectsWithUnresolvedReferences = unresolved,
         });
         clock.Add(WalkStage.Build, built);
 
@@ -303,13 +304,15 @@ public sealed class SolutionWalker
     private static async Task<(List<(Project Project, Compilation Compilation)> Compilations,
                               List<ProjectNode> Nodes,
                               List<string> NotLoaded,
-                              List<string> Unreadable)> CompileAsync(
+                              List<string> Unreadable,
+                              List<UnresolvedReferences> Unresolved)> CompileAsync(
         List<Project> projects, List<string> diagnostics, CancellationToken cancellationToken)
     {
         var compilations = new List<(Project Project, Compilation Compilation)>();
         var nodes = new List<ProjectNode>();
         var notLoaded = new List<string>();
         var unreadable = new List<string>();
+        var unresolved = new List<UnresolvedReferences>();
 
         foreach (var project in projects)
         {
@@ -341,6 +344,27 @@ public sealed class SolutionWalker
                     .Where(path => !string.IsNullOrEmpty(path)));
             }
 
+            // docs/DEFECTS.md §56, counted here because this is the one place the compilation is
+            // already in hand, and it is the only signal separating "compiled" from "compiled
+            // against everything it names".
+            //
+            // GetDiagnostics binds every method body, which sounds like a second semantic pass and
+            // is mostly a RESCHEDULED one: the walk pays for that binding lazily, one question at
+            // a time. Measured on both reference solutions, before and after, with --profile:
+            //
+            //   nopCommerce   compile 10.5s -> 16.4s,  walk 15.5s -> 12.1s,  total 33.7s -> 35.2s
+            //   Umbraco       compile  3.5s ->  8.2s,  walk 21.1s -> 12.4s,  total 30.4s -> 26.5s
+            //
+            // So it costs ~+1.5s on one and ~-3.9s on the other, against a 60s cold budget. Do not
+            // "optimise" this into GetDeclarationDiagnostics: that skips method bodies, where a
+            // CS0246 from an unrestored package is most of the count, and the saving is a stage
+            // boundary rather than work.
+            var unresolvedHere = compilation.GetDiagnostics(cancellationToken)
+                .Count(d => d.Severity == DiagnosticSeverity.Error
+                            && MissingReference.Contains(d.Id, StringComparer.Ordinal));
+
+            if (unresolvedHere > 0) unresolved.Add(new UnresolvedReferences(project.Name, unresolvedHere));
+
             compilations.Add((project, compilation));
             nodes.Add(new ProjectNode(
                 project.Name,
@@ -348,8 +372,31 @@ public sealed class SolutionWalker
                 compilation.Options.OutputKind == OutputKind.DynamicallyLinkedLibrary));
         }
 
-        return (compilations, nodes, notLoaded, unreadable);
+        return (compilations, nodes, notLoaded, unreadable, unresolved);
     }
+
+    /// <summary>
+    /// The three errors a compilation emits when a reference did not resolve.
+    /// </summary>
+    /// <remarks>
+    /// <c>docs/DEFECTS.md</c> §56. <c>CS0246</c> is <i>type or namespace not found</i>,
+    /// <c>CS0234</c> is <i>does not exist in the namespace</i>, and <c>CS0012</c> is <i>defined in
+    /// an assembly that is not referenced</i>. Three ids rather than "any error", because a
+    /// project can have ordinary compile errors and still have restored — this is a question about
+    /// the reference closure, not about whether the code is finished.
+    /// <para>
+    /// <b>An unrestored solution is the usual cause and not the only one, and Umbraco is both
+    /// cases at once.</b> <c>Umbraco.JsonSchema</c> has no <c>project.assets.json</c> and cannot
+    /// find <c>CommandLine</c>, <c>Namotion</c> or <c>NJsonSchema</c> — restore fixes it.
+    /// <c>Umbraco.Core</c> is fully restored and still emits one, because
+    /// <c>UmbracoBuilder.cs:325</c> registers <c>AddUnique&lt;IElementContainerService,
+    /// ElementContainerService&gt;()</c> and <b>no file in the solution declares
+    /// <c>ElementContainerService</c></b>. <b>Both are missing edges and the consequence is
+    /// identical</b>, so both are counted — but the sentence that reports them must not promise
+    /// that restoring closes the gap, because on the second it will not.
+    /// </para>
+    /// </remarks>
+    private static readonly string[] MissingReference = ["CS0246", "CS0234", "CS0012"];
 
     /// <summary>Whether a symbol is declared by one of the assemblies being analysed.</summary>
     /// <remarks>

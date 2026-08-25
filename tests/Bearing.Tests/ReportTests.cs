@@ -212,6 +212,7 @@ public sealed class ReportTests(CoreWalkFixture core)
             ProjectsNotLoaded = [],
             ExcludedTypes = 0,
             UnreadableFiles = [],
+            ProjectsWithUnresolvedReferences = [],
         }));
 
         Assert.Contains("2 diagnostics while loading", text, StringComparison.Ordinal);
@@ -250,6 +251,7 @@ public sealed class ReportTests(CoreWalkFixture core)
             ProjectsNotLoaded = ["Widgets"],
             ExcludedTypes = 0,
             UnreadableFiles = [],
+            ProjectsWithUnresolvedReferences = [],
         }));
 
         Assert.Contains("1 project did not load: Widgets.", text, StringComparison.Ordinal);
@@ -281,11 +283,82 @@ public sealed class ReportTests(CoreWalkFixture core)
             ProjectsNotLoaded = [],
             ExcludedTypes = 0,
             UnreadableFiles = [],
+            ProjectsWithUnresolvedReferences = [],
         }));
 
         Assert.Contains("diagnostic 10", text, StringComparison.Ordinal);
         Assert.DoesNotContain("diagnostic 11", text, StringComparison.Ordinal);
         Assert.Contains("4 diagnostics not shown of 14", text, StringComparison.Ordinal);
+    }
+
+    // ------------------------------------------------------------------ defect 56 ----
+
+    /// <summary>
+    /// A project that compiled without resolving its references is disclosed, and named.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §56.</b> <c>README.md</c> warns that an unrestored solution loads
+    /// with missing references and understates the results; the artifact said <i>"Every project
+    /// selected for analysis produced a compilation"</i>, which is true and reads as reassurance.
+    /// <b>A compilation with unresolved references is still a compilation</b>, so the sentence
+    /// above cannot carry this and a new one has to.
+    /// </para>
+    /// <para>
+    /// <b>The direction is part of the claim.</b> A missing reference is a missing edge and never a
+    /// spurious one, so every number moves one way — measured on Umbraco with three of twenty-five
+    /// projects unrestored: 37,118 edges against 37,241 restored, and types identical either way
+    /// because Roslyn parses syntax without references. The reader is told which way to read the
+    /// bias, not merely that something is wrong.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_project_that_did_not_resolve_its_references_is_disclosed()
+    {
+        var text = string.Join(Environment.NewLine, Report.NotAnalysed(new Coverage
+        {
+            ExclusionsApplied = [],
+            SkippedProjects = [],
+            LoadDiagnostics = [],
+            ProjectsNotLoaded = [],
+            ExcludedTypes = 0,
+            UnreadableFiles = [],
+            ProjectsWithUnresolvedReferences = [new UnresolvedReferences("Widgets", 412)],
+        }));
+
+        Assert.Contains("1 project did NOT resolve every type it names", text, StringComparison.Ordinal);
+        Assert.Contains("Widgets — 412 unresolved type names", text, StringComparison.Ordinal);
+        Assert.Contains("lower bound", text, StringComparison.Ordinal);
+
+        // The clean line is not also printed, which would contradict the block above it.
+        Assert.DoesNotContain("Every project resolved every reference it names", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A clean run says so, because the absence of a warning is not an assurance.
+    /// </summary>
+    /// <remarks>
+    /// Invariant 8, and the half that is easy to skip. Every other incompleteness this section
+    /// reports states its "none" — skipped projects, exclusions, dangling edges — because a reader
+    /// scanning for a warning cannot distinguish "nothing was wrong" from "nothing was checked".
+    /// <c>docs/DEFECTS.md</c> §56 exists because this one was the exception.
+    /// </remarks>
+    [Fact]
+    public void A_run_that_resolved_everything_says_so()
+    {
+        var text = string.Join(Environment.NewLine, Report.NotAnalysed(new Coverage
+        {
+            ExclusionsApplied = [],
+            SkippedProjects = [],
+            LoadDiagnostics = [],
+            ProjectsNotLoaded = [],
+            ExcludedTypes = 0,
+            UnreadableFiles = [],
+            ProjectsWithUnresolvedReferences = [],
+        }));
+
+        Assert.Contains("Every project resolved every reference it names.", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("did NOT resolve", text, StringComparison.Ordinal);
     }
 
     // ------------------------------------------------------------------ defect 16 ----

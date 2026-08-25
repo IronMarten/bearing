@@ -886,6 +886,16 @@ public static class HtmlReport
               + ". Fan-in understates everywhere they are referenced, so read every number as a "
               + "lower bound.</li>\n");
 
+        // docs/DEFECTS.md §56. Directly after the compilation sentence, because that is the
+        // sentence it qualifies -- a compilation with unresolved references is still a
+        // compilation, so "produced a compilation" is true and cannot mean what it looks like.
+        page.Append(coverage.ProjectsWithUnresolvedReferences.Count == 0
+            ? "<li>Every project resolved every reference it names.</li>\n"
+            : $"<li><strong>{Html.Count(coverage.ProjectsWithUnresolvedReferences.Count)} project(s) did not resolve every type they name</strong> — "
+              + Html.Text(string.Join(", ", coverage.ProjectsWithUnresolvedReferences
+                  .Select(p => $"{p.Project} ({Html.Count(p.Diagnostics)})")))
+              + ". Edges are missing, so every number on this page is a lower bound. Usually an unrestored solution; sometimes a name the source uses and does not declare.</li>\n");
+
         if (coverage.LoadDiagnostics.Count > 0)
         {
             page.Append($"<li>{Html.Count(coverage.LoadDiagnostics.Count)} diagnostic(s) while loading. ");

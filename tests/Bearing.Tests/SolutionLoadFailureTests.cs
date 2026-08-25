@@ -298,6 +298,7 @@ public sealed class SolutionLoadFailureTests
             ProjectsNotLoaded = [],
             ExcludedTypes = 0,
             UnreadableFiles = [],
+            ProjectsWithUnresolvedReferences = [],
         }));
 
         Assert.DoesNotContain("could not be parsed", text, StringComparison.Ordinal);

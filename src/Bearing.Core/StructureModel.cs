@@ -523,6 +523,21 @@ public readonly record struct ExternalDependency(
     ExternalOrigin Origin = ExternalOrigin.Unknown);
 
 /// <summary>
+/// A project whose references did not all resolve, and how loudly.
+/// </summary>
+/// <param name="Project">The project's name, as the solution declares it.</param>
+/// <param name="Diagnostics">
+/// How many <c>CS0246</c>, <c>CS0234</c> and <c>CS0012</c> errors its compilation emitted.
+/// </param>
+/// <remarks>
+/// <b><c>docs/DEFECTS.md</c> §56.</b> A count rather than a flag, because the two ends of the range
+/// mean different things: a handful is one package or one conditional target, and thousands is a
+/// project that never restored. Neither is a threshold — nothing here decides anything, and the
+/// number is printed so a reader can tell which of the two they are looking at.
+/// </remarks>
+public readonly record struct UnresolvedReferences(string Project, int Diagnostics);
+
+/// <summary>
 /// What the analysis did not see.
 /// </summary>
 /// <remarks>
@@ -559,6 +574,41 @@ public sealed class Coverage
     /// invariant 8, silence is not a clean bill of health.
     /// </remarks>
     public required IReadOnlyList<string> ProjectsNotLoaded { get; init; }
+
+    /// <summary>
+    /// Projects whose references did not all resolve, and are therefore missing edges.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §56, and it is the one incompleteness this tool did not
+    /// disclose.</b> <c>README.md</c> says it — <i>"the target solution must restore before
+    /// analysis, or projects load with missing references and the results are silently
+    /// understated"</i> — and the artifact said <i>"Every project selected for analysis produced a
+    /// compilation"</i>, which is true and reads as reassurance. A compilation with unresolved
+    /// references is still a compilation.
+    /// </para>
+    /// <para>
+    /// <b>Measured on Umbraco with three of twenty-five projects unrestored.</b> Types do not move
+    /// — Roslyn parses syntax without references — and every other number moves <i>upward</i> when
+    /// the references resolve, because a missing reference is a missing edge and never a spurious
+    /// one: 37,118 edges to 37,241, <c>StringExtensions</c> 362 callers to 363,
+    /// <c>IContentTypeBaseService</c> 89 to 92, boundaries 52 to 54.
+    /// </para>
+    /// <para>
+    /// <b>This is invariant 8 in the one place it was missing.</b> Skipped test projects, excluded
+    /// paths, unreadable files, dangling edges and capped lists are all disclosed; this was not,
+    /// and it is the only one that silently moves <i>every</i> number rather than a named subset.
+    /// Empty is the ordinary case and is stated as such — silence is not a clean bill of health.
+    /// </para>
+    /// <para>
+    /// <b>It counts names that did not resolve, which is restore failure and is not only restore
+    /// failure.</b> A project can be fully restored and still name a type nothing declares —
+    /// Umbraco.Core does, at <c>UmbracoBuilder.cs:325</c> — and the edge is just as missing. The
+    /// count is honest about the consequence and deliberately silent about the cause, because the
+    /// tool can see the first and cannot see the second.
+    /// </para>
+    /// </remarks>
+    public required IReadOnlyList<UnresolvedReferences> ProjectsWithUnresolvedReferences { get; init; }
 
     /// <summary>Types dropped because they matched an exclusion.</summary>
     public required int ExcludedTypes { get; init; }
