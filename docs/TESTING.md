@@ -811,6 +811,22 @@ throughout, and could not have been otherwise.
 > `PolicySweepTests` cover the judgements. Nothing covered the inputs, and the gap ran from the
 > first commit to A2 with a green suite the whole way.
 
+> **One half of that second measurement is now a harness rather than a habit.**
+> `ProseOnRealReportsTests` runs `Prose`'s rules over rendered reports from a directory named by
+> `BEARING_REPORT_DIR`, and is inert without it — the build-time gate stays `ProseTests` over
+> `TestBed`, because walking three real solutions is minutes rather than milliseconds.
+>
+> ```
+> bearing <solution> --html out/name.html --full > out/name.txt
+> BEARING_REPORT_DIR=out dotnet test --filter FullyQualifiedName~ProseOnRealReports
+> ```
+>
+> **Run 2026-08-25 on all three reference solutions, both renderers, `--full`: six reports, four
+> rules, zero violations.** Appending `docs/DEFECTS.md` §56's first-draft sentence to any one of
+> them fails it on `plural-count-singular-verb`, which is what makes the zero evidence rather than
+> an absence — §3's rule that a check which cannot fail is not a check. **This is only the prose
+> half.** Everything else in the table above is still a run somebody has to read.
+
 **The second real run, after A3–A5, and it paid again.** Both solutions completed — no crash, no
 dangling edge in 27,028 emitted edges, no ragged row in 37,251 CSV rows, and the JSON parsed on
 both. Four things came out of it that the fixture could not have produced:

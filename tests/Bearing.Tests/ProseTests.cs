@@ -66,6 +66,8 @@ public sealed class ProseTests(CoreWalkFixture core)
     /// </remarks>
     [Theory]
     [InlineData("   1 file could not be parsed and were not read:", "singular-count-plural-verb")]
+    [InlineData("   2 projects did NOT resolve every reference it names, so edges are MISSING", "plural-count-singular-verb")]
+    [InlineData("   3 files were not read and its contents are missing.", "plural-count-singular-verb")]
     [InlineData("     (39 boundarys not shown of 54 — raise --top to see them.)", "naive-plural")]
     [InlineData("   at Nerdbank.GitVersioning.VersionOracle..ctor(GitContext context)", "stack-frame")]
     public void The_rules_catch_what_they_were_written_for(string line, string rule)
@@ -79,9 +81,18 @@ public sealed class ProseTests(CoreWalkFixture core)
     /// And they do not fire on the sentences the report legitimately writes.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The controls matter more than the catches: these rules are patterns over English, and one
     /// that flags correct prose gets weakened until it finds nothing. <c>1 type calls into it</c>
     /// and <c>only 1 type depends on it</c> are §32's own fixes, still correct on Umbraco.
+    /// </para>
+    /// <para>
+    /// <b>The mirror rule's controls were not guessed — they are what it flagged.</b> Its first
+    /// draft matched <b>98 lines</b> across both renderers on all three reference solutions, all of
+    /// them correct, and every one turned on a bare object <c>it</c>. Its second flagged
+    /// <i>"each has"</i>. Both narrowings are pinned below, because a rule narrowed for a reason
+    /// that is not written down gets widened again by the next person who reads it.
+    /// </para>
     /// </remarks>
     [Theory]
     [InlineData("   FriendlyPublishedContentExtensions — 34 writes to static state, and 1 type calls into it.")]
@@ -90,6 +101,17 @@ public sealed class ProseTests(CoreWalkFixture core)
     [InlineData("     107 of this solution's 3,209 types sit in a group too small to compare them against")]
     [InlineData("   3 of them do still appear in the nominations above: the findings that need no cohort")]
     [InlineData("     Umbraco.Cms.Api.Management.ViewModels — 12 types, 4 of them entities")]
+    // The six controls below are the mirror rule's, and each is a wording the corpus actually
+    // carries. The first is why a bare "it" does not count: it is an OBJECT here, and admitting it
+    // flagged 98 correct sentences across the three reference solutions. The second is why the
+    // window stops at a new subject -- "has" agrees with "each", not with "11 kinds". The last is
+    // the singular form of the sentence the rule was written for, which must stay silent.
+    [InlineData("   SemVersion — 20 types depend on it, it depends on nothing.")]
+    [InlineData("   The strongest row of the rarest kind. 11 kinds fired and each has one claim below.")]
+    [InlineData("   ExamineEvents — 4 writes to static state, and 7 types call into it.")]
+    [InlineData("   88% of this codebase has nothing said about it")]
+    [InlineData("     System.Data                                3 types  (ships with .NET)")]
+    [InlineData("   1 project did NOT resolve every type it names, so edges are MISSING")]
     public void The_rules_leave_correct_sentences_alone(string line) =>
         Assert.Empty(Prose.Violations(line));
 }
