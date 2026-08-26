@@ -145,9 +145,9 @@ requirement that superseded it.
 **`KnownDefectTests` went with the probe at R2, by construction**: every assertion in it stated
 the probe's behaviour, so there was nothing to port. What replaces a pin is an ordinary test in
 the suite that owns the behaviour, naming the requirement and asserting what the tool does now.
-[`DEFECTS.md`](DEFECTS.md) still carries the evidence and the remedy for each entry, and an entry
-that describes live behaviour still needs a test somewhere — D37 is the model: its fix is
-asserted by `OrderingTests`, and removing the fix fails there.
+The commit that fixed a defect carries the evidence and the remedy for it, and an entry
+that describes live behaviour still needs a test somewhere. The project-ordering fix is the
+model: it is asserted by `OrderingTests`, and removing the fix fails there.
 
 ### What the equivalence suite proved, and what replaced it
 
@@ -171,7 +171,7 @@ expired the same way, one level up: **an end-to-end comparison earns its place w
 underneath are unverified, and becomes a liability once they are.**
 
 The liability was not hypothetical. Ports of the probe-reading tests found two things a
-comparison could not: the JSON export's project ordering (`DEFECTS.md` §37), which both
+comparison could not: the JSON export's project ordering, which both
 implementations got from the same enumeration and therefore agreed about, and the fact that 45
 tests asserting Core alone were sitting inside files named for the comparison, one deletion away
 from going with it.
@@ -422,7 +422,7 @@ Tidying it up changes the expected answers.
   detection already works. The case that does not is convention registration
 - boundary: **19** contact points, 16 inbound, 3 outbound. Shapes
   `1,1,1,1,1,2,3,4,4,4,5,5,6,7,8,8,8,8,12`, median 4, so `WIDEST CONTRACT SURFACE` threshold 6 and
-  **seven qualify** against a ceiling of five, which is `docs/DEFECTS.md` §12 and why row 5 still
+  **seven qualify** against a ceiling of five, which is why row 5 still
   cannot fire. **P6's four new boundaries were given surfaces 4, 4, 5 and 5 on purpose**: the
   median is the 10th of 19 and stays at 4, so the qualifying set is the same seven it was at
   fifteen boundaries. Anything above the median would have emptied the finding to one and taken
@@ -447,7 +447,7 @@ Tidying it up changes the expected answers.
   condition, so the floor cannot discriminate at any solution size — `TASKS.md` X4. Nothing on the
   fixture reaches exactly two, either, so lowering it admits nobody
 - **layering patterns: five of them**, grouped on the type's own role plus its named dependencies
-  rather than on the kind signature (`docs/DEFECTS.md` §11). `QuoteController`,
+  rather than on the kind signature. `QuoteController`,
   `DocumentController`, `RateController` and `TrackingController` are one pattern of four —
   `ApiBoundary`, reaching `TenantStore` and `CarrierGateway`. `AuthenticationMiddleware`
   (`TenantStore`, `AuditClient`) and `PolicyBridge` (`Internal`, reaching `QuoteController`,
@@ -457,7 +457,7 @@ Tidying it up changes the expected answers.
   only nominations whose detail collapses — and `PublicIntakeConduit` / `PublicRelayConduit`, a
   pattern of two reaching the *identical* three components and separated from the six by nothing
   but their own `ApiBoundary` role. Under the probe's kind-signature grouping all fourteen are one
-  pattern and the whole section collapses to a line, which is `DEFECTS.md` §11 stated as loudly as
+  pattern and the whole section collapses to a line, which is the collapse stated as loudly as
   the fixture can state it
 - five of the six need their own architectural role to reach the span — the four controllers and
   the middleware, all at two kinds through dependencies. `PolicyBridge` is the control: three
@@ -675,13 +675,13 @@ Two were dead and are now planted in `Core/Dispatch/Dispatch.cs`:
 
 > **And it found a wording defect the moment the gate had a case.** The size arm of the hub
 > disjunction prints *"AND carries real logic"* about a type whose worst method is cc 1 —
-> `DEFECTS.md` §16. The receipts in the same sentence refute it. Nothing could have seen that
+> The receipts in the same sentence refute it. Nothing could have seen that
 > while the arm was unreachable.
 
 > **~~Two constraints on any further plant, both still binding.~~ One, now.** The first was
 > withdrawn as decision X1 and its premise was false: *no new `ApiBoundary` or `ExternalCall`
 > type, because the fixture sits at nine boundaries and row 5's suppression stops being reachable
-> at ten*. Row 5 was unreachable at **every** count — `DEFECTS.md` §12 — so a boundary count
+> at ten*. Row 5 was unreachable at **every** count, so a boundary count
 > could not have protected it, and the same constraint had been recorded elsewhere with the
 > opposite justification. P4 has since taken the fixture from nine boundaries to fifteen with
 > nothing disarmed, and F9 made the ceiling observable from both sides for the first time. What
@@ -792,7 +792,7 @@ throughout, and could not have been otherwise.
 
 | Condition | Why TestBed cannot show it | Found as |
 |---|---|---|
-| An edge endpoint the walk never declared | every type TestBed declares is analysed, so no edge has ever had an absent endpoint | `DEFECTS.md` §7 — a `KeyNotFoundException`, not the recorded inaccuracy. 123 such edges on Jellyfin, 57 on nopCommerce |
+| An edge endpoint the walk never declared | every type TestBed declares is analysed, so no edge has ever had an absent endpoint | A `KeyNotFoundException`, not the recorded inaccuracy. 123 such edges on Jellyfin, 57 on nopCommerce |
 | An anonymous type as a reference target | TestBed projects none into a position the collector reaches | §22, and the crash on nopCommerce |
 | Zero external contact points | TestBed has 19, so the disagreeing case is the zero case | §20 — needed a solution that is a library and a CLI and nothing else |
 | A load diagnostic | every solution in this repository loads cleanly | §4, confirmed: nopCommerce's six are NuGet **vulnerability advisories**, not failures |
@@ -822,7 +822,7 @@ throughout, and could not have been otherwise.
 > ```
 >
 > **Run 2026-08-25 on all three reference solutions, both renderers, `--full`: six reports, four
-> rules, zero violations.** Appending `docs/DEFECTS.md` §56's first-draft sentence to any one of
+> rules, zero violations.** Appending that disclosure's first-draft sentence to any one of
 > them fails it on `plural-count-singular-verb`, which is what makes the zero evidence rather than
 > an absence — §3's rule that a check which cannot fail is not a check. **This is only the prose
 > half.** Everything else in the table above is still a run somebody has to read.
@@ -833,7 +833,7 @@ both. Four things came out of it that the fixture could not have produced:
 
 | Found | Why the fixture could not show it |
 |---|---|
-| **D1's fix decides something, measured.** nopCommerce has exactly one FQN in two assemblies — the spike's `BaseNameCompatibility` — and Core reports two rows and **no project cycle** where name-keying fabricated a five-project one | the fixture's colliding pair has fan-in 0 and sits in no cycle, so merged and split give identical components. `DEFECTS.md` §1 called this out as still owed |
+| **D1's fix decides something, measured.** nopCommerce has exactly one FQN in two assemblies — the spike's `BaseNameCompatibility` — and Core reports two rows and **no project cycle** where name-keying fabricated a five-project one | the fixture's colliding pair has fan-in 0 and sits in no cycle, so merged and split give identical components. The entry called this out as still owed |
 | **A3's covering arm renders** — 7 of Jellyfin's 13 namespace loops and 8 of nopCommerce's 22 visit every member | both TestBed cycles are the partial case, so only the disclosing arm had ever rendered |
 | **"the other 1 are entangled too"** — a verb agreed with a computed number, ten times across the two runs | TestBed's two remainders are 2 and 5. Reworded to carry no verb rather than patched, since the next such number is a defect waiting on the right input |
 | **§25: a redirected report is transcoded through the code page** | *not a fixture gap at all* — every snapshot calls `Report.For` and asserts on the returned strings, so `Console.Out` is not on the path under test |
@@ -893,7 +893,7 @@ was correct cell by cell and the suite had nothing to say about it, because what
 | Found | Why the fixture could not show it |
 |---|---|
 | **The picture inverted the two projects that matter.** By tinted area it ranks `Nop.Services` › `Nop.Web` › `Nop.Web.Framework`; by the quantity every claim uses — counts of types — the order is `Nop.Web.Framework` (29%) › `Nop.Services` (26%) › `Nop.Web` (12%). `Nop.Web` carries the joint-most findings and the most ink and is the **least dense of the five, with 31 dependents**: the leaf, and by the reader's own logic the safest place to work | **the fixture has three projects and one of them holds 94% of the lines.** A rank inversion needs enough projects to have an order, and a correlation between area and count needs a population to appear in. On TestBed the picture and the counts agree by accident of scale |
-| **Label placement needed a second solution to exercise at all.** nopCommerce has five depended-on projects and every name fits; **jellyfin has twenty, places eleven and discloses nine**. The disclosure arm — `DEFECTS.md` §31's rule in a new drawing — never runs on nopCommerce and cannot run on the fixture | the fixture has three projects, so no label ever collides. The arm that drops a name and lists it is unreachable by construction, which is the same shape as the mosaic's `Unlabelled` and is why both are written down here rather than pinned |
+| **Label placement needed a second solution to exercise at all.** nopCommerce has five depended-on projects and every name fits; **jellyfin has twenty, places eleven and discloses nine**. The disclosure arm — the folded-box rule in a new drawing — never runs on nopCommerce and cannot run on the fixture | the fixture has three projects, so no label ever collides. The arm that drops a name and lists it is unreachable by construction, which is the same shape as the mosaic's `Unlabelled` and is why both are written down here rather than pinned |
 
 > **The lesson is one row wider than the last four.** The other real runs found inputs a synthetic
 > fixture cannot contain. This one found that a *correct* drawing can still be a wrong picture, and
@@ -1090,7 +1090,7 @@ graphs, so what is unobserved is the *section's* ordering rather than Tarjan's. 
 fixes all three at once**, and P8 needs a cycle built anyway — one plant, four gates.
 
 **One divergence the fixture cannot see, and it is not a constant.** Core keys type identity on
-`(assembly, FQN)` and the probe keys on the FQN alone — `DEFECTS.md` §1, the one carve-out from
+`(assembly, FQN)` and the probe keys on the FQN alone — the one carve-out from
 the byte-identical rule. The plant that was supposed to make it observable, `PayloadTag` in `Data`
 and `Tools`, gives both declarations fan-in 0. Nothing points at either, so the merged type is in
 no strongly-connected component and no nomination that reads inbound edges: merged and split
@@ -1188,7 +1188,7 @@ Each is a recurring defect class from the probe build, turned into a question:
   running the tool would have revealed)*
 - **Is this gate measured against something its own filter already bounds?** *(a proportional
   suppression on top of a proportional filter can only ever land on its own threshold —
-  `DEFECTS.md` §12)*
+  a suppression that could never fire)*
 - Can two findings contradict each other about one component?
 - Does this claim something the tool cannot see?
 - Is a statistic being printed where none exists? *(`999x`, median-of-one)*
@@ -1196,7 +1196,7 @@ Each is a recurring defect class from the probe build, turned into a question:
   travel, absolute ones do not)*
 - **Is this output ordered by something total, or is the tail of the sort decided by whatever
   order the data arrived in?** *(a stable sort on a non-total key looks deterministic on one
-  machine and is not a property of the tool — §5, `DEFECTS.md` §6)*
+  machine and is not a property of the tool — §5)*
 
 ## 9. A gate that cannot fail is worse than no gate
 

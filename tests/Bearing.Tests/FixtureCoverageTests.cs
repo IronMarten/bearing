@@ -103,7 +103,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This assertion used to run the other way, and <c>DEFECTS.md</c> §10 inverted it.</b> The
+    /// <b>This assertion used to run the other way, and the cohort-floor fix inverted it.</b> The
     /// nominations sat at 12, 8, 5, 4.333 and 3.5 times their peer median — all distinct — so the
     /// sort was decided entirely by rank and the <c>ThenBy</c> on identity could have been deleted
     /// without failing anything. The remark then said what the gap cost: <i>a tiebreak covered on
@@ -666,7 +666,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This branch was owed from the moment <c>DEFECTS.md</c> §11 closed.</b> Under the probe's
+    /// <b>This branch was owed from the moment the collapse closed.</b> Under the probe's
     /// kind-signature grouping all six spanning types were one pattern, so the collapsed line was
     /// the only branch the fixture exercised and the per-type detail branch had none — the opposite
     /// of what <c>TECHREQ-job-b.md</c> §3.1 and §5 both claimed, and the golden settled it. Core

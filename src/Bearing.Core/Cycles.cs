@@ -197,7 +197,7 @@ public static class Cycles
         foreach (var (from, to) in edges)
         {
             // Both endpoints have to be analysed types. An edge to something the walk never
-            // declared has no project — DEFECTS.md §7 — and inventing one from the name is how
+            // declared has no project, and inventing one from the name is how
             // §1 fabricated a cycle in the first place.
             if (!projectOf.TryGetValue(from, out var fromProject)) continue;
             if (!projectOf.TryGetValue(to, out var toProject)) continue;

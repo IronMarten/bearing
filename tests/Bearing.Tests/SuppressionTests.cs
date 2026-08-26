@@ -174,7 +174,7 @@ public sealed class SuppressionTests(CoreWalkFixture core)
     /// <remarks>
     /// <para>
     /// <b>This replaces a test that pinned the opposite.</b> <c>RoutingDepot</c> used to be the
-    /// survivor, and it survived <i>because</i> <c>DEFECTS.md</c> §10 was live: its cohort of three
+    /// survivor, and it survived <i>because</i> the cohort floor was live: its cohort of three
     /// stripped its concealed-decision nomination, so suppression row 2 had nothing to suppress
     /// with. The old test's own remark said the day §10 was fixed the survivor would leave and a
     /// replacement had to be planted <b>in the same change, not discovered afterwards</b>. This is
@@ -249,7 +249,7 @@ public sealed class SuppressionTests(CoreWalkFixture core)
     /// <remarks>
     /// <para>
     /// <b>Row 7 used to be implemented as <c>MinCohort</c> and it was doing more than row 7 asks.</b>
-    /// <c>DEFECTS.md</c> §10: a floor of five silenced peer groups of three, which are small and
+    /// A floor of five silenced peer groups of three, which are small and
     /// real, and the silence sent those types into breaks alone instead — two findings
     /// contradicting each other about one component. What row 7 actually says is that a type with
     /// <i>no</i> peer group makes no relative claim, and that survives the fix.

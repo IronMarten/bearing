@@ -23,7 +23,7 @@
 //
 //   * ~~No new ApiBoundary or ExternalCall types, because row 5's suppression stops being
 //     reachable at ten boundaries.~~ WITHDRAWN — the claim was false, and it was stated in three
-//     places with two different and mutually contradictory justifications. DEFECTS.md §12 proves
+//     places with two different and mutually contradictory justifications. The measurement proves
 //     row 5 is unreachable AT EVERY boundary count, and KnownDefectTests proves it over arbitrary
 //     distributions rather than over this fixture, so nine was never a cliff edge. Callback.cs
 //     takes the count to ten and nothing about the suppression moved. Decision X1.

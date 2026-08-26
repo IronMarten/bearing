@@ -2,7 +2,7 @@
 // role belongs in the pattern key. Both halves in one plant, because both are the same partition
 // read twice — how many members a group has, and what puts a type in one group rather than another.
 //
-// WHY THERE WAS NOTHING TO OBSERVE. Closing DEFECTS.md §11 took the collapse's only case away.
+// WHY THERE WAS NOTHING TO OBSERVE. Closing the collapse took its only case away.
 // The probe groups spanning types on the kind signature alone, and with three significant kinds
 // and a floor of three every spanning type carries the identical signature — so all six fixture
 // types were one group of six against a threshold of five, the collapsed line was the ONLY branch
@@ -27,7 +27,7 @@
 //
 // The two halves interlock rather than merely coexisting: with the role in the key the group of
 // six collapses and the pair keeps its detail; without it a group of eight collapses and the pair
-// loses detail it is entitled to. That is DEFECTS.md §11's failure in miniature — the collapse
+// loses detail it is entitled to. That is the collapse's failure in miniature — it
 // absorbing something that is not an instance of the pattern — and it is why one plant is enough.
 //
 // WHY THIS PLANT BRINGS ITS OWN DEPENDENCIES. The one constraint binding every plant is NO NEW
@@ -176,7 +176,7 @@ public class EgressConduit
 // key as written they are a pattern of two and keep their detail. Drop the type's own role from
 // the key and they join the six, and a component that receives calls from outside the solution is
 // reported as one more instance of an internal relay pattern — which is the collapse absorbing
-// something it should not, the same shape as DEFECTS.md §11 one level down.
+// something it should not, the same shape as the collapse one level down.
 //
 // Surface 4 apiece, which is the median of the boundary population rather than an accident.
 

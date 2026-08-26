@@ -1,4 +1,4 @@
-# Contributing
+﻿# Contributing
 
 ```
 dotnet build Bearing.sln      # warnings are errors
@@ -7,9 +7,9 @@ dotnet test  Bearing.sln      # 281 tests, ~10s
 
 Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first — it is short, and it explains
 why the code is split the way it is. [`docs/TESTING.md`](docs/TESTING.md) covers the suite
-and the two snapshot regimes. [`docs/DEFECTS.md`](docs/DEFECTS.md) lists behaviour that is
-known to be wrong and deliberately left that way — **check it before reporting one**, and
-before assuming a surprising output is a bug you have just found.
+and the two snapshot regimes. Behaviour known to be wrong and deliberately left that way is
+filed as an issue — **check the open ones before reporting a defect**, and before assuming
+a surprising output is a bug you have just found.
 
 On a machine where the SDK is user-local and not on `PATH`:
 

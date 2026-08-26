@@ -42,7 +42,7 @@ public sealed record AnalysisPolicy
     /// <remarks>
     /// <b>Gating only, since X3.</b> This decides whether a cohort supports a comparative claim.
     /// It used to decide <see cref="CohortBasisFloor"/> as well, which is why
-    /// <c>DEFECTS.md</c> §10 had no local repair: one number was answering two questions that pull
+    /// The cohort floor had no local repair: one number was answering two questions that pull
     /// in opposite directions.
     /// </remarks>
     public int MinCohort { get; init; } = 5;

@@ -186,7 +186,7 @@ public sealed class FindingTests(CoreWalkFixture core)
     // ------------------------------------------------------------------ change cost ----
 
     /// <summary>
-    /// The floor is the fan-in floor, and it is no longer the cohort floor. <c>DEFECTS.md</c> §9.
+    /// The floor is the fan-in floor, and it is no longer the cohort floor.
     /// </summary>
     /// <remarks>
     /// Both default to 5, which is what hid this for the whole probe build, so the two are pinned
@@ -275,7 +275,7 @@ public sealed class FindingTests(CoreWalkFixture core)
     // ------------------------------------------------ hubs, static state, layer span ----
 
     /// <summary>
-    /// The two arms of §3.8's disjunction say different things, which is <c>DEFECTS.md</c> §16.
+    /// The two arms of §3.8's disjunction say different things, and one sentence for both is false.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -499,7 +499,7 @@ public sealed class FindingTests(CoreWalkFixture core)
     /// </para>
     /// <para>
     /// Without this the ordering could be deleted outright with the suite green, which was
-    /// confirmed by deleting it. The discipline it encodes is the one <c>DEFECTS.md</c> §11 is
+    /// confirmed by deleting it. The discipline it encodes is the one the collapse is
     /// about: an ordering that puts the boilerplate first is the inverse of interestingness.
     /// </para>
     /// </remarks>

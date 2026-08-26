@@ -5,7 +5,7 @@
 //
 //   * THE NAME TRUNCATION. StructureSections.TypesPerTangle is 8 and the existing tangle has
 //     exactly 8 members, so `names.Count > limit` has always been false and the "6 of 10 shown"
-//     arm — DEFECTS.md §3's remedy for the probe's bare ellipsis — had never rendered. Nine is
+//     arm — the remedy for the probe's bare ellipsis — had never rendered. Nine is
 //     the smallest number that fires it.
 //   * THE LARGEST-FIRST ORDERING. One tangle sorts identically under every comparator. Nine
 //     against the existing eight and Loop.cs's four is an order that a wrong comparator changes.
