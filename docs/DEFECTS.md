@@ -52,7 +52,7 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Fourteen open. Roughly severity-ordered, and the numbers are identity — they are never reused and
+*Six open. Roughly severity-ordered, and the numbers are identity — they are never reused and
 never renumbered.*
 
 ### 10. The cohort floor strips a suppression it was never meant to touch
