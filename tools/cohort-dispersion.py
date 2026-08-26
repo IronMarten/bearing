@@ -183,6 +183,62 @@ def rank_of(sorted_values, x):
     return above + 0.5 * equal + 0.5
 
 
+
+def times_median_gate(x, med):
+    """Distribution.TimesMedianOf as the DETECTOR sees it -- infinity at a zero median,
+    which satisfies `>= OutlierFactor` by definition. That is DEFECTS.md §61, and
+    modelling it as *undefined therefore blocked* is what hid it."""
+    return (float("inf") if x > 0 else 1.0) if med <= 0 else x / med
+
+
+def candidates(d, share=0.10, floor=MIN_COHORT):
+    """Replacements for the rank gate, scored against what ships.
+
+    The ratio is demoted from gate to evidence throughout -- it contributes 5-12% and
+    it is what §61 rides on. The question here is what carries the cohort-relative
+    judgement instead.
+
+    A pure share is not it: 5% of a 2,909-member cohort is 146 findings from one
+    cohort. Capping it -- `min(ConcealedTopRank, ceil(share * n))` -- reproduces the
+    shipped volume, leaves the large end byte-identical and tightens only the thin end,
+    which is the one place the ratio was doing any work.
+    """
+    import math
+    types, members = load(d)
+    cohort_of = {t["Id"]: t["Cohort"] for t in types}
+    pool = collections.defaultdict(list)
+    for m in members:
+        if m["Kind"] in METHOD_LIKE and cohort_of.get(m["DeclaringType"]):
+            pool[cohort_of[m["DeclaringType"]]].append(int(m["Cyclomatic"]))
+    groups = [v for v in pool.values() if len(v) >= floor]
+
+    opts = [
+        ("ships: cc>=5, ratio>=3, rank<=3",
+         lambda x, r, md, n: x >= MIN_DECISION_CC and times_median_gate(x, md) >= OUTLIER_FACTOR
+         and r <= CONCEALED_TOP_RANK),
+        ("rank<=3, ratio demoted",
+         lambda x, r, md, n: x >= MIN_DECISION_CC and r <= CONCEALED_TOP_RANK),
+        ("rank<=1, no constant at all",
+         lambda x, r, md, n: x >= MIN_DECISION_CC and r <= 1),
+        (f"min({CONCEALED_TOP_RANK}, ceil({share:.0%} n)), floor 1",
+         lambda x, r, md, n: x >= MIN_DECISION_CC
+         and r <= max(1, min(CONCEALED_TOP_RANK, math.ceil(share * n)))),
+    ]
+    print()
+    print(f"  rank-gate candidates (cohort floor {floor})")
+    for label, f in opts:
+        total = thin = big = 0
+        for v in groups:
+            sv, md, n = sorted(v), median(v), len(v)
+            k = sum(1 for x in v if f(x, rank_of(sv, x), md, n))
+            total += k
+            if n <= 9:
+                thin += k
+            if n >= 100:
+                big += k
+        print(f"    {label:38s} total={total:5d}  cohorts 5-9={thin:4d}  100+={big:5d}")
+
+
 def decompose(d):
     """Which of ConcealedDecision.AtMethodLevel's three gates actually decides?
 
@@ -238,3 +294,4 @@ if __name__ == "__main__":
         report(d)
         null_model(d)
         decompose(d)
+        candidates(d)

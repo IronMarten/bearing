@@ -762,6 +762,42 @@ already understood. These are questions with no answer yet.
   question and has never been asked of `MinDecisionCc`. **Neither is decided here, and the entry's
   original direction is not withdrawn — it is now the third-ranked option rather than the only one.**
 
+  **The replacement, measured 2026-08-25 on three solutions.** The ratio is demoted from gate to
+  evidence — it contributes 5–12% and it is what §61 rides on — so the question is what carries the
+  cohort-relative judgement instead. Member level, `tools/cohort-dispersion.py`:
+
+  | rank gate | nopCommerce | Jellyfin | Umbraco | cohorts 5–9 | cohorts 100+ |
+  |---|---|---|---|---|---|
+  | **ships** — `cc>=5 AND ratio>=3 AND rank<=3` | 103 | 167 | 366 | 1 / 17 / 14 | 36 / 31 / 106 |
+  | `rank<=3`, ratio demoted | 108 | 177 | 405 | 1 / 22 / 26 | 36 / 31 / 106 |
+  | `rank<=1` — no constant at all | 40 | 66 | 155 | 1 / 12 / 18 | 11 / 10 / 35 |
+  | **`min(3, ceil(0.10n))`, floor 1** | **105** | **157** | **382** | 1 / 12 / 18 | 36 / 31 / 106 |
+
+  **A pure share is not the answer** — 5% of a 2,909-member cohort is 146 findings from one cohort,
+  and 5/10/20% shares give nopCommerce 423, 814 and 1,243 against 103. **Capped, it is.**
+  `min(ConcealedTopRank, ceil(share·n))` reproduces the shipped volume within ±6% on all three,
+  leaves the large end **byte-identical** (36/31/106 either way), and tightens only cohorts of 5–24
+  — the one place the ratio was doing any work, because a top-3 of five is 60% of the cohort and a
+  top-3 of five hundred is 0.6%.
+
+  **`rank<=1` is the only formulation with no constant in it at all** — *the most complex member of
+  its peer group* is a definition rather than a threshold — and it cuts 58–61% of the findings. That
+  is a report-moving change rather than a refactor, and it is recorded as the option that exists,
+  not the one recommended.
+
+  **Deleting `MinCohort`'s gating role is cheap under every formulation, and that is a correction to
+  the reason given for wanting the share.** Below-floor cohorts hold **57, 79 and 119 members** —
+  0.6%, 1.4% and 0.6% of the gated population — so letting them nominate adds 12, 11 and 53 findings
+  even under the unguarded `rank<=3`. **§10's pattern exactly: a real inconsistency with almost no
+  field incidence.** The share is worth taking because selectivity should not depend on cohort size,
+  not because the thin end is dangerous. It is not.
+
+  **Honest cost.** `min(3, ceil(0.10n))` is *two* constants where there was one. They do different
+  jobs — 3 is a volume cap, 10% is selectivity — which is X3's split-the-parameter shape rather than
+  a sixth threshold, and neither has to move when a codebase changes size. **X16 was expected to
+  delete two policy values; on this design it deletes `OutlierFactor`'s gating use and keeps
+  `ConcealedTopRank` as a cap.** Say so rather than counting it as a deletion.
+
   **Scope, corrected 2026-08-25.** This read *expected to close §10, §14, §28, §34, §38*, and
   **nine of the ten entries above are already closed** — each by the local repair this decision
   exists to remove. Only **§10** is live. So the deliverable is: **§10 closes; §14, §28, §34 and §38
