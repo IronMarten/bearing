@@ -798,6 +798,41 @@ already understood. These are questions with no answer yet.
   delete two policy values; on this design it deletes `OutlierFactor`'s gating use and keeps
   `ConcealedTopRank` as a cap.** Say so rather than counting it as a deletion.
 
+  **Shipped 2026-08-25, `581a61f`, and the shape is not what this entry proposed.** Dispersion did
+  not *replace* the ratio as a single gate; it took the ratio's job while a rank limit took a job
+  the entry had not separated out.
+
+  | | gate | job |
+  |---|---|---|
+  | `MinDecisionCc` | `cc >= 5` | absolute floor, unchanged |
+  | `ConcealedTopShare` + `ConcealedTopRank` | `rank <= min(3, TopRankLimit(0.2))` | **how many** may say it — method arm only |
+  | `ConcealedDispersionFactor` | `cc > (MAD > 0 ? median + 3·MAD : median)` | **whether the gap is meaningful** |
+  | ~~`OutlierFactor`~~ | — | evidence now; gates nothing |
+
+  Method arm 103/167/366 → **103/160/366**; type arm 78/64/146 → **69/61/144**; nopCommerce's
+  `suffix:Service` roll-call halves, 21 → 10.
+
+  > **The trap above is real and does not bite, and the reason is the part this entry was missing.**
+  > It considered dispersion *replacing* the ratio with nothing else beside it, which is why a naive
+  > gate read as worse than what ships. With a rank limit bounding a no-spread group to its top few,
+  > `x > median` at `MAD = 0` is safe — and the claim there is a count rather than a multiple,
+  > which `Claims.ConcealedType` already renders as *"the only complexity among its N peers"*.
+  > **Dispersion decides whether a gap is meaningful; rank decides how many may say so. Neither
+  > does the other's job, and that is the sentence this entry took four measurements to reach.**
+
+  > **Demoting the ratio with only rank behind it is wrong, and three real solutions did not catch
+  > it.** Rank is ordinal, so the top of a high-median cohort clears it while being barely above its
+  > peers: the run nominated `DetentionEvaluator`, `FuelEvaluator` and `LaneEvaluator` at **cc 12
+  > against a peer median of 10.5**, and P0 planted those as *complex code that is not anomalous*.
+  > The comment beside the gate had predicted it and named the count — *"the fixture has three of
+  > those"*. On the reference solutions the same class was 6, 12 and 42 findings that read as
+  > marginal. **The fixture is where a gate is observable; the solutions are where it is measured.
+  > This entry needed both and would have shipped a false-positive class on either alone.**
+
+  > **A rank gate on the type arm over-cuts and was reverted.** 78 → 38 against 69 for the
+  > dispersion swap alone: two volume-ish conditions stack where the ratio was one. The type arm
+  > has no rank gate, as it never did.
+
   **Scope, corrected 2026-08-25.** This read *expected to close §10, §14, §28, §34, §38*, and
   **nine of the ten entries above are already closed** — each by the local repair this decision
   exists to remove. Only **§10** is live. So the deliverable is: **§10 closes; §14, §28, §34 and §38
