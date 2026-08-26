@@ -52,86 +52,46 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Four open. Roughly severity-ordered, and the numbers are identity — they are never reused and
-never renumbered.*
+*One open. The numbers are identity — they are never reused and never renumbered.*
 
-### 45. A layer wider than the cap is drawn as two rows, and nothing says so
+> **D45, D53 and D58 closed together on 2026-08-26, and the rule they were waiting for is not the
+> rule they asked for.** All three had been held open on one question, stated in D45 and repeated
+> in D58: *when is a large component a fact about the codebase rather than a finding about it?*
+> Answering it needs a judgement nobody has a measurement for. **None of the three needed it**,
+> because in each case the artifact's mistake was not misjudging a population — it was **asserting
+> over a population wider than its own evidence**, and the extent of the evidence is arithmetic:
+>
+> - **D45** — a row boundary means *depends on*. Between two genuinely adjacent layers there is
+>   always an edge, because `DepthOf` is a longest path; between two rows of one wrapped layer
+>   there never is, because equal depth forbids an edge and a mutual pair is one box already. Both
+>   are theorems, so the drawing marks the boundaries it can prove and stops implying the rest.
+> - **D53** — a line means *depends on*. The transitive reduction of a DAG is unique and preserves
+>   reachability exactly, so drawing it tells a reader everything drawing every edge told them.
+> - **D58** — a shape reading means *these hold each other as state*. It is now claimed over the
+>   namespaces named in the held pairs, which is what the evidence is.
+>
+> **What made the question look unavoidable was a measurement taken on the wrong graph.** D45's
+> counter-example — a width bound puts *22 of 27 nopCommerce projects deeper than their real
+> depth* — is true of the twenty-seven **projects** and irrelevant to the drawing, which lays out
+> ten **boxes** whose widest layer is three. Re-measured on what the renderer actually lays out,
+> the bound displaces **0 of 10** boxes on nopCommerce and **0 of 18** on Umbraco because it never
+> engages at all, and **7 of 21** on Jellyfin, where it was supposed to be the remedy. So it is
+> not conditional; it is worse everywhere it does anything, trading a misstatement a reader can
+> check against the edges for one that leaves no trace on the page.
+>
+> **One half of D58's second face is not fixed, and it is a prominence problem rather than a false
+> claim.** `Microsoft.Extensions.Hosting` is still the first member named on Umbraco's cycle line
+> and still seeds the example loop, because members are ordinal and `Cycles.PathThrough` seeds at
+> the ordinal minimum. Everything said about it is now true — it reaches the others, and the
+> holding sentence no longer covers it. Seeding the loop from a namespace the evidence covers would
+> read better and was deliberately not done: `CycleShapes` is a pass *over* the detected set and
+> does not have the adjacency, so wiring the reading back into detection would invert the
+> separation that keeps the suppressed set disclosable. It is worth its own entry if anyone reads
+> the loop line and is misled by it; nobody has yet.
 
-
-`ArchitectureDiagram.MaxPerRow` is 5; a layer holding more wraps onto a second row. Its own remark
-says wrapping *"does misrepresent the layout"*, that *"nothing on the drawing currently says so"*,
-and that it *"ships unexercised on real input"*. **The first two are right and the third is
-wrong** — it fires on Jellyfin, which is a reference solution and the artifact §5.4 calls the
-screenshot.
-
-**Measured from the shipped SVG, not from a model.** Jellyfin's drawing has ten rows for twenty-one
-projects, and two adjacent rows of exactly five sit at y = 344 and y = 452 with **zero edges between
-them** and identical downstream fan-out — 5, 5, 5 and 8 edges into the four rows below. Every other
-adjacent pair of rows on that drawing carries at least one edge.
-
-**That zero is conclusive rather than suggestive.** `ProjectGraph.DepthOf` is a longest path —
-`deepest = max(DepthOf(next) + 1)` — so a node at depth *k* always has a neighbour at *k−1*, and two
-genuinely adjacent layers must therefore share at least one edge. Two adjacent rows with none are
-one layer drawn as two.
-
-**Why it matters more than the ink.** A row means *depends on the row below* everywhere else on the
-drawing, so a wrapped layer reads as a dependency that is not in the code — the same class of
-misrepresentation as §44's axis, and the opposite of what a layered map is for.
-
-**The remedy is not raising the cap**, which moves the threshold rather than removing the class.
-Width-bounded layering does remove it: Coffman–Graham takes a width bound W and guarantees no layer
-exceeds it, so overflow moves *down a layer* rather than across a row. Rendered at W = 5 on
-Jellyfin's used project graph it gives 952 x 892 against the shipped 952 x 1074 — same width, one
-extra layer, no wrap.
-
-> **But it must be conditional, and that is the part with no rule yet.** On nopCommerce the same
-> bound places **22 of 27 projects deeper than their dependency depth**, because 22 of them
-> genuinely sit at depth 0 under a plugin host — the true profile is `[22, 1, 1, 1, 1, 1]`. There
-> width *is* the finding and the fold is the honest compression. **A layer wider than the cap is
-> either a layering the algorithm can improve or a fact about the codebase**, and shipping one
-> treatment for both is how this drawing came to hide a layer in the first place. Specimens:
-> `SPIKE-job-a-prior-art.md` §9.
-
-### 53. The project map draws an edge through whatever box is in the way, so a direct dependency reads as an indirect one
-
-The map places projects in depth layers and routes each edge as a cubic from the source box's
-bottom edge to the target box's top edge. **Nothing avoids the boxes in between.** Where a layer is
-narrow the columns line up, the spline degenerates to a straight line, and it crosses an unrelated
-node.
-
-On nopCommerce `Nop.Services`, `Nop.Data` and `Nop.Core` are one column — all three at x 206–374,
-at y 543, 651 and 759 — and the `Nop.Services → Nop.Core` edge is `M290 605 C290 625 290 739 290
-759`: **a vertical line at x = 290 straight through the interior of the `Nop.Data` box.**
-`Nop.Core` *is* a direct dependency of `Nop.Services`, in the declared graph and the used graph
-alike. Nothing distinguishes that edge from one that terminates at `Nop.Data` and resumes below it.
-
-**Measured, and it is not a nopCommerce accident:**
-
-| run | edges crossing an unrelated box |
-|---|---|
-| `nop-v13.html` | **18 of 29** |
-| `nop-2024-08-27.html` | 18 of 29 — so it predates the backtest cut |
-| `jellyfin-v3.html` | **81 of 98 — 83%** |
-
-**It worsens as the map grows**, which is the opposite of what a map is for.
-
-**Found by A11 round 2, and the participants are the evidence that it misleads**: two of five
-described `Nop.Core` as an **indirect** dependency of `Nop.Services` — the reading the drawing
-supports and the code contradicts — in a task all five otherwise answered correctly, inside two
-minutes. The private record is `FINDINGS-a11-round2.md` §5.
-
-**This is D45's inverse, and the two are one piece of work.** D45 is geometry asserting a
-dependency the code does not have, a wrapped layer read as a row; this is geometry concealing one
-it does. Both are the layered map's *drawing* rather than its data, and both are worse on Jellyfin.
-**Do not fix this alone and call the map done.**
-
-**The cheap half needs no new rule**: route around box interiors — a waypointed or orthogonal edge
-where a straight one would cross — which is independent of D45's open question about when a wide
-layer is a fact about the codebase rather than a layering to fix.
-
-**What would hold it**: a geometric assertion over the rendered SVG — no edge path enters the
-interior of a box rect that is not one of its own endpoints. `TestBed` already has a
-three-project chain, so this is reachable without a plant, which is rare for a picture defect.
+> **It is a decision now, and it has code in it, so it has a number**: `docs/ARCHITECTURE.md` §10,
+> X17. The general form is *bound the claim to the evidence rather than judge the population*, and
+> it is worth reaching for wherever an artifact describes a set larger than the one it measured.
 
 ### 54. `--top`, a display cap, decides a judgement
 
@@ -174,41 +134,10 @@ this register's own discipline is that a threshold proposed without measuring bo
 next entry rather than the fix for this one. It is X16's family in a different layer: a constant
 that looks calibrated and is coupled to something it has no relationship with.
 
-### 58. A namespace cycle's shape is decided by one arm and applied to the whole component
-
-Umbraco's namespace graph has a single strongly-connected component of **363 namespaces**, rendered
-as:
-
-```
-NAMESPACE CYCLES - sibling namespaces that hold each other as state,
-so neither can be layered, understood or extracted without the other:
-  363 namespaces: Microsoft.Extensions.Hosting <-> ... - 6 of 363 shown
-```
-
-**The component is real and the sentence is not.** 363 namespaces are not *siblings*, and the
-section itself lists only **14 mutually-holding pairs** inside it -- `CycleShapes.Read` labels the
-whole component `Coupling` because *at least one* sibling pair holds, and the label then describes
-all 363.
-
-**Verified at source rather than argued from the graph.** Exactly one Umbraco file declares
-`namespace Microsoft.Extensions.Hosting` -- an extension class following the ordinary .NET
-convention of putting extensions in the namespace of the thing they extend -- and
-`Umbraco.Extensions` spans 175 files across projects. Those catch-all namespaces reach everything
-and are reached by everything, which collapses the projection into one component. **The finding is
-true and unactionable**, which is invariant 2: a flag that fires on 363 of a codebase's namespaces
-conveys nothing.
-
-**A second face, folded in here rather than numbered separately**: `Microsoft.Extensions.Hosting` is
-presented as a component of Umbraco's architecture. It is, by the model's definition -- Umbraco
-declares a type in it. It reads as the framework being part of the cycle.
-
-**Defect 45's missing rule is the same rule**, in the namespace layer instead of the map layer: a
-component this large is either a layering problem or a fact about the codebase, and there is nothing
-that tells them apart.
 
 ## Closed
 
-**Index only — the prose is in git.** Fifty-eight entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Sixty-one entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — then D56 and D57, all closed 2026-08-25 — and D45, D53 and D58, closed together on 2026-08-26 by the rule recorded above and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -259,6 +188,9 @@ forty-seven in full is the commit before this one.
 | 43 | A solution needing a newer SDK is reported as an unreadable file | fixed |
 | 44 | Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye | fixed 2026-08-26 — both axes are a fixed 0–100% square root and the dot radius is `sqrt(types)`, so all three channels are functions of the project rather than the run. `Bound`, `Step` and the radius basis deleted; the 2026-08-22 disclosure is inverted rather than removed |
 | 46 | A suppression emptied the HTML cycles section, because the evidence replacing it went to one renderer | fixed |
+| 45 | A layer wider than the cap is drawn as two rows, and nothing says so | fixed 2026-08-26 — rows of one layer sit at a tighter gap and a dashed rule marks each boundary that an edge proves, drawn only where a layer wrapped. The width bound was measured on the folded graph and rejected: it displaces 7 of Jellyfin's 21 boxes and never engages on the other two |
+| 53 | The project map draws an edge through whatever box is in the way, so a direct dependency reads as an indirect one | fixed 2026-08-26 — the map draws `ProjectGraph.Reduction` and paints edges over the boxes. Crossings went 18→0 on nopCommerce, 27→2 on Umbraco and 81→21 on Jellyfin; the implied count is disclosed in the caption |
+| 58 | A namespace cycle's shape is decided by one arm and applied to the whole component | fixed 2026-08-26 — the holding claim is made over `ShapedCycle.Coupled` and the component keeps its own, larger sentence. Umbraco reads 15 of 363, nopCommerce 10 of 30, Jellyfin 2 of 18. See the residue in the register's note |
 | 47 | The report tells the reader the exports carry the findings, and no export carries any | reworded; the export itself is `SCHEMA-findings-export.md` step 5 |
 | 55 | A count-bearing sentence disagrees with its own number | fixed 2026-08-25 |
 | 59 | An MSBuild diagnostic is pasted into the report verbatim | fixed 2026-08-25 |
