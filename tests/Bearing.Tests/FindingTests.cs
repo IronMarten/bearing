@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -645,9 +645,11 @@ public sealed class FindingTests(CoreWalkFixture core)
             .Select(f => f.ValueOf("CyclomaticXMedian"))
             .ToList();
 
-        // Two pairs since P7, which is the margin going back up. The remark above records that it
-        // had fallen to one and that losing the last one would leave the tiebreak unexercised; the
-        // near-miss families put a second pair back without being built for it.
-        Assert.Equal(2, ranks.Count - ranks.Distinct().Count());
+        // Back to one pair at X16, and that is the margin this test exists to watch rather than a
+        // number to keep updating. P7 had taken it to two; the dispersion gate removes the members
+        // whose ratios tied at the low end, because a tie just above a peer median is exactly what
+        // it is built to refuse. One pair still exercises the tiebreak, and the remark above says
+        // what losing it would cost — so if this reaches zero, plant, do not relax the assertion.
+        Assert.Equal(1, ranks.Count - ranks.Distinct().Count());
     }
 }

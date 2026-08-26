@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing;
+﻿namespace IronMarten.Bearing;
 
 /// <summary>
 /// <i>"Looks like plumbing, but is a complexity outlier among its peers — and is probably tested
@@ -57,6 +57,10 @@ public static class ConcealedDecision
 
             var complexity = Distribution.Of(peers.Select(p => (double)p.Member.Cyclomatic));
 
+            // Capped share, not a bare fraction: 5% of this cohort is 146 methods on nopCommerce's
+            // largest. AnalysisPolicy.ConcealedTopShare carries the measurement.
+            var limit = Math.Min(policy.ConcealedTopRank, complexity.TopRankLimit(policy.ConcealedTopShare));
+
             foreach (var (_, member) in peers)
             {
                 // Below this there is no decision to conceal: cc 1 is one linear path and
@@ -66,7 +70,6 @@ public static class ConcealedDecision
                 if (member.Cyclomatic < policy.MinDecisionCc) continue;
 
                 if (complexity.Read(member.Cyclomatic) is not { } reading) continue;
-                if (reading.TimesMedian < policy.OutlierFactor) continue;
 
                 // Rank is the gate the ratio could not be. A multiple of a cohort median that
                 // sits on the floor is not an outlier test: nopCommerce's method medians are 1
@@ -75,21 +78,38 @@ public static class ConcealedDecision
                 // rather than with how unusual anything is — 1,091 nominations on one solution,
                 // of which the report can show 15.
                 //
-                // It is added to the ratio rather than replacing it, and that is deliberate.
-                // Replacing it widens the finding in the other direction: a method at rank 1 of
-                // a cohort whose median is already high clears the rank bar while being twice
-                // its peers rather than many times them, and the fixture has three of those
-                // (FindingEquivalenceTests). The conjunction is strictly narrower than either
-                // half, which is what was measured. MEASURE-concealed-decision.md.
-                if (reading.Rank > policy.ConcealedTopRank) continue;
+                // X16, 2026-08-25: the ratio is no longer the other half of a conjunction, it is
+                // evidence. Measured on three solutions, dropping it moves the shipped output
+                // +5%, +6% and +11% — it was the least load-bearing of the three gates — and at
+                // a zero median `TimesMedian >= OutlierFactor` is satisfied by definition, which
+                // is docs/DEFECTS.md §61 and dies here rather than by substituting a constant for
+                // the infinity. What it widened is cohorts of 5–24, where a fixed top-3 is a
+                // large share of the cohort, and that is what the share below takes back.
+                if (reading.Rank > limit) continue;
+
+                // And dispersion decides whether the gap is worth a sentence, which rank cannot:
+                // rank is ordinal, so the top of a cohort whose median is already high clears it
+                // while being barely above its peers. TestBed's planted evaluators are that case
+                // at 1.14x, and P0 planted them as complex code that is NOT anomalous.
+                if (!Outlies(complexity, member.Cyclomatic, policy)) continue;
 
                 found.Add((reading.TimesMedian, member.Cyclomatic, new Finding(
                     new FindingKey(FindingKind.ConcealedDecisionMethod, member.Subject),
                     [
                         Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
                         Receipt.Gated("Cyclomatic", member.Cyclomatic, nameof(AnalysisPolicy.MinDecisionCc)),
-                        Receipt.Gated("CyclomaticXMedian", reading.TimesMedian, nameof(AnalysisPolicy.OutlierFactor)),
+                        // Evidence, not a gate, since X16. It still leads the sentence and still
+                        // orders the section; what it no longer does is decide — which is also
+                        // what stops docs/DEFECTS.md §61 recurring, because a gated receipt is
+                        // never null now.
+                        Receipt.Of("CyclomaticXMedian", reading.TimesMedian),
                         Receipt.Gated("CyclomaticRank", reading.Rank, nameof(AnalysisPolicy.ConcealedTopRank)),
+                        // Both limits travel with the finding because neither can be recomputed
+                        // from what is printed, and both now vary with the cohort. BlastRadius
+                        // publishes FanInTopRankLimit for the same reason.
+                        Receipt.Of("CyclomaticTopRankLimit", limit),
+                        Receipt.Gated("CyclomaticOutlierFloor", OutlierFloor(complexity, policy), nameof(AnalysisPolicy.ConcealedDispersionFactor)),
+                        Receipt.Of("CohortCyclomaticMad", complexity.MedianAbsoluteDeviation),
                         // The median the ratio was taken against, which is the half of this gate a
                         // reader cannot otherwise see — WidestSurfaces' precedent. It matters more
                         // here than there: on nopCommerce 58 of 70 usable cohorts have a method
@@ -133,12 +153,17 @@ public static class ConcealedDecision
             var fanIn = Distribution.Of(peers.Select(t => (double)t.FanIn));
             var fanOut = Distribution.Of(peers.Select(t => (double)t.FanOut));
 
+            // X16, 2026-08-25. This arm has no rank gate and does not gain one: the ratio is
+            // swapped for dispersion one for one, which is the whole change here. A rank gate was
+            // tried beside it and over-cut — 78 -> 38 on nopCommerce against 69 for the swap alone
+            // — because two volume-ish conditions stack where the ratio was one. Dispersion also
+            // halves the roll-call on its own: suffix:Service falls from 21 findings to 10.
             foreach (var type in peers)
             {
                 if (type.MaxMemberCyclomatic < policy.MinDecisionCc) continue;
 
                 if (complexity.Read(type.MaxMemberCyclomatic) is not { } cc) continue;
-                if (cc.TimesMedian < policy.OutlierFactor) continue;
+                if (!Outlies(complexity, type.MaxMemberCyclomatic, policy)) continue;
 
                 if (fanIn.Read(type.FanIn) is not { } inbound) continue;
                 if (fanOut.Read(type.FanOut) is not { } outbound) continue;
@@ -150,7 +175,11 @@ public static class ConcealedDecision
                     [
                         Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
                         Receipt.Gated("MaxMemberCyclomatic", type.MaxMemberCyclomatic, nameof(AnalysisPolicy.MinDecisionCc)),
-                        Receipt.Gated("MaxMemberCyclomaticXMedian", cc.TimesMedian, nameof(AnalysisPolicy.OutlierFactor)),
+                        // Evidence since X16, not a gate — see the method arm.
+                        // Evidence since X16 — see the method arm.
+                        Receipt.Of("MaxMemberCyclomaticXMedian", cc.TimesMedian),
+                        Receipt.Gated("MaxMemberCyclomaticOutlierFloor", OutlierFloor(complexity, policy), nameof(AnalysisPolicy.ConcealedDispersionFactor)),
+                        Receipt.Of("CohortMaxMemberCyclomaticMad", complexity.MedianAbsoluteDeviation),
                         Receipt.Gated("FanInXMedian", inbound.TimesMedian, nameof(AnalysisPolicy.ConcealedFanInCeiling)),
                         Receipt.Gated("FanOutXMedian", outbound.TimesMedian, nameof(AnalysisPolicy.ConcealedFanOutCeiling)),
                         Receipt.Of("MaxMemberCyclomaticPctl", cc.Percentile),
@@ -201,6 +230,42 @@ public static class ConcealedDecision
     /// a reader sees first.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// Whether a value is an outlier among its peers, on the spread they actually have.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Two branches, because a group with no spread supports a different claim rather than a
+    /// weaker one.</b> With spread, the question is whether the gap exceeds the gaps already in the
+    /// group — <see cref="AnalysisPolicy.ConcealedDispersionFactor"/> deviations above the median.
+    /// Without it, any complexity at all is the whole of the group's variation, and the sentence
+    /// says so: <i>"the only complexity among the 6 types whose name ends in Trait"</i>.
+    /// </para>
+    /// <para>
+    /// <b>The second branch is only safe because a rank gate stands beside it.</b> <c>x &gt;
+    /// median</c> at <c>MAD = 0</c> admits everything above the median, which is
+    /// <c>ARCHITECTURE.md</c> §11's trap and is measured at 1.5–1.8x what ships. What bounds it is
+    /// <see cref="AnalysisPolicy.ConcealedTopShare"/>, not a constant here. Dispersion decides
+    /// whether a gap is meaningful; rank decides how many may say so.
+    /// </para>
+    /// </remarks>
+    private static bool Outlies(Distribution peers, double value, AnalysisPolicy policy) =>
+        value > OutlierFloor(peers, policy);
+
+    /// <summary>
+    /// The value a member has to beat to be an outlier among these peers. Travels with the finding
+    /// because a reader cannot recompute it — the same reason
+    /// <see cref="BlastRadius"/> publishes <c>FanInTopRankLimit</c>.
+    /// </summary>
+    private static double OutlierFloor(Distribution peers, AnalysisPolicy policy)
+    {
+        var spread = peers.MedianAbsoluteDeviation;
+
+        return spread > 0
+            ? peers.Median + (policy.ConcealedDispersionFactor * spread)
+            : peers.Median;
+    }
+
     private static List<Finding> Ranked(IEnumerable<(double Rank, double Absolute, Finding Finding)> found) =>
         Nomination.Ranked(
             found.OrderByDescending(f => double.IsFinite(f.Rank))

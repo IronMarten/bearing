@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing;
+﻿namespace IronMarten.Bearing;
 
 /// <summary>
 /// One value's standing within its peer group: where it sits, and how far from typical.
@@ -79,6 +79,7 @@ public readonly record struct Reading
 public sealed class Distribution
 {
     private readonly double[] _sorted;
+    private double? _mad;
 
     private Distribution(double[] sorted, double median)
     {
@@ -100,6 +101,50 @@ public sealed class Distribution
     /// least two values.
     /// </summary>
     public bool IsComparable => _sorted.Length >= 2;
+
+    /// <summary>
+    /// Median absolute deviation — the median of each value's distance from
+    /// <see cref="Median"/>. Zero means the group has no spread at all.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The variable a cohort-relative claim should be gated on, and the reason is that size is
+    /// not.</b> A multiple of the median asks <i>how many times its peers is it</i>, which on a
+    /// cohort whose median is 1 evaluates to the value itself — 59% of nopCommerce's method-like
+    /// members sit at <c>cc</c> 0 or 1, so <c>3x median</c> is <c>cc &gt;= 3</c> and the claim is
+    /// absolute wearing relative words. This asks <i>is the gap larger than the gaps already in
+    /// this group</i>, which is the question the sentence makes.
+    /// </para>
+    /// <para>
+    /// <b>Zero is a real answer and not a degenerate one, so callers must branch on it.</b> At
+    /// <c>MAD = 0</c> the scale estimate collapses and <c>median + k·MAD</c> is the median, so a
+    /// naive gate admits everything above it — measured at 1.5–1.8x what ships on the three
+    /// reference solutions, and 5.6–18.5x at type level. That is <c>ARCHITECTURE.md</c> §11's
+    /// recorded trap and it is real. What defuses it is not a substitute constant but a volume
+    /// gate beside this one: a rank limit bounds a group with no spread to its top few, and the
+    /// claim there degrades from a multiple to a count — <i>"the only complexity among its N
+    /// peers"</i>. Dispersion decides whether a gap is meaningful; rank decides how many may say
+    /// so. Neither does the other's job.
+    /// </para>
+    /// <para>
+    /// Zero for a distribution of fewer than two values, on the same convention as
+    /// <see cref="Median"/>: <see cref="Read"/> answers nothing there.
+    /// </para>
+    /// </remarks>
+    public double MedianAbsoluteDeviation
+    {
+        get
+        {
+            if (_mad is { } cached) return cached;
+
+            var deviations = new double[_sorted.Length];
+            for (var i = 0; i < _sorted.Length; i++) deviations[i] = Math.Abs(_sorted[i] - Median);
+            Array.Sort(deviations);
+
+            _mad = MedianOf(deviations);
+            return _mad.Value;
+        }
+    }
 
     /// <summary>Builds a distribution from a set of measurements.</summary>
     public static Distribution Of(IEnumerable<double> values)

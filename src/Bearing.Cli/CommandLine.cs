@@ -85,6 +85,8 @@ public static class CommandLine
         (nameof(AnalysisPolicy.HighCc), (p, v) => p with { HighCc = (int)v }),
         (nameof(AnalysisPolicy.MinDecisionCc), (p, v) => p with { MinDecisionCc = (int)v }),
         (nameof(AnalysisPolicy.ConcealedTopRank), (p, v) => p with { ConcealedTopRank = (int)v }),
+        (nameof(AnalysisPolicy.ConcealedTopShare), (p, v) => p with { ConcealedTopShare = v }),
+        (nameof(AnalysisPolicy.ConcealedDispersionFactor), (p, v) => p with { ConcealedDispersionFactor = v }),
         (nameof(AnalysisPolicy.HubMin), (p, v) => p with { HubMin = (int)v }),
         (nameof(AnalysisPolicy.GodObjectMembers), (p, v) => p with { GodObjectMembers = (int)v }),
         (nameof(AnalysisPolicy.MinKindSpan), (p, v) => p with { MinKindSpan = (int)v }),

@@ -174,7 +174,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <div class="fld"><b class="name">ShipmentController.Post</b><p class="where">Core · Controllers.cs:56</p><p class="claim">looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.</p></div>
 </div>
 <div class="row">
-<div class="lbl"><span class="kind">Concealed decision, method level</span><span class="rank">1 of 14</span></div>
+<div class="lbl"><span class="kind">Concealed decision, method level</span><span class="rank">1 of 13</span></div>
 <div class="fld"><b class="name">TariffCalculator.Apply</b><p class="where">Core · TariffCalculator.cs:9</p><p class="claim">the most complex of the 49 methods in the 33 types in TestBed.Core.</p></div>
 </div>
 <div class="row">
@@ -561,7 +561,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">12</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">12</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">0.769</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">93.75</td><td><span class="empty">context</span></td></tr>
@@ -583,7 +585,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">5</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">9</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">9</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">9</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">90</td><td><span class="empty">context</span></td></tr>
@@ -608,7 +612,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">5</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">0.769</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">68.75</td><td><span class="empty">context</span></td></tr>
@@ -633,7 +639,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">4.333</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">4.333</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">3</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">2</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">88.889</td><td><span class="empty">context</span></td></tr>
@@ -658,7 +666,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">7</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">21</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">3.5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">3.5</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">6</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">0.714</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">92.857</td><td><span class="empty">context</span></td></tr>
@@ -683,7 +693,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">5</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">6</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">3</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">5</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">2</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">0</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">90</td><td><span class="empty">context</span></td></tr>
@@ -708,7 +720,9 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">6</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>MaxMemberCyclomatic</td><td class="n">6</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">undefined</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>MaxMemberCyclomaticXMedian</td><td class="n">undefined</td><td><span class="empty">context</span></td></tr>
+<tr><td>MaxMemberCyclomaticOutlierFloor</td><td class="n">0</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortMaxMemberCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>FanInXMedian</td><td class="n">1</td><td><span class="mono">ConcealedFanInCeiling</span> = 2</td></tr>
 <tr><td>FanOutXMedian</td><td class="n">0</td><td><span class="mono">ConcealedFanOutCeiling</span> = 2</td></tr>
 <tr><td>MaxMemberCyclomaticPctl</td><td class="n">91.667</td><td><span class="empty">context</span></td></tr>
@@ -718,7 +732,7 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 </table>
 </details>
 </div>
-<h3>Concealed decision, method level — 14</h3>
+<h3>Concealed decision, method level — 13</h3>
 <p class="sub">The same claim about one method. This is the primary level, not a drill-down of the one above.</p>
 <div class="card" id="c0fb2cce0">
 <h4>TariffCalculator.Apply</h4>
@@ -731,8 +745,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">49</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">22</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">22</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">22</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">98.98</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -752,8 +769,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">13</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">16</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">16</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">16</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">96.154</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
@@ -773,8 +793,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">49</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">13</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">13</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">2</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">96.939</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">11</td><td><span class="empty">context</span></td></tr>
@@ -794,8 +817,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">12</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">12</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.1</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">93.75</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">4</td><td><span class="empty">context</span></td></tr>
@@ -815,8 +841,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">11</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">11</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">11</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">2</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.1</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">81.25</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -836,8 +865,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">5</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">9</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">9</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">9</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">1.5</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">90</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -857,32 +889,14 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">11</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">6</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">6</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">95.455</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
-<tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>LinesOfCode</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
-</table>
-</details>
-</div>
-<div class="card" id="c4780040d">
-<h4>AuthenticationMiddleware.Authenticate</h4>
-<p class="where">Core · AuthenticationMiddleware.cs:8</p>
-<p class="sub">Compared against the 8 types deriving from ControllerBase</p>
-<details>
-<summary>The receipts behind this claim</summary>
-<p class="sub">The tool's own field names, unchanged, so a number here can be matched to the thresholds at the foot of the page and checked against the code. These are evidence rather than an explanation — the sentence above is the claim, and nothing in this table adds to it.</p>
-<table class="receipts">
-<tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
-<tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
-<tr><td>Cyclomatic</td><td class="n">5</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
-<tr><td>CyclomaticRank</td><td class="n">3</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
-<tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
-<tr><td>CyclomaticPctl</td><td class="n">68.75</td><td><span class="empty">context</span></td></tr>
-<tr><td>Dsm</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
 <tr><td>MaxNestingDepth</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>LinesOfCode</td><td class="n">12</td><td><span class="empty">context</span></td></tr>
 </table>
@@ -899,8 +913,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">11</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">5</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">5</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">2</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">1</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">86.364</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -920,8 +937,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">4.333</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">4.333</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1.5</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.3</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">3</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">88.889</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -941,8 +961,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">9</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">13</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">4.333</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">4.333</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1.5</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.3</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">3</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">88.889</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -962,8 +985,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">8</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">21</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">3.5</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">3.5</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">2.1</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">6</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">6</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">93.75</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">15</td><td><span class="empty">context</span></td></tr>
@@ -983,8 +1009,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">5</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">6</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">3</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">3</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">1.5</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">5</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">1</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">2</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">90</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -1004,8 +1033,11 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><th>Measured</th><th class="n">Value</th><th>Had to clear</th></tr>
 <tr><td>CohortSize</td><td class="n">6</td><td><span class="mono">MinCohort</span> = 5</td></tr>
 <tr><td>Cyclomatic</td><td class="n">10</td><td><span class="mono">MinDecisionCc</span> = 5</td></tr>
-<tr><td>CyclomaticXMedian</td><td class="n">undefined</td><td><span class="mono">OutlierFactor</span> = 3</td></tr>
+<tr><td>CyclomaticXMedian</td><td class="n">undefined</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticRank</td><td class="n">1</td><td><span class="mono">ConcealedTopRank</span> = 3</td></tr>
+<tr><td>CyclomaticTopRankLimit</td><td class="n">1.7</td><td><span class="empty">context</span></td></tr>
+<tr><td>CyclomaticOutlierFloor</td><td class="n">0</td><td><span class="mono">ConcealedDispersionFactor</span> = 3</td></tr>
+<tr><td>CohortCyclomaticMad</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>MedianCohortCyclomatic</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
 <tr><td>CyclomaticPctl</td><td class="n">91.667</td><td><span class="empty">context</span></td></tr>
 <tr><td>Dsm</td><td class="n">0</td><td><span class="empty">context</span></td></tr>
@@ -2087,6 +2119,8 @@ footer{margin-top:4rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 <tr><td>HighCc</td><td class="n">10</td><td class="mono">--high-cc</td></tr>
 <tr><td>MinDecisionCc</td><td class="n">5</td><td class="mono">--min-decision-cc</td></tr>
 <tr><td>ConcealedTopRank</td><td class="n">3</td><td class="mono">--concealed-top-rank</td></tr>
+<tr><td>ConcealedTopShare</td><td class="n">0.2</td><td class="mono">--concealed-top-share</td></tr>
+<tr><td>ConcealedDispersionFactor</td><td class="n">3</td><td class="mono">--concealed-dispersion-factor</td></tr>
 <tr><td>HubMin</td><td class="n">5</td><td class="mono">--hub-min</td></tr>
 <tr><td>GodObjectMembers</td><td class="n">20</td><td class="mono">--god-object-members</td></tr>
 <tr><td>MinKindSpan</td><td class="n">3</td><td class="mono">--min-kind-span</td></tr>

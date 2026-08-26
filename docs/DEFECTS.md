@@ -1,4 +1,4 @@
-# Known defects
+﻿# Known defects
 
 **Open entries only.** Behaviour that is wrong in the shipped tool today, recorded rather than
 fixed. Every entry names what supersedes it.
@@ -52,7 +52,7 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Seven open. Roughly severity-ordered, and the numbers are identity — they are never reused and
+*Six open. Roughly severity-ordered, and the numbers are identity — they are never reused and
 never renumbered.*
 
 ### 10. The cohort floor strips a suppression it was never meant to touch
@@ -365,49 +365,9 @@ declares a type in it. It reads as the framework being part of the cycle.
 component this large is either a layering problem or a fact about the codebase, and there is nothing
 that tells them apart.
 
-### 61. A finding ships gated on a value its own receipt reports as absent
-
-`Distribution.TimesMedianOf` returns `PositiveInfinity` when the median is zero, so
-`TimesMedian >= OutlierFactor` is satisfied **by definition** for any positive value in a
-zero-median cohort. The detector treats that as an outlier test passing. The export then writes the
-same quantity as `null`, because §28 settled that an undefined ratio is the *absence* of a
-measurement rather than a large one.
-
-Both halves are defensible and together they publish a finding whose stated justification is blank.
-`Nop.Services.Plugins.PluginManager<TPlugin>.LoadPluginBySystemNameAsync`, shipped:
-
-```
-CohortSize                37   gatedBy=MinCohort
-Cyclomatic                 6   gatedBy=MinDecisionCc
-CyclomaticXMedian       null   gatedBy=OutlierFactor     <-- gated on nothing
-CyclomaticRank             1   gatedBy=ConcealedTopRank
-MedianCohortCyclomatic     0
-```
-
-**Measured on three solutions, from the shipped `--json`:** 7 on nopCommerce of 1,015 findings, 5 on
-Jellyfin of 777, 23 on Umbraco of 2,029. **It is a class, not a site** — three finding kinds
-(`ConcealedDecisionType`, `ConcealedDecisionMethod`, `BugBlastRadius`) and two gates
-(`OutlierFactor`, `BlastFanInMultiple`).
-
-**§28 is where this came from and its fix was half of one.** §28 is recorded as *"a ratio against a
-zero median renders as `∞`"*, fixed by blanking it — in `CohortStatistics`, which is the projection
-the *renderers and the export* read. `ConcealedDecision` calls `Distribution.TimesMedianOf`
-directly and never saw the fix. **Two code paths hold the same quantity and disagree about whether
-it exists**, which is `ARCHITECTURE.md` §3's shape.
-
-**The deliverable is a property rather than a repair**, and the export is where it belongs:
-*no finding may carry a gated receipt whose value is null.* That is one contract test in
-`SCHEMA-findings-export.md` §8's family, it fails today on all three solutions, and it closes the
-class rather than the three kinds. **What the detector should do at a zero median is X16's
-question** — the honest reading there is a count, *"cc 6 where all 37 peers are 0"*, not a ratio —
-so do not close this by picking a substitute constant for the infinity.
-
-**Found while decomposing X16's gates**, by modelling the ratio as *undefined therefore blocked* and
-getting 102 findings where the tool emits 103. The single missing finding was this one.
-
 ## Closed
 
-**Index only — the prose is in git.** Fifty-four entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Fifty-five entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -467,6 +427,7 @@ forty-seven in full is the commit before this one.
 | 60 | `framework` and `package` read as a category and mean a provenance | reworded 2026-08-25 to state the resolution |
 | 56 | Nothing tells the reader that a project's references did not resolve | fixed 2026-08-25 |
 | 57 | Two types with one fully-qualified name render as one type contradicting itself | fixed 2026-08-25; the entry's reason for surviving was wrong, see below |
+| 61 | `TimesMedian >= OutlierFactor` is satisfied by definition at a zero median | closed 2026-08-25 by X16 — the ratio no longer gates, so there is no tautological gate to fire |
 
 > **D56 shipped with a wider meaning than it was filed with, and the widening was measured.** The
 > entry proposed counting `CS0246`/`CS0234`/`CS0012` as *"this project's references did not

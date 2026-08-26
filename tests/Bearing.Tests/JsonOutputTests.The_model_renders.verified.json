@@ -15,6 +15,8 @@
     "highCc": 10,
     "minDecisionCc": 5,
     "concealedTopRank": 3,
+    "concealedTopShare": 0.2,
+    "concealedDispersionFactor": 3,
     "hubMin": 5,
     "godObjectMembers": 20,
     "minKindSpan": 3,
@@ -28016,12 +28018,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 22,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28079,12 +28096,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 16,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28142,12 +28174,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 13,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 2,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28205,12 +28252,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 12,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28268,12 +28330,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 11,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 2,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28331,12 +28408,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 9,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 1.5,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28394,12 +28486,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 6,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.7,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28414,69 +28521,6 @@
         {
           "name": "Dsm",
           "value": 0,
-          "gate": null
-        },
-        {
-          "name": "MaxNestingDepth",
-          "value": 1,
-          "gate": null
-        },
-        {
-          "name": "LinesOfCode",
-          "value": 12,
-          "gate": null
-        }
-      ],
-      "qualifiers": [],
-      "participants": [],
-      "relations": []
-    },
-    {
-      "key": "ConcealedDecisionMethod|member|Core|global::TestBed.Core.AuthenticationMiddleware|M:TestBed.Core.AuthenticationMiddleware.Authenticate(TestBed.Core.RawResponse,TestBed.Core.NormalizationContext,System.String)",
-      "kind": "ConcealedDecisionMethod",
-      "class": "claim",
-      "status": "reported",
-      "suppressedBy": null,
-      "subject": {
-        "kind": "Member",
-        "canonical": "member|Core|global::TestBed.Core.AuthenticationMiddleware|M:TestBed.Core.AuthenticationMiddleware.Authenticate(TestBed.Core.RawResponse,TestBed.Core.NormalizationContext,System.String)",
-        "members": null,
-        "declaringType": "type|Core|global::TestBed.Core.AuthenticationMiddleware"
-      },
-      "receipts": [
-        {
-          "name": "CohortSize",
-          "value": 8,
-          "gate": "MinCohort"
-        },
-        {
-          "name": "Cyclomatic",
-          "value": 5,
-          "gate": "MinDecisionCc"
-        },
-        {
-          "name": "CyclomaticXMedian",
-          "value": 5,
-          "gate": "OutlierFactor"
-        },
-        {
-          "name": "CyclomaticRank",
-          "value": 3,
-          "gate": "ConcealedTopRank"
-        },
-        {
-          "name": "MedianCohortCyclomatic",
-          "value": 1,
-          "gate": null
-        },
-        {
-          "name": "CyclomaticPctl",
-          "value": 68.75,
-          "gate": null
-        },
-        {
-          "name": "Dsm",
-          "value": 2,
           "gate": null
         },
         {
@@ -28520,12 +28564,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 5,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 2,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.7,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28583,12 +28642,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 4.333333333333333,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1.5,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.3,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 3,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28646,12 +28720,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 4.333333333333333,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1.5,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.3,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 3,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28709,12 +28798,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 3.5,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 2.1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 6,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28772,12 +28876,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": 3,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 1.5,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 5,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 1,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28835,12 +28954,27 @@
         {
           "name": "CyclomaticXMedian",
           "value": null,
-          "gate": "OutlierFactor"
+          "gate": null
         },
         {
           "name": "CyclomaticRank",
           "value": 1,
           "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 1.7000000000000002,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 0,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "MedianCohortCyclomatic",
@@ -28898,7 +29032,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": 12,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "FanInXMedian",
@@ -28969,7 +29113,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": 9,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "FanInXMedian",
@@ -29040,7 +29194,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": 5,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "FanInXMedian",
@@ -29111,7 +29275,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": 4.333333333333333,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 3,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "FanInXMedian",
@@ -29182,7 +29356,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": 3.5,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 6,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "FanInXMedian",
@@ -29253,7 +29437,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": 3,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 5,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 1,
+          "gate": null
         },
         {
           "name": "FanInXMedian",
@@ -29324,7 +29518,17 @@
         {
           "name": "MaxMemberCyclomaticXMedian",
           "value": null,
-          "gate": "OutlierFactor"
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 0,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
         },
         {
           "name": "FanInXMedian",

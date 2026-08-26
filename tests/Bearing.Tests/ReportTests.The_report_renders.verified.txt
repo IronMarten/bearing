@@ -28,7 +28,7 @@ Every claim shows the numbers behind it.
    ShipmentController.Post — looks like plumbing but is 12x the median internal complexity of the 8 types deriving from ControllerBase.
      Core · Controllers.cs:56 · concealed decision, 1 of 7
    TariffCalculator.Apply — the most complex of the 49 methods in the 33 types in TestBed.Core.
-     Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 14
+     Core · TariffCalculator.cs:9 · concealed decision, method level, 1 of 13
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds
      Core · AuthenticationMiddleware.cs:8 · spans architectural layers, 1 of 14
    IdentityTurnstile.Turned — no static references found — verify before deleting. Nothing refers to IdentityTurnstile either.
@@ -56,7 +56,6 @@ Every claim shows the numbers behind it.
    ReconciliationController.Reconcile — among the 2 most complex of the 8 methods in the 8 types deriving from ControllerBase. (cc 11 against a peer median of 1; dsm 0, nesting 1, 18 lines) — Reconcilers.cs:291
    ThroughputGauge.Sample — the most complex of the 5 methods in the 5 types whose name ends in Gauge. (cc 9 against a peer median of 1; dsm 0, nesting 1, 20 lines) — Gauges.cs:62
    MarkCaliper.Sweep — the most complex of the 11 methods in the 10 types whose name ends in Caliper. (cc 6 against a peer median of 1; dsm 0, nesting 1, 12 lines) — Calipers.cs:167
-   AuthenticationMiddleware.Authenticate — among the 3 most complex of the 8 methods in the 8 types deriving from ControllerBase. (cc 5 against a peer median of 1; dsm 2, nesting 1, 12 lines) — AuthenticationMiddleware.cs:13
    LandCaliper.Sweep — among the 2 most complex of the 11 methods in the 10 types whose name ends in Caliper. (cc 5 against a peer median of 1; dsm 0, nesting 1, 11 lines) — Calipers.cs:142
    MethodReconciler.Reconcile — among the 2 most complex of the 9 methods in the 9 types whose name ends in Reconciler. (cc 13 against a peer median of 3; dsm 0, nesting 1, 20 lines) — Reconcilers.cs:188
    RateReconciler.Reconcile — among the 2 most complex of the 9 methods in the 9 types whose name ends in Reconciler. (cc 13 against a peer median of 3; dsm 0, nesting 1, 20 lines) — Reconcilers.cs:120

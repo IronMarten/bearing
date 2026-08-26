@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -88,8 +88,14 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
         // the method-level population is below MinCohort and never runs.
         var only = byType.Except(byMethod, StringComparer.Ordinal).ToList();
 
-        Assert.Single(only);
-        Assert.EndsWith("CustomsTrait", only[0], StringComparison.Ordinal);
+        // **X16 added a second, and the property is stronger for it.** AuthenticationMiddleware
+        // joins CustomsTrait: the dispersion gate keeps it at type level, where its cohort has
+        // spread its own methods' cohort does not. What the test claims — that type level is not
+        // a filter over method level — now rests on two subjects arriving by different routes
+        // rather than on one plant. P9's plant is still named, because it is still the case the
+        // method-level population never runs for.
+        Assert.Equal(2, only.Count);
+        Assert.Contains(only, o => o.EndsWith("CustomsTrait", StringComparison.Ordinal));
     }
 
     /// <summary>

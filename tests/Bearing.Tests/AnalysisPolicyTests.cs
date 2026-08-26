@@ -56,7 +56,7 @@ public sealed class AnalysisPolicyTests
     /// </remarks>
     [Fact]
     public void The_policy_carries_the_number_of_values_the_inventory_was_run_over() =>
-        Assert.Equal(29, AnalysisPolicy.Default.Values.Count);
+        Assert.Equal(31, AnalysisPolicy.Default.Values.Count);
 
     /// <summary>
     /// Every named threshold can be moved from the command line.

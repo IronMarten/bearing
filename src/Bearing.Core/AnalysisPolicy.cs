@@ -110,6 +110,70 @@ public sealed record AnalysisPolicy
     public int ConcealedTopRank { get; init; } = 3;
 
     /// <summary>
+    /// The share of a cohort that may be nominated as a concealed decision, capped by
+    /// <see cref="ConcealedTopRank"/>. Binds only below that cap, so it tightens small cohorts
+    /// and leaves large ones exactly as they were.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The paragraph above is right that a proportion cannot do this job alone, and this does
+    /// not ask it to.</b> Measured 2026-08-25 on three solutions: a bare 5% limit gives
+    /// nopCommerce 423 method nominations against 103 today, 10% gives 814 and 20% gives 1,243 —
+    /// exactly the failure <see cref="ConcealedTopRank"/> was introduced to avoid. The effective
+    /// limit is <c>min(ConcealedTopRank, TopRankLimit(ConcealedTopShare))</c>, so the fixed rank
+    /// still bounds the output by the taxonomy and the share only ever makes it smaller.
+    /// </para>
+    /// <para>
+    /// <b>What it fixes is the other end, which the fixed rank alone gets wrong.</b> A top-3 of a
+    /// cohort of five is 60% of that cohort and a top-3 of five hundred is 0.6% — one constant
+    /// meaning two different things, which is <c>docs/DEFECTS.md</c> §10's complaint. At this
+    /// value a cohort of five admits one and a cohort of twenty-five or more admits three.
+    /// </para>
+    /// <para>
+    /// <b>It is not here because the thin end was dangerous, and that is worth recording because
+    /// it is the obvious reason to assume.</b> Below-floor cohorts hold 0.6%, 1.4% and 0.6% of
+    /// the gated population on the three solutions, so letting them nominate unguarded adds 12,
+    /// 11 and 53 findings. §10's pattern: a real inconsistency with almost no field incidence.
+    /// The share is taken because selectivity should not depend on cohort size, not because the
+    /// output was wrong without it. <c>ARCHITECTURE.md</c> §11.
+    /// </para>
+    /// </remarks>
+    public double ConcealedTopShare { get; init; } = 0.20;
+
+    /// <summary>
+    /// How many median absolute deviations above its peer median a value must sit to be an
+    /// outlier among them. Where the peers have no spread at all, above the median is enough.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This is the gate <see cref="OutlierFactor"/> used to be, asking a question a multiple of
+    /// the median cannot.</b> A ratio asks <i>how many times its peers is it</i>, and on a cohort
+    /// whose median is 1 that evaluates to the value — <c>3x median</c> becomes <c>cc &gt;= 3</c>,
+    /// which is <c>docs/DEFECTS.md</c> §2. It also fails in the other direction, and that is the
+    /// half this was built for: a method at <c>cc</c> 12 in a cohort whose median is 10.5 is the
+    /// top of its group and is not remarkable, and <b>rank alone cannot tell the two apart because
+    /// rank is ordinal</b>. <c>TestBed</c>'s planted evaluators are exactly that case — three of
+    /// them, at 1.14x their peers — and P0 planted them as <i>complex code that is not
+    /// anomalous</i>.
+    /// </para>
+    /// <para>
+    /// <b>The <c>MAD = 0</c> branch is not a special case, it is the other half of the claim.</b>
+    /// A group with no spread supports no statement about gaps, so the sentence stops being a
+    /// multiple and becomes a count — <i>"the only complexity among the 6 types whose name ends in
+    /// Trait"</i>, which <c>Claims.ConcealedType</c> already renders. Letting everything above the
+    /// median through there is <c>ARCHITECTURE.md</c> §11's trap; what stops it is
+    /// <see cref="ConcealedTopShare"/> bounding the group to its top few, not a constant here.
+    /// </para>
+    /// <para>
+    /// <b>Measured 2026-08-25 on three solutions, member level, against 103 / 167 / 366 today:</b>
+    /// this gate with the rank limit beside it gives <b>103 / 160 / 366</b>. The value is 3 for
+    /// the ordinary reason — it is the same k the ratio used — and it was not tuned to reproduce
+    /// that: k of 1 and 2 give 107 / 168 / 396 and 104 / 166 / 385.
+    /// </para>
+    /// </remarks>
+    public double ConcealedDispersionFactor { get; init; } = 3.0;
+
+    /// <summary>
     /// How far down the boundary population a type may sit and still be said to carry real logic.
     /// </summary>
     /// <remarks>
@@ -359,6 +423,8 @@ public sealed record AnalysisPolicy
         (nameof(HighCc), HighCc),
         (nameof(MinDecisionCc), MinDecisionCc),
         (nameof(ConcealedTopRank), ConcealedTopRank),
+        (nameof(ConcealedTopShare), ConcealedTopShare),
+        (nameof(ConcealedDispersionFactor), ConcealedDispersionFactor),
         (nameof(HubMin), HubMin),
         (nameof(GodObjectMembers), GodObjectMembers),
         (nameof(MinKindSpan), MinKindSpan),

@@ -5,12 +5,14 @@ value                          default   notch   down       up
 ------------------------------------------------------------------------
 MinCohort                            5       1   moves      moves
 CohortBasisFloor                     5       1   moves      moves
-OutlierFactor                        3     0.1   -          moves
+OutlierFactor                        3     0.1   -          -
 MinFanIn                             5       1   -          moves
 Top                                 15       1   -          -
 HighCc                              10       1   moves      moves
 MinDecisionCc                        5       1   moves      moves
-ConcealedTopRank                     3       1   moves      moves
+ConcealedTopRank                     3       1   -          -
+ConcealedTopShare                  0.2    0.05   moves      -
+ConcealedDispersionFactor            3       1   -          moves
 HubMin                               5       1   moves      moves
 GodObjectMembers                    20       1   moves      -
 MinKindSpan                          3       1   -          moves
