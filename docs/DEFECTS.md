@@ -52,112 +52,8 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Five open. Roughly severity-ordered, and the numbers are identity — they are never reused and
+*Four open. Roughly severity-ordered, and the numbers are identity — they are never reused and
 never renumbered.*
-
-### 44. Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye
-
-
-Found by the use the picture is most likely to get: two runs of the same solution, side by side.
-nopCommerce at 2024-08-27 and at 2026-08-21, same tool build, `Nop.Web.Framework`:
-
-| | reach (x) | density (y) | rendered at |
-|---|---|---|---|
-| 2024 | **43.1%** | 15.7% | (840, 264) |
-| 2026 | **33.7%** | 26.0% | (823, 121) |
-
-**Its reach fell nine points and it did not visibly move.** The x-axis is 17.3 px per 1% in the
-first report and 21.6 in the second, so a real improvement — proportionally fewer of the solution's
-types reaching into it — renders as the same far-right position, and a reader concludes nothing
-changed. A first reader of these two reports read the point as having moved *up and to the right*.
-Up was right; right was the axis.
-
-**All three channels are normalised, not just the one that misled.**
-
-```
-var xmax = Bound(points.Max(p => p.Reach));
-var ymax = Bound(points.Max(p => p.Density));
-var biggest = Math.Max(1, points.Max(p => p.Types));
-double R(int types) => Math.Max(5, 34 * Math.Sqrt(types / (double)biggest));
-```
-
-Position on both axes and bubble area are all relative to the extremes of the run being drawn. **The
-y-axis matching across these two reports is luck** — both maxima happened to round to the same
-bound — so the one reading that came out right came out right by accident. A project whose type
-count never changed also draws smaller whenever some other project grows.
-
-**This is not a nitpick, because the metric was chosen to avoid exactly this.** `PlotPoint.Reach` is
-a share rather than a count, and the reason is written on it: *"A count would make the axis a
-property of the solution's size rather than of its shape, and two runs could not be read the same
-way."* The measure was made run-comparable on purpose and the rendering discards it. Same class as
-§34 — the claim is sound and the presentation of it is not.
-
-**It is load-bearing for the paid tier and not only for the free one.** `PRD-paid-tier.md` is
-drift: the product is two runs compared. A picture at the top of the report that cannot survive
-that comparison is a defect in the thing the paid tier sells, and it would have been found by a
-customer rather than by us — this time it was found by a five-minute manual read, which is the
-cheapest possible way to have learned it.
-
-**Candidate remedies, none measured.** A fixed 0–100 domain on both axes, which is honest and wastes
-most of the canvas. A domain shared with the baseline when one is supplied, which fixes the paid
-case and leaves the single-run case unchanged. Or stating the axis range and the area basis on the
-plot, which does not make the pictures comparable but stops a reader believing they are.
-
----
-
-**Measured 2026-08-21, and two of those three are gone.** The third shipped. **The entry stays
-open**, because what shipped is a mitigation and the headline is still true: two reports cannot be
-compared by eye.
-
-**The fixed 0–100 domain is dead, and it is the one that looked right.** Rendered against
-nopCommerce it puts all five labelled projects inside x 110–467 and y 393–465 — a quarter of the
-canvas, with the two densest dots merging. That was the expected cost. The unexpected one is that
-it moves `Nop.Web.Framework` (43% reach, 29% density) out of the top-right corner, and
-`PROTOCOL-a11-newcomer.md` §12 pre-registers *"a position — top right"* as the reading round 2
-exists to detect. **The obvious fix would have broken the instrument built to grade the picture.**
-
-**The baseline-shared domain is ruled out for this tier, not merely unbuilt.** **X7** put drift in
-the paid service — *"not the free tool with a flag on it"* — and `R1` records the free report being
-a section shorter than the probe's as asserted deliberately. So the free tier's own picture cannot
-be fixed by a mechanism that needs a second run, whatever gets built later. It also would not have
-caught this: **this was found by a manual read of two reports with no baseline between them**,
-which is the free-tier case and the one that stays broken.
-
-**What shipped is the disclosure, and the drawing now states all three scales.** Two lines below the
-x-axis title:
-
-> Every scale here fits this run: 0–50% across, 0–30% up, dot area against the largest project's
-> 1,218 types.
-> Another report is scaled to its own run, so the two do not line up — compare the numbers, not the
-> positions.
-
-Across the pair that found the defect those read **0–50% / 1,218 types** and **0–40% / 1,281
-types**, so the disagreement a reader was previously not given is now on both pages. The area basis
-is stated beside the axes because it misleads the same way and is worse: a tick label at least
-discloses an axis to a reader who looks for it, and nothing said a dot shrank because some other
-project grew.
-
-**It cost nothing that was already drawn.** `Height` and `Bottom` grew by the same 36, so
-`Height - Bottom` and `Height - Top - Bottom` — the two numbers both axis maps are built from — are
-unchanged at 484 and 420. The diff against the frozen artifact is four lines: the viewBox, the
-background rect, and the two new sentences. Every dot, tick, gridline and label sits where it sat.
-`The_plotting_area_is_where_it_was_before_the_disclosure` holds that, and the footer gets §36's
-collision discipline rather than a second lesson about fixed geometry.
-
-**A second face of the same defect, found on Jellyfin and folded in here rather than filed apart.**
-Its y-axis is bound at **100%, set entirely by `Emby.Photos` — 1 of 1 named**. Every other project
-on that drawing is under 36%, so **nine-tenths of the vertical canvas is spent on one type**, and
-the axis of the whole picture is set by the least informative point on it. It is the family of §34
-and §41 — a ratio on a denominator too small to mean anything — and it is the same defect wearing a
-second face: the axis is a function of the run, and here the run's extreme is noise. Note what it
-does to the remedies above: a fixed 0–100 y-axis costs Jellyfin *nothing*, because that is already
-what it draws. **It is not repaired with a floor on the denominator**, which would be the sixth
-local threshold of exactly the kind **X16** exists to stop being added one at a time.
-
-**What is left, and it has to work from one run.** A domain that does not depend on the run's own
-extremes, that survives the top-right reading, and that is not set by a project with one type in
-it. X16 is the road that remains — the baseline road is closed by X7, not merely unpaved — and it
-is not this entry's to build alone.
 
 ### 45. A layer wider than the cap is drawn as two rows, and nothing says so
 
@@ -312,7 +208,7 @@ that tells them apart.
 
 ## Closed
 
-**Index only — the prose is in git.** Fifty-seven entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Fifty-eight entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -361,6 +257,7 @@ forty-seven in full is the commit before this one.
 | 41 | The `Clean` tile counts a disclosure as a finding | fixed |
 | 42 | A file Roslyn cannot parse is walked anyway, and the report says it read everything | fixed |
 | 43 | A solution needing a newer SDK is reported as an unreadable file | fixed |
+| 44 | Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye | fixed 2026-08-26 — both axes are a fixed 0–100% square root and the dot radius is `sqrt(types)`, so all three channels are functions of the project rather than the run. `Bound`, `Step` and the radius basis deleted; the 2026-08-22 disclosure is inverted rather than removed |
 | 46 | A suppression emptied the HTML cycles section, because the evidence replacing it went to one renderer | fixed |
 | 47 | The report tells the reader the exports carry the findings, and no export carries any | reworded; the export itself is `SCHEMA-findings-export.md` step 5 |
 | 55 | A count-bearing sentence disagrees with its own number | fixed 2026-08-25 |

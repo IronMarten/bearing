@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using IronMarten.Bearing;
@@ -291,44 +291,60 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     // ------------------------------------------------ what the drawing is scaled to ----
 
     /// <summary>
-    /// The stated scales are the scales the drawing actually used.
+    /// Nothing on the drawing is scaled to the run, and the caption says the same.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §44. <b>Read back off the drawing rather than recomputed</b>, which
-    /// is the rule <see cref="ReachPlot.Unlabelled"/> follows for the same reason: a caption and
-    /// the thing it explains must not be able to disagree. The axis spans come from the last tick
-    /// on each axis and the area basis from the model, so a disclosure that drifted from the
-    /// geometry fails here instead of misleading a reader who trusted it.
+    /// <c>docs/DEFECTS.md</c> §44. <b>This assertion used to run the other way.</b> All three
+    /// channels were fitted to the run — both axes to the next ten above the largest value, dot
+    /// area to the largest project — and the test checked that the caption <i>disclosed</i> that,
+    /// because disclosure was the mitigation that shipped while the fix was unmeasured. It is
+    /// measured now: the axes are a fixed 0–100% square root and the radius is
+    /// <c>sqrt(types)</c>, so two reports line up and the caption says so.
     /// </para>
     /// <para>
-    /// <b>This is a mitigation and not the fix, and the test says so.</b> Stating a scale does not
-    /// make two reports comparable — it stops a reader assuming they already are. §44 stays open
-    /// for the domain that would.
+    /// <b>Read back off the drawing rather than recomputed</b>, which is the rule
+    /// <see cref="ReachPlot.Unlabelled"/> follows for the same reason: a caption and the thing it
+    /// explains must not be able to disagree. The radii are asserted as a multiset against the
+    /// model's own type counts, which is what pins the third channel to the project rather than to
+    /// whatever else the run happened to contain — the failure a reader could never have seen,
+    /// because nothing said a dot shrank when some other project grew.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_drawing_states_the_scale_it_was_drawn_to()
+    public void Nothing_on_the_drawing_is_scaled_to_the_run()
     {
         var svg = Svg;
-        var ticks = XDocument.Parse(svg).Root!
-            .Descendants()
+        var root = XDocument.Parse(svg).Root!;
+
+        var ticks = root.Descendants()
             .Where(e => e.Name.LocalName == "text" && e.Attribute("class")?.Value == "tk")
             .Select(e => (Anchor: e.Attribute("text-anchor")?.Value ?? "start", Value: e.Value))
             .ToList();
 
-        // Across is anchored middle under the axis; up is anchored end in the left gutter.
-        var across = ticks.Where(t => t.Anchor == "middle").Select(t => t.Value).Last();
-        var up = ticks.Where(t => t.Anchor == "end").Select(t => t.Value).Last();
-        var biggest = ReachPlot.Points(core.Model, Findings).Max(p => p.Types);
+        // Across is anchored middle under the axis; up is anchored end in the left gutter. Both
+        // run to 100% on every drawing, which is the whole of what makes two of them comparable.
+        Assert.Equal("100%", ticks.Where(t => t.Anchor == "middle").Select(t => t.Value).Last());
+        Assert.Equal("100%", ticks.Where(t => t.Anchor == "end").Select(t => t.Value).Last());
 
-        Assert.Contains($"0–{across} across", svg, StringComparison.Ordinal);
-        Assert.Contains($"0–{up} up", svg, StringComparison.Ordinal);
-        Assert.Contains($"largest project's {Html.Count(biggest)} types", svg, StringComparison.Ordinal);
+        // Every dot's radius is its own project's type count and nothing else.
+        var drawn = root.Descendants()
+            .Where(e => e.Name.LocalName == "circle")
+            .Select(e => Math.Round(double.Parse(e.Attribute("r")!.Value, CultureInfo.InvariantCulture), 1))
+            .OrderBy(r => r)
+            .ToList();
 
-        // The consequence, said plainly. The spans alone are on the axes already and a reader who
-        // did not know they moved between runs had no reason to read them.
-        Assert.Contains("scaled to its own run", svg, StringComparison.Ordinal);
+        var expected = ReachPlot.Points(core.Model, Findings)
+            .Select(p => Math.Round(Math.Max(5, Math.Sqrt(p.Types)), 1))
+            .OrderBy(r => r)
+            .ToList();
+
+        Assert.Equal(expected, drawn);
+
+        // And the caption states the fixed scale rather than disclosing a run-fitted one.
+        Assert.Contains("0–100% on a square-root scale", svg, StringComparison.Ordinal);
+        Assert.Contains("the two line up", svg, StringComparison.Ordinal);
+        Assert.DoesNotContain("scaled to its own run", svg, StringComparison.Ordinal);
     }
 
     /// <summary>
