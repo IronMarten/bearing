@@ -618,6 +618,14 @@ already understood. These are questions with no answer yet.
   namespace-cycle repair of the same day: classify by what is actually there instead of
   thresholding an aggregate.
 
-  **Scope**: expected to close §10, §14, §28, §34, §38 and the remainder of X3, and to delete
-  `ConcealedTopRank` and `MinCohort`'s gating use. **Unmeasured** — the replacement has not been run
-  end to end, and that measurement is the first piece of work, not the last.
+  **Scope, corrected 2026-08-25.** This read *expected to close §10, §14, §28, §34, §38*, and
+  **nine of the ten entries above are already closed** — each by the local repair this decision
+  exists to remove. Only **§10** is live. So the deliverable is: **§10 closes; §14, §28, §34 and §38
+  lose the threshold their repair installed; X3's remainder is answered; and `ConcealedTopRank` and
+  `MinCohort`'s gating use are deleted.** Stated as a count of closures it is a success criterion
+  nothing can meet.
+
+  **Measured on two solutions, to be re-derived on three.** The table above is 2026-08-21,
+  nopCommerce and Jellyfin. Umbraco — 6,230 types — became a reference solution on 2026-08-25 and
+  has never been in this measurement. **Unmeasured** — the replacement has not been run end to end,
+  and that measurement is the first piece of work, not the last.
