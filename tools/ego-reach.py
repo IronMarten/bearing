@@ -23,6 +23,14 @@ So this measures three populations, and the gap between them is the point:
     what a reader can actually click. Each detector emits strongest-first, so
     these are the most extreme members of the most extreme population, and
     their neighbourhoods are the largest in the codebase by construction.
+  * **the leads** -- the single top row of each kind, which is X10's selection
+    and what A8 ships against. Being the most extreme row of each kind, these
+    are the WORST cases and not typical ones: a median of 66-100, and 19 of
+    the 28 distinct leads across the three solutions are over 50 nodes. That
+    is what took the drill-down from a drawing to a grouped list, so it is
+    measured here rather than remembered. Leads are DEDUPED -- two kinds can
+    lead with the same type, as BaseItem does for hubs and blast radius on
+    Jellyfin, and counting it twice moves the median.
 
 The cost figure is what settles whether the view can be pre-rendered into the
 single-file report rather than scripted, so it is printed beside each cap.
@@ -46,6 +54,9 @@ from collections import defaultdict
 # map's own density rather than guessed: a box with its label, and a path with
 # its coordinates. Only used for the cost estimate, and only to an order.
 BOX_BYTES, EDGE_BYTES = 130, 70
+
+# One row of the list form: a name, its project, the direction, and a link.
+ROW_BYTES = 70
 
 # Caps worth reporting. 25 and 50 are legibility guesses; 100 and 200 exist to
 # show how fast the tail falls off, which is what keeps a cap from being a
@@ -136,6 +147,30 @@ def main(csv_dir, model_path):
     print(f"    no cap : draws {len(shown):3d}/{len(shown)} ( 100%), withholds   0"
           f"   ~{(nodes * BOX_BYTES + edges * EDGE_BYTES) / 1024:6.0f} KB of inline SVG")
 
+    leads = list(dict.fromkeys(v[0] for v in per_kind.values() if v and v[0] in ids))
+    lead_sizes = [len(hop1[s]) for s in leads]
+    project = {r["Id"]: r["Project"] for r in rows}
+    groups, biggest = [], []
+    for s in leads:
+        by = defaultdict(int)
+        for t in hop1[s]:
+            by[project[t]] += 1
+        groups.append(len(by))
+        biggest.append(max(by.values()) if by else 0)
+    drawn_kb = ((sum(lead_sizes) + len(leads)) * BOX_BYTES
+                + sum(len(out[s]) + len(inn[s]) for s in leads) * EDGE_BYTES) / 1024
+    print()
+    print("  the leads -- X10's selection, one per kind, and what A8 ships against:")
+    print(f"    {len(leads)} distinct leads, one-hop median {statistics.median(lead_sizes):.0f}, "
+          f"max {max(lead_sizes)}, {sum(1 for x in lead_sizes if x > 50)} over 50 nodes")
+    print(f"    as drawings:      ~{drawn_kb:5.0f} KB, largest {max(lead_sizes)} nodes "
+          f"-- the hairball 5.5 refuses")
+    print(f"    as grouped lists: ~{sum(lead_sizes) * ROW_BYTES / 1024:5.0f} KB over "
+          f"{sum(lead_sizes)} rows, nothing withheld")
+    print(f"    grouped by project: {statistics.median(groups):.0f} groups per lead "
+          f"(max {max(groups)}); largest single group median {statistics.median(biggest):.0f}, "
+          f"max {max(biggest)} -- a group needs a count and a fold, never a truncation")
+    print()
     print(f"\n  rendered subjects by kind (median / p90 / max one-hop):")
     by_kind = defaultdict(list)
     for kind, subjects in per_kind.items():
