@@ -66,9 +66,6 @@ public sealed record AnalysisPolicy
     /// </remarks>
     public int CohortBasisFloor { get; init; } = 5;
 
-    /// <summary>The "x times the peer median" bar an outlier has to clear.</summary>
-    public double OutlierFactor { get; init; } = 3.0;
-
     /// <summary>
     /// The absolute floor beside every normalized measure: how many callers "widely depended
     /// on" has to mean before a percentile is allowed to say it.
@@ -146,8 +143,9 @@ public sealed record AnalysisPolicy
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the gate <see cref="OutlierFactor"/> used to be, asking a question a multiple of
-    /// the median cannot.</b> A ratio asks <i>how many times its peers is it</i>, and on a cohort
+    /// <b>This is the gate <c>OutlierFactor</c> used to be — deleted 2026-08-25, because once it
+    /// stopped gating it was a policy value nothing read. It asked a question a multiple of the
+    /// median cannot answer.</b> A ratio asks <i>how many times its peers is it</i>, and on a cohort
     /// whose median is 1 that evaluates to the value — <c>3x median</c> becomes <c>cc &gt;= 3</c>,
     /// which is <c>docs/DEFECTS.md</c> §2. It also fails in the other direction, and that is the
     /// half this was built for: a method at <c>cc</c> 12 in a cohort whose median is 10.5 is the
@@ -417,7 +415,6 @@ public sealed record AnalysisPolicy
     [
         (nameof(MinCohort), MinCohort),
         (nameof(CohortBasisFloor), CohortBasisFloor),
-        (nameof(OutlierFactor), OutlierFactor),
         (nameof(MinFanIn), MinFanIn),
         (nameof(Top), Top),
         (nameof(HighCc), HighCc),
@@ -502,6 +499,12 @@ public sealed record AnalysisPolicy
         // every type clearing the other three conditions.
         if (BoundaryTopFraction is <= 0 or > 1)
             throw new ArgumentOutOfRangeException(nameof(BoundaryTopFraction), BoundaryTopFraction, "BoundaryTopFraction is a share of the boundary population and must be within 0..1.");
+
+        // A share of a cohort, on BoundaryTopFraction's reasoning. Above 1 the cap in
+        // min(ConcealedTopRank, TopRankLimit(share)) can never bind, which silently returns the
+        // gate to the fixed rank this was introduced to bound at the thin end.
+        if (ConcealedTopShare is <= 0 or > 1)
+            throw new ArgumentOutOfRangeException(nameof(ConcealedTopShare), ConcealedTopShare, "ConcealedTopShare is a share of a cohort and must be within 0..1.");
 
         if (BlastTopFraction > 1)
             throw new ArgumentOutOfRangeException(nameof(BlastTopFraction), BlastTopFraction, "BlastTopFraction is a share of a cohort and must be within 0..1.");

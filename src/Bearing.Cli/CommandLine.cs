@@ -79,7 +79,6 @@ public static class CommandLine
     [
         (nameof(AnalysisPolicy.MinCohort), (p, v) => p with { MinCohort = (int)v }),
         (nameof(AnalysisPolicy.CohortBasisFloor), (p, v) => p with { CohortBasisFloor = (int)v }),
-        (nameof(AnalysisPolicy.OutlierFactor), (p, v) => p with { OutlierFactor = v }),
         (nameof(AnalysisPolicy.MinFanIn), (p, v) => p with { MinFanIn = (int)v }),
         (nameof(AnalysisPolicy.Top), (p, v) => p with { Top = (int)v }),
         (nameof(AnalysisPolicy.HighCc), (p, v) => p with { HighCc = (int)v }),

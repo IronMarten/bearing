@@ -56,7 +56,7 @@ public sealed class AnalysisPolicyTests
     /// </remarks>
     [Fact]
     public void The_policy_carries_the_number_of_values_the_inventory_was_run_over() =>
-        Assert.Equal(31, AnalysisPolicy.Default.Values.Count);
+        Assert.Equal(30, AnalysisPolicy.Default.Values.Count);
 
     /// <summary>
     /// Every named threshold can be moved from the command line.
@@ -99,11 +99,11 @@ public sealed class AnalysisPolicyTests
     public void A_policy_flag_actually_moves_the_policy()
     {
         // Otherwise the table above could be complete and inert.
-        var invocation = CommandLine.Parse(["TestBed.sln", "--min-cohort", "9", "--outlier-factor", "2.5"]);
+        var invocation = CommandLine.Parse(["TestBed.sln", "--min-cohort", "9", "--concealed-dispersion-factor", "2.5"]);
 
         Assert.NotNull(invocation.Options);
         Assert.Equal(9, invocation.Options.Policy.MinCohort);
-        Assert.Equal(2.5, invocation.Options.Policy.OutlierFactor);
+        Assert.Equal(2.5, invocation.Options.Policy.ConcealedDispersionFactor);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public sealed class AnalysisPolicyTests
         var policy = AnalysisPolicy.Default;
 
         Assert.Equal(5, policy.MinCohort);
-        Assert.Equal(3.0, policy.OutlierFactor);
+        Assert.Equal(3.0, policy.ConcealedDispersionFactor);
         Assert.Equal(5, policy.MinFanIn);
         Assert.Equal(0.2, policy.StableThreshold);
         Assert.Equal(10, policy.HighCc);          // McCabe's conventional "worth a look"
@@ -234,7 +234,8 @@ public sealed class AnalysisPolicyTests
         AnalysisPolicy.Default with { RollCallDivisor = 0 },
         AnalysisPolicy.Default with { MaxNamedSurfaces = 0 },
         AnalysisPolicy.Default with { MinCohort = 1 },
-        AnalysisPolicy.Default with { OutlierFactor = double.NaN },
+        AnalysisPolicy.Default with { ConcealedDispersionFactor = double.NaN },
+        AnalysisPolicy.Default with { ConcealedTopShare = 1.5 },
         AnalysisPolicy.Default with { StableThreshold = double.PositiveInfinity },
     ];
 
@@ -244,7 +245,7 @@ public sealed class AnalysisPolicyTests
         // Validation guards the arithmetic, not the judgement. A very high complexity bar or a
         // very large cohort floor is a choice someone may want; refusing it would be the tool
         // overriding a decision it has no standing to make.
-        var severe = AnalysisPolicy.Default with { HighCc = 500, MinCohort = 200, OutlierFactor = 50 };
+        var severe = AnalysisPolicy.Default with { HighCc = 500, MinCohort = 200, ConcealedDispersionFactor = 50 };
 
         severe.Validate();
     }

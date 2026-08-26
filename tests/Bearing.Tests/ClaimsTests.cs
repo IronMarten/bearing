@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -54,7 +54,8 @@ public sealed class ClaimsTests(CoreWalkFixture core)
         var finding = new Finding(
             new FindingKey(kind, subject.Subject),
             [
-                Receipt.Gated(ratio, double.PositiveInfinity, nameof(AnalysisPolicy.OutlierFactor)),
+                // Evidence rather than a gate since X16, which is how the detectors emit it now.
+                Receipt.Of(ratio, double.PositiveInfinity),
                 Receipt.Of("MedianCohortCyclomatic", 0),
                 Receipt.Gated("CohortSize", 6, nameof(AnalysisPolicy.MinCohort)),
             ],

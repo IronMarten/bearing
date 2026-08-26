@@ -81,7 +81,7 @@ public static class ConcealedDecision
                 // X16, 2026-08-25: the ratio is no longer the other half of a conjunction, it is
                 // evidence. Measured on three solutions, dropping it moves the shipped output
                 // +5%, +6% and +11% — it was the least load-bearing of the three gates — and at
-                // a zero median `TimesMedian >= OutlierFactor` is satisfied by definition, which
+                // a zero median `TimesMedian >= 3` was satisfied by definition, which
                 // is docs/DEFECTS.md §61 and dies here rather than by substituting a constant for
                 // the infinity. What it widened is cohorts of 5–24, where a fixed top-3 is a
                 // large share of the cohort, and that is what the share below takes back.

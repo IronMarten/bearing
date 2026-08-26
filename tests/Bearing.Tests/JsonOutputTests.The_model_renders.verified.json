@@ -9,7 +9,6 @@
   "policy": {
     "minCohort": 5,
     "cohortBasisFloor": 5,
-    "outlierFactor": 3,
     "minFanIn": 5,
     "top": 15,
     "highCc": 10,

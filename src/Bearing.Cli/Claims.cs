@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing.Cli;
+﻿namespace IronMarten.Bearing.Cli;
 
 /// <summary>
 /// One finding, worded — the subject, the claim it makes, and the numbers behind it.
@@ -263,7 +263,7 @@ public static class Claims
             : "connectivity is unremarkable for its peers, but it is ";
 
         // The number that ranked the row leads the sentence. This section is ordered on the
-        // multiple of the peer median — the quantity `OutlierFactor` gated — and it used to open on
+        // multiple of the peer median — the quantity that used to gate, before X16 — and it opened on
         // the percentile, so nopCommerce printed "top 2%" above two rows reading "top 1%" and the
         // section read as unsorted. An order the reader cannot see is not an order that helps them.
         var basis = double.IsInfinity(times)

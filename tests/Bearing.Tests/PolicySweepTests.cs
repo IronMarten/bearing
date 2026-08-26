@@ -81,7 +81,6 @@ public sealed class PolicySweepTests(CoreWalkFixture core)
         [nameof(AnalysisPolicy.GlobalComplexityPercentile)] = 1,
 
         // Multiples and ratios.
-        [nameof(AnalysisPolicy.OutlierFactor)] = 0.1,
         [nameof(AnalysisPolicy.StableThreshold)] = 0.1,
         [nameof(AnalysisPolicy.IsolatedThreshold)] = 0.1,
         [nameof(AnalysisPolicy.ConcealedFanInCeiling)] = 0.1,
@@ -183,7 +182,6 @@ public sealed class PolicySweepTests(CoreWalkFixture core)
     {
         nameof(AnalysisPolicy.MinCohort) => policy with { MinCohort = (int)v },
         nameof(AnalysisPolicy.CohortBasisFloor) => policy with { CohortBasisFloor = (int)v },
-        nameof(AnalysisPolicy.OutlierFactor) => policy with { OutlierFactor = v },
         nameof(AnalysisPolicy.MinFanIn) => policy with { MinFanIn = (int)v },
         nameof(AnalysisPolicy.Top) => policy with { Top = (int)v },
         nameof(AnalysisPolicy.HighCc) => policy with { HighCc = (int)v },
