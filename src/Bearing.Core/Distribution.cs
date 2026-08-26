@@ -33,8 +33,8 @@ public readonly record struct Reading
     /// <b>The same statistic as <see cref="Percentile"/>, expressed from the other end</b> —
     /// <c>rank = count·(100 − percentile)/100 + 0.5</c> exactly, for every tie configuration.
     /// It exists because a threshold on it can be made reachable and a threshold on the
-    /// percentile cannot: see <see cref="Distribution.TopRankLimit"/> and
-    /// <c>docs/DEFECTS.md</c> §14.
+    /// percentile cannot: see <see cref="Distribution.TopRankLimit"/>, which is
+    /// satisfiable at every group size.
     /// <para>
     /// Fractional ranks are the tie behaviour, not a rounding artefact, and they are what stops
     /// a rank gate degenerating into a roll-call. Forty types tied at the cohort maximum sit at
@@ -227,7 +227,7 @@ public sealed class Distribution
     /// <para>
     /// The consequence is worth knowing before gating on this: a unique maximum tops out at
     /// <c>(n-0.5)/n·100</c>, so a threshold of 95 is unsatisfiable for any group smaller than
-    /// ten. See <c>docs/DEFECTS.md</c> §14 — a percentile floor can be unreachable by
+    /// ten: a percentile floor can be unreachable by
     /// arithmetic rather than by tuning. <b>Gate on <see cref="TopRankLimit"/> instead</b>, which
     /// says the same thing in a form where the floor is visible and can be raised to 1.
     /// </para>

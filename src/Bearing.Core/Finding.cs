@@ -72,7 +72,7 @@ public readonly record struct Qualifier(string Name, bool Holds, string? Gate = 
 /// <b>It consolidates three types rather than adding a fourth.</b> <c>HeldPair</c>,
 /// <c>ProjectLink</c> and <c>TanglePair</c> were each written for one cycle kind and each invented
 /// this shape again — two of them keying their members on bare strings, which is
-/// <c>docs/DEFECTS.md</c> §13 and §39's mistake in a third place. Measured before being proposed:
+/// the bare-string mistake in a third place. Measured before being proposed:
 /// every kind that needed a weighted pair was a cycle kind, and all three needed it.
 /// </para>
 /// <para>
@@ -168,7 +168,7 @@ public static class Qualifiers
     /// re-routing it.
     /// </summary>
     /// <remarks>
-    /// One arm of §3.8's disjunction, and half of <c>docs/DEFECTS.md</c> §16's repair. The probe
+    /// One arm of §3.8's disjunction, and half of the god-object repair. The probe
     /// prints <i>"AND carries real logic"</i> for either arm, which is false by construction on
     /// the other one — a type reaches the size arm precisely by having bulk and no logic.
     /// </remarks>
@@ -195,7 +195,7 @@ public static class Qualifiers
     /// examples list, which is the proof that the finding is not withdrawn — what it loses is the
     /// per-kind breakdown, and §3.1 says that breakdown is the finding. See
     /// <see cref="SpansArchitecturalLayers"/> for what makes two subjects the same instance, which
-    /// is <c>docs/DEFECTS.md</c> §11.
+    /// is the collapse that used to hide the anomaly it shares a signature with.
     /// </remarks>
     public const string PartOfALayeringPattern = "part-of-a-layering-pattern";
 

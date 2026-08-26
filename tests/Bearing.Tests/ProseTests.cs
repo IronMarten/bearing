@@ -4,13 +4,13 @@ using IronMarten.Bearing.Cli;
 namespace Bearing.Tests;
 
 /// <summary>
-/// The report's English, checked as a property rather than by reading — <c>docs/DEFECTS.md</c> §55.
+/// The report's English, checked as a property rather than by reading.
 /// </summary>
 /// <remarks>
 /// <para>
 /// <b>Why this is a property and not five fixes.</b> A sentence disagreeing with its own number has
-/// now been found five times: §32 was three of them at once, and §55 is two more. Every previous
-/// fix was applied to the site somebody happened to be looking at, and §32 recorded the prediction
+/// now been found five times: one was three of them at once, and the count-verb defect is two more. Every previous
+/// fix was applied to the site somebody happened to be looking at, and the entry recorded the prediction
 /// out loud — <i>"the next such number is a defect waiting on the right input"</i>. It was right,
 /// and the input was Umbraco.
 /// </para>
@@ -84,7 +84,7 @@ public sealed class ProseTests(CoreWalkFixture core)
     /// <para>
     /// The controls matter more than the catches: these rules are patterns over English, and one
     /// that flags correct prose gets weakened until it finds nothing. <c>1 type calls into it</c>
-    /// and <c>only 1 type depends on it</c> are §32's own fixes, still correct on Umbraco.
+    /// and <c>only 1 type depends on it</c> are its own fixes, still correct on Umbraco.
     /// </para>
     /// <para>
     /// <b>The mirror rule's controls were not guessed — they are what it flagged.</b> Its first

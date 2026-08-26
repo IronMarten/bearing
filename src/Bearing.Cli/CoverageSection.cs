@@ -73,7 +73,7 @@ internal static class CoverageSection
     /// The sentence that used to be wrong.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §17.</b> The probe states that these types "are absent from the
+    /// The probe states that these types "are absent from the
     /// nominations above", and three of them are not: the cohort-free findings do not consult a
     /// cohort, so a peerless type is eligible for every one of them. No nomination was wrong —
     /// the sentence describing them was, and it was wrong in the direction that tells a reader to

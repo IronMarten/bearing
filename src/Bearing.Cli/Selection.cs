@@ -63,7 +63,7 @@ public static class Selection
                 // fired: Claims.CompetesForLead carries why the cycle kinds render in their own
                 // section instead. The filter is here rather than in the four callers for the
                 // reason Subjects gives in full -- one derivation, because two of them disagree
-                // silently, and docs/DEFECTS.md §41 is what that costs.
+                // silently, and a disclosure counted as a finding is what that costs.
                 .Where(f => Claims.CompetesForLead(f.Kind))
                 .GroupBy(f => f.Kind)
                 .OrderBy(g => g.Count())

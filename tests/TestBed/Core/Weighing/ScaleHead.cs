@@ -10,7 +10,7 @@ using TestBed.Core.Tariffs;
 /// <b>Why this exists.</b> Every namespace cycle in the fixture was a <c>FolderLayout</c>
 /// — <c>TestBed.Core</c> and its own subfolders — so <c>ShapedCycle.IsReportable</c> was false for
 /// all of them and the reportable branch was unreachable. That left both renderers' cycle output
-/// ungated, which is how <c>docs/DEFECTS.md</c> §46 shipped: the HTML dropped the held-pair
+/// ungated, which is how the renderer drift shipped: the HTML dropped the held-pair
 /// evidence and the suite stayed green, because nothing here could produce a cycle to render.
 /// </para>
 /// <para>

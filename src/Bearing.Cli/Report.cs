@@ -145,7 +145,7 @@ public static class Report
             yield return line;
 
         // Suppressed as a set when it stops discriminating, so an empty list here is a decision
-        // rather than an absence of candidates — docs/DEFECTS.md §12. Saying nothing at all is
+        // rather than an absence of candidates. Saying nothing at all is
         // what the rule asks for; the section simply does not appear.
         var surfaces = findings.OfKind(FindingKind.WidestContractSurface);
         if (surfaces.Count == 0) yield break;

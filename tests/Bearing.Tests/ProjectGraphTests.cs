@@ -264,7 +264,7 @@ public sealed class ProjectGraphTests
     /// A dependency another path already carries is not in the reduction, and is counted.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §53.</b> <c>A</c> depends on <c>B</c>, <c>B</c> on <c>C</c>, and
+    /// <c>A</c> depends on <c>B</c>, <c>B</c> on <c>C</c>, and
     /// <c>A</c> on <c>C</c> directly. All three dependencies are real; the drawing only has to
     /// carry two, because the third is what a reader traces through the first two. This is the
     /// shape the whole defect is: on the real solutions the skipping edge was drawn, was cut in
@@ -324,7 +324,7 @@ public sealed class ProjectGraphTests
     /// A layer wider than one row becomes several, and every row after the first says so.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §45</b>, and the reason
+    /// <b>The wrapped layer</b>, and the reason
     /// <see cref="IronMarten.Bearing.Cli.ArchitectureDiagram.Rows"/> takes a graph: Jellyfin's
     /// widest layer holds eleven boxes and the fixture holds three projects in a chain, so the
     /// case cannot be reached from a walk. Six siblings over one foundation is the smallest graph
@@ -387,7 +387,7 @@ public sealed class ProjectGraphTests
     }
 
     /// <summary>An edge to an unanalysed type contributes no dependency.</summary>
-    /// <remarks><c>docs/DEFECTS.md</c> §7, and §1 is what guessing a project would repeat.</remarks>
+    /// <remarks>Guessing a project from a name is what this would repeat.</remarks>
     [Fact]
     public void An_edge_to_an_unanalysed_type_is_dropped()
     {

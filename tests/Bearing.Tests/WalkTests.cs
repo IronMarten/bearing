@@ -19,7 +19,7 @@ namespace Bearing.Tests;
 /// <b>Identity is the one place Core was allowed to differ, and TestBed still plants the case.</b>
 /// Core keys a type by <c>(assembly, fully-qualified name)</c>; the probe keyed on the name alone,
 /// so where a solution declared one FQN in two assemblies it merged the rows and summed their
-/// metrics. That is <c>docs/DEFECTS.md</c> §1. The fix outlives its witness: the two declarations
+/// metrics. That is name-only identity. The fix outlives its witness: the two declarations
 /// are two rows in <c>StructureTests.Fixture_shape_is_stable</c>, and the dependency the merge
 /// used to fabricate is <c>ProjectCycleTests</c>.
 /// </para>
@@ -42,7 +42,7 @@ public sealed class WalkTests(CoreWalkFixture core)
     [Fact]
     public void Member_identity_distinguishes_what_the_probes_did_not()
     {
-        // docs/DEFECTS.md §13: the probe's member id is the bare method name, so every Apply in
+        // The probe's member id is the bare method name, so every Apply in
         // the solution shares one. Core qualifies by declaring type and parameters.
         var applies = core.Model.Types
             .SelectMany(t => t.Members)

@@ -60,7 +60,7 @@ public static class BlastRadius
 
                 // "Top of its peer group", as a rank rather than a percentile. Identical to the
                 // probe's FanInPctl >= 95 in every cohort of ten or more, and reachable below
-                // ten where that gate was not. docs/DEFECTS.md §14.
+                // ten where that gate was not.
                 if (inbound.Rank > topRank) continue;
 
                 if (cc.Percentile < policy.BlastComplexityPercentile) continue;

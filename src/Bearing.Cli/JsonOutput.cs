@@ -51,11 +51,11 @@ public static class JsonOutput
     /// ids from a 1.x file cannot join them against a 2.0 one: the same member has a different id,
     /// and nothing in the file says so. That is the definition of a major, and it is the reason the
     /// minor would have been the wrong call — a field being added is ignorable, a key changing
-    /// value is not. <c>docs/DEFECTS.md</c> §39 is what the old ids were doing.
+    /// value is not, and the old member ids were changing.
     /// </para>
     /// <para>
     /// The readable form did not disappear with it: <c>signature</c> is new in 2.0 and carries what
-    /// <c>id</c> used to look like. It is not a key and §39 says which members share one.
+    /// <c>id</c> used to look like. It is not a key, and members can share one.
     /// </para>
     /// </remarks>
     public const string SchemaVersion = "2.1";
@@ -346,7 +346,7 @@ public static class JsonOutput
         IReadOnlyList<string> ProjectsNotLoaded,
         int ExcludedTypes,
         int EdgesToUnanalysedTypes,
-        // docs/DEFECTS.md §42. Additive, so SchemaVersion does not move: the rule above is about
+        // Additive, so SchemaVersion does not move: the rule above is about
         // renames. Empty on healthy code, which is every run on both reference solutions.
         IReadOnlyList<string> UnreadableFiles);
 
@@ -567,7 +567,7 @@ public static class JsonOutput
     /// <remarks>
     /// <para>
     /// <b>A ratio against a zero median is undefined, not infinite, and this is the third place
-    /// that has had to say so.</b> <c>docs/DEFECTS.md</c> §28 was the report printing <c>∞</c> as a
+    /// that has had to say so.</b> The report used to print <c>∞</c> as a
     /// measured value; <c>CohortStatistics.TimesMedian</c> answers <see langword="null"/> for the
     /// same reason and states it — <i>infinity sorts to the top of a column as though it were the
     /// largest measurement rather than the missing one</i>. <see cref="Receipt.Value"/> is a bare

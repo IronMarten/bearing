@@ -191,7 +191,7 @@ public static class CircularReferences
     /// <b>Wider than what the section prints, and that is the point of carrying it here.</b> The
     /// renderers name only the heaviest pair (<see cref="CycleEvidence.HeaviestPair"/>), which is a
     /// display choice; the finding carries the evidence the choice was made from, so a second
-    /// renderer cannot arrive at a different one. That is <c>docs/DEFECTS.md</c> §46's mechanism
+    /// renderer cannot arrive at a different one. That is the renderer-drift mechanism
     /// removed rather than repaired.
     /// </remarks>
     private static IReadOnlyList<Relation> Holding(ShapedTangle shaped, IReadOnlyList<Edge> edges)

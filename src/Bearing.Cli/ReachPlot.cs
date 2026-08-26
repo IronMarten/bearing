@@ -59,7 +59,7 @@ public readonly record struct PlotPoint(
 /// <b>Labels are placed deterministically and the ones that do not fit are disclosed.</b> An
 /// SVG renderer cannot measure text, so widths are estimated and each label takes the first of four
 /// offsets that collides with nothing already placed. A label that fits nowhere is dropped and
-/// named beside the picture instead — <c>docs/DEFECTS.md</c> §31's rule, that a reader scanning a
+/// named beside the picture instead — the rule that a reader scanning a
 /// picture for a name reads its absence as an omission rather than as a shortage of pixels.
 /// </para>
 /// </remarks>
@@ -71,7 +71,7 @@ public static class ReachPlot
     /// The canvas, and <see cref="Bottom"/> the gutter under the plotting area.
     /// </summary>
     /// <remarks>
-    /// <b>Both grew by 36 together, and that is deliberate</b> — <c>docs/DEFECTS.md</c> §44 added
+    /// <b>Both grew by 36 together, and that is deliberate</b> — the fixed-scale fix added
     /// two lines of scale disclosure below the x-axis title, and moving the canvas floor and the
     /// gutter by the same amount leaves <c>Height - Bottom</c> and <c>Height - Top - Bottom</c>
     /// exactly where they were. Every dot, tick and label on every run therefore sits at the
@@ -92,7 +92,7 @@ public static class ReachPlot
 
     /// <summary>Where the y-axis title sits in the left gutter, rotated up its own axis.</summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §36. The gutter is <see cref="Left"/> wide; the tick labels are
+    /// The gutter is <see cref="Left"/> wide; the tick labels are
     /// anchored at <c>Left - 10</c> and the widest is three characters, so nothing else claims the
     /// space to the left of about x = 68.
     /// </remarks>
@@ -168,7 +168,7 @@ public static class ReachPlot
 
         svg.Append(CultureInfo.InvariantCulture,
             $"<text class=\"ax\" x=\"{Left}\" y=\"{Height - 54}\">how much of the rest of the codebase reaches into it →</text>\n");
-        // The y-axis title runs up its own axis — docs/DEFECTS.md §36. Laid out horizontally
+        // The y-axis title runs up its own axis. Laid out horizontally
         // at x = Left - 78 it began at x = 18 and ran about 215px, straight through the subtitle
         // at x = 96, four pixels of baseline apart: fixed geometry, so it collided on every run
         // whatever the data. Rotating it removes the collision by construction rather than by
@@ -267,7 +267,7 @@ public static class ReachPlot
     /// The projects on the picture whose label would not fit anywhere, largest first.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §31, and the same remedy <see cref="Mosaic.Unlabelled"/> uses: the
+    /// The same remedy <see cref="Mosaic.Unlabelled"/> uses: the
     /// layout is recomputed rather than cached, so a caption and the drawing it explains cannot
     /// disagree about which dots got a name.
     /// </remarks>
@@ -348,7 +348,7 @@ public static class ReachPlot
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §44. <b>All three channels used to be normalised to the run being
+    /// <b>All three channels used to be normalised to the run being
     /// drawn</b> — both axes to the next ten above the largest value, dot area to the largest
     /// project — so the same project measured twice could improve and not move.
     /// <c>Nop.Web.Framework</c> went from 43.0% reach to 33.7% across two nopCommerce vintages and
@@ -384,7 +384,7 @@ public static class ReachPlot
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Fixed, because <c>docs/DEFECTS.md</c> §44 is that it was not.</b> Both axes used to run
+    /// <b>Fixed, because it used not to be.</b> Both axes used to run
     /// to the next ten above the largest value in the run, so the same project at the same share
     /// drew in a different place in two reports. Measured on the pair that found the defect —
     /// <c>Nop.Web.Framework</c> at 2024-08-27 and 2026-08-21 — a reach falling 43.0% to 33.7%
@@ -397,10 +397,10 @@ public static class ReachPlot
     /// the price of comparability: the closest labelled pair goes from 14.5% of the canvas to 6.9%.
     /// </para>
     /// <para>
-    /// <b>It also removes §44's second face without a threshold.</b> Jellyfin's y-axis was set
+    /// <b>It also removes the run-relative scale's second face without a threshold.</b> Jellyfin's y-axis was set
     /// entirely by <c>Emby.Photos</c> — one type, one of them named, 100% — and the axis of the
     /// whole picture was a function of its least informative point. A fixed domain leaves it in the
-    /// top corner where it belongs and costs the other projects nothing. That is §34's family
+    /// top corner where it belongs and costs the other projects nothing. That is the peer-group family
     /// answered by construction rather than by the floor on the denominator X16 exists to refuse.
     /// </para>
     /// </remarks>

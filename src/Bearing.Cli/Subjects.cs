@@ -19,10 +19,10 @@ namespace IronMarten.Bearing.Cli;
 /// <see cref="Named"/> had to say what it counts rather than rely on a subject failing to resolve.
 /// </para>
 /// <para>
-/// <b>Public for the reason <see cref="Sentences"/> is public, and §57 is the reason it changed.</b>
+/// <b>Public for the reason <see cref="Sentences"/> is public, and a name collision is why it changed.</b>
 /// The property that no two subjects share a rendered identity is about what
 /// <see cref="Where"/> produces, so it cannot be asserted without calling it — and the case it
-/// guards is unreachable from the fixture, which is how §57 survived §1 being fixed in the model.
+/// guards is unreachable from the fixture, which is how it survived identity being fixed in the model.
 /// <c>Bearing.Cli</c> packs as a tool and not as a library, so nothing about its surface is a
 /// contract.
 /// </para>

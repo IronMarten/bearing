@@ -33,7 +33,7 @@ namespace Bearing.Tests;
 /// <c>edges.csv</c>, <c>members.csv</c> and the terminal report were already stable. The JSON
 /// export was not — its <c>projects</c> array came out in declaration order, because
 /// <c>SolutionModel.Projects</c> was the one collection <c>ModelBuilder</c> did not sort. That is
-/// <c>docs/DEFECTS.md</c> §37, fixed in the commit that brought this file across.
+/// Fixed in the commit that brought this file across.
 /// </para>
 /// <para>
 /// The control is unchanged: remove an <c>OrderBy</c> that a renderer or the builder relies on

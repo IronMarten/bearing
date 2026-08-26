@@ -3,7 +3,7 @@ using IronMarten.Bearing;
 namespace Bearing.Tests;
 
 /// <summary>
-/// A member's identity — decision X14, and <c>docs/DEFECTS.md</c> §39 is what it replaces.
+/// A member's identity — decision X14, and a display string is what it replaces.
 /// </summary>
 /// <remarks>
 /// <para>

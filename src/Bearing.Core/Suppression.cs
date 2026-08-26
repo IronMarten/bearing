@@ -101,7 +101,7 @@ public static class Suppression
             "normalizer that picks the wrong option propagates into the data going out the " +
             "door, not through the call graph")
         {
-            // At type level or on any of its methods, which is the whole of docs/DEFECTS.md §15.
+            // At type level or on any of its methods, which is the whole of the rule.
             // The reason the rule exists is behavioural and behaviour lives in methods, so the
             // level that happened to nominate it does not change whether the decision is there.
             // ContainsAbout is the query SubjectRef's member -> declaring type walk was built for.
@@ -130,7 +130,7 @@ public static class Suppression
         {
             // The first row that suppresses a SET rather than a subject: every member goes or
             // none does, because what is wrong is the size of the set and not anything about the
-            // type. docs/DEFECTS.md §12.
+            // type.
             //
             // An absolute count, and that is the whole repair. The probe asks whether the
             // qualifying set exceeds half the boundaries, and the qualifying filter is already

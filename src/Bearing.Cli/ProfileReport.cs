@@ -27,7 +27,7 @@ public sealed record ProfileStage(string Name, TimeSpan Duration, string Detail 
 /// </para>
 /// <para>
 /// <b>Printed to stderr, like every other note about the run.</b> The report is what a user pipes;
-/// a profile arriving in the middle of it would be a defect of the same family as §25.
+/// a profile arriving in the middle of it would be a defect of the same family as a transcoded report.
 /// </para>
 /// <para>
 /// <b>The table is meant to be read by a person and parsed by <c>tools/measure.py</c>.</b> That is

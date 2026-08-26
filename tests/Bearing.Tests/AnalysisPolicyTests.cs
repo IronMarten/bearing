@@ -26,7 +26,7 @@ public sealed class AnalysisPolicyTests
         "ConcealedFanOutCeiling",
         "BlastFanInMultiple",
         // Named as BlastFanInPercentile when the thirteen were catalogued; renamed when
-        // docs/DEFECTS.md §14 was decided, because the gate it names is no longer a percentile.
+        // the percentile floor was replaced, because the gate it names is no longer a percentile.
         // The literal it replaced is still one of the thirteen.
         "BlastTopFraction",
         "BoundaryTopFraction",
@@ -35,7 +35,7 @@ public sealed class AnalysisPolicyTests
         "BreaksAloneMinFanIn",
         "RollCallDivisor",
         "SurfaceOutlierMultiple",
-        // Renamed when docs/DEFECTS.md §12 was decided: the gate it named was a proportion,
+        // Renamed when the unreachable suppression was fixed: the gate it named was a proportion,
         // and a proportion cannot sit on a filter proportional to the same distribution. The
         // literal it replaced is still one of the thirteen.
         "MaxNamedSurfaces",
@@ -156,7 +156,7 @@ public sealed class AnalysisPolicyTests
         Assert.Equal(2.0, p.ConcealedFanInCeiling);              // FanInXMedian <= 2.0
         Assert.Equal(2.0, p.ConcealedFanOutCeiling);             // FanOutXMedian <= 2.0
         Assert.Equal(2.0, p.BlastFanInMultiple);                 // FanInXMedian >= 2.0
-        Assert.Equal(0.05, p.BlastTopFraction);                  // was FanInPctl >= 95; §14
+        Assert.Equal(0.05, p.BlastTopFraction);                  // was FanInPctl >= 95
         Assert.Equal(70, p.BlastComplexityPercentile);           // CyclomaticPctl >= 70
         Assert.Equal(0.8, p.IsolatedThreshold);                  // Instability >= 0.8
         Assert.Equal(1, p.BreaksAloneMinFanIn);                  // FanIn >= 1

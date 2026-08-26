@@ -4,7 +4,7 @@ using IronMarten.Bearing.Cli;
 namespace Bearing.Tests;
 
 /// <summary>
-/// The three CSV files — shipped at A5, and where <c>docs/DEFECTS.md</c> §13 stops being the
+/// The three CSV files — shipped at A5, and where the bare-name member id stops being the
 /// probe's problem.
 /// </summary>
 /// <remarks>
@@ -146,7 +146,7 @@ public sealed class CsvOutputTests(CoreWalkFixture core)
     // ----------------------------------------------------------------------- D13 ----
 
     /// <summary>
-    /// The member <c>Id</c> column is unique — which is the whole of <c>docs/DEFECTS.md</c> §13.
+    /// The member <c>Id</c> column is unique — which is the whole point of having one.
     /// </summary>
     /// <remarks>
     /// <para>

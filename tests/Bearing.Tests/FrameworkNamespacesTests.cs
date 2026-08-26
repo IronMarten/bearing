@@ -8,7 +8,7 @@ namespace Bearing.Tests;
 /// <remarks>
 /// <para>
 /// <b>This file is <c>TASKS.md</c> P10, and it exists because the fixture cannot do this job.</b>
-/// <c>docs/DEFECTS.md</c> §5 added <c>LinqToDB</c> and <c>FluentMigrator</c> to the data-access
+/// A measured fix added <c>LinqToDB</c> and <c>FluentMigrator</c> to the data-access
 /// list on the evidence of two real-solution runs — 134 reclassifications on nopCommerce, 0 on
 /// jellyfin — and TestBed references neither library. It cannot, without taking a NuGet dependency
 /// for the sake of a classification rule. So the suite was byte-identical with the list and

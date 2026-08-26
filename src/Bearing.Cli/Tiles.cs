@@ -227,12 +227,12 @@ public static class Tiles
     /// <c>TypeNode.MostComplexMember</c> is where the model already holds it.
     /// </para>
     /// <para>
-    /// <b>And it says where the member is — <c>docs/DEFECTS.md</c> §52.</b> Every other rendering
+    /// <b>And it says where the member is.</b> Every other rendering
     /// of a subject on the page carries <c>project · file:line</c>; this one rendered the name and
     /// dropped the rest of the identity. <b>A11 round 2's participants placed it by guessing</b> —
     /// <i>"almost assuredly in either Nop.Services or Nop.Core"</i> — and then scrolled to another
     /// finding to confirm. The tile row is the first screen and the confirmation was several
-    /// screens down, which is <c>X14</c>'s identity work stopping one element short: §39 made a
+    /// screens down, which is <c>X14</c>'s identity work stopping one element short: it made a
     /// member subject an identity rather than a display string <i>precisely</i> so a member could
     /// be located.
     /// </para>
@@ -249,7 +249,7 @@ public static class Tiles
 
         var named = Sentences.Member(worst.Name, member.Name);
 
-        // docs/DEFECTS.md §52. The member's own location, not its declaring type's -- the same rule
+        // The member's own location, not its declaring type's -- the same rule
         // Subjects.Where follows and for the same reason: a type line sends a reader to the top of
         // a 3,000-line file to hunt for a method 800 lines down. The line number is unformatted
         // because it is an address somebody retypes.
@@ -279,7 +279,7 @@ public static class Tiles
     /// </para>
     /// <para>
     /// <b>A receipt this does not have words for is skipped rather than printed.</b> Four names is a
-    /// vocabulary; the sixty-five in <c>docs/DEFECTS.md</c> §27 are why one is not allowed to grow
+    /// vocabulary; the sixty-five internal identifiers once published are why one may not grow
     /// silently, and an unrecognised receipt reaching a reader is that defect starting again.
     /// </para>
     /// </remarks>

@@ -6,8 +6,8 @@ namespace IronMarten.Bearing;
 /// <remarks>
 /// <para>
 /// <b>Extracted so it can be asserted.</b> These were three <c>params string[]</c> literals inline
-/// in <c>ModelBuilder.Classify</c>, and nothing in the suite could see them: <c>docs/DEFECTS.md</c>
-/// §5 added <c>LinqToDB</c> and <c>FluentMigrator</c> on the evidence of two real-solution runs —
+/// in <c>ModelBuilder.Classify</c>, and nothing in the suite could see them. A later fix
+/// added <c>LinqToDB</c> and <c>FluentMigrator</c> on the evidence of two real-solution runs —
 /// 134 reclassifications on nopCommerce — and the fixture references neither, so the list could be
 /// trimmed back to what it was with every test green. That is <c>TASKS.md</c> P10, and the entry
 /// itself said making the list assertable was likely to beat planting a type that needs a package
@@ -36,7 +36,7 @@ public static class FrameworkNamespaces
 
     /// <summary>Reaches a database or persistence framework.</summary>
     /// <remarks>
-    /// <c>LinqToDB</c> and <c>FluentMigrator</c> are <c>docs/DEFECTS.md</c> §5. Removing either
+    /// <c>LinqToDB</c> and <c>FluentMigrator</c> were added on measurement. Removing either
     /// fails <c>FrameworkNamespacesTests</c>, which is the whole point of this type existing.
     /// </remarks>
     public static IReadOnlyList<string> DataAccess { get; } =

@@ -123,14 +123,14 @@ public sealed record AnalysisPolicy
     /// <para>
     /// <b>What it fixes is the other end, which the fixed rank alone gets wrong.</b> A top-3 of a
     /// cohort of five is 60% of that cohort and a top-3 of five hundred is 0.6% — one constant
-    /// meaning two different things, which is <c>docs/DEFECTS.md</c> §10's complaint. At this
+    /// meaning two different things, which is the whole complaint. At this
     /// value a cohort of five admits one and a cohort of twenty-five or more admits three.
     /// </para>
     /// <para>
     /// <b>It is not here because the thin end was dangerous, and that is worth recording because
     /// it is the obvious reason to assume.</b> Below-floor cohorts hold 0.6%, 1.4% and 0.6% of
     /// the gated population on the three solutions, so letting them nominate unguarded adds 12,
-    /// 11 and 53 findings. §10's pattern: a real inconsistency with almost no field incidence.
+    /// 11 and 53 findings. A familiar pattern: a real inconsistency with almost no field incidence.
     /// The share is taken because selectivity should not depend on cohort size, not because the
     /// output was wrong without it. <c>ARCHITECTURE.md</c> §11.
     /// </para>
@@ -147,7 +147,7 @@ public sealed record AnalysisPolicy
     /// stopped gating it was a policy value nothing read. It asked a question a multiple of the
     /// median cannot answer.</b> A ratio asks <i>how many times its peers is it</i>, and on a cohort
     /// whose median is 1 that evaluates to the value — <c>3x median</c> becomes <c>cc &gt;= 3</c>,
-    /// which is <c>docs/DEFECTS.md</c> §2. It also fails in the other direction, and that is the
+    /// which is an absolute gate that does not travel. It also fails in the other direction, and
     /// half this was built for: a method at <c>cc</c> 12 in a cohort whose median is 10.5 is the
     /// top of its group and is not remarkable, and <b>rank alone cannot tell the two apart because
     /// rank is ordinal</b>. <c>TestBed</c>'s planted evaluators are exactly that case — three of
@@ -272,7 +272,7 @@ public sealed record AnalysisPolicy
     /// <para>
     /// Replaces the probe's <c>FanInPctl &gt;= 95</c>, which was <b>unsatisfiable in any cohort
     /// smaller than ten</b> while <see cref="MinCohort"/> admitted five — a gate unreachable by
-    /// arithmetic rather than by tuning. <c>docs/DEFECTS.md</c> §14.
+    /// arithmetic rather than by tuning.
     /// </para>
     /// <para>
     /// <b>It stays a fraction rather than becoming a count</b>, and that is the part worth
@@ -363,7 +363,7 @@ public sealed record AnalysisPolicy
     /// <remarks>
     /// <para>
     /// <b>An absolute count, replacing the proportional ceiling, and that is
-    /// <c>docs/DEFECTS.md</c> §12's whole point.</b> The probe suppresses when the qualifying set
+    /// the whole point.</b> The probe suppresses when the qualifying set
     /// exceeds half the boundaries, and the qualifying filter is
     /// <see cref="SurfaceOutlierMultiple"/> against the median of the same distribution — so the
     /// set is already bounded by the share the ceiling tests for. It lands on the threshold at

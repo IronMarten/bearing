@@ -59,7 +59,7 @@ public sealed class StructureTests(CoreWalkFixture core)
         // 179 rows, and the last two of them are the point. TestBed declares two fully-qualified
         // names in two assemblies each — TestBed.Shared.PayloadTag and CarrierTwin — and Core
         // keys type identity on (assembly, FQN), so each is two rows. The probe keyed on the name
-        // alone and reported 177; that was docs/DEFECTS.md §1, the one behaviour the extraction
+        // alone and reported 177; that was the defect, the one behaviour the extraction
         // was permitted to change, and this count is where the change is visible. Retiring the
         // probe did not fix it and did not need to: the fix shipped with Core's walk, and what R2
         // removed was the second opinion, not the behaviour.
@@ -108,7 +108,7 @@ public sealed class StructureTests(CoreWalkFixture core)
         // field, which is CycleShape.Coupling and therefore the first cycle IsReportable has ever
         // returned true for here. Every cycle before it was TestBed.Core over its own subfolders,
         // so the reportable branch was unreachable and both renderers' cycle output was ungated:
-        // that is how docs/DEFECTS.md §46 shipped and stayed green. Nothing that already existed
+        // that is how the renderer drift shipped and stayed green. Nothing that already existed
         // gains fan-in — the four reference only each other — and Head, Window, Scale and Tariff
         // were each checked against the fixture's trailing words before being chosen, so no suffix
         // cohort changes size.

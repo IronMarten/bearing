@@ -130,7 +130,7 @@ public sealed class HighlightsTests(CoreWalkFixture core)
     /// <remarks>
     /// <b>Tier 4, and the count is the point.</b> The enumeration is what A11 round 1 called "a wall
     /// of text"; it still ships, behind a flag, and the default page has to say where it went — a
-    /// page quietly showing nine findings of 1,642 would be <c>docs/DEFECTS.md</c> §3 at the scale
+    /// page quietly showing nine findings of 1,642 would be undisclosed truncation at the scale
     /// of a whole artifact.
     /// </remarks>
     [Fact]

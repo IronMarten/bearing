@@ -192,7 +192,7 @@ public sealed class SuppressionTests(CoreWalkFixture core)
         var policy = core.Model.Policy;
         var detected = Analysis.Detected(core.Model);
 
-        // The old survivor has left, which is §10 being fixed rather than a regression.
+        // The old survivor has left, which is the cohort floor being fixed rather than a regression.
         var depot = core.Model.Types.Single(t => t.Name == "RoutingDepot");
         Assert.Equal(3, depot.CohortSize);
         Assert.True(
@@ -289,8 +289,8 @@ public sealed class SuppressionTests(CoreWalkFixture core)
         Assert.True(pair.MaxMemberCyclomatic >= policy.MinDecisionCc);
         Assert.DoesNotContain(pair.Subject, nominated);
 
-        // Two peers, and it does claim. This is the case §10 was about: the floor used to strip
-        // this nomination and hand the type to breaks alone. §62 is what makes the claim honest at
+        // Two peers, and it does claim. This is the case the floor was about: it used to strip
+        // this nomination and hand the type to breaks alone. The top-share claim is what makes it honest at
         // this size — one of three reads as a third of its group, not as a rarity.
         var thin = core.Model.Types.Single(t => t.Name == "PricingVault");
         Assert.Equal(3, thin.CohortSize);

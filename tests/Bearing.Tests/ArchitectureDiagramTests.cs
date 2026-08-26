@@ -35,7 +35,7 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §53, and the paint order was the whole mechanism.</b> Boxes are
+    /// <b>The paint order was the whole mechanism.</b> Boxes are
     /// opaque. Painted last, they cut any line that passes behind them into two stubs, and two
     /// stubs either side of a box read as a dependency into it and another out of it — so a direct
     /// dependency reads as a chain through a project it never names. It is not a rare case:
@@ -66,7 +66,7 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// Nothing wraps on the fixture, so the drawing spends no ink saying which gaps are real.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §45.</b> The dashed rules exist to tell a layer boundary from a
+    /// The dashed rules exist to tell a layer boundary from a
     /// wrapped one, and where no layer wrapped there is no such distinction to draw — the same
     /// rule <see cref="ArchitectureDiagram.Tinted"/> follows, which is to key what fired rather
     /// than what exists. nopCommerce and Umbraco draw none; Jellyfin draws seven.
@@ -102,7 +102,7 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// <b>Found on Jellyfin, which declares both <c>Emby.Server.Implementations</c> and
     /// <c>Jellyfin.Server.Implementations</c>.</b> Shortening each to its last segment drew two
     /// different projects under one label, in a picture with nothing else on it to tell them
-    /// apart — <c>docs/DEFECTS.md</c> §1's mistake made by a renderer rather than a walker: a
+    /// apart — a walker's mistake made by a renderer instead: a
     /// display name that is not an identity.
     /// </para>
     /// <para>
@@ -187,7 +187,7 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §31, reopened 2026-08-22. The first fix put the names in a legend
+    /// Reopened 2026-08-22. The first fix put the names in a legend
     /// beside the diagram <i>instead of</i> in the boxes, and read A11 round 1's T2 result — the
     /// flat Projects list beating the map at finding tax — as evidence that readers navigate by
     /// list. <b>Both of nopCommerce's tax projects were inside folded boxes whose labels named
@@ -228,7 +228,7 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// A folded box grows downward and never sideways.
     /// </summary>
     /// <remarks>
-    /// The measurement §31's reopening turned on. <see cref="ArchitectureDiagram"/> shortens a
+    /// The measurement the reopening turned on. <see cref="ArchitectureDiagram"/> shortens a
     /// label to twenty characters, so a member line cannot outrun the box it sits in — which is
     /// why naming everyone costs height and no width. nopCommerce went 580 × 642 to 580 × 841.
     /// If a future label rule lets a name run wider, this fails rather than the drawing quietly
@@ -255,11 +255,11 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// Every tint the map can draw has a name and a meaning to key it with.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §48, asserted rather than observed.</b> The defect was an orange
+    /// <b>Asserted rather than observed.</b> The defect was an orange
     /// box with no key; the fix is a caption built from <see cref="ArchitectureDiagram.Tinted"/>,
     /// which reports what was drawn. That caption is only as good as the words behind each zone,
     /// and <b>the <c>useless</c> tint fires on none of nopCommerce, Jellyfin, Umbraco or TestBed</b>
-    /// — §48 filed it as <i>unobserved rather than fine</i>, and it still is. So the property is
+    /// — it was filed as <i>unobserved rather than fine</i>, and it still is. So the property is
     /// stated over the enum instead of over a run: a zone a box can be tinted for that has no name
     /// or no gloss would ship a keyless colour again, and nothing in a golden would say so.
     /// </remarks>

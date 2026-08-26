@@ -8,7 +8,7 @@ namespace IronMarten.Bearing.Cli;
 /// <remarks>
 /// <para>
 /// <b>This exists because reading is the only instrument that has ever found these, and reading
-/// does not converge.</b> <c>docs/DEFECTS.md</c> §55 is the fifth recurrence of one class — a
+/// does not converge.</b> The count-verb defect was the fifth recurrence of one class — a
 /// sentence disagreeing with the number in it — and each of the previous four was fixed at the
 /// site that happened to be read. Two of the five were sitting on the nopCommerce report through
 /// both A11 rounds, in front of seven developers, because they were given tasks rather than asked
@@ -16,7 +16,7 @@ namespace IronMarten.Bearing.Cli;
 /// </para>
 /// <para>
 /// <b>Rules over rendered text, not over the helpers.</b> <see cref="Sentences.Plural"/> and
-/// <see cref="Sentences.Do"/> are correct; every instance of §55 is a <i>call site</i> that
+/// <see cref="Sentences.Do"/> are correct; every instance of it is a <i>call site</i> that
 /// hardcoded a verb beside a helper that got the number right. A test of the helpers passes while
 /// the page is wrong, which is how this survived four fixes.
 /// </para>
@@ -45,9 +45,9 @@ public static class Prose
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §56 wrote one of these while being written, which is the whole
+    /// <b>A disclosure wrote one of these while being written, which is the whole
     /// argument for the rule.</b> The disclosure shipped its first draft as <i>"2 projects did NOT
-    /// resolve every reference <b>it</b> names"</i>. That is §55's defect with the number and the
+    /// resolve every reference <b>it</b> names"</i>. That is the same defect with the number and the
     /// verb swapped, and the existing rule could not see it: it anchors on a literal <c>1</c> and
     /// looks forward for a <i>plural</i>. Reading caught it. Reading does not converge, which is
     /// why <see cref="Prose"/> exists at all.
@@ -85,7 +85,7 @@ public static class Prose
         RegexOptions.Compiled);
 
     /// <summary>
-    /// A stack frame — <c>docs/DEFECTS.md</c> §59. A diagnostic belongs in the report; the frames
+    /// A stack frame. A diagnostic belongs in the report; the frames
     /// underneath it belong to whoever wrote the task that threw.
     /// </summary>
     private static readonly Regex StackFrame = new(

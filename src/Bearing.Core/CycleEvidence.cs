@@ -6,10 +6,10 @@ namespace IronMarten.Bearing;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>This file exists because of `docs/DEFECTS.md` §46, and it is the shape that closes it.</b>
+/// <b>This file exists because two renderers drifted apart, and it is the shape that closes that.</b>
 /// The cycle family carried its evidence as three hand-rolled pair types, computed inside the
 /// shape classifiers and read separately by each renderer — so a change could subtract a
-/// population from both and add the evidence replacing it to one, which is exactly what §46 was.
+/// population from both and add the evidence replacing it to one, which is exactly what drift was.
 /// The finding now carries the relations, and every aggregate a renderer wants is derived here.
 /// </para>
 /// <para>
@@ -22,7 +22,7 @@ namespace IronMarten.Bearing;
 /// </para>
 /// <para>
 /// <b>The renderers call this rather than each aggregating</b> — the sentence above is only true if
-/// the derivation has one home, and moving it into two renderers would have rebuilt §46's mechanism
+/// the derivation has one home, and moving it into two renderers would have rebuilt that mechanism
 /// while removing its instance.
 /// </para>
 /// </remarks>
@@ -41,7 +41,7 @@ public static class CycleEvidence
 
         // The project of a type is read from the model rather than from the canonical's assembly
         // segment. They agree on both reference solutions and they are not the same thing: the
-        // canonical is keyed on assembly because docs/DEFECTS.md §1 needs it to be, and a project
+        // canonical is keyed on assembly because type identity needs it to be, and a project
         // is what a .csproj declares. Deriving one from the other would be a new assumption in a
         // file whose whole subject is evidence.
         var projectOf = model.Types.ToDictionary(

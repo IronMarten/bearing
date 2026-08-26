@@ -34,7 +34,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §36, and the reason it needs a test rather than a corrected
+    /// The axis-title collision, and the reason it needs a test rather than a corrected
     /// constant. The y-axis title was placed by hand at <c>x = Left - 78</c>, which put it at
     /// x = 18 running about 215px — straight through the subtitle at x = 96, four pixels of
     /// baseline apart. It collided on **every run whatever the data**, and the suite could not see
@@ -127,7 +127,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// The population is <see cref="SolutionModel.ProjectCouplings"/> and not
     /// <see cref="SolutionModel.Projects"/>, which are not the same list: a project excluded down
     /// to nothing has no density to plot and no coupling to place it by. A picture that quietly
-    /// dropped one would be <c>docs/DEFECTS.md</c> §3 in a new medium.
+    /// dropped one would be undisclosed truncation in a new medium.
     /// </remarks>
     [Fact]
     public void Every_project_that_declares_a_type_is_one_dot()
@@ -148,7 +148,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// by the whole solution, or counting lines instead of types, fails here rather than looking
     /// plausible. Counting types is the whole reason this picture replaced the mosaic.
     /// <para>
-    /// <b>Claims and not findings</b>, <c>docs/DEFECTS.md</c> §41. This recomputation said
+    /// <b>Claims and not findings.</b> This recomputation said
     /// <c>About(...).Count > 0</c>, which is where the y-axis got the coverage disclosure — the one
     /// kind whose entry says nothing could be judged about the type — counted as a finding naming
     /// it. A second derivation only checks the first if it means the same thing.
@@ -206,7 +206,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// Only the projects something depends on are named, and any that would not fit are disclosed.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §31 in a second picture. The leaves are a population rather than a
+    /// The folded-box lesson in a second picture. The leaves are a population rather than a
     /// list — 22 of nopCommerce's 27 — and naming them would bury the handful the picture is about;
     /// their count is on the drawing instead. What must not happen is a name being dropped for want
     /// of pixels and nothing saying so.
@@ -295,7 +295,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §44. <b>This assertion used to run the other way.</b> All three
+    /// <b>This assertion used to run the other way.</b> All three
     /// channels were fitted to the run — both axes to the next ten above the largest value, dot
     /// area to the largest project — and the test checked that the caption <i>disclosed</i> that,
     /// because disclosure was the mitigation that shipped while the fix was unmeasured. It is
@@ -351,9 +351,9 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
     /// The strip below the plot fits, and nothing in it lands on anything else in it.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §36 was fixed geometry in the header colliding on every run whatever
+    /// It was fixed geometry in the header colliding on every run whatever
     /// the data, and it was invisible to a suite that checked the SVG was well-formed and complete.
-    /// §44 added a second strip of fixed geometry beside the x-axis title, so it gets the same
+    /// The fixed scale added a second strip of geometry beside the x-axis title, so it gets the same
     /// discipline rather than a second lesson — with the same width estimate the layout itself
     /// uses, so text that grows fails here instead of on a screenshot.
     /// </remarks>
@@ -374,7 +374,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
                 Y = double.Parse(e.Attribute("y")!.Value, CultureInfo.InvariantCulture),
                 Size = e.Attribute("class")?.Value == "ax" ? 12.0 : 11.0,
             })
-            // Below the x-axis tick labels, which is the strip §44 added.
+            // Below the x-axis tick labels, which is the strip the fixed scale added.
             .Where(t => t.Y > 510)
             .Select(t => (t.Text, L: t.X, R: t.X + t.Text.Length * t.Size * CharWidth, T: t.Y - t.Size, B: t.Y + 4))
             .ToList();

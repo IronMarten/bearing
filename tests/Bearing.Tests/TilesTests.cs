@@ -58,7 +58,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// A type the run declined to judge is clean — <c>docs/DEFECTS.md</c> §41.
+    /// A type the run declined to judge is clean.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -111,9 +111,9 @@ public sealed class TilesTests(CoreWalkFixture core)
     /// <b>That is one line away from being wrong.</b> Teaching <c>Subjects.Of</c> to walk a set's
     /// members — an obvious enough thing to want, since a tangle's members <i>are</i> types —
     /// would silently charge every tangle member to the named population and move the number in
-    /// the largest glyph on the page. That is <c>docs/DEFECTS.md</c> §41 exactly, which took the
+    /// the largest glyph on the page. That is a disclosure counted as a finding, which took the
     /// clean tile from 88% to 85% on nopCommerce and was found by reading the page rather than by
-    /// the suite. This is the assertion §41 did not have.
+    /// the suite. This is the assertion that was missing.
     /// </para>
     /// </remarks>
     [Fact]

@@ -23,7 +23,7 @@ namespace IronMarten.Bearing;
 /// <para>
 /// <b>No truncation.</b> The probe writes six namespace names or eight type names and appends
 /// <c>", ..."</c>, so how many members a cycle really has is recoverable but what they are is
-/// not. That is <c>docs/DEFECTS.md</c> §3 in the small, and a display cap is the renderer's to
+/// not. That is undisclosed truncation in the small, and a display cap is the renderer's to
 /// apply and disclose.
 /// </para>
 /// </remarks>
@@ -97,7 +97,7 @@ public sealed class Cycle
 /// <c>PRD-free-tier.md</c> §7.1.
 /// </para>
 /// <para>
-/// <b>Not to be confused with what <c>docs/DEFECTS.md</c> §1 fabricated.</b> Keying type identity
+/// <b>Not to be confused with what name-only identity fabricated.</b> Keying type identity
 /// on the fully-qualified name alone merged two same-named types across assemblies and attributed
 /// one's edges to the other's project, which invented a five-project cycle on nopCommerce. That
 /// was a defect and this is a feature, and the only thing keeping them apart is that

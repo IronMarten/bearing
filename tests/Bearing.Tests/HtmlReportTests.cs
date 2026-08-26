@@ -33,7 +33,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §35. <b>An SVG <c>&lt;style&gt;</c> block inlined into HTML is
+    /// <b>An SVG <c>&lt;style&gt;</c> block inlined into HTML is
     /// page-wide, not local to its drawing</b>, and the last one wins. The page inlines three —
     /// the plot, the project map and the mosaic — so a class name used by two of them is one
     /// silently restyling the other. It happened: the plot's label class was <c>nm</c>, which is
@@ -136,7 +136,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §26.</b> The cohort used to be middot-joined to the project and
+    /// The cohort used to be middot-joined to the project and
     /// the file location, which are addresses — so the population a claim is measured against read
     /// as a third address, and readers guessed at what it was for. It has its own line now, and it
     /// says what it is.
@@ -310,7 +310,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     /// The findings pane applies <c>Top</c> and says when it bit.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §3 in this medium. Core emits every finding and the renderer caps —
+    /// Undisclosed truncation in this medium. Core emits every finding and the renderer caps —
     /// and a cap that does not disclose is the probe's <c>Take</c>, which went unnoticed for
     /// months. Asserted at a <c>Top</c> low enough to bite on the fixture, since at the default
     /// nothing here truncates.
@@ -449,7 +449,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §27, settled at A13 tier 3.</b> The pane was headed <i>"why this
+    /// <b>Settled at A13 tier 3.</b> The pane was headed <i>"why this
     /// fired"</i> — the promise of an explanation over a table of 65 field names, which
     /// participants said left them understanding less than before. The names stay unchanged,
     /// because they are the join to the threshold table at the foot of the page and renaming them

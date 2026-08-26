@@ -45,7 +45,7 @@ public sealed record WalkOptions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §21. <see cref="SolutionModel.ToolVersion"/> used to read
+    /// <see cref="SolutionModel.ToolVersion"/> used to read
     /// <c>typeof(SolutionModel).Assembly</c> — <c>Bearing.Core</c>, which sets no version and so
     /// reported the SDK default <c>1.0.0</c> against a tool shipping <c>0.0.1-preview.1</c>. The
     /// version lives on whatever packs, and Core is not it.
@@ -117,7 +117,7 @@ public sealed record WalkOptions
 /// Distinct from a load <i>diagnostic</i>, which <see cref="Coverage.LoadDiagnostics"/> carries
 /// and which does not stop the walk. This is the case where the workspace never opened: an
 /// unsupported format, a file that is not a solution, a path the process may not read. See
-/// <c>docs/DEFECTS.md</c> §23.
+/// what a raw stack trace looked like.
 /// </para>
 /// <para>
 /// <b>The cause is kept rather than classified.</b> Core knows the load failed and what threw;
@@ -296,7 +296,7 @@ public sealed class SolutionWalker
     /// the graph is complete.
     /// <para>
     /// <b>The same rule one level down, for a file rather than a project</b> —
-    /// <c>docs/DEFECTS.md</c> §42. A tree that did not parse is removed from the compilation
+    /// A tree that did not parse is removed from the compilation
     /// before anything walks it, because what came out of walking one was not a missing type but a
     /// type recorded under the wrong namespace.
     /// </para>
@@ -322,7 +322,7 @@ public sealed class SolutionWalker
             if (compilation is null)
             {
                 // Both, deliberately: the diagnostic is the detail and the name is the outcome.
-                // Only the second bounds the numbers — docs/DEFECTS.md §4.
+                // Only the second bounds the numbers.
                 diagnostics.Add($"No compilation for {project.Name}");
                 notLoaded.Add(project.Name);
                 continue;
@@ -344,7 +344,7 @@ public sealed class SolutionWalker
                     .Where(path => !string.IsNullOrEmpty(path)));
             }
 
-            // docs/DEFECTS.md §56, counted here because this is the one place the compilation is
+            // Counted here because this is the one place the compilation is
             // already in hand, and it is the only signal separating "compiled" from "compiled
             // against everything it names".
             //
@@ -379,7 +379,7 @@ public sealed class SolutionWalker
     /// The three errors a compilation emits when a reference did not resolve.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §56. <c>CS0246</c> is <i>type or namespace not found</i>,
+    /// <c>CS0246</c> is <i>type or namespace not found</i>,
     /// <c>CS0234</c> is <i>does not exist in the namespace</i>, and <c>CS0012</c> is <i>defined in
     /// an assembly that is not referenced</i>. Three ids rather than "any error", because a
     /// project can have ordinary compile errors and still have restored — this is a question about
@@ -505,7 +505,7 @@ public sealed class SolutionWalker
     /// <b>Narrow in scope rather than narrow in type, and deliberately.</b> The catch covers one
     /// call — "open this file as a solution" — and everything the walk does afterwards is outside
     /// it, so this cannot swallow an analysis bug. Within that one call the failure modes are
-    /// MSBuild's and open-ended: <c>docs/DEFECTS.md</c> §23 was found as an
+    /// MSBuild's and open-ended: the crash was found as an
     /// <c>InvalidProjectFileException</c>, and a bad path, an unreadable file and a format
     /// MSBuild does not parse all arrive as different types from assemblies Core deliberately
     /// does not reference. Listing the types we happen to have seen is how the next unlisted one
@@ -520,7 +520,7 @@ public sealed class SolutionWalker
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §30, and the reason it is not a list of names.</b> §5 is the
+    /// <b>The reason it is not a list of names.</b> §5 is the
     /// standing example of what a curated list costs: it decides a classification, so anything the
     /// list has not heard of is silently sorted wrong. Names are also genuinely ambiguous here —
     /// <c>System.Text.Json</c> is in the shared framework on one target framework and a package on
@@ -607,7 +607,7 @@ public sealed class SolutionWalker
     /// <c>.csproj</c> files a <c>.sln</c> does, and MSBuild evaluates each of those exactly as it
     /// always has — so the gap is a file format, not a toolchain. Reading it with the serializer
     /// Visual Studio and the SDK use, then handing the paths to <c>OpenProjectAsync</c>, closes
-    /// <c>docs/DEFECTS.md</c> §8 without moving off the Roslyn version every golden was measured
+    /// the <c>.slnx</c> gap without moving off the Roslyn version every golden was measured
     /// against.
     /// </para>
     /// <para>

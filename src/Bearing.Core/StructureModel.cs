@@ -160,12 +160,12 @@ public sealed class Member
     /// <remarks>
     /// <para>
     /// Qualified because a bare member name is not an identifier: the fixture alone has twelve
-    /// types declaring <c>Apply</c>. See <c>docs/DEFECTS.md</c> §13 for what keying on the bare
+    /// types declaring <c>Apply</c>. Keying on the bare
     /// name would merge.
     /// </para>
     /// <para>
     /// <b>The signature half is Roslyn's documentation comment ID</b> — decision X14, and
-    /// <c>docs/DEFECTS.md</c> §39 is the four ways the display string it replaced was not an
+    /// there were four ways the display string it replaced was not an
     /// identity. <see cref="Signature"/> is the readable form, and it is not unique.
     /// </para>
     /// </remarks>
@@ -181,7 +181,7 @@ public sealed class Member
     /// <b>Published beside <see cref="Subject"/> rather than instead of it, and it is not a key.</b>
     /// X14 made the identity a documentation comment ID, which is exact and which nobody wants to
     /// read down a column; this is what a person scanning <c>members.csv</c> is actually looking
-    /// for. Two members can share it — that is <c>docs/DEFECTS.md</c> §39, and the whole reason the
+    /// for. Two members can share it, and that is the whole reason the
     /// identity is somewhere else.
     /// </remarks>
     public string Signature { get; }
@@ -232,7 +232,7 @@ public sealed class Member
     /// something outside the compiler's reference graph addresses a member — a serialiser, a
     /// container, a test runner, a routing table — so its presence is the one general signal
     /// §5.6's remaining categories share. Naming <i>which</i> attributes mean invocation would be
-    /// a curated list, and <c>docs/DEFECTS.md</c> §5 is the standing example of what one costs:
+    /// a curated list, and the hardcoded ORM list is the standing example of what one costs:
     /// the case it has not heard of is sorted wrong, silently.
     /// </remarks>
     public bool HasAttributes { get; internal set; }
@@ -316,7 +316,7 @@ public sealed class TypeNode
     /// <remarks>
     /// .NET permits one FQN in two assemblies and plugin architectures use it deliberately.
     /// Keying on the name merges the declarations and sums their metrics — see
-    /// <c>docs/DEFECTS.md</c> §1. This is the one place extraction is permitted to change
+    /// This is the one place extraction is permitted to change
     /// behaviour relative to the probe.
     /// </remarks>
     public SubjectRef Subject { get; }
@@ -483,14 +483,14 @@ public readonly record struct ProjectNode(string Name, bool HasEntryPoint, bool 
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b><c>docs/DEFECTS.md</c> §30.</b> A reader asked for the list to separate what the project
+/// A reader asked for the list to separate what the project
 /// built from what the language and framework provide, with the reason attached: <i>"I'm not going
 /// to change any of those, so I'm not worried about them."</i> That is the list divided by what
 /// somebody could act on, which is the axis it did not carry.
 /// </para>
 /// <para>
 /// <b>Read off the resolved reference path rather than off the name.</b> Classifying by name is
-/// §5's defect — a curated list that silently mis-sorts whatever it has not heard of — and it is
+/// the curated-list defect — a list that silently mis-sorts whatever it has not heard of — and it is
 /// wrong in a specific way here: <c>System.Text.Json</c> ships in the shared framework on one
 /// target and as a package on another, so the same name has two different answers and only the
 /// resolution knows which. Framework assemblies resolve out of the targeting packs and the shared
@@ -530,7 +530,7 @@ public readonly record struct ExternalDependency(
 /// How many <c>CS0246</c>, <c>CS0234</c> and <c>CS0012</c> errors its compilation emitted.
 /// </param>
 /// <remarks>
-/// <b><c>docs/DEFECTS.md</c> §56.</b> A count rather than a flag, because the two ends of the range
+/// A count rather than a flag, because the two ends of the range
 /// mean different things: a handful is one package or one conditional target, and thousands is a
 /// project that never restored. Neither is a threshold — nothing here decides anything, and the
 /// number is printed so a reader can tell which of the two they are looking at.
@@ -556,7 +556,7 @@ public sealed class Coverage
     /// <summary>Diagnostics emitted while loading. Not necessarily failures.</summary>
     /// <remarks>
     /// <b>These are not evidence that anything failed to load, and reading them as if they were is
-    /// <c>docs/DEFECTS.md</c> §4.</b> MSBuild raises a NuGet vulnerability advisory as a
+    /// </b> MSBuild raises a NuGet vulnerability advisory as a
     /// <c>Failure</c>-kind workspace diagnostic: on nopCommerce that is six of them, every project
     /// compiles, and a tool that judged coverage from this list would refuse a major .NET codebase
     /// over unrelated CVEs. <see cref="ProjectsNotLoaded"/> is the outcome; this is the commentary.
@@ -580,7 +580,7 @@ public sealed class Coverage
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §56, and it is the one incompleteness this tool did not
+    /// <b>It is the one incompleteness this tool did not
     /// disclose.</b> <c>README.md</c> says it — <i>"the target solution must restore before
     /// analysis, or projects load with missing references and the results are silently
     /// understated"</i> — and the artifact said <i>"Every project selected for analysis produced a
@@ -618,7 +618,7 @@ public sealed class Coverage
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §42. <b>A file with syntax errors used to be walked anyway</b>, and
+    /// <b>A file with syntax errors used to be walked anyway</b>, and
     /// the damage was not a missing type but a wrong one: a type in a broken file was collected as
     /// <c>global::NeighbourInSameFile</c> rather than under its own namespace, because the
     /// namespace declaration was part of what failed to parse. That is a wrong
@@ -640,7 +640,7 @@ public sealed class Coverage
     /// the graph.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §7. A reference can resolve to a symbol that belongs to this solution
+    /// A reference can resolve to a symbol that belongs to this solution
     /// while pointing at a type no node was built for — excluded by path, in a skipped project, or
     /// compiler-generated. Those cannot be edges, and a graph quietly missing some of them
     /// understates fan-in exactly where a reader would not think to look. Set during
@@ -702,7 +702,7 @@ public sealed class SolutionModel
     /// The version of the tool that produced this analysis, as the host reported it.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §21. This used to read <c>typeof(SolutionModel).Assembly</c>, which
+    /// This used to read <c>typeof(SolutionModel).Assembly</c>, which
     /// is <c>Bearing.Core</c> — a project that sets no version and therefore reported the SDK
     /// default <c>1.0.0</c> against a tool shipping <c>0.0.1-preview.1</c>. It comes from
     /// <see cref="WalkOptions.ToolVersion"/> now, because the version belongs to whatever packs
@@ -784,7 +784,7 @@ public sealed class SolutionModel
     /// aggregating the type graph reproduces the reference DAG. A cycle here means an analysed
     /// assembly was reached some way other than a project reference — see
     /// <see cref="Cycles.AmongProjects(SolutionModel)"/>, and note what
-    /// <c>docs/DEFECTS.md</c> §1 fabricated here before <see cref="SubjectRef"/> keyed types by
+    /// name-only identity fabricated here before <see cref="SubjectRef"/> keyed types by
     /// assembly.
     /// </remarks>
     public IReadOnlyList<Cycle> ProjectCycles => _projectCycles ??= Cycles.AmongProjects(

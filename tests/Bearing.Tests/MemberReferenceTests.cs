@@ -28,7 +28,7 @@ public sealed class MemberReferenceTests(CoreWalkFixture core)
     /// <summary>Both endpoints of every reference name a member that exists.</summary>
     /// <remarks>
     /// <b>The graph's one structural invariant.</b> An endpoint that joins nothing is the failure
-    /// mode <c>docs/DEFECTS.md</c> §7 was at type level — a reference resolving to a symbol no node
+    /// mode the dangling endpoint was at type level — a reference resolving to a symbol no node
     /// was built for — and there it was a crash rather than an inaccuracy. Here a <c>To</c> that
     /// joined nothing would silently subtract from a member's inbound count, which is the number
     /// A9 makes a deletion claim from.

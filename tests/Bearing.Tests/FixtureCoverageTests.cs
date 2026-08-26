@@ -686,7 +686,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// <para>
     /// The two halves interlock: with the role in the key the six collapse and the pair keeps its
     /// detail; without it all eight collapse and the pair loses detail it is entitled to. That is
-    /// §11's failure one level down — a collapse absorbing something that is not an instance of
+    /// The collapse failure one level down — a collapse absorbing something that is not an instance of
     /// the pattern — which is why the pair is the control rather than a second plant.
     /// </para>
     /// </remarks>
@@ -877,7 +877,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// <para>
     /// <b>It will not be this test that announces the feature, though.</b> The assertion below
     /// renders the <i>probe</i>, which is frozen, so type-level dead code landing in Core leaves
-    /// it green — the same trap <c>docs/DEFECTS.md</c> §1 fell into, where a pin on the oracle was
+    /// it green — the same trap as before, where a pin on the oracle was
     /// mistaken for a guard on the reimplementation. When the feature is built, the assertion that
     /// matters is over Core's finding set and belongs beside it. Invariant 4 is what it has to
     /// satisfy: a tool that says "safe to remove" about something six customers depend on has
@@ -956,7 +956,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §24.</b> A constructor's member name <i>is</i> <c>.ctor</c>, so
+    /// A constructor's member name <i>is</i> <c>.ctor</c>, so
     /// joining it to its type with a dot yields <c>CustomerInfoValidator..ctor</c>. The fixture
     /// declares no constructor complex enough to be nominated, which is why the defect was found
     /// by reading nopCommerce and not by this suite — and why it sat filed as cosmetic while being
@@ -993,7 +993,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     /// whose extremity was measured, and orders that group by absolute complexity, because a
     /// ratio against zero is undefined rather than infinite. Ordering on the ratio alone put ten
     /// tied rows at the top of nopCommerce's section — cc 6 leading — ahead of a constructor at
-    /// 37x its peer median. <c>docs/DEFECTS.md</c> §28.
+    /// 37x its peer median.
     /// </para>
     /// <para>
     /// <b>The fixture cannot show any of it.</b> Every cohort here has a non-zero median, so that

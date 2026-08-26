@@ -16,7 +16,7 @@ namespace Bearing.Tests;
 /// <para>
 /// The probe is rendered with its display cap lifted. Core does not truncate: a model that drops
 /// findings leaves every renderer unable to say how much it is not showing
-/// (<c>docs/DEFECTS.md</c> §3), and in the probe the cap silently weakens suppression too,
+/// at all, and in the probe the cap silently weakens suppression too,
 /// because the set breaks-alone tests membership against is the truncated one. Comparing against
 /// an untruncated render is comparing the two populations rather than one against a prefix of
 /// the other.

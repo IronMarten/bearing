@@ -30,11 +30,11 @@ namespace IronMarten.Bearing;
 /// addition here.
 /// </para>
 /// <para>
-/// <b>Two defects close with this port.</b> <c>docs/DEFECTS.md</c> §9: the floor was
+/// <b>Two defects close with this port.</b> The floor was
 /// <see cref="AnalysisPolicy.MinCohort"/>, a cohort-size threshold used as a fan-in floor on a
 /// finding that has no cohort in it — the two share a default of 5, which is what hid it for the
 /// whole probe build. It is <see cref="AnalysisPolicy.MinFanIn"/> now, and the two are pinned
-/// apart. §2: the absolute gate is joined by a proportional one, which is the only thing that
+/// apart. The absolute gate is joined by a proportional one, which is the only thing that
 /// makes a threshold hold still across codebases.
 /// </para>
 /// <para>
@@ -68,7 +68,7 @@ public static class ChangeCost
         {
             if (!Eligible.Contains(type.Classification.Kind, StringComparer.Ordinal)) continue;
 
-            // docs/DEFECTS.md §9. MinFanIn, never MinCohort — there is no cohort here for a
+            // MinFanIn, never MinCohort — there is no cohort here for a
             // cohort threshold to be a threshold on.
             if (type.FanIn < policy.MinFanIn) continue;
 

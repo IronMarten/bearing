@@ -29,7 +29,7 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §62. <see cref="Distribution.PercentileOf"/> is a midrank, so it
+    /// <see cref="Distribution.PercentileOf"/> is a midrank, so it
     /// splits a value's own tie band and reports the middle of it: a unique maximum of six lands
     /// at the 92nd percentile and the sentence printed <i>"top 8%"</i>, which a reader takes as one
     /// in twelve. Midrank is right for ordering and wrong for a claim, and the two were the same
@@ -71,7 +71,7 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §38. A ratio against a zero peer median is undefined, and
+    /// A ratio against a zero peer median is undefined, and
     /// <c>Sentences.Number</c> renders it as the word <i>undefined</i> — which is right, and which
     /// two call sites then followed with a literal <c>x</c>. Concealed decision branches for it;
     /// blast radius did not, and shipped <i>"89 distinct callers (undefinedx its peer median)"</i>
@@ -150,7 +150,7 @@ public sealed class ClaimsTests(CoreWalkFixture core)
             Assert.NotEqual("", Claims.KindBlurb(kind));
 
             // The name is the reader's, not the enum's. A kind rendering as its own identifier is
-            // docs/DEFECTS.md §27 — MaxMemberCyclomaticPctl printed at somebody — one level up.
+            // an internal identifier published at somebody — MaxMemberCyclomaticPctl — one level up.
             Assert.NotEqual(kind.ToString(), Claims.KindName(kind));
         }
     }
@@ -186,13 +186,13 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// A verb agrees with a number a real solution made singular — <c>docs/DEFECTS.md</c> §32.
+    /// A verb agrees with a number a real solution made singular.
     /// </summary>
     /// <remarks>
     /// <b>Asserted as the property, because the fixture cannot reach any of the three cases.</b>
     /// TestBed has no shared-mutable-state type with exactly one caller and no contract with a
     /// one-field surface, so a test over the fixture's output would pass without exercising the
-    /// fix — the same shape §24 was left in, and named here rather than assumed.
+    /// fix — the same shape the constructor rendering was left in, and named here rather than assumed.
     /// </remarks>
     [Fact]
     public void A_count_of_one_takes_a_singular_verb()
@@ -277,9 +277,9 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §57.</b> Umbraco ships two ImageSharp integrations declaring one
+    /// Umbraco ships two ImageSharp integrations declaring one
     /// namespace, so <c>ConfigureImageSharpMiddlewareOptions</c> is two types with one
-    /// fully-qualified name. The model is right — §1 was fixed to key on <c>(assembly, FQN)</c>
+    /// fully-qualified name. The model is right — identity was fixed to key on <c>(assembly, FQN)</c>
     /// precisely because <i>"plugin architectures use it deliberately"</i> — and the renderer then
     /// printed one name twice with different receipts.
     /// </para>
@@ -288,8 +288,8 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     /// Asserting on the name alone would fail the fixture for behaviour that is correct:
     /// <c>TestBed.Interop.CarrierTwin</c> is declared in both <c>Core</c> and <c>Data</c>, both
     /// declarations are nominated, and the two rows separate cleanly because
-    /// <see cref="Subjects.Where"/> leads with the project. <b>That is §57's scenario handled, not
-    /// §57 occurring</b> — and it corrects the entry, which recorded the planted collisions as
+    /// <see cref="Subjects.Where"/> leads with the project. <b>That is the collision scenario handled, not
+    /// a collision occurring</b> — and it corrects the entry, which recorded the planted collisions as
     /// never reaching a claim. They reach one; nothing looked wrong because nothing was.
     /// </para>
     /// <para>
@@ -328,7 +328,7 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §57's live face, found on Umbraco 2026-08-25.</b> The
+    /// <b>The live face of two types sharing one name, found on Umbraco 2026-08-25.</b> The
     /// concealed-decision claim titles itself with the type's most complex <i>member</i> and passed
     /// no trailer, so <see cref="Subjects.Where"/> fell back to the declaring <i>type</i>'s line.
     /// The page then printed <c>Utf8ToAsciiConverter.ToAscii</c> at <c>:12</c> — the class
@@ -338,9 +338,9 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     /// <para>
     /// <b>And the type really does declare two <c>ToAscii</c> overloads</b>, at lines 76 and 131 —
     /// cc 3 and cc 1312 — so a reader had no way to tell whether they were looking at two methods
-    /// or at one method described twice. <b>§39 made a member subject an identity rather than a
+    /// or at one method described twice. <b>X14 made a member subject an identity rather than a
     /// display string so that a member could be located</b>; this is the same work stopping one
-    /// element short, which is the shape §52 had on the tile.
+    /// element short, which is the shape it had on the tile.
     /// </para>
     /// </remarks>
     [Fact]

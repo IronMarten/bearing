@@ -18,7 +18,7 @@ namespace IronMarten.Bearing;
 /// two arms are carried as separate qualifying facts rather than as one "is a god object" boolean.
 /// </para>
 /// <para>
-/// <b>That separation is <c>docs/DEFECTS.md</c> §16, fixed here.</b> The probe's disjunction has
+/// <b>That separation is the fix.</b> The probe's disjunction has
 /// two arms and one sentence — <i>"it both depends on and is depended on by much of the system,
 /// AND carries real logic"</i> — printed for either. On the size arm the claim is false by
 /// construction, because that arm exists precisely for types with bulk and no logic:

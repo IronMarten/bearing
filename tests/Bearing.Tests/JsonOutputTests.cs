@@ -102,7 +102,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §21, and this is the field it was open for: the model used to read
+    /// The tool version, and this is the field it was open for: the model used to read
     /// <c>typeof(SolutionModel).Assembly</c>, which is <c>Bearing.Core</c>, which sets no version
     /// and reported the SDK default <c>1.0.0</c> — a release that does not exist, about to become
     /// a field somebody parsed and compared.
@@ -153,7 +153,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
     /// <remarks>
     /// The property a consumer will assume without checking, and the one this format exists to
     /// support: an edge is a link, and a link to a row that is not in the document is what turns
-    /// a graph renderer into a crash. It is also exactly what <c>docs/DEFECTS.md</c> §7 was —
+    /// a graph renderer into a crash. It is also exactly what the dangling-endpoint defect was —
     /// 123 edges on Jellyfin whose endpoint no node was built for — so the model drops those, and
     /// this asserts that the drop reaches the file.
     /// </remarks>
@@ -176,7 +176,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
     /// The two <c>PayloadTag</c> declarations are two rows, keyed by assembly.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §1 through the format that publishes it. A JSON document keyed on
+    /// Name-only identity, through the format that publishes it. A JSON document keyed on
     /// the fully-qualified name alone would carry one of these and silently drop the other, or
     /// carry two rows with the same id — and a consumer indexing by id would get whichever came
     /// last.
@@ -197,7 +197,7 @@ public sealed class JsonOutputTests(CoreWalkFixture core)
     /// A member id is a member id — qualified, and unique across the whole solution.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §13 is that the probe's <c>MethodMetrics.Id</c> is the bare method
+    /// The probe's <c>MethodMetrics.Id</c> is the bare method
     /// name: TestBed alone has seventeen colliding groups, one of them twelve wide. Core keys a
     /// member on <c>(assembly, declaring type, signature)</c> so the collision cannot happen, and
     /// this is where that stops being an internal detail and becomes a promise to whoever indexes

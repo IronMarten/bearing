@@ -121,8 +121,8 @@ public sealed class ReportTests(CoreWalkFixture core)
         var version = ToolInfo.ReadVersion(typeof(Report).Assembly);
         Assert.Equal($"BEARING {version} — TestBed.sln", Lines[2]);
 
-        // Keyed on (assembly, FQN), so both PayloadTag declarations are counted — docs/DEFECTS.md
-        // §1. StructureTests.Fixture_shape_is_stable owns this number and its history; the point
+        // Keyed on (assembly, FQN), so both PayloadTag declarations are counted.
+        // StructureTests.Fixture_shape_is_stable owns this number and its history; the point
         // here is only that the header renders it from the model rather than recounting.
         Assert.Contains("206 types — classes and interfaces — in 3 projects", Text, StringComparison.Ordinal);
     }
@@ -133,7 +133,7 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §21, <b>closed at A4</b>. The property used to read
+    /// <b>closed at A4</b>. The property used to read
     /// <c>typeof(SolutionModel).Assembly</c> — <c>Bearing.Core</c>, which sets no
     /// <c>&lt;Version&gt;</c> and therefore reported the SDK default <c>1.0.0</c> against a tool
     /// shipping <c>0.0.1-preview.1</c>. It comes from <c>WalkOptions.ToolVersion</c> now, which
@@ -194,7 +194,7 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// the loudest thing the report can say with nothing exercising it.
     /// </para>
     /// <para>
-    /// The wording is the assertion. <c>docs/DEFECTS.md</c> §4 is load success judged by
+    /// The wording is the assertion. Load success used to be judged by
     /// diagnostic rather than by outcome — six spurious failures on nopCommerce — so the section
     /// may not call a diagnostic a failure. **Fixed 2026-08-20**: the warning moved onto
     /// <c>Coverage.ProjectsNotLoaded</c>, which is the only fact that supports it, and the two
@@ -218,7 +218,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         Assert.Contains("2 diagnostics while loading", text, StringComparison.Ordinal);
         Assert.Contains("Project 'A.csproj' failed to restore.", text, StringComparison.Ordinal);
 
-        // The lower-bound warning is NOT attached to them. This is the whole of §4: every project
+        // The lower-bound warning is NOT attached to them. This is the whole of it: every project
         // compiled, so there is nothing to read as a lower bound, however alarming the diagnostics
         // sound. On nopCommerce this block is six NuGet advisories and 3,209 types loaded.
         Assert.DoesNotContain("lower bound", text, StringComparison.Ordinal);
@@ -235,7 +235,7 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// A project that did not load is what carries the lower-bound warning.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §4, the other half. The claim has to be made by something, and this
+    /// The other half of that. The claim has to be made by something, and this
     /// is the only fact that supports it: a project that produced no compilation declares no
     /// types, so every type it referenced is short an inbound edge. It is named, because "one
     /// project did not load" is not actionable and "Nop.Data did not load" is.
@@ -298,7 +298,7 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §56.</b> <c>README.md</c> warns that an unrestored solution loads
+    /// <c>README.md</c> warns that an unrestored solution loads
     /// with missing references and understates the results; the artifact said <i>"Every project
     /// selected for analysis produced a compilation"</i>, which is true and reads as reassurance.
     /// <b>A compilation with unresolved references is still a compilation</b>, so the sentence
@@ -341,7 +341,7 @@ public sealed class ReportTests(CoreWalkFixture core)
     /// Invariant 8, and the half that is easy to skip. Every other incompleteness this section
     /// reports states its "none" — skipped projects, exclusions, dangling edges — because a reader
     /// scanning for a warning cannot distinguish "nothing was wrong" from "nothing was checked".
-    /// <c>docs/DEFECTS.md</c> §56 exists because this one was the exception.
+    /// The unresolved-reference disclosure exists because this one was the exception.
     /// </remarks>
     [Fact]
     public void A_run_that_resolved_everything_says_so()
@@ -381,7 +381,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         Assert.Contains("broad rather than deep", line, StringComparison.Ordinal);
         Assert.DoesNotContain("carries real logic", line, StringComparison.Ordinal);
 
-        // docs/DEFECTS.md §29. The claim this arm makes has not changed; the words have. "Too
+        // The claim this arm makes has not changed; the words have. "Too
         // large for anyone to hold at once" was read by a reader outside the build as the report
         // giving up rather than as a statement about the type, and the old phrasing is asserted
         // absent because that is the kind of sentence that comes back from an old snapshot.
@@ -440,7 +440,7 @@ public sealed class ReportTests(CoreWalkFixture core)
 
         // Stated rather than parsed out of the sentence: the point of the fix is that the number
         // comes from the finding set, so the test asks the finding set the same question.
-        Assert.True(expected > 0, "the fixture no longer exercises defect 17 — see docs/DEFECTS.md §17");
+        Assert.True(expected > 0, "the fixture no longer exercises the NO PEER GROUP disclosure");
         Assert.Contains($"   {expected} of them do still appear", Text, StringComparison.Ordinal);
     }
 
@@ -498,7 +498,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         // other out. D10 added the fourth — letting thin cohorts nominate takes method-level
         // concealed decision to 16 against a --top of 15, so the section drops one and discloses
         // it. Asserted as a set rather than loosened to "at least one", because a section that
-        // silently stopped disclosing would still pass that — docs/DEFECTS.md §3.
+        // silently stopped disclosing would still pass that.
         Assert.Equal(4, disclosures.Count);
         // P10 takes the peerless population 22 -> 25: ScaleHead alone under suffix:Head, and the
         // two *Window types under a suffix cohort of two. IScaleHead is NOT among them — it is

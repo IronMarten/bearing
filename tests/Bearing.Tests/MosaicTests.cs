@@ -55,7 +55,7 @@ public sealed class MosaicTests(CoreWalkFixture core)
     /// <b>The caption says <i>every one of the types this run analysed</i>, so this is the sentence
     /// under test rather than a property of the layout.</b> A mosaic that quietly dropped the tail
     /// of a large project would look complete — that is the whole failure mode of an area encoding,
-    /// and it is <c>docs/DEFECTS.md</c> §3 in a medium where nobody can count the elements by eye.
+    /// and it is undisclosed truncation in a medium where nobody can count the elements by eye.
     /// </para>
     /// <para>
     /// Counted as path commands rather than as elements, because the cells are accumulated into two
@@ -91,8 +91,8 @@ public sealed class MosaicTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// A type whose only entry is the coverage disclosure is not tinted — <c>docs/DEFECTS.md</c>
-    /// §41.
+    /// A type whose only entry is the coverage disclosure is not tinted: a disclosure
+    /// is not a finding.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -157,8 +157,8 @@ public sealed class MosaicTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// The caption's count of outlined cells is the number of claims the page prints above it —
-    /// <c>docs/DEFECTS.md</c> §40.
+    /// The caption's count of outlined cells is the number of claims the page prints above it,
+    /// and nothing else.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -200,7 +200,7 @@ public sealed class MosaicTests(CoreWalkFixture core)
     /// it.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §31: a reader scanning a picture for a project name reads its absence
+    /// A reader scanning a picture for a project name reads its absence
     /// as an omission. A block too small for text is a shortage of pixels, and the caption has to
     /// carry what the block cannot.
     /// </remarks>
@@ -359,12 +359,12 @@ public sealed class MosaicTests(CoreWalkFixture core)
     /// The legend's three counts partition the analysed types, and say so in <i>types</i>.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §50.</b> Both of the mosaic's marks are per type and readers
+    /// Both of the mosaic's marks are per type and readers
     /// counted both as findings — <i>"counts of findings across types"</i>, two of five in A11
     /// round 2's T9, answering independently and in writing. The remedy is counts and a named
     /// population on every swatch, and the property that keeps it honest is that the tinted count
     /// plus the plain count is the whole population: a legend whose numbers do not add up to the
-    /// picture is <c>docs/DEFECTS.md</c> §40 with better manners.
+    /// picture is the same defect with better manners.
     /// </remarks>
     [Fact]
     public void The_legend_partitions_the_types_it_draws()
@@ -385,7 +385,7 @@ public sealed class MosaicTests(CoreWalkFixture core)
     /// Every swatch names its population, so a mark cannot be read as a count of findings.
     /// </summary>
     /// <remarks>
-    /// The wording is what <c>docs/DEFECTS.md</c> §50 diagnosed: the old legend had <i>a
+    /// The wording is what the legend defect diagnosed: the old legend had <i>a
     /// finding</i> as the subject of a per-<i>type</i> mark. <i>type</i> or <i>types</i> on each
     /// swatch is the half of the fix a golden would not notice going away.
     /// </remarks>

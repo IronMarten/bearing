@@ -107,7 +107,7 @@ public sealed record ShapeReading(
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §58.</b> The shape is decided by whether <i>any</i> sibling pair
+    /// The shape is decided by whether <i>any</i> sibling pair
     /// holds, and was then applied to the whole component: Umbraco's namespace graph has one
     /// strongly-connected component of <b>363</b>, and the section called all of them siblings that
     /// hold each other as state on the evidence of 14 pairs spanning <b>15</b> namespaces — 4% of
@@ -125,7 +125,7 @@ public sealed record ShapeReading(
     /// <b>The framework namespace falls out of the headline as a consequence.</b>
     /// <c>Microsoft.Extensions.Hosting</c> is in Umbraco's component by the model's definition and
     /// stays there, but it is in no holding pair, so it is no longer named as evidence of coupling
-    /// in Umbraco's own architecture. That was §58's second face and it needed no rule of its own.
+    /// in Umbraco's own architecture. That was its second face, and it needed no rule of its own.
     /// </para>
     /// </remarks>
     public IReadOnlyList<string> Coupled => CycleShapes.Coupled(Pairs);
@@ -160,7 +160,7 @@ public sealed record ShapedCycle(
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §58.</b> The shape is decided by whether <i>any</i> sibling pair
+    /// The shape is decided by whether <i>any</i> sibling pair
     /// holds, and was then applied to the whole component: Umbraco's namespace graph has one
     /// strongly-connected component of <b>363</b>, and the section called all of them siblings that
     /// hold each other as state on the evidence of 14 pairs spanning <b>15</b> namespaces — 4% of
@@ -178,7 +178,7 @@ public sealed record ShapedCycle(
     /// <b>The framework namespace falls out of the headline as a consequence.</b>
     /// <c>Microsoft.Extensions.Hosting</c> is in Umbraco's component by the model's definition and
     /// stays there, but it is in no holding pair, so it is no longer named as evidence of coupling
-    /// in Umbraco's own architecture. That was §58's second face and it needed no rule of its own.
+    /// in Umbraco's own architecture. That was its second face, and it needed no rule of its own.
     /// </para>
     /// </remarks>
     public IReadOnlyList<string> Coupled => CycleShapes.Coupled(Pairs);
@@ -396,7 +396,7 @@ public static class CycleShapes
     /// One implementation for <see cref="ShapeReading.Coupled"/> and
     /// <see cref="ShapedCycle.Coupled"/>, so the reading and the cycle it is attached to cannot
     /// come to disagree about which namespaces the evidence covers — the arrangement
-    /// <c>docs/DEFECTS.md</c> §46 came out of, avoided here by there being one of it.
+    /// that let two renderers drift, avoided here by there being one of it.
     /// </remarks>
     public static IReadOnlyList<string> Coupled(IReadOnlyList<HeldPair> pairs)
     {

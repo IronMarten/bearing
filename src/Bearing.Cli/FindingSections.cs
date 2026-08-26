@@ -138,7 +138,7 @@ internal static class FindingSections
     /// What an absolute gate selected here, wrapped to the section's width.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §2's last outstanding half, and decision X13's "say why". Printed
+    /// The last outstanding half of "an absolute gate does not travel", and X13's "say why". Printed
     /// only where the gate is a fixed count, because on a comparative gate the share is the gate
     /// and saying so would be noise.
     /// </remarks>
@@ -288,7 +288,7 @@ internal static class FindingSections
         }
 
         // Collapsed and detailed findings are the same claim worded two ways, and which one
-        // applies is the qualifier's answer rather than a count taken here. docs/DEFECTS.md §11:
+        // applies is the qualifier's answer rather than a count taken here:
         // a pattern is a shared dependency set, so the renderer can no longer decide this by
         // grouping on the kind signature.
         var collapsed = found.Where(f => f.Holds(Qualifiers.PartOfALayeringPattern)).ToList();
@@ -393,7 +393,7 @@ internal static class FindingSections
     /// <b>The wording is <see cref="Claims"/>' and the layout is this file's</b>, which is the
     /// split that lets the page make the same claims without borrowing the fixed-width shape they
     /// were written for. The cap and its disclosure stay here because how many lines fit on a
-    /// screen is a property of this medium — <c>docs/DEFECTS.md</c> §3.
+    /// screen is a property of this medium.
     /// </remarks>
     internal static IEnumerable<string> Rows(
         SolutionModel model,

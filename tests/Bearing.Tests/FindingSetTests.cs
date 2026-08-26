@@ -53,7 +53,7 @@ public sealed class FindingSetTests
     }
 
     /// <summary>
-    /// <c>docs/DEFECTS.md</c> §15: the primary of the two concealed-decision nominations is at
+    /// The primary of the two concealed-decision nominations is at
     /// method level, and it is the one the probe's suppression cannot see.
     /// </summary>
     [Fact]

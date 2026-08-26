@@ -23,7 +23,7 @@ public sealed class DistributionTests
     [Fact]
     public void A_unique_maximum_cannot_reach_the_top_of_the_scale()
     {
-        // (n-0.5)/n*100. This is docs/DEFECTS.md §14 stated as arithmetic: a gate at 95 is
+        // (n-0.5)/n*100. The unreachable percentile floor, stated as arithmetic: a gate at 95 is
         // unsatisfiable below ten members, whatever the members look like.
         Assert.Equal(90.0, Distribution.Of([1, 1, 1, 1, 9]).PercentileOf(9));
         Assert.Equal(94.44, Math.Round(Distribution.Of([1, 1, 1, 1, 1, 1, 1, 1, 9]).PercentileOf(9), 2));
@@ -125,7 +125,7 @@ public sealed class DistributionTests
     /// </summary>
     /// <remarks>
     /// <c>rank = n·(100 − pctl)/100 + 0.5</c> is an identity, not an approximation, and it is
-    /// what lets <c>docs/DEFECTS.md</c> §14 be repaired without moving a golden: at
+    /// what lets the percentile floor be repaired without moving a golden: at
     /// <c>fraction = 0.05</c> the rank gate admits exactly what <c>FanInPctl &gt;= 95</c>
     /// admitted, in every cohort where that gate was satisfiable at all. If this ever fails, the
     /// repair has quietly become a retune.

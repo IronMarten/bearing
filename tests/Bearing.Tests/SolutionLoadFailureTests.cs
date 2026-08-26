@@ -4,7 +4,7 @@ using IronMarten.Bearing.Cli;
 namespace Bearing.Tests;
 
 /// <summary>
-/// What the tool does with a solution it cannot read — <c>docs/DEFECTS.md</c> §23.
+/// What the tool does with a solution it cannot read.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -31,8 +31,8 @@ public sealed class SolutionLoadFailureTests
     public async Task An_unreadable_solution_raises_a_load_failure_rather_than_msbuilds_own()
     {
         using var scratch = new Scratch();
-        // Genuinely malformed, not merely empty: "<Solution />" parses now (docs/DEFECTS.md
-        // §8) and an empty solution is a walk over nothing rather than a failure.
+        // Genuinely malformed, not merely empty: "<Solution />" parses now
+        // and an empty solution is a walk over nothing rather than a failure.
         var path = scratch.Write("Broken.slnx", "<Solution><Project Path=");
 
         var failure = await Assert.ThrowsAsync<SolutionLoadException>(
@@ -71,7 +71,7 @@ public sealed class SolutionLoadFailureTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §8. The container is the only new thing — the projects a
+    /// The container is the only new thing — the projects a
     /// <c>.slnx</c> names are the same <c>.csproj</c> files, so the claim worth pinning is not
     /// "it opened" but "it opened the same thing". Comparing type counts against the fixture's
     /// own <c>.sln</c> is what makes a silently half-loaded solution fail here.
@@ -214,7 +214,7 @@ public sealed class SolutionLoadFailureTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §42. <b>The damage was never a missing type — it was a wrong
+    /// <b>The damage was never a missing type — it was a wrong
     /// one.</b> A type in a broken file was collected as <c>global::NeighbourInSameFile</c> rather
     /// than under its own namespace, because the namespace declaration was part of what failed to
     /// parse: a wrong <c>SubjectRef</c>, which <c>--baseline</c> reads as a delete plus an add,
@@ -258,7 +258,7 @@ public sealed class SolutionLoadFailureTests
     /// A project that merely does not compile is still walked.
     /// </summary>
     /// <remarks>
-    /// <b>The line §42 must not cross.</b> Semantic errors are the ordinary condition of a project
+    /// <b>The line this must not cross.</b> Semantic errors are the ordinary condition of a project
     /// whose packages did not restore — an unresolved type is <c>CS0246</c> and parses perfectly —
     /// and refusing those would refuse most of the real world for a problem none of them has. Only
     /// a syntax error puts a type under the wrong namespace, so only a syntax error refuses a
@@ -285,7 +285,7 @@ public sealed class SolutionLoadFailureTests
     /// not a clean bill of health. This one deliberately does not, and the difference is that a
     /// project failing to load is a thing a reader might reasonably suspect, where "the parser
     /// accepted your C#" is a sentence nobody needs on a report already called a wall of text.
-    /// Recorded in §42 so the next reader knows it was a choice.
+    /// Recorded so the next reader knows it was a choice.
     /// </remarks>
     [Fact]
     public void A_run_with_nothing_unreadable_says_nothing_about_parsing()
@@ -312,7 +312,7 @@ public sealed class SolutionLoadFailureTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §43. <b>Driven through the walk rather than through a synthesized
+    /// <b>Driven through the walk rather than through a synthesized
     /// exception</b>, because the whole fix turns on matching words MSBuild chose, and a test that
     /// supplies those words itself proves only that the constant matches the constant. This one
     /// fails if MSBuild ever rewords the sentence — which is the point, since the failure mode is
@@ -439,7 +439,7 @@ public sealed class SolutionLoadFailureTests
     /// what the machine carries, and it will still be wrong after the install — so the arm that is
     /// certain from the path runs before the arm that reads a message. The <c>.slnx</c> arm is not
     /// in that position, because its advice is an inference from a failure that may not be about
-    /// the file at all, and §43 is the case where it is not.
+    /// the file at all, and a newer-SDK solution is the case where it is not.
     /// </remarks>
     [Fact]
     public void A_project_file_outranks_the_sdk_and_a_slnx_does_not()

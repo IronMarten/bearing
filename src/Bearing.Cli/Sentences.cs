@@ -9,7 +9,7 @@ namespace IronMarten.Bearing.Cli;
 /// <remarks>
 /// <para>
 /// <b>Public for the reason <see cref="Html"/> is public.</b> These are the rules whose failure is
-/// silent and whose cases a fixture cannot always reach — <c>docs/DEFECTS.md</c> §32 is three
+/// silent and whose cases a fixture cannot always reach — one of them was three
 /// sentences that agreed a verb with a number no solution in this repository makes singular, so the
 /// rule has to be assertable without a solution that exercises it. <c>Bearing.Cli</c> packs as a
 /// tool and not as a library, so nothing about its surface is a contract.
@@ -25,7 +25,7 @@ public static class Sentences
 {
     /// <summary>Two decimal places at most, invariant, with an undefined ratio said so.</summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §28. Infinity here is always a ratio against a zero median, which
+    /// Infinity here is always a ratio against a zero median, which
     /// is undefined and not enormous. The sections that can produce one mostly branch before they
     /// get here — <i>"the only complexity among its 37 peers"</i> — and this is what is left.
     /// </remarks>
@@ -38,7 +38,7 @@ public static class Sentences
 
     /// <summary><c>1 type</c> / <c>3 types</c> / <c>34 boundaries</c>.</summary>
     /// <remarks>
-    /// <b>English, not <c>+ "s"</c> — <c>docs/DEFECTS.md</c> §55.</b> This appended an <c>s</c> to
+    /// <b>English, not <c>+ "s"</c>.</b> This appended an <c>s</c> to
     /// whatever it was given, which produced <c>39 boundarys</c> on every solution with more
     /// boundaries than <c>--top</c>, including both A11 artifacts. Fixed as a rule rather than at
     /// the call site because the call site was never wrong: it passed the singular noun, which is
@@ -52,7 +52,7 @@ public static class Sentences
     /// How much of a namespace cycle the coupling evidence actually covers.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §58</b>, and it lives here because both renderers say it. The
+    /// <b>It lives here because both renderers say it.</b> The
     /// component's size is one claim and the held pairs are a different, smaller one; running them
     /// together is what let a reading taken from 14 pairs describe 363 namespaces. Stating the two
     /// populations in one sentence is what stops them merging again.
@@ -92,7 +92,7 @@ public static class Sentences
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §32, and it is the third instance of one mistake.</b> The register
+    /// <b>It is the third instance of one mistake.</b> The register
     /// already carries <i>"the other 1 are entangled too"</i>, reworded at A3 to carry no verb at
     /// all, with the note that <i>"the next such number is a defect waiting on the right input"</i>.
     /// It was: three sentences agreed a verb with a plural that a real solution made singular —
@@ -119,7 +119,7 @@ public static class Sentences
     /// <b>The word has two readings and a reader outside the build hit the wrong one</b>: <i>type</i>
     /// as a category of thing, against <i>type</i> as the C# declaration. Every count in this report
     /// is the second, and nothing said so — the report opened on <i>"3,209 types"</i> and left the
-    /// reader to guess which. It is the same defect class as <c>docs/DEFECTS.md</c> §26: a phrase
+    /// reader to guess which. It is the same defect class as an unlabelled fact: a phrase
     /// that is perfectly clear once you know what job it is doing.
     /// </para>
     /// <para>
@@ -183,14 +183,14 @@ public static class Sentences
     /// <summary>Where an external namespace came from, as a trailing phrase, or nothing.</summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §30. Worded rather than coloured, because the terminal has no colour
+    /// Worded rather than coloured, because the terminal has no colour
     /// to spend and the HTML should say the same thing as the text it was generated beside.
     /// <see cref="ExternalOrigin.Unknown"/> says nothing at all: a row with no marker is one this
     /// tool could not place, and inventing a third label for it would be the guess the origin
     /// exists to avoid.
     /// </para>
     /// <para>
-    /// <b>The label states the resolution and not a kind — <c>docs/DEFECTS.md</c> §60.</b> It read
+    /// <b>The label states the resolution and not a kind.</b> It read
     /// <c>(framework)</c> and <c>(package)</c>, which are the names of <i>categories</i>, so
     /// <c>Microsoft.AspNetCore.Mvc (package)</c> printing directly above
     /// <c>Microsoft.AspNetCore.Http (framework)</c> looked like a misclassification of one product.
@@ -209,7 +209,7 @@ public static class Sentences
 
     /// <summary>What a main-sequence zone is called, in the one wording every surface uses.</summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §48 and §49, which are one defect.</b> The map tinted a box
+    /// <b>Two defects that are one.</b> The map tinted a box
     /// <i>stable and concrete</i>, the HTML table said <i>zone of pain — stable and concrete</i>
     /// and the terminal said <i>ZONE OF PAIN (stable and concrete)</i>: three sites spelling one
     /// measure, none of them glossed, and nothing stopping a fourth from inventing a fourth
@@ -226,7 +226,7 @@ public static class Sentences
 
     /// <summary>What a zone means for the reader, in one clause.</summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §48. A tint with no key is a colour a reader has to scroll 170 lines
+    /// A tint with no key is a colour a reader has to scroll 170 lines
     /// to decode, and the two zones are opposite failures rather than two shades of one.
     /// </remarks>
     public static string ZoneMeans(MainSequenceZone zone) => zone switch
@@ -242,7 +242,7 @@ public static class Sentences
     /// The main sequence, defined once, in the sentence the report never spent.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §49.</b> The term was used twenty-five times on nopCommerce and
+    /// The term was used twenty-five times on nopCommerce and
     /// defined nowhere; the nearest thing to a definition defined a <i>column</i> in terms of it —
     /// <i>"D = distance from the main sequence"</i> — and twenty-four rows then read <i>near the
     /// main sequence</i>. A11 round 2 raised it unprompted and the debrief <i>"led to a good
@@ -300,7 +300,7 @@ public static class Sentences
     /// <summary>A member named under its declaring type, in words a reader can search for.</summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §24.</b> A constructor's member name <i>is</i> <c>.ctor</c>, so
+    /// A constructor's member name <i>is</i> <c>.ctor</c>, so
     /// joining type and member with a dot produced <c>CustomerInfoValidator..ctor</c>. It was
     /// filed as cosmetic and only visible on real code; it is now the first row of nopCommerce's
     /// concealed-decision section, because the ranking fix moved a pair of constructors to the top.
@@ -309,7 +309,7 @@ public static class Sentences
     /// Spelled out rather than trimmed to <c>ctor</c>. The name is here so a reader can find the
     /// thing, and <i>constructor</i> is what they would call it — <c>.ctor</c> is what the runtime
     /// calls it, which is the same mistake one level down as printing <c>MaxMemberCyclomaticPctl</c>
-    /// at somebody (§27).
+    /// at somebody.
     /// </para>
     /// </remarks>
     public static string Member(string owner, string member) => member switch
@@ -343,7 +343,7 @@ public static class Sentences
     /// <b>Rounded up, unlike <see cref="TopPercent"/>, and for the reason this method exists.</b>
     /// One of eight is 12.5%, and <c>Math.Round</c> prints it as <i>"top 12%"</i> — half a point
     /// more extreme than the group supports, which is a smaller version of the error
-    /// <c>docs/DEFECTS.md</c> §62 is about. Rounding away from zero is the direction that cannot
+    /// a midrank claim is about. Rounding away from zero is the direction that cannot
     /// overstate, and the cost is that an exact 12.5% reads as 13%.
     /// </para>
     /// </remarks>
@@ -370,7 +370,7 @@ public static class Sentences
     /// interface are relationships, and a kind is a classification this tool assigned rather than
     /// something the code says about itself. The last of those is worth wording carefully — a
     /// reader who sees "the 5 types we classified as DataAccess" can tell the classifier was
-    /// involved, and <c>docs/DEFECTS.md</c> §5 is the reason that matters.
+    /// involved, and a hardcoded classifier list is the reason that matters.
     /// </para>
     /// <para>
     /// The <c>Basis</c> strings come from <see cref="CohortBasis"/> by way of
@@ -457,7 +457,7 @@ public static class Sentences
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §3, and it is the renderer's half of the fix.</b> Core does not
+    /// <b>It is the renderer's half of the fix.</b> Core does not
     /// truncate — every detector emits every finding it made, and the display cap lives here
     /// because how many lines fit on a screen is a presentation decision. But a capped list that
     /// does not say it was capped reports "15 of 106" as though it were all of them, and a reader

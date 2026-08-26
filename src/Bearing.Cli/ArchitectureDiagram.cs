@@ -32,7 +32,7 @@ namespace IronMarten.Bearing.Cli;
 /// </para>
 /// <para>
 /// <b>Height is not the acceptance criterion, and that is what lets a folded box name its
-/// members</b> — <c>docs/DEFECTS.md</c> §31, reopened. A reader arrives holding a name and
+/// members</b>. A reader arrives holding a name and
 /// looks for it; on nopCommerce seventeen of twenty-seven projects were not in the picture,
 /// including both tax plugins, which is the task A11 round 1 watched the map lose. Naming them
 /// costs height and no width at all.
@@ -44,8 +44,8 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="Layer">The layer its boxes belong to.</param>
 /// <param name="Boxes">Each box on it, named by its first project, left to right.</param>
 /// <param name="Continues">
-/// Whether this row continues the layer above rather than depending on it — <c>docs/DEFECTS.md</c>
-/// §45. False for every row of a layer that fitted in one, and for the first row of one that did
+/// Whether this row continues the layer above rather than depending on it.
+/// False for every row of a layer that fitted in one, and for the first row of one that did
 /// not.
 /// </param>
 public readonly record struct Row(int Layer, IReadOnlyList<string> Boxes, bool Continues);
@@ -63,7 +63,7 @@ public static class ArchitectureDiagram
     /// header lines that the list sits in.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §31, reopened. <b>Only the height moves.</b> The names come from
+    /// <b>Only the height moves.</b> The names come from
     /// <see cref="Labels"/>, which is already capped at twenty characters, so the widest member
     /// line is about 123px inside a 144px box interior — <b>a folded box never grows wider than
     /// an unfolded one</b>, and the drawing's width is still set by how many boxes sit in a row.
@@ -81,7 +81,7 @@ public static class ArchitectureDiagram
     /// <para>
     /// <b>Wrapping misrepresents the layout</b> — the second row is the same layer, drawn as though
     /// it were below one — and nothing on the drawing says so. <b>It fires on Jellyfin</b>, whose
-    /// widest layer holds ten boxes: <c>docs/DEFECTS.md</c> §45, where the measurement is. The
+    /// widest layer holds ten boxes. The
     /// remark that stood here until 2026-08-22 said this shipped unexercised on real input, which
     /// was true of nopCommerce and never checked against the other reference solution.
     /// </para>
@@ -94,7 +94,7 @@ public static class ArchitectureDiagram
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §45.</b> A row means <i>depends on the row below</i> everywhere
+    /// A row means <i>depends on the row below</i> everywhere
     /// else on this drawing, so a wrapped layer drawn at the ordinary gap states a dependency the
     /// code does not have. Jellyfin's layer 4 holds eleven boxes and wraps into three rows, which
     /// is most of the extra height in a ten-row drawing of eight layers.
@@ -157,7 +157,7 @@ public static class ArchitectureDiagram
 
         LayerRules(svg, placed, width);
 
-        // Boxes first, then edges over them -- docs/DEFECTS.md §53. The paint order was the whole
+        // Boxes first, then edges over them. The paint order was the whole
         // mechanism: an opaque box painted last cuts a line that skips a layer into two stubs, and
         // two stubs either side of a box read as a dependency into it and another out. A line
         // drawn over the box is continuous, so a reader can trace it to the box it actually names.
@@ -200,10 +200,10 @@ public static class ArchitectureDiagram
         var first = true;
 
         // The plan is Rows', so the geometry and the caption that explains it come from one
-        // reading of the graph rather than two -- docs/DEFECTS.md §46's arrangement, avoided.
+        // reading of the graph rather than two -- the arrangement that let two renderers drift, avoided.
         foreach (var row in Rows(graph))
         {
-            // docs/DEFECTS.md §45. The second and later rows of one layer are the same layer, so
+            // The second and later rows of one layer are the same layer, so
             // the gap above them must not be the gap that means "depends on".
             if (!first) y += row.Continues ? WrapGapY : GapY;
             first = false;
@@ -232,7 +232,7 @@ public static class ArchitectureDiagram
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §45, and the half of it a smaller gap cannot carry.</b> Tightening
+    /// <b>The half of it a smaller gap cannot carry.</b> Tightening
     /// the gap inside a wrapped layer stops the drawing <i>asserting</i> a dependency there; it
     /// does not tell a reader which of the remaining gaps to trust. The rule is that sentence, in
     /// the picture rather than under it — everything above one depends on something below it, and
@@ -278,7 +278,7 @@ public static class ArchitectureDiagram
     /// honest about being a straight line.
     /// </para>
     /// <para>
-    /// <b>Only <see cref="ProjectGraph.Reduction"/> is drawn — <c>docs/DEFECTS.md</c> §53.</b>
+    /// <b>Only <see cref="ProjectGraph.Reduction"/> is drawn.</b>
     /// Boxes are painted after edges and are opaque, so a line that skips a layer is cut in half
     /// by the box it passes behind, and the two stubs read as a chain through a project the
     /// dependency never names. Drawing every edge put 18 of 29 lines through a box on nopCommerce,
@@ -289,7 +289,7 @@ public static class ArchitectureDiagram
     /// <para>
     /// <b>The rest are disclosed, not dropped</b> — <see cref="ProjectGraph.Implied"/> is what the
     /// caption says, and it is the model's number so that the sentence and the drawing cannot come
-    /// to disagree. <c>docs/DEFECTS.md</c> §47 is the shape being avoided: an artifact that shows
+    /// to disagree. The shape being avoided is an artifact that shows
     /// a subset while telling the reader it shows everything.
     /// </para>
     /// </remarks>
@@ -347,7 +347,7 @@ public static class ArchitectureDiagram
             if (Note(group, zone) is { Length: > 0 } note)
                 svg.Append(CultureInfo.InvariantCulture, $"<text class=\"sm\" x=\"{cx}\" y=\"{box.Y + 43}\" text-anchor=\"middle\">{Html.Text(note)}</text>\n");
 
-            // Every project in a folded box is named in it — docs/DEFECTS.md §31, reopened. The
+            // Every project in a folded box is named in it. The
             // box is the only place a reader looking for their own project will look, and it is
             // the whole of the standalone --diagram export.
             if (group.Size <= 1) continue;
@@ -371,7 +371,7 @@ public static class ArchitectureDiagram
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §31.</b> The fold is this artifact's best compression — 27
+    /// The fold is this artifact's best compression — 27
     /// projects to 10 boxes on nopCommerce, against 1444px unfolded — and to a first reader it
     /// reads as an omission. Asked <i>"why isn't Nop.Plugin in the graph?"</i> while looking at the
     /// projects table directly below it, where the plugin names are. The caption says folding
@@ -379,7 +379,7 @@ public static class ArchitectureDiagram
     /// </para>
     /// <para>
     /// <b>The names are now in the boxes as well, and this legend is the searchable copy</b> —
-    /// §31 reopened on 2026-08-22. The original fix put them here <i>instead</i>, on the grounds
+    /// Reopened on 2026-08-22. The original fix put them here <i>instead</i>, on the grounds
     /// that a picture cannot be searched and that a box growing to fit its members is what the
     /// fold exists to prevent. The second of those was measured and is not true of this drawing:
     /// <see cref="Labels"/> caps a name at twenty characters, so only the height moves.
@@ -412,7 +412,7 @@ public static class ArchitectureDiagram
         if (group.IsCycle) return $"{group.Size} projects, mutually dependent";
         if (group.Size > 1) return $"{group.Size} projects, same shape";
 
-        // docs/DEFECTS.md §48/§49. The words are Sentences.Zone's, so the box and the caption that
+        // The words are Sentences.Zone's, so the box and the caption that
         // keys it cannot come to spell one measure two ways -- which is what they were doing.
         return zone is MainSequenceZone.Pain or MainSequenceZone.Uselessness ? Sentences.Zone(zone) : "";
     }
@@ -421,7 +421,7 @@ public static class ArchitectureDiagram
     /// The zones this map actually tinted, in reading order.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §48.</b> A reader met an orange box with no key: the definition
+    /// A reader met an orange box with no key: the definition
     /// lived 170 lines further down under <c>Projects</c>, and A11 round 2 asked about it by name
     /// immediately after T1. The caption already explains the direction convention and the folded
     /// boxes, so the key belongs beside them.
@@ -451,7 +451,7 @@ public static class ArchitectureDiagram
     /// Whether any layer was too wide for one row, so the drawing had to wrap it.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §45.</b> The caption that explains the dashed rules must appear
+    /// The caption that explains the dashed rules must appear
     /// exactly when the rules do, and this is recomputed from the graph for the same reason
     /// <see cref="Tinted"/> and <see cref="Folded"/> are: a caption and the drawing it explains
     /// must not be able to disagree about whether the thing being explained is on the page.
@@ -468,7 +468,7 @@ public static class ArchitectureDiagram
     /// <see cref="SolutionModel"/>, for the reason <see cref="ProjectGraph.Of"/> takes
     /// primitives</b> — the shapes worth asserting about this layout are not in the fixture and
     /// cannot be put there. The fixture has three projects; the case
-    /// <c>docs/DEFECTS.md</c> §45 is about is a layer of eleven, and a test that could only run
+    /// this exists for is a layer of eleven, and a test that could only run
     /// against three would be asserting that nothing wraps.
     /// </para>
     /// <para>
@@ -510,7 +510,7 @@ public static class ArchitectureDiagram
     /// <c>Emby.Server.Implementations</c> and <c>Jellyfin.Server.Implementations</c>, and
     /// shortening each to its tail drew two different projects under one label — a reader looking
     /// at that map cannot tell which box is which, and there is nothing on the page to reveal it.
-    /// That is <c>docs/DEFECTS.md</c> §1's mistake made by a renderer instead of a walker: a
+    /// That is a walker's mistake made by a renderer instead: a
     /// display name that is not an identity. Where the tail collides the full name is kept and
     /// truncated instead, which is uglier and true.
     /// </para>

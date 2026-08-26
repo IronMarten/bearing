@@ -39,7 +39,7 @@ public static class BoundaryMarking
     /// neither, usually, can the team.
     /// </para>
     /// <para>
-    /// <b>Two conditions, and the second one is <c>docs/DEFECTS.md</c> §33.</b> The complexity
+    /// <b>Two conditions, and the second one is why this fires as rarely as it should.</b> The complexity
     /// floor alone fired on <b>19.5% of nopCommerce's 672 boundaries and 33.3% of jellyfin's
     /// 174</b> — a claim about a third of the population it filters is describing that population,
     /// not finding an anomaly in it, and <i>"boundaries carrying real logic"</i> said about a third
@@ -110,7 +110,7 @@ public static class BoundaryMarking
     /// <remarks>
     /// <para>
     /// <b>Whether this may be said at all is decided in <see cref="Suppression"/>, not here</b>,
-    /// and the reason is <c>docs/DEFECTS.md</c> §12. The rule is that the section prints only when
+    /// and the reason is a suppression that could never fire. The rule is that the section prints only when
     /// it discriminates, and the probe expresses that as a proportion — suppress when the
     /// qualifying set exceeds half the boundaries. It can never fire. The qualifying filter is
     /// <c>DataShape &gt;= 1.5 × median</c>, which is proportional to the same distribution the
@@ -128,7 +128,7 @@ public static class BoundaryMarking
     /// <para>
     /// No cap is applied here. Core emits every finding and lets suppression remove the set as a
     /// set; a detector that truncated would leave the renderer unable to say how much it dropped,
-    /// which is <c>docs/DEFECTS.md</c> §3.
+    /// which is truncation nobody is told about.
     /// </para>
     /// </remarks>
     public static IEnumerable<Finding> WidestSurfaces(SolutionModel model)

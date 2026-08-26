@@ -58,7 +58,7 @@ public readonly record struct Claim(string Subject, string Sentence, string Evid
 /// <b>Still presentation, and still deciding nothing.</b> Every number comes off the finding or off
 /// the model it names; nothing here re-derives one, because a renderer that recomputes can disagree
 /// with the claim it is printing. Which sentence a disjunction gets is read from the qualifier that
-/// holds — <c>docs/DEFECTS.md</c> §16 — rather than chosen here.
+/// holds rather than chosen here.
 /// </para>
 /// </remarks>
 public static class Claims
@@ -131,7 +131,7 @@ public static class Claims
     /// <para>
     /// <b>The two must be able to disagree or the split is decorative</b>, and
     /// <c>ClaimsTests</c> asserts that they do. The one selector answering two questions is
-    /// <c>docs/DEFECTS.md</c> §40 and §41's family, which is why this is a second predicate rather
+    /// where a disclosure gets counted as a claim, which is why this is a second predicate rather
     /// than another arm on the first.
     /// </para>
     /// </remarks>
@@ -173,7 +173,7 @@ public static class Claims
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Decision X13 named exactly these two, and <c>docs/DEFECTS.md</c> §2 is the measurement
+    /// <b>Decision X13 named exactly these two, and the absolute-gate measurement is what sits
     /// behind it.</b> A comparative gate ranks and therefore always selects the same share; an
     /// absolute gate asserts a property of the type — <c>min(fan-in, fan-out) &gt;= 5</c>, or
     /// instability and complexity both past a bar — and the share it happens to select is a fact
@@ -255,7 +255,7 @@ public static class Claims
         var times = finding.ValueOf("MaxMemberCyclomaticXMedian") ?? 0;
         // The share at or above, not the midrank percentile beside it in the receipts. A unique
         // maximum of six is one in six; midrank splits its own tie band and prints "top 8%", which
-        // a reader takes as one in twelve. docs/DEFECTS.md §62.
+        // a reader takes as one in twelve.
         var topShare = finding.ValueOf("MaxMemberCyclomaticTopShare") ?? 100;
 
         // "Looks like plumbing" only holds when connectivity is low in ABSOLUTE terms. The gate is
@@ -273,7 +273,7 @@ public static class Claims
             ? "the only complexity among "
             : $"{Sentences.Number(times)}x the median internal complexity of ";
 
-        // docs/DEFECTS.md §57. The title names a MEMBER and the trailer was empty, so Subjects.Where
+        // The title names a MEMBER and the trailer was empty, so Subjects.Where
         // fell back to the declaring TYPE's line -- on Umbraco that printed
         // "Utf8ToAsciiConverter.ToAscii" at :12, the class declaration, while the tile beside it
         // printed the same name at :131, the method. One page, one name, two addresses, and the
@@ -296,7 +296,7 @@ public static class Claims
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §34, and the measurement moved the diagnosis.</b> The register
+    /// <b>The measurement moved the diagnosis.</b> The register
     /// recorded this as <i>cohorts are too big to be peers</i> — <i>"93x the median of its 2,909
     /// peers"</i> about a group holding 53% of the solution's methods. Measured, size is not what
     /// breaks the claim: <b>58 of nopCommerce's 70 usable cohorts have a method median of 1 or
@@ -306,7 +306,7 @@ public static class Claims
     /// </para>
     /// <para>
     /// <b>So the sentence says what was measured.</b> <c>b5cc69a</c> made this a rank gate and the
-    /// wording kept leading with the ratio — the same mistake as <c>docs/DEFECTS.md</c> §28, where
+    /// wording kept leading with the ratio — the same mistake as before, where
     /// a section sorted on the multiple and opened on the percentile. Rank is a true statement
     /// about a peer group of any size: <i>the most complex of 2,909 methods</i> is checkable, and
     /// does not collapse when the median sits on the floor.
@@ -403,8 +403,8 @@ public static class Claims
         // Two different findings and two different remedies: a live type with a member nothing
         // calls is a member to remove; a type nothing reaches at all is a type to remove, and
         // saying so about each of its members individually would be saying it many times.
-        // Sentences.Do rather than an inline ternary, which is docs/DEFECTS.md §32's remedy — and
-        // §32 said the next such number was "a defect waiting on the right input". It was: this
+        // Sentences.Do rather than an inline ternary, which is the remedy for a verb agreeing with a singular — and
+        // that defect said the next such number was "a defect waiting on the right input". It was: this
         // read "1 reference reach UserAgentHelper itself" on nopCommerce, and the fixture makes no
         // singular here either.
         var standing = typeInbound > 0
@@ -450,7 +450,7 @@ public static class Claims
         if (model.Find(finding.Subject) is not { } type) return Claim.None;
 
         // A ratio against a zero median is undefined, and `Sentences.Number` says so — but
-        // "undefined" followed by an "x" is not a word. docs/DEFECTS.md §38. The concealed-decision
+        // "undefined" followed by an "x" is not a word. The concealed-decision
         // sentence above already branches for this; this one never did, and shipped
         // "89 distinct callers (undefinedx its peer median)" on nopCommerce's BaseController.
         //
@@ -527,10 +527,10 @@ public static class Claims
     /// The hub claim, which opens the rail — and opens it on two terms it has to define.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §51.</b> The sentence led with <c>fan-in 28, fan-out 24</c> and
+    /// The sentence led with <c>fan-in 28, fan-out 24</c> and
     /// defined neither. The two words appear nowhere else on the page as anything but threshold
     /// <i>names</i> inside the collapsed <c>Show all thresholds</c> table — <c>MinFanIn</c>,
-    /// <c>ConcealedFanInCeiling</c> — which is §27's surface and not a glossary.
+    /// <c>ConcealedFanInCeiling</c> — which is the receipt's surface and not a glossary.
     /// <para>
     /// <b>A11 round 2's participants explained the two to each other to get through T3</b>, and it
     /// worked because five people were in one room. <c>PRD-free-tier.md</c> §2 defines the target
@@ -562,7 +562,7 @@ public static class Claims
     /// Which danger this hub actually presents.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §16.</b> The probe treats the two arms as one disjunction and
+    /// The probe treats the two arms as one disjunction and
     /// prints "AND carries real logic" whenever either fires — which is false by construction on
     /// the size arm, since a type reaches it precisely by having bulk and no logic. The receipts in
     /// the same sentence then refute the sentence: <i>"carries real logic (23 members, worst method
@@ -589,7 +589,7 @@ public static class Claims
             (true, false) => $"AND carries real logic ({type.MemberCount} members, worst method "
                              + $"{worst?.Name} at cc {type.MaxMemberCyclomatic}, dsm {type.Dsm})",
             // The size arm alone. No claim about logic, because the receipts would refute it.
-            // docs/DEFECTS.md §29: "too large for anyone to hold at once" was read as the report
+            // "too large for anyone to hold at once" was read as the report
             // giving up rather than as a claim about the type. Naming the shape says the same thing
             // and cannot be read as an apology.
             _ => $"AND is broad rather than deep ({type.MemberCount} members, no method above "
@@ -669,7 +669,7 @@ public static class Claims
     /// A boundary carrying decisions, with the population it was judged against.
     /// </summary>
     /// <remarks>
-    /// <b>The evidence line is new with <c>docs/DEFECTS.md</c> §33 and the gap was old.</b> This
+    /// <b>The evidence line is new and the gap it closed was old.</b> This
     /// claim carried no numbers at all, which was invisible while every card was the same size and
     /// became the whole of the lead card the moment the rank gate made this the rarest kind on the
     /// fixture — the same hole layer span had, found the same way. What it states is the pair the

@@ -210,8 +210,8 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the gate the fixture never had, and its absence is how <c>docs/DEFECTS.md</c>
-    /// §46 shipped.</b> Every namespace cycle here was a folder layout, so <c>IsReportable</c> was
+    /// <b>This is the gate the fixture never had, and its absence is how the renderer
+    /// drift shipped.</b> Every namespace cycle here was a folder layout, so <c>IsReportable</c> was
     /// false for all of them, the reportable branch was unreachable from the fixture, and both
     /// renderers' cycle output was ungated — the HTML dropped the pair evidence entirely and the
     /// whole suite stayed green.
@@ -274,7 +274,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §58.</b> One holding pair makes the whole component
+    /// One holding pair makes the whole component
     /// <see cref="CycleShape.Coupling"/> — which is right, because a cycle silenced costs the
     /// reader the finding — but the sentence that followed described every member as a sibling
     /// holding state. On Umbraco that put 14 pairs of evidence under a claim about <b>363</b>
@@ -308,7 +308,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
 
     /// <summary>A reading with no pairs claims no coupling at all.</summary>
     /// <remarks>
-    /// The other side of §58: the bound has to be empty where there is no evidence, or the
+    /// The other side of it: the bound has to be empty where there is no evidence, or the
     /// sentence would go back to being about the component.
     /// </remarks>
     [Fact]
@@ -454,7 +454,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         // The fixture's model knows nothing of these types, so the cycle is real and the evidence
         // for it is empty. That is the honest pairing: the aggregation reports what it can resolve
         // against the model, and inventing a link for a relation whose endpoints the walk never
-        // declared is the failure docs/DEFECTS.md §1 is about.
+        // declared is the failure name-only identity is about.
         Assert.Empty(links);
         Assert.Equal(["Core", "Web"], cycle.Members.Select(m => m.Canonical.Replace("project|", "", StringComparison.Ordinal)));
     }
@@ -654,7 +654,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
     /// <c>PayloadTag</c> rows where the probe merges them, and both have fan-in 0 — a node with
     /// no inbound edges is in no strongly-connected component, so merged and split give the same
     /// partition. S2 therefore agrees with the probe for a reason that has nothing to do with S2
-    /// being right. <c>docs/DEFECTS.md</c> §1, <c>TASKS.md</c> P8.
+    /// being right.
     /// </remarks>
     [Fact]
     public void The_collision_is_invisible_to_the_cycles_and_that_is_why_P8_exists()

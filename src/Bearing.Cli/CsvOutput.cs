@@ -157,7 +157,7 @@ public static class CsvOutput
     /// </summary>
     /// <remarks>
     /// <b><c>Id</c> is a real identifier here, which it was not in the probe.</b>
-    /// <c>docs/DEFECTS.md</c> §13: <c>MethodMetrics.Id</c> is the bare method name, because
+    /// <c>MethodMetrics.Id</c> is the bare method name, because
     /// <c>SymbolDisplayFormat.FullyQualifiedFormat</c> qualifies type symbols and leaves members
     /// bare — TestBed alone has seventeen colliding groups and one of them is twelve members wide.
     /// The probe's <c>methods.csv</c> works around it with a four-part sort key and still emits a
@@ -167,7 +167,7 @@ public static class CsvOutput
     /// <para>
     /// <b>Two columns for the member, since X14, and only one of them is a key.</b> <c>Id</c>
     /// carries the documentation comment ID and joins; <c>Signature</c> is the readable form and
-    /// does not — <c>docs/DEFECTS.md</c> §39 lists the four kinds of member it merges. Publishing
+    /// does not, because it merges four kinds of member into one string. Publishing
     /// only the exact one would make the file unreadable, and publishing only the readable one is
     /// the defect.
     /// </para>

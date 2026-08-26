@@ -83,7 +83,7 @@ public sealed class ProjectGraph
     /// about what depends on what. It is not a suppression and there is no threshold in it.
     /// </para>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §53.</b> Boxes are painted after edges and are opaque, so an edge
+    /// Boxes are painted after edges and are opaque, so an edge
     /// that skips a layer is not drawn <i>over</i> the box in between — it is cut in half by it,
     /// and the two visible stubs read as <c>A → C</c> and <c>C → B</c>. A direct dependency
     /// becomes a chain through a project it never names. Measured on three solutions, the edges
@@ -108,7 +108,7 @@ public sealed class ProjectGraph
     /// </summary>
     /// <remarks>
     /// <b>The drawing has to disclose this and both renderers need the same number.</b> A picture
-    /// that quietly shows a third of the edges is the <c>docs/DEFECTS.md</c> §47 shape — an
+    /// that quietly shows a third of the edges is a familiar shape — an
     /// artifact telling a reader it holds everything when it holds a subset. The count is the
     /// model's so that the sentence cannot disagree with the drawing.
     /// </remarks>
@@ -154,7 +154,7 @@ public sealed class ProjectGraph
 
         foreach (var (from, to) in edges)
         {
-            // Both endpoints analysed, or the edge has no project — docs/DEFECTS.md §7, and
+            // Both endpoints analysed, or the edge has no project, and
             // inventing one from a name is what §1 did.
             if (!projectOf.TryGetValue(from, out var source)) continue;
             if (!projectOf.TryGetValue(to, out var target)) continue;

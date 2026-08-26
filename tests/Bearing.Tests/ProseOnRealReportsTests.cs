@@ -10,7 +10,7 @@ namespace Bearing.Tests;
 /// <b>Because <see cref="ProseTests"/> cannot do this and says so.</b> Its own remark records that
 /// asserting over <c>TestBed</c> catches a regression the moment it is written and <b>does not</b>
 /// prove the rules hold on real solutions — the fixture has no unparseable file, does not cap its
-/// boundary list, and did not have an unrestored project until <c>docs/DEFECTS.md</c> §56 went
+/// boundary list, and did not have an unrestored project until the disclosure went
 /// looking. That is why <see cref="Prose"/> lives in the shipped assembly, and this is the step
 /// that had been done by hand every time.
 /// </para>
@@ -27,7 +27,7 @@ namespace Bearing.Tests;
 /// <para>
 /// <b>Last run 2026-08-25, on the three reference solutions, both renderers, <c>--full</c> so the
 /// page enumerates every finding rather than one per kind: six reports, four rules, zero
-/// violations.</b> The same run with the §56 first draft appended to one file fails on
+/// violations.</b> The same run with that first draft appended to one file fails on
 /// <c>plural-count-singular-verb</c>, which is what makes the zero mean something —
 /// <c>docs/TESTING.md</c> §3's rule that a check which cannot fail is not evidence.
 /// </para>

@@ -78,8 +78,8 @@ public static class Mosaic
     /// <remarks>
     /// Not a threshold about the project — it is the point at which text stops fitting inside a
     /// rectangle, which is arithmetic about this canvas and nothing about the codebase. What the
-    /// unlabelled blocks are is <see cref="Unlabelled"/>'s answer, and it is <c>docs/DEFECTS.md</c>
-    /// §31 that makes saying so mandatory rather than nice: a reader scanning a picture for a
+    /// unlabelled blocks are is <see cref="Unlabelled"/>'s answer, and it is the folded-box
+    /// lesson that makes saying so mandatory rather than nice: a reader scanning a picture for a
     /// project name reads its absence as an omission, not as a shortage of pixels.
     /// </remarks>
     private const int NameFitsWidth = 76;
@@ -184,7 +184,7 @@ public static class Mosaic
     /// The projects whose block came out too small to write a name inside, largest first.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §31, and the same remedy <see cref="ArchitectureDiagram.Folded"/>
+    /// The same remedy <see cref="ArchitectureDiagram.Folded"/>
     /// uses: the picture cannot be searched, so the names go beside it as text. The layout is
     /// recomputed rather than cached, so a caption and the drawing it explains cannot disagree
     /// about which blocks got a label.
@@ -211,7 +211,7 @@ public static class Mosaic
     /// bytes of attributes; <c>M12 34h7v7h-7z</c> is a sixth of that and carries the same rectangle,
     /// so the drawing costs tens of kilobytes rather than hundreds. It also removes the only thing
     /// that made the count of cells expensive, which is what lets this draw the whole population
-    /// instead of a sample — and a sampled mosaic would be <c>docs/DEFECTS.md</c> §3 in a picture.
+    /// instead of a sample — and a sampled mosaic would be undisclosed truncation in a picture.
     /// </para>
     /// <para>
     /// <b>Whole pixels, and a floor of one.</b> Fractional coordinates would cost more bytes than
@@ -482,7 +482,7 @@ public static class Mosaic
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §50, and the legend is the common cause of both halves of it.</b>
+    /// <b>The legend is the common cause of both halves of it.</b>
     /// The caption under the mosaic was correct in both cases and is the <i>second</i> thing read;
     /// the legend is what sits beside the marks. It read <i>the findings lead with this / a finding
     /// names it / no finding names it</i> — no counts, and <b><i>a finding</i> as the subject of a
@@ -499,12 +499,12 @@ public static class Mosaic
     /// others do not invites the reader to work out what is different about that one.
     /// </para>
     /// <para>
-    /// <b>Two departures from the wording §50 drafted, and both were found by rendering it.</b>
+    /// <b>Two departures from the wording first drafted, and both were found by rendering it.</b>
     /// The register proposed <i>11 types the claims above are about</i>. It says <i>above</i>,
     /// which is true on the page and false in the one place this file is designed to end up —
     /// pasted somewhere the report is not, where there is nothing above it. And at a count of one
     /// it reads <i>1 types … are about</i>: <see cref="Sentences.Plural"/> fixes the noun, but
-    /// <i>1 type the claims above are about</i> then trips <see cref="Prose"/>'s §55 rule, and
+    /// <i>1 type the claims above are about</i> then trips <see cref="Prose"/>'s count-verb rule, and
     /// <see cref="Prose"/>'s standing instruction for that is to reword the sentence rather than
     /// weaken the rule. <i>The report leads with</i> is true standalone, correct at one, and puts
     /// all three swatches in one grammatical shape — <i>N types … name(s)</i>.

@@ -23,7 +23,7 @@ namespace Bearing.Tests;
 /// <b>not</b> established by anything here.
 /// </para>
 /// <para>
-/// The other half of this file is the confusion <c>docs/DEFECTS.md</c> §1 caused: it fabricated a
+/// The other half of this file is the confusion name-only identity caused: it fabricated a
 /// five-project cycle on nopCommerce by merging same-named types across assemblies. The last case
 /// pins that a merged identity is what invents one, so the difference is asserted rather than
 /// remembered.
@@ -119,8 +119,8 @@ public sealed class ProjectCycleTests(CoreWalkFixture core)
     /// An edge whose endpoint was never analysed contributes no project.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §7 — 123 of Jellyfin's edges and 57 of nopCommerce's point at types
-    /// no node was built for. Attributing one to a project by guessing from its name is how §1
+    /// 123 of Jellyfin's edges and 57 of nopCommerce's point at types
+    /// no node was built for. Attributing one to a project by guessing from its name is how the merge
     /// invented a cycle, so an edge missing either endpoint is dropped and not repaired.
     /// </remarks>
     [Fact]
@@ -140,7 +140,7 @@ public sealed class ProjectCycleTests(CoreWalkFixture core)
     /// is what fabricates a project cycle, and keying on assembly is what stops it.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §1 and the caution in <c>PRD-free-tier.md</c> §7.1, which says the
+    /// Name-only identity, and the caution in <c>PRD-free-tier.md</c> §7.1, which says the
     /// finding is not trustworthy until <c>SubjectRef.ForType(assembly, fqn)</c> is what the
     /// walkers key on. It is — <c>WalkTests</c> asserts that from three sides — and
     /// this shows what the alternative would have reported here, so the two cannot be confused in

@@ -7,7 +7,7 @@ namespace IronMarten.Bearing.Cli;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <c>docs/DEFECTS.md</c> §23. A first-time user's most likely mistakes — pointing at a project
+/// A first-time user's most likely mistakes — pointing at a project
 /// file, at a <c>.slnx</c>, at something that is not a solution at all — reached them as eleven
 /// frames of MSBuild stack trace, because <see cref="Program"/> caught the argument parser's
 /// exception and nothing the walk could throw. All three arrive as the same MSBuild message,
@@ -22,7 +22,7 @@ namespace IronMarten.Bearing.Cli;
 /// <b>The extension is read after the failure, never before it.</b> There is no pre-flight check
 /// rejecting <c>.slnx</c>, and the design note that predicted why is worth keeping now that it has
 /// paid: the text said it would stop being reached the day the load learned to succeed, and
-/// <c>docs/DEFECTS.md</c> §8 is that day. A guard in front of the load would have gone on refusing
+/// <c>.slnx</c> support was that day. A guard in front of the load would have gone on refusing
 /// a file that had started working, and nothing would have failed to say so.
 /// </para>
 /// <para>
@@ -32,11 +32,11 @@ namespace IronMarten.Bearing.Cli;
 /// for the user's typo.
 /// </para>
 /// <para>
-/// <b>A fourth cause was added later and it is not one of §23's</b> — <c>docs/DEFECTS.md</c> §43.
+/// <b>A fourth cause was added later and it is not one of the original three.</b>
 /// A solution pinning an SDK newer than the machine's is the likeliest first-run failure there is,
 /// it is a missing prerequisite rather than a mistake, and unlike the other three it arrives in
 /// words that name it. So it is the one arm read from the message, and <see cref="Advice"/> carries
-/// the order that keeps that from reopening what §23 settled.
+/// the order that keeps that from reopening what the taxonomy settled.
 /// </para>
 /// </remarks>
 public static class Failure
@@ -91,10 +91,10 @@ public static class Failure
     /// them.
     /// </para>
     /// <para>
-    /// <b>This sits inside §23 rather than against it</b> — <c>docs/DEFECTS.md</c> §43. What §23
+    /// <b>This sits inside the taxonomy rather than against it</b>. What it
     /// established is that its three causes all arrive as <c>No file format header found</c>, so
     /// the message cannot tell them apart and the path has to. A missing SDK does not share that
-    /// message; it is separable by exactly the thing §23 could not use.
+    /// message; it is separable by exactly the thing the crash could not use.
     /// </para>
     /// </remarks>
     private static IEnumerable<string> Advice(string path, string reason)

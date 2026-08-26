@@ -15,7 +15,7 @@ internal static class StructureSections
     /// </summary>
     /// <remarks>
     /// A display cap, so it lives here and not on the policy — and unlike the probe's, it says
-    /// what it cost. <c>docs/DEFECTS.md</c> §3.
+    /// what it cost.
     /// </remarks>
     private const int NamespacesPerCycle = 6;
 
@@ -90,7 +90,7 @@ internal static class StructureSections
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b><c>docs/DEFECTS.md</c> §59.</b> An MSBuild diagnostic is one string and can carry an
+    /// An MSBuild diagnostic is one string and can carry an
     /// entire exception inside it. On Umbraco this section printed twenty lines of a
     /// <c>Nerdbank.GitVersioning</c> stack trace, including frames from the package author's build
     /// machine, immediately after telling the reader these are usually not failures.
@@ -189,7 +189,7 @@ internal static class StructureSections
     /// "six" read as the tool contradicting itself.
     /// </para>
     /// <para>
-    /// <b>It is also the most likely place for <c>docs/DEFECTS.md</c> §5 to show up.</b> The
+    /// <b>It is also the most likely place for a missing classifier entry to show up.</b> The
     /// classifier recognises an external call by a hardcoded list of namespace prefixes —
     /// <c>System.Net.Http</c>, <c>Azure.</c>, <c>Stripe</c> and a handful more. Run Bearing on
     /// itself and it reports zero outbound contact points while listing Roslyn and MSBuild in the
@@ -239,7 +239,7 @@ internal static class StructureSections
 
         var (shown, disclosure) = Sentences.Cap(map.Systems, model.Policy.Top, "system", "     ");
 
-        // docs/DEFECTS.md §30. The row says what somebody could change: the framework is not a
+        // The row says what somebody could change: the framework is not a
         // dependency anybody is going to rewrite, and a package is. Origin decides the label and
         // deliberately not the list -- see ExternalSurface.Integrations for what that cost when
         // it was tried the other way round.
@@ -257,7 +257,7 @@ internal static class StructureSections
     {
         yield return "";
         yield return "-- CIRCULAR REFERENCES -----------------------------------------";
-        // docs/DEFECTS.md §58. The heading used to make the holding claim over everything listed
+        // The heading used to make the holding claim over everything listed
         // beneath it, and what is listed beneath it is a component -- 363 namespaces on Umbraco
         // against 14 pairs of evidence. The component and the pairs are two populations and the
         // heading now names them as two.
@@ -331,7 +331,7 @@ internal static class StructureSections
             // missing is where to start, which is the heaviest link and the type that carries it.
             //
             // Read off the finding rather than recomputed from model.Edges, and derived by
-            // CycleEvidence rather than here — docs/DEFECTS.md §46 was one renderer keeping
+            // CycleEvidence rather than here — one renderer once kept
             // evidence the other lost, so neither of these two may hold its own copy of either.
             foreach (var link in CycleEvidence
                          .ProjectLinks(model, Relations(findings, FindingKind.ProjectCycle, cycle))
@@ -417,7 +417,7 @@ internal static class StructureSections
     /// <remarks>
     /// The probe writes <c>", ..."</c> here, which leaves the count recoverable and the names
     /// not. Saying "6 of 10 shown" costs the same space and answers the question the ellipsis
-    /// raises. <c>docs/DEFECTS.md</c> §3.
+    /// raises.
     /// </remarks>
     private static string Members(
         Cycle cycle, string noun, int limit, string separator, Func<SubjectRef, string> name)
@@ -437,7 +437,7 @@ internal static class StructureSections
         yield return "   I = Ce/(Ce+Ca), low = much depends on it. A = share of types that are";
         yield return "   abstract or interfaces.";
 
-        // docs/DEFECTS.md §49. The term ran twenty-five times across the nopCommerce report and was
+        // The term ran twenty-five times across the nopCommerce report and was
         // never unpacked; the nearest thing to a definition defined D in terms of it, which sends a
         // reader who does not already know the axis away with nothing.
         var gloss = $"The MAIN SEQUENCE is {Sentences.MainSequence}: a project much depended on "
@@ -483,18 +483,18 @@ internal static class StructureSections
         }
     }
 
-    // docs/DEFECTS.md §48/§49. The words come from Sentences.Zone so that the terminal, the HTML
+    // The words come from Sentences.Zone so that the terminal, the HTML
     // table and the box on the map cannot spell one measure three ways -- which is what they did.
 
     /// <summary>
-    /// Whether every project compiled against everything it names — <c>docs/DEFECTS.md</c> §56.
+    /// Whether every project compiled against everything it names.
     /// </summary>
     /// <remarks>
     /// <para>
     /// <b>Stated either way, because this is the one incompleteness that moves every number.</b>
     /// A skipped test project or an excluded path understates a named subset; references that did
     /// not resolve understate <i>everything</i>, and always downward — a missing reference is a
-    /// missing edge and never a spurious one. Silence here would be the §4 mistake in a new place:
+    /// missing edge and never a spurious one. Silence here would be the load-success mistake again:
     /// the absence of a warning read as the presence of an assurance.
     /// </para>
     /// <para>
@@ -517,7 +517,7 @@ internal static class StructureSections
 
         // Two wordings were wrong before this one, and both were found by reading the rendered
         // rows rather than by reasoning about them. "2 projects ... every type IT names" is
-        // docs/DEFECTS.md §55 in the mirror -- a plural count against a singular pronoun, which
+        // the count-verb defect in the mirror -- a plural count against a singular pronoun, which
         // Prose's rule does not look for. And "restore the solution to close the gap" asserts a
         // cause: Umbraco.Core is restored and still has one, because the source names a type it
         // never declares. The consequence is the same either way; the remedy is not.
@@ -584,7 +584,7 @@ internal static class StructureSections
     /// <para>
     /// <b>Load diagnostics come first inside the section and are worded as diagnostics.</b>
     /// <c>Coverage</c> says in as many words that they are not necessarily failures, and
-    /// <c>docs/DEFECTS.md</c> §4 is the reason to take that seriously — load success is judged by
+    /// there is good reason to take that seriously: load success used to be judged by
     /// diagnostic rather than by outcome, which produced six spurious failures on nopCommerce. So
     /// the wording says what is certain (a project that did not load understates fan-in everywhere
     /// it is referenced) without asserting that any particular diagnostic means that happened.
@@ -610,7 +610,7 @@ internal static class StructureSections
         yield return "-- WHAT WAS NOT ANALYSED ---------------------------------------";
         yield return "   Every number above is relative to what was read. This is the rest.";
 
-        // The warning belongs to the outcome, not to the diagnostics — docs/DEFECTS.md §4. It
+        // The warning belongs to the outcome, not to the diagnostics. It
         // used to hang off LoadDiagnostics, which on nopCommerce meant telling a reader to rule
         // out six NuGet advisories before trusting any number on the page, when all 27 projects
         // had compiled. What bounds fan-in is a project that did not load, and now that is what
@@ -624,14 +624,14 @@ internal static class StructureSections
             yield return "   referenced, so read every number above as a lower bound.";
         }
 
-        // docs/DEFECTS.md §42. A tripwire rather than a feature: silent when nothing failed to
+        // A tripwire rather than a feature: silent when nothing failed to
         // parse, which is every run on healthy code and both reference solutions. It sits above
         // the load diagnostics because it bounds the numbers the same way ProjectsNotLoaded does
         // — a file that was not read is types and edges that are not there.
         if (coverage.UnreadableFiles.Count > 0)
         {
             yield return "";
-            // docs/DEFECTS.md §55. Sentences.Do for the verb, because Plural gets the number right
+            // Sentences.Do for the verb, because Plural gets the number right
             // and the sentence after it used to be written as though the answer were always plural.
             var unreadable = coverage.UnreadableFiles.Count;
 
@@ -671,7 +671,7 @@ internal static class StructureSections
             yield return "   Every project selected for analysis produced a compilation.";
         }
 
-        // docs/DEFECTS.md §56, and it goes directly under that sentence because that sentence is
+        // It goes directly under that sentence because that sentence is
         // what it qualifies: a compilation with unresolved references IS a compilation, so
         // "produced a compilation" is true and reads as a clean bill of health it cannot give.
         foreach (var line in UnresolvedReferenceLines(coverage)) yield return line;
@@ -698,7 +698,7 @@ internal static class StructureSections
             yield return "   Load diagnostics: none";
 
         // Stated whether or not any were dropped, because "none" is the reassurance and the
-        // absence of a line is not. docs/DEFECTS.md §7.
+        // absence of a line is not.
         yield return coverage.EdgesToUnanalysedTypes > 0
             ? $"   Dependencies pointing outside the analysed set: "
               + $"{Sentences.Whole(coverage.EdgesToUnanalysedTypes)} (fan-in is a lower bound)"
@@ -711,7 +711,7 @@ internal static class StructureSections
     /// <remarks>
     /// <c>--top</c> is how many <i>findings</i> a reader wants to see, and lowering it to focus a
     /// report should not also hide the reasons that report might be wrong. Fixed, and it discloses
-    /// what it dropped like every other capped list — <c>docs/DEFECTS.md</c> §3.
+    /// what it dropped like every other capped list.
     /// </remarks>
     private const int DiagnosticsShown = 10;
 }

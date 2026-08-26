@@ -19,7 +19,7 @@ namespace IronMarten.Bearing;
 /// <para>
 /// <b>No <c>Take</c>.</b> <see cref="AnalysisPolicy.Top"/> is a display cap applied by the
 /// renderer. A model that truncates leaves every renderer unable to say how much it is not
-/// showing (<c>docs/DEFECTS.md</c> §3), and it silently weakens suppression: in the probe a type
+/// showing, and it silently weakens suppression: in the probe a type
 /// nominated below the cap suppresses nothing, because the set membership is tested against was
 /// truncated first.
 /// </para>

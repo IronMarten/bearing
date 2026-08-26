@@ -27,7 +27,7 @@ namespace IronMarten.Bearing;
 /// </para>
 /// <para>
 /// <b>Two subjects are instances of one pattern when they reach the same kinds through the same
-/// dependencies</b>, which is <c>docs/DEFECTS.md</c> §11 and the second deliberate divergence from
+/// dependencies</b>, which is the second deliberate divergence from
 /// the oracle. The probe groups on the kind signature alone, and that assumes a shared signature
 /// means a shared phenomenon. It does not: four boilerplate controllers wired to a store and a
 /// gateway carry the identical signature to a middleware reaching into customer lookup and an
@@ -93,7 +93,7 @@ public static class SpansArchitecturalLayers
 
             // Identity, never the simple name: two types may share a name across assemblies, and
             // a pattern key built from names would merge components that have nothing to do with
-            // each other. docs/DEFECTS.md §1.
+            // each other.
             var participants = reached
                 .DistinctBy(r => r.Subject.Canonical, StringComparer.Ordinal)
                 .OrderBy(r => r.Kind, StringComparer.Ordinal)
@@ -143,7 +143,7 @@ public static class SpansArchitecturalLayers
         // Rarer patterns first — §3.1's discipline, in the model rather than in the renderer.
         // Within one pattern the members are equivalent by construction, so fan-in and then
         // identity are a tiebreak between things the finding does not distinguish, rather than
-        // the inverse-of-interestingness ordering §11 records against the probe.
+        // the inverse-of-interestingness ordering recorded against the probe.
         return Nomination.Ranked(
             found.OrderBy(f => f.GroupSize).ThenByDescending(f => f.FanIn),
             f => f.Finding);

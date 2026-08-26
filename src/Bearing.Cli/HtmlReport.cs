@@ -24,7 +24,7 @@ namespace IronMarten.Bearing.Cli;
 /// types and a row each would make the artifact several megabytes — and §6 makes bundle size a
 /// real budget. The bound is the finding set rather than a cap, so it scales with what there is to
 /// say rather than with the size of the codebase, and the section says what it left out and where
-/// the rest is. A silent subset would be <c>docs/DEFECTS.md</c> §3 again in a new medium.
+/// the rest is. A silent subset would be undisclosed truncation again, in a new medium.
 /// </para>
 /// <para>
 /// <b>What building this said about the finding record</b> — which is the job §6 assigns it —
@@ -63,7 +63,7 @@ public static class HtmlReport
         // behind a flag for CI and for whoever wants it. `PRD-free-tier.md` §9's anti-metric is that
         // more findings is worse.
         //
-        // docs/DEFECTS.md §47: this comment used to say every row was "still reachable — in --json,
+        // This comment used to say every row was "still reachable — in --json,
         // in --csv, and here behind a flag", which is three untruths. The exports carry the model
         // and not the findings, and --full is capped at --top like every other section. Closing
         // that for real is the findings export (`SCHEMA-findings-export.md`), not a wording change.
@@ -186,7 +186,7 @@ public static class HtmlReport
         page.Append("both axes are measurements, and which trade-off matters is the reader's call, because the ");
         page.Append("tool has no severity model to make it with.</p>\n");
 
-        // docs/DEFECTS.md §31 again, in a second picture: a name that is not on the drawing reads
+        // The folded-box lesson again, in a second picture: a name that is not on the drawing reads
         // as an omission rather than as a shortage of pixels.
         var unlabelled = ReachPlot.Unlabelled(model, findings);
         if (unlabelled.Count > 0)
@@ -409,7 +409,7 @@ public static class HtmlReport
     /// <b>A pointer rather than a fourth document.</b> A13 tier 4 is explicit that the full
     /// population already ships twice, in <c>--json</c> and <c>--csv</c>, and that writing another
     /// one is the mistake. What this has to do is make the omission visible: a page that quietly
-    /// showed nine findings out of 1,642 would be <c>docs/DEFECTS.md</c> §3 at the scale of a whole
+    /// showed nine findings out of 1,642 would be undisclosed truncation at the scale of a whole
     /// artifact, and invariant 8 says silence is never a clean bill.
     /// </remarks>
     private static void Everything(StringBuilder page, SolutionModel model, FindingSet findings)
@@ -420,7 +420,7 @@ public static class HtmlReport
         // way. This read `findings.All.Select(f => f.Kind).Distinct().Count()` for the kind count
         // and `findings.Count` for the total, while the list immediately below enumerated
         // Selection.Exemplars — two derivations of one population, agreeing by coincidence. That
-        // is docs/DEFECTS.md §40 and §41's shape exactly: a caption asserting a correspondence
+        // is that shape exactly: a caption asserting a correspondence
         // with the thing under it that nothing guarantees. Both numbers now come off the same
         // enumeration the list does, so the sentence cannot describe a different set from the one
         // it introduces.
@@ -453,7 +453,7 @@ public static class HtmlReport
         }
         page.Append("</ul>\n");
 
-        // docs/DEFECTS.md §47. This said the exports carry "every finding", and no export carries
+        // This said the exports carry "every finding", and no export carries
         // any: the JSON document's twelve top-level keys are model, and --full is prose capped at
         // --top. What is complete is the counting above, so that is what the sentence claims now.
         page.Append("<p class=\"lede\"><strong>Nothing above is a quiet subset</strong> — the count beside each ");
@@ -536,9 +536,9 @@ public static class HtmlReport
 
         page.Append($"{Html.Count(graph.Depth)} layer(s) deep.</p>\n");
 
-        // docs/DEFECTS.md §53 and §45. Both sentences are about what the drawing is not saying,
+        // Both sentences are about what the drawing is not saying,
         // and both numbers come from the model rather than from counting the SVG, so the caption
-        // cannot drift away from the picture it explains -- §46's failure in the direction where
+        // cannot drift away from the picture it explains -- renderer drift in the direction where
         // the prose is the half that goes stale.
         if (graph.Implied > 0)
             page.Append("<p class=\"sub\">Lines show the dependencies that carry the shape: ")
@@ -557,7 +557,7 @@ public static class HtmlReport
 
         page.Append("<div class=\"scroll\">\n").Append(ArchitectureDiagram.Render(model)).Append("</div>\n");
 
-        // docs/DEFECTS.md §31. Saying that folding happened is not the same as saying what is
+        // Saying that folding happened is not the same as saying what is
         // inside, and a reader scanning for a project name reads a fold as an omission. The names
         // go here rather than into the boxes: a picture cannot be searched, and a box that grows
         // to fit its members is the thing the fold exists to prevent.
@@ -573,7 +573,7 @@ public static class HtmlReport
     /// What the map's tints mean, beside the map.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §48 and §49, which are one fix.</b> The caption above already
+    /// <b>Two defects with one fix.</b> The caption above already
     /// explains the direction convention and the folded boxes and said nothing about the colour;
     /// the definition sat 170 lines down under <c>Projects</c>, and <i>main sequence</i> — the
     /// measure both surfaces spell — was used twenty-five times on nopCommerce and never unpacked
@@ -607,7 +607,7 @@ public static class HtmlReport
     private static void Projects(StringBuilder page, SolutionModel model)
     {
         page.Append("<h3>Projects</h3>\n");
-        // docs/DEFECTS.md §49. The caption used to define a COLUMN in terms of the main sequence
+        // The caption used to define a COLUMN in terms of the main sequence
         // and leave the term itself alone, so twenty-four of twenty-seven rows read "near the main
         // sequence" against no definition anywhere on the page.
         page.Append("<p class=\"sub\">I = Ce/(Ce+Ca), low means much depends on it. A = share of types that are ");
@@ -707,7 +707,7 @@ public static class HtmlReport
         var held = reportable.ToDictionary(c => c.Cycle, c => c);
 
         CycleGroup(page, "Namespaces", [.. reportable.Select(c => c.Cycle)],
-            // docs/DEFECTS.md §58. The blurb made the holding claim over every name listed
+            // The blurb made the holding claim over every name listed
             // under it, and the list is a component: 363 names on Umbraco, 15 of them in a
             // holding pair. Holding is now claimed where Holding() states it, over the set
             // that holds.
@@ -720,7 +720,7 @@ public static class HtmlReport
 
         // Off the finding, through CycleEvidence, exactly as the terminal renderer does it. Both
         // used to recompute this from model.Edges independently, which is the arrangement
-        // docs/DEFECTS.md §46 came out of.
+        // that let the two renderers drift apart.
         CycleGroup(page, "Projects", model.ProjectCycles,
             "Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.",
             id => Name(model, id),
@@ -802,13 +802,13 @@ public static class HtmlReport
     /// </remarks>
     private static IEnumerable<string> Holding(ShapedCycle cycle)
     {
-        // docs/DEFECTS.md §58. The bound first, in the model's words, so this renderer and the
+        // The bound first, in the model's words, so this renderer and the
         // text one cannot state the two populations differently.
         yield return Sentences.CoupledWithin(cycle.Coupled.Count, cycle.Cycle.Size, cycle.Pairs.Count);
 
         // Six, as the text report shows six: enough to see where the weight sits without the pair
         // list outgrowing the membership it is evidence for. The remainder is stated rather than
-        // dropped, which is docs/DEFECTS.md §3's rule.
+        // dropped, which is the rule for every capped list.
         foreach (var pair in cycle.Pairs.Take(6))
             yield return $"{pair.First} ↔ {pair.Second} — {pair.Weight} held reference(s)";
 
@@ -902,7 +902,7 @@ public static class HtmlReport
             : $"<li><strong>{Html.Count(coverage.EdgesToUnanalysedTypes)} dependency reference(s)</strong> pointed at "
               + "types the walk never analysed and were dropped. Read fan-in as a lower bound.</li>\n");
 
-        // docs/DEFECTS.md §4. This used to justify itself with an anecdote about another
+        // This used to justify itself with an anecdote about another
         // solution; it states the outcome of this run instead.
         page.Append(coverage.ProjectsNotLoaded.Count == 0
             ? "<li>Every project selected for analysis produced a compilation.</li>\n"
@@ -911,7 +911,7 @@ public static class HtmlReport
               + ". Fan-in understates everywhere they are referenced, so read every number as a "
               + "lower bound.</li>\n");
 
-        // docs/DEFECTS.md §56. Directly after the compilation sentence, because that is the
+        // Directly after the compilation sentence, because that is the
         // sentence it qualifies -- a compilation with unresolved references is still a
         // compilation, so "produced a compilation" is true and cannot mean what it looks like.
         page.Append(coverage.ProjectsWithUnresolvedReferences.Count == 0
@@ -975,7 +975,7 @@ public static class HtmlReport
             page.Append($"<h3>{Html.Text(Claims.KindName(group.Key))} — {Html.Count(all.Count)}</h3>\n");
             page.Append($"<p class=\"sub\">{Html.Text(Claims.KindBlurb(group.Key))}</p>\n");
 
-            // docs/DEFECTS.md §2, decision X13: an absolute gate says what share it took here and
+            // Decision X13: an absolute gate says what share it took here and
             // that the share does not travel. Only where the gate is a fixed count — on a
             // comparative gate the share IS the gate.
             if (Claims.GateIsAbsolute(group.Key))
@@ -1000,7 +1000,7 @@ public static class HtmlReport
 
         if (type is not null)
         {
-            // docs/DEFECTS.md §26. This line used to join three facts with middots, and the third
+            // This line used to join three facts with middots, and the third
             // was not the same kind of thing as the first two: project and file are addresses,
             // the cohort is the population the claim is measured against — the whole basis of the
             // finding. Readers understood the phrase and guessed at its job ("project membership?
@@ -1039,7 +1039,7 @@ public static class HtmlReport
 
         if (finding.Receipts.Count > 0)
         {
-            // docs/DEFECTS.md §27, settled by A13 tier 3. The pane used to be headed "Why this
+            // Settled by A13 tier 3. The pane used to be headed "Why this
             // fired", which promises the explanation — and participants who opened it understood
             // LESS than before, because what it delivers is 65 field names. Two things changed and
             // neither is a rename of the sixty-five: tier 4 took the whole enumeration off the
@@ -1201,8 +1201,8 @@ public static class HtmlReport
     // ------------------------------------------------------------------------ words ----
 
     /// <summary>
-    /// <c>docs/DEFECTS.md</c> §30 — what a reader could change, said in the row — and §60, which
-    /// is the same row saying it as a provenance rather than as a category.
+    /// What a reader could change, said in the row — and said as a provenance rather than
+    /// as a category.
     /// </summary>
     private static string Provider(ExternalOrigin origin) => origin switch
     {
@@ -1220,7 +1220,7 @@ public static class HtmlReport
             var member = owner.Members
                 .FirstOrDefault(m => string.Equals(m.Subject.Canonical, subject.Canonical, StringComparison.Ordinal));
 
-            // docs/DEFECTS.md §24, and one rule for both renderers now. This medium had its own
+            // One rule for both renderers now. This medium had its own
             // half-fix that skipped the dot and produced "CustomerInfoValidator ctor", which is
             // not wrong so much as still addressed to the runtime rather than to a reader.
             if (member is not null) return Sentences.Member(owner.Name, member.Name);

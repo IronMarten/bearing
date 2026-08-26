@@ -10,7 +10,7 @@ namespace IronMarten.Bearing;
 /// <param name="PlumbingReferences">
 /// How many type-to-namespace references were omitted as language or framework plumbing. Reported
 /// rather than dropped: a filtered list that does not say it filtered is a list a reader cannot
-/// calibrate — <c>docs/DEFECTS.md</c> §3.
+/// calibrate.
 /// </param>
 public readonly record struct IntegrationMap(
     IReadOnlyList<ExternalDependency> Systems,
@@ -43,8 +43,8 @@ public static class ExternalSurface
     /// to", and the answer is never the collections library.
     /// </para>
     /// <para>
-    /// <b>A hardcoded list, like <c>docs/DEFECTS.md</c> §5's four ORMs, and it fails more
-    /// gently.</b> §5's list decides a classification, so a missing entry silently changes what a
+    /// <b>A hardcoded list, like the classifier's four ORMs, and it fails more
+    /// gently.</b> That list decides a classification, so a missing entry silently changes what a
     /// type <i>is</i>; this one only decides what appears in a list whose omissions are counted
     /// out loud. A package this list has never heard of shows up as an integration, which is the
     /// safe direction to be wrong in.
@@ -84,7 +84,7 @@ public static class ExternalSurface
     /// <remarks>
     /// <para>
     /// <b>Origin does not decide this, and the fixture's known answer is why.</b>
-    /// <c>docs/DEFECTS.md</c> §30 was read once as "framework-resolved means plumbing", which
+    /// The provenance split was read once as "framework-resolved means plumbing", which
     /// emptied the fixture's integration map: <c>System.Data</c> and <c>System.Net.Http</c> both
     /// resolve from the framework, and both are exactly how that solution reaches a database and
     /// the network. `CoreEquivalenceTests` caught it in one run.

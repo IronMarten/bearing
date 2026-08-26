@@ -66,7 +66,7 @@ public readonly record struct CohortStatistics(
 /// for a cohort of one; this blanks below <see cref="AnalysisPolicy.MinCohort"/>, because a
 /// percentile taken over two peers is arithmetic rather than a comparison and the tool already
 /// refuses to make claims there. And an <b>undefined</b> ratio — a multiple of a median of zero —
-/// is blank here where the probe writes <c>inf</c>: <c>docs/DEFECTS.md</c> §28, which is that
+/// is blank here where the probe writes <c>inf</c>, which is that
 /// infinity is the absence of a measurement rather than a large one, and it sorts like a large one
 /// in every tool that reads this file. The percentile survives in that case and carries the
 /// reading.
@@ -137,7 +137,7 @@ public static class CohortStatisticsSet
     /// The multiple, or nothing where the median is zero.
     /// </summary>
     /// <remarks>
-    /// <c>docs/DEFECTS.md</c> §28. <see cref="Distribution.TimesMedianOf"/> answers
+    /// <see cref="Distribution.TimesMedianOf"/> answers
     /// <see cref="double.PositiveInfinity"/> there, deliberately and correctly — the quantity is
     /// undefined and collapsing it to a number would hide that. An export is where it has to become
     /// an absence instead: every consumer of a CSV sorts it, and infinity sorts to the top of a

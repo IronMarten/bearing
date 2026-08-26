@@ -66,7 +66,7 @@ internal sealed class ReferenceCollector : CSharpSyntaxWalker
 
     /// <summary>Whether entering this node means entering a member.</summary>
     /// <remarks>
-    /// <b>A field's declarator rather than its declaration</b>, for <c>docs/DEFECTS.md</c> §39's
+    /// <b>A field's declarator rather than its declaration</b>, for the member-identity
     /// reason: <c>GetDeclaredSymbol</c> answers <see langword="null"/> for a
     /// <c>BaseFieldDeclarationSyntax</c>, so a reference in an initialiser would be attributed to
     /// nothing at all. It is also the only reading that survives <c>int a = X(), b = Y();</c>,

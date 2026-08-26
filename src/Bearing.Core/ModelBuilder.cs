@@ -21,7 +21,7 @@ internal sealed class ModelBuilder
     /// <remarks>
     /// <c>FullyQualifiedFormat</c> qualifies type symbols and leaves member symbols bare, which
     /// is why the probe's member ids collapse twelve <c>Apply</c> methods into one — see
-    /// <c>docs/DEFECTS.md</c> §13.
+    /// how a bare name merges them.
     /// </remarks>
     private static readonly SymbolDisplayFormat MemberFormat = SymbolDisplayFormat.FullyQualifiedFormat
         .WithMemberOptions(SymbolDisplayMemberOptions.IncludeContainingType
@@ -43,7 +43,7 @@ internal sealed class ModelBuilder
     private readonly WalkClock _clock;
 
     /// <summary>
-    /// Where each external namespace resolved from — <c>docs/DEFECTS.md</c> §30.
+    /// Where each external namespace resolved from.
     /// </summary>
     /// <remarks>
     /// One namespace can be reached through more than one assembly, and the answers can differ:
@@ -160,7 +160,7 @@ internal sealed class ModelBuilder
     /// <para>
     /// <b>Usually one, and for a field declaration it is one per variable</b> — <c>int a, b;</c> is
     /// two fields, with two names, two accessibilities and two sets of callers. It used to be one
-    /// member named <c>a</c>, which is <c>docs/DEFECTS.md</c> §39: a dead-code claim cannot be made
+    /// member named <c>a</c>, and a dead-code claim cannot be made
     /// about a member the model never separated from its neighbour.
     /// </para>
     /// <para>
@@ -389,7 +389,7 @@ internal sealed class ModelBuilder
         for (var b = type.BaseType; b is not null; b = b.BaseType) bases.Add(b.Name);
 
         // The lists and the matching rule are FrameworkNamespaces, so both can be asserted —
-        // docs/DEFECTS.md §5 could be undone with the suite green until they were. TASKS.md P10.
+        // the list could be undone with the suite green until they were.
         string? ExternalMatch(IReadOnlyList<string> prefixes) =>
             FrameworkNamespaces.Match(node.ExternalNamespaces, prefixes);
 
@@ -425,7 +425,7 @@ internal sealed class ModelBuilder
             return;
         }
 
-        // docs/DEFECTS.md §5. LinqToDB and FluentMigrator were missing, and on nopCommerce that
+        // LinqToDB and FluentMigrator were missing, and on nopCommerce that
         // was not a silence — it was 114 of Nop.Data's 129 Internal types, the *Builder mapping
         // layer under Nop.Data/Mapping/Builders, one per entity. The 23 that did classify were
         // caught by System.Data rather than by any ORM rule: right by coincidence.
@@ -493,7 +493,7 @@ internal sealed class ModelBuilder
         }
 
         // An endpoint the walk never declared cannot be an edge in the report, and looking one up
-        // unguarded is what crashed Bearing on both reference solutions — docs/DEFECTS.md §7, whose
+        // unguarded is what crashed Bearing on both reference solutions, whose
         // consequence turned out to be a KeyNotFoundException rather than a small inaccuracy.
         //
         // `_isInSolution` answers "does this symbol belong to a project in this solution", which is
@@ -533,7 +533,7 @@ internal sealed class ModelBuilder
                     if (_entryPoints.Contains(SignatureIn(member.Subject))) member.IsEntryPoint = true;
 
         // Projects are canonicalised for the same reason types and edges above them are, and were
-        // not until R2 — docs/DEFECTS.md §37. They arrive in workspace load order, which is the
+        // not until R2. They arrive in workspace load order, which is the
         // order the .sln declares them in, so reversing four lines of a solution file with no
         // semantic content reordered the projects array in the JSON export. The terminal and HTML
         // reports sorted for themselves and were never affected, which is exactly why nothing
@@ -664,7 +664,7 @@ internal sealed class ModelBuilder
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Decision X14, and <c>docs/DEFECTS.md</c> §39 is what it replaces.</b> The signature used
+    /// <b>Decision X14, and a display string is what it replaces.</b> The signature used
     /// to be <c>symbol.ToDisplayString(MemberFormat)</c>, and a display string is not an identity:
     /// it drops <c>ref</c>, <c>out</c> and <c>in</c>, renders a static constructor exactly like an
     /// instance one, gives an explicit interface implementation the containing type's name, and —
@@ -835,7 +835,7 @@ internal sealed class ModelBuilder
     /// <b>The symbol first, and the syntax only when there is none.</b> The syntactic list had no
     /// arm for <c>EventFieldDeclarationSyntax</c>, so every event in a type was named
     /// <c>EventFieldDeclaration</c> — all 81 of Jellyfin's, collapsed into 15 subjects
-    /// (<c>docs/DEFECTS.md</c> §39). A list of syntax kinds is a list that goes on being incomplete;
+    /// under the old display string. A list of syntax kinds is a list that goes on being incomplete;
     /// the symbol knows its own name for every kind of member there is.
     /// </remarks>
     private static string MemberName(ISymbol? symbol, MemberDeclarationSyntax member) => symbol?.Name switch

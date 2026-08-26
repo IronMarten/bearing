@@ -27,7 +27,7 @@ namespace IronMarten.Bearing.Cli;
 /// wrong — bad arguments, or a solution this tool cannot read — and <c>3</c> no MSBuild. The
 /// second and third are separated because they are different people's problems: <c>2</c> is
 /// something the user typed and can retype, <c>3</c> is the machine. Every failure the load can
-/// produce now has an arm here; <c>docs/DEFECTS.md</c> §23 is what the missing one looked like.
+/// produce now has an arm here; a raw MSBuild stack trace is what the missing one looked like.
 /// </para>
 /// </remarks>
 internal static class Program
@@ -69,7 +69,7 @@ internal static class Program
         }
 
         // The version the tool actually ships, told to Core rather than guessed by it.
-        // docs/DEFECTS.md §21: the model used to read Bearing.Core's assembly, which sets none.
+        // The model used to read Bearing.Core's assembly, which sets none.
         var options = invocation.Options with { ToolVersion = version };
 
         if (!File.Exists(options.SolutionPath))
@@ -232,7 +232,7 @@ internal static class Program
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>docs/DEFECTS.md</c> §25. Redirected to a file, <c>Console.Out</c> encodes through the
+    /// Redirected to a file, <c>Console.Out</c> encodes through the
     /// process code page, and on a Windows machine that is not UTF-8 every em dash in the report
     /// best-fit-maps to an ASCII hyphen — 247 of them in one nopCommerce run, none surviving.
     /// </para>

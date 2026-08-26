@@ -109,7 +109,7 @@ public sealed class CohortStatisticsTests(CoreWalkFixture core)
     /// An undefined multiple is absent rather than infinite.
     /// </summary>
     /// <remarks>
-    /// <b><c>docs/DEFECTS.md</c> §28, in the medium where it does the most damage.</b> A ratio
+    /// <b>In the medium where it does the most damage.</b> A ratio
     /// against a median of zero is undefined, and the probe writes <c>inf</c> — which every tool
     /// that opens a CSV sorts to the top of the column as though it were the largest measurement
     /// rather than the missing one. The percentile survives and carries the reading.

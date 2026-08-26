@@ -37,8 +37,8 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the test that would have caught <c>docs/DEFECTS.md</c> §47</b> — the report
-    /// telling a reader that the exports carry every finding while they carried none. §47 was
+    /// <b>This is the test that would have caught the false exports sentence</b> — the report
+    /// telling a reader that the exports carry every finding while they carried none. It was
     /// closed by rewording the page, because the sentence was the only thing that could be fixed
     /// at the time; this is the version that closes it by making the sentence true, and it is the
     /// invariant that stops the four-surface version of the same defect.
@@ -332,7 +332,7 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
     /// <para>
     /// <b>A presentation flag must not decide what a persistence format contains.</b> §4: two runs
     /// at different <c>--top</c> would diff as though findings had appeared and vanished, and
-    /// nothing in the file would say why. It is also what makes <c>docs/DEFECTS.md</c> §47's
+    /// nothing in the file would say why. It is also what makes the exports
     /// sentence true rather than merely reworded — the page claims the exports carry every finding,
     /// and a cap here would make that a second wrong version of the same claim.
     /// </para>
@@ -349,8 +349,8 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
     /// findings.
     /// </para>
     /// <para>
-    /// <b>It found that §8.3 is half true, and the half that is not is <c>docs/DEFECTS.md</c>
-    /// §54.</b> The population is uncapped — same keys, same count, at either <c>--top</c>. The
+    /// <b>It found that §8.3 is half true, and the half that is not is a display cap
+    /// deciding a judgement.</b> The population is uncapped — same keys, same count, at either <c>--top</c>. The
     /// <i>content</i> is not: <c>RollCallThreshold</c> is <c>Top / RollCallDivisor</c>, so the
     /// display cap decides whether a layer-span finding carries
     /// <c>part-of-a-layering-pattern</c>. <c>SCHEMA-findings-export.md</c> §4 says Core has no
@@ -380,7 +380,7 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
         Assert.Equal(Keys(narrow), Keys(wide));
 
         // And the half that does not, asserted as the defect rather than left as a silence.
-        // docs/DEFECTS.md §54: RollCallThreshold is Top / RollCallDivisor, so --top decides whether
+        // RollCallThreshold is Top / RollCallDivisor, so --top decides whether
         // a layer-span finding carries part-of-a-layering-pattern. A display cap reaching a
         // judgement is the defect; this line fails the day it is fixed, which is the point of
         // writing it this way round rather than skipping the test.

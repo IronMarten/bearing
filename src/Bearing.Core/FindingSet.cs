@@ -84,7 +84,7 @@ public sealed class FindingSet
             // The member -> declaring type walk, which is the whole reason SubjectRef carries
             // one. A concealed decision nominated on a method is a concealed decision about the
             // type that declares it, because the reason the suppression exists is behavioural
-            // and behaviour lives in methods. docs/DEFECTS.md §15.
+            // and behaviour lives in methods.
             if (finding.Subject.DeclaringType is { } declaring)
                 including.Add(new FindingKey(finding.Kind, declaring).Canonical);
         }
@@ -110,7 +110,7 @@ public sealed class FindingSet
     /// The query the suppression matrix needs. "Already nominated as a concealed decision" does
     /// not say whether a nomination on one of the type's methods counts; it does, and the level
     /// that happened to nominate it does not change whether the decision is there. Asking with
-    /// <see cref="Contains(FindingKind, SubjectRef)"/> instead is <c>docs/DEFECTS.md</c> §15 —
+    /// <see cref="Contains(FindingKind, SubjectRef)"/> instead is the type-level-only bug —
     /// the report saying "this method is making business judgements" and "if it breaks, it
     /// breaks alone" about one component.
     /// </remarks>

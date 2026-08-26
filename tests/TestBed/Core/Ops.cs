@@ -1,6 +1,6 @@
 // PLANT (P4): the boundary population that makes WIDEST CONTRACT SURFACE's suppression reachable.
 //
-// docs/DEFECTS.md §12: the current gate suppresses the section when the qualifying set exceeds
+// The current gate suppresses the section when the qualifying set exceeds
 // half the boundaries, and the qualifying filter is `DataShape >= 1.5 * median` — proportional to
 // the same distribution the ceiling is measured against. It lands on the threshold at every
 // boundary count and never crosses, so the suppression cannot fire on any solution at any size.

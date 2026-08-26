@@ -22,7 +22,7 @@
 //   * Dispatch.cs and docs/TESTING.md: "row 5's suppression stops being reachable at ten."
 //   * TASKS.md X1: "ten makes D12's suppression reachable, disarming its pin."
 //
-// Opposite claims about the same number. docs/DEFECTS.md §12 settles it: WIDEST CONTRACT SURFACE
+// Opposite claims about the same number. The measurement settles it: WIDEST CONTRACT SURFACE
 // can never be suppressed AT ANY BOUNDARY COUNT, because the qualifying filter is proportional to
 // the same distribution the ceiling is measured against, and the Take(5) caps it besides. Nine was
 // not a cliff edge. Its pin is a synthetic proof over the distributions that MAXIMISE the

@@ -5,7 +5,7 @@ namespace Bearing.Tests;
 
 /// <summary>
 /// An absolute gate says what share it took and that the share does not travel —
-/// <c>docs/DEFECTS.md</c> §2's last outstanding half, and decision X13's "say why".
+/// the last outstanding half of "an absolute gate does not travel", and X13's "say why".
 /// </summary>
 /// <remarks>
 /// <para>

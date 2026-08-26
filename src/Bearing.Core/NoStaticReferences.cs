@@ -251,7 +251,7 @@ public static class NoStaticReferences
     /// </para>
     /// <para>
     /// It is deliberately not a test for whether the solution uses a container, because that would
-    /// be a curated list of registration APIs, and <c>docs/DEFECTS.md</c> §5 is the standing
+    /// be a curated list of registration APIs, and the hardcoded ORM list is the standing
     /// example of what one of those costs.
     /// </para>
     /// </remarks>
