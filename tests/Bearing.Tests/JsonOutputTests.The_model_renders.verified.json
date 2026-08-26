@@ -63,7 +63,7 @@
     "loadDiagnostics": [],
     "projectsNotLoaded": [],
     "excludedTypes": 2,
-    "edgesToUnanalysedTypes": 0,
+    "edgesToUnanalysedTypes": 1,
     "unreadableFiles": []
   },
   "projects": [
@@ -76,10 +76,10 @@
         "ca": 2,
         "ce": 0,
         "abstractTypes": 14,
-        "totalTypes": 199,
-        "abstractness": 0.07035175879396985,
+        "totalTypes": 200,
+        "abstractness": 0.07,
         "instability": 0,
-        "distanceFromMainSequence": 0.9296482412060302,
+        "distanceFromMainSequence": 0.9299999999999999,
         "zone": "Pain"
       }
     },
@@ -134,21 +134,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 78.78787878787878,
+        "fanOutPercentile": 79.41176470588235,
         "fanOutTimesMedian": 4,
-        "cyclomaticPercentile": 78.78787878787878,
+        "cyclomaticPercentile": 79.41176470588235,
         "cyclomaticTimesMedian": 3,
-        "maxMemberCyclomaticPercentile": 74.24242424242425,
+        "maxMemberCyclomaticPercentile": 75,
         "maxMemberCyclomaticTimesMedian": 2,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 86.36363636363636,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "dataShapePercentile": 86.76470588235294,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 4,
@@ -310,8 +310,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -401,8 +401,8 @@
         "dsmPercentile": 42.857142857142854,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -512,8 +512,8 @@
         "dsmPercentile": 42.857142857142854,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -610,21 +610,21 @@
       "kindEvidence": "external-ns:System.Net.Http",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 87.87878787878788,
+        "fanInPercentile": 88.23529411764706,
         "fanInTimesMedian": 7,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 60.60606060606061,
-        "solutionFanInPercentile": 93.68932038834951,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 61.76470588235294,
+        "solutionFanInPercentile": 93.71980676328502,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 7,
       "fanOut": 0,
@@ -716,8 +716,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -807,8 +807,8 @@
         "dsmPercentile": 40,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 60,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -880,8 +880,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 66.66666666666667,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 92.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 92.27053140096618
       },
       "fanIn": 0,
       "fanOut": 5,
@@ -1043,8 +1043,8 @@
         "dsmPercentile": 40,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 20,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -1116,8 +1116,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -1189,8 +1189,8 @@
         "dsmPercentile": 81.25,
         "dsmTimesMedian": null,
         "dataShapePercentile": 31.25,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 84.46601941747574
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 84.54106280193237
       },
       "fanIn": 0,
       "fanOut": 5,
@@ -1298,8 +1298,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -1461,8 +1461,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -1552,8 +1552,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 84.95145631067962,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 85.02415458937197,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 4,
       "fanOut": 0,
@@ -1625,8 +1625,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 90,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -1698,8 +1698,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -1789,8 +1789,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 83.49514563106796,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 83.57487922705315,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 3,
       "fanOut": 0,
@@ -1862,8 +1862,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 83.49514563106796,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 83.57487922705315,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 3,
       "fanOut": 0,
@@ -1935,8 +1935,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 83.49514563106796,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 83.57487922705315,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 3,
       "fanOut": 0,
@@ -2008,8 +2008,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 2,
       "fanOut": 1,
@@ -2099,8 +2099,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 2,
       "fanOut": 2,
@@ -2208,8 +2208,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 65,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 83.00970873786407
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 83.09178743961353
       },
       "fanIn": 2,
       "fanOut": 5,
@@ -2371,8 +2371,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 80,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 84.46601941747574
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 84.54106280193237
       },
       "fanIn": 0,
       "fanOut": 8,
@@ -2588,8 +2588,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 95,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 0,
       "fanOut": 8,
@@ -2805,8 +2805,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -2896,8 +2896,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 80,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 5,
       "fanOut": 0,
@@ -2987,8 +2987,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 10,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -3078,8 +3078,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -3156,21 +3156,21 @@
       "kindEvidence": "external-ns:System.Net.Http",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 80.3030303030303,
+        "fanInPercentile": 80.88235294117646,
         "fanInTimesMedian": 6,
-        "fanOutPercentile": 62.121212121212125,
+        "fanOutPercentile": 63.23529411764706,
         "fanOutTimesMedian": 2,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 81.81818181818181,
-        "solutionFanInPercentile": 91.99029126213593,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 82.3529411764706,
+        "solutionFanInPercentile": 92.02898550724638,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 6,
       "fanOut": 2,
@@ -3264,8 +3264,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -3355,8 +3355,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 80,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -3428,8 +3428,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 80,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -3508,21 +3508,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 62.121212121212125,
+        "fanOutPercentile": 63.23529411764706,
         "fanOutTimesMedian": 2,
-        "cyclomaticPercentile": 78.78787878787878,
+        "cyclomaticPercentile": 79.41176470588235,
         "cyclomaticTimesMedian": 3,
-        "maxMemberCyclomaticPercentile": 74.24242424242425,
+        "maxMemberCyclomaticPercentile": 75,
         "maxMemberCyclomaticTimesMedian": 2,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -3601,21 +3601,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 78.78787878787878,
+        "fanOutPercentile": 79.41176470588235,
         "fanOutTimesMedian": 4,
-        "cyclomaticPercentile": 66.66666666666667,
+        "cyclomaticPercentile": 67.6470588235294,
         "cyclomaticTimesMedian": 2,
-        "maxMemberCyclomaticPercentile": 74.24242424242425,
+        "maxMemberCyclomaticPercentile": 75,
         "maxMemberCyclomaticTimesMedian": 2,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 60.60606060606061,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "dataShapePercentile": 61.76470588235294,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 4,
@@ -3746,21 +3746,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 62.121212121212125,
+        "fanOutPercentile": 63.23529411764706,
         "fanOutTimesMedian": 2,
-        "cyclomaticPercentile": 66.66666666666667,
+        "cyclomaticPercentile": 67.6470588235294,
         "cyclomaticTimesMedian": 2,
-        "maxMemberCyclomaticPercentile": 74.24242424242425,
+        "maxMemberCyclomaticPercentile": 75,
         "maxMemberCyclomaticTimesMedian": 2,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -3855,21 +3855,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 96.96969696969697,
+        "fanInPercentile": 97.05882352941177,
         "fanInTimesMedian": 8,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 9.090909090909092,
+        "cyclomaticPercentile": 8.823529411764707,
         "cyclomaticTimesMedian": 0,
-        "maxMemberCyclomaticPercentile": 9.090909090909092,
+        "maxMemberCyclomaticPercentile": 8.823529411764707,
         "maxMemberCyclomaticTimesMedian": 0,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 7.575757575757576,
-        "solutionFanInPercentile": 95.87378640776699,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "dataShapePercentile": 7.352941176470588,
+        "solutionFanInPercentile": 95.89371980676329,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 8,
       "fanOut": 0,
@@ -3922,8 +3922,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -4031,8 +4031,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -4140,8 +4140,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 94.90291262135922
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 94.92753623188406
       },
       "fanIn": 1,
       "fanOut": 4,
@@ -4285,8 +4285,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 1,
@@ -4376,8 +4376,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -4503,8 +4503,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -4576,8 +4576,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -4703,8 +4703,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -4776,8 +4776,8 @@
         "dsmPercentile": 37.5,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 6.25,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 1,
@@ -4849,8 +4849,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 0,
@@ -4958,8 +4958,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 5,
@@ -5427,8 +5427,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -5554,8 +5554,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -5627,8 +5627,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -5754,8 +5754,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -5827,8 +5827,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -5954,8 +5954,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -6027,8 +6027,8 @@
         "dsmPercentile": 37.5,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 62.5,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 7,
@@ -6154,8 +6154,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -6245,8 +6245,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 27.77777777777778,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -6354,8 +6354,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -6517,8 +6517,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 91.99029126213593,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 92.02898550724638,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 6,
       "fanOut": 0,
@@ -6590,8 +6590,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -6644,8 +6644,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 1,
@@ -6722,21 +6722,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -6795,21 +6795,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 66.66666666666667,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 67.6470588235294,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -6868,21 +6868,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 83.33333333333333,
+        "fanOutPercentile": 83.82352941176471,
         "fanOutTimesMedian": 5,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 5,
@@ -7044,8 +7044,8 @@
         "dsmPercentile": 92.85714285714286,
         "dsmTimesMedian": null,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 99.27184466019418
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 99.27536231884058
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -7137,8 +7137,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 77.77777777777777,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -7246,8 +7246,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -7319,8 +7319,8 @@
         "dsmPercentile": 40,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 20,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -7392,8 +7392,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 16.666666666666668,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -7452,21 +7452,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 71.21212121212122,
+        "fanInPercentile": 72.05882352941177,
         "fanInTimesMedian": 2,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 9.090909090909092,
+        "cyclomaticPercentile": 8.823529411764707,
         "cyclomaticTimesMedian": 0,
-        "maxMemberCyclomaticPercentile": 9.090909090909092,
+        "maxMemberCyclomaticPercentile": 8.823529411764707,
         "maxMemberCyclomaticTimesMedian": 0,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -7525,21 +7525,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 71.21212121212122,
+        "fanInPercentile": 72.05882352941177,
         "fanInTimesMedian": 2,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 9.090909090909092,
+        "cyclomaticPercentile": 8.823529411764707,
         "cyclomaticTimesMedian": 0,
-        "maxMemberCyclomaticPercentile": 9.090909090909092,
+        "maxMemberCyclomaticPercentile": 8.823529411764707,
         "maxMemberCyclomaticTimesMedian": 0,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -7611,8 +7611,8 @@
         "dsmPercentile": 40,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 60,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -7671,21 +7671,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 96.96969696969697,
+        "fanInPercentile": 97.05882352941177,
         "fanInTimesMedian": 8,
-        "fanOutPercentile": 72.72727272727273,
+        "fanOutPercentile": 73.52941176470588,
         "fanOutTimesMedian": 3,
-        "cyclomaticPercentile": 9.090909090909092,
+        "cyclomaticPercentile": 8.823529411764707,
         "cyclomaticTimesMedian": 0,
-        "maxMemberCyclomaticPercentile": 9.090909090909092,
+        "maxMemberCyclomaticPercentile": 8.823529411764707,
         "maxMemberCyclomaticTimesMedian": 0,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 90.9090909090909,
-        "solutionFanInPercentile": 95.87378640776699,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "dataShapePercentile": 91.17647058823529,
+        "solutionFanInPercentile": 95.89371980676329,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 8,
       "fanOut": 3,
@@ -7744,21 +7744,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 71.21212121212122,
+        "fanInPercentile": 72.05882352941177,
         "fanInTimesMedian": 2,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 9.090909090909092,
+        "cyclomaticPercentile": 8.823529411764707,
         "cyclomaticTimesMedian": 0,
-        "maxMemberCyclomaticPercentile": 9.090909090909092,
+        "maxMemberCyclomaticPercentile": 8.823529411764707,
         "maxMemberCyclomaticTimesMedian": 0,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -7817,21 +7817,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 62.121212121212125,
+        "fanOutPercentile": 63.23529411764706,
         "fanOutTimesMedian": 2,
-        "cyclomaticPercentile": 92.42424242424242,
+        "cyclomaticPercentile": 92.6470588235294,
         "cyclomaticTimesMedian": 16,
-        "maxMemberCyclomaticPercentile": 92.42424242424242,
+        "maxMemberCyclomaticPercentile": 92.6470588235294,
         "maxMemberCyclomaticTimesMedian": 4,
-        "dsmPercentile": 95.45454545454545,
+        "dsmPercentile": 95.58823529411765,
         "dsmTimesMedian": null,
-        "dataShapePercentile": 95.45454545454545,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 83.00970873786407
+        "dataShapePercentile": 95.58823529411765,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 83.09178743961353
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -8229,8 +8229,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -8392,8 +8392,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -8446,8 +8446,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 1,
@@ -8537,8 +8537,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -8664,8 +8664,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -8791,8 +8791,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 95.87378640776699,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 95.89371980676329,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 8,
       "fanOut": 0,
@@ -8884,8 +8884,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 95.87378640776699,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 95.89371980676329,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 8,
       "fanOut": 0,
@@ -8977,8 +8977,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 95.87378640776699,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 95.89371980676329,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 8,
       "fanOut": 1,
@@ -9050,8 +9050,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -9177,8 +9177,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 4,
@@ -9304,8 +9304,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 4,
@@ -9431,8 +9431,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -9558,8 +9558,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -9685,8 +9685,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 83.49514563106796,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 83.57487922705315,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 3,
       "fanOut": 0,
@@ -9741,8 +9741,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -9855,21 +9855,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 96.96969696969697,
+        "fanOutPercentile": 97.05882352941177,
         "fanOutTimesMedian": 11,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 11,
@@ -10139,8 +10139,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -10212,8 +10212,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 88.88888888888889,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 97.0873786407767
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 97.10144927536231
       },
       "fanIn": 1,
       "fanOut": 6,
@@ -10393,8 +10393,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 5,
       "fanOut": 0,
@@ -10484,8 +10484,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 99.27184466019418,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 99.27536231884058,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 20,
       "fanOut": 0,
@@ -10575,8 +10575,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 99.75728155339806,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 99.7584541062802,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 21,
       "fanOut": 0,
@@ -10648,8 +10648,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 94.44444444444444,
-        "solutionFanInPercentile": 98.30097087378641,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 98.30917874396135,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 15,
       "fanOut": 0,
@@ -10793,8 +10793,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -10884,8 +10884,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -10944,21 +10944,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 72.72727272727273,
+        "fanOutPercentile": 73.52941176470588,
         "fanOutTimesMedian": 3,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 3,
@@ -11084,8 +11084,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 91.99029126213593,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 92.02898550724638,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 6,
       "fanOut": 0,
@@ -11157,8 +11157,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 83.00970873786407
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 83.09178743961353
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -11230,8 +11230,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -11321,8 +11321,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -11412,8 +11412,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -11485,8 +11485,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -11558,8 +11558,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -11631,8 +11631,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -11704,8 +11704,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -11795,8 +11795,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -11886,8 +11886,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 90,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 90.53398058252426
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 90.57971014492753
       },
       "fanIn": 5,
       "fanOut": 4,
@@ -12049,8 +12049,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -12140,8 +12140,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 40,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 5,
       "fanOut": 1,
@@ -12218,21 +12218,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 66.66666666666667,
+        "cyclomaticPercentile": 67.6470588235294,
         "cyclomaticTimesMedian": 2,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 92.42424242424242,
+        "dsmPercentile": 92.6470588235294,
         "dsmTimesMedian": null,
-        "dataShapePercentile": 74.24242424242425,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 75,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -12360,8 +12360,8 @@
         "dsmPercentile": 37.5,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 62.5,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -12487,8 +12487,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -12565,21 +12565,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 9.090909090909092,
+        "cyclomaticPercentile": 8.823529411764707,
         "cyclomaticTimesMedian": 0,
-        "maxMemberCyclomaticPercentile": 9.090909090909092,
+        "maxMemberCyclomaticPercentile": 8.823529411764707,
         "maxMemberCyclomaticTimesMedian": 0,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 7.575757575757576,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "dataShapePercentile": 7.352941176470588,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -12632,8 +12632,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 27.77777777777778,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -12741,8 +12741,8 @@
         "dsmPercentile": 37.5,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 62.5,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 7,
@@ -12868,8 +12868,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -12959,8 +12959,8 @@
         "dsmPercentile": 42.857142857142854,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -13070,8 +13070,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 88.88888888888889,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 97.0873786407767
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 97.10144927536231
       },
       "fanIn": 1,
       "fanOut": 4,
@@ -13215,8 +13215,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 94.90291262135922
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 94.92753623188406
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -13342,8 +13342,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 94.90291262135922
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 94.92753623188406
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -13433,8 +13433,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 94.90291262135922
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 94.92753623188406
       },
       "fanIn": 2,
       "fanOut": 2,
@@ -13560,8 +13560,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 92.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 92.27053140096618
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -13651,8 +13651,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 92.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 92.27053140096618
       },
       "fanIn": 1,
       "fanOut": 4,
@@ -13814,8 +13814,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 92.23300970873787
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 92.27053140096618
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -13905,8 +13905,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 77.77777777777777,
-        "solutionFanInPercentile": 98.7864077669903,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 98.79227053140097,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 19,
       "fanOut": 0,
@@ -14016,8 +14016,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -14076,21 +14076,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 92.42424242424242,
+        "fanOutPercentile": 92.6470588235294,
         "fanOutTimesMedian": 9,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 9,
@@ -14324,8 +14324,8 @@
         "dsmPercentile": 37.5,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 18.75,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 92.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 92.27053140096618
       },
       "fanIn": 1,
       "fanOut": 6,
@@ -14487,8 +14487,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -14578,8 +14578,8 @@
         "dsmPercentile": 42.857142857142854,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -14689,8 +14689,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -14839,21 +14839,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -14925,8 +14925,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 84.95145631067962,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 85.02415458937197,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 4,
       "fanOut": 0,
@@ -14985,21 +14985,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 77.27272727272727,
+        "fanInPercentile": 77.94117647058823,
         "fanInTimesMedian": 5,
-        "fanOutPercentile": 96.96969696969697,
+        "fanOutPercentile": 97.05882352941177,
         "fanOutTimesMedian": 11,
-        "cyclomaticPercentile": 66.66666666666667,
+        "cyclomaticPercentile": 67.6470588235294,
         "cyclomaticTimesMedian": 2,
-        "maxMemberCyclomaticPercentile": 74.24242424242425,
+        "maxMemberCyclomaticPercentile": 75,
         "maxMemberCyclomaticTimesMedian": 2,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 90.9090909090909,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "dataShapePercentile": 91.17647058823529,
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 5,
       "fanOut": 11,
@@ -15091,8 +15091,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -15241,21 +15241,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 78.78787878787878,
+        "cyclomaticPercentile": 79.41176470588235,
         "cyclomaticTimesMedian": 3,
-        "maxMemberCyclomaticPercentile": 86.36363636363636,
+        "maxMemberCyclomaticPercentile": 86.76470588235294,
         "maxMemberCyclomaticTimesMedian": 3,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -15345,8 +15345,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 16.666666666666668,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -15405,21 +15405,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 78.78787878787878,
+        "cyclomaticPercentile": 79.41176470588235,
         "cyclomaticTimesMedian": 3,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 86.36363636363636,
+        "dsmPercentile": 86.76470588235294,
         "dsmTimesMedian": null,
-        "dataShapePercentile": 66.66666666666667,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 67.6470588235294,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -15535,21 +15535,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 89.39393939393939,
+        "cyclomaticPercentile": 89.70588235294117,
         "cyclomaticTimesMedian": 8,
-        "maxMemberCyclomaticPercentile": 86.36363636363636,
+        "maxMemberCyclomaticPercentile": 86.76470588235294,
         "maxMemberCyclomaticTimesMedian": 3,
-        "dsmPercentile": 89.39393939393939,
+        "dsmPercentile": 89.70588235294117,
         "dsmTimesMedian": null,
-        "dataShapePercentile": 7.575757575757576,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "dataShapePercentile": 7.352941176470588,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -15751,8 +15751,8 @@
         "dsmPercentile": 93.75,
         "dsmTimesMedian": null,
         "dataShapePercentile": 93.75,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 94.90291262135922
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 94.92753623188406
       },
       "fanIn": 0,
       "fanOut": 5,
@@ -15829,21 +15829,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 87.87878787878788,
+        "fanInPercentile": 88.23529411764706,
         "fanInTimesMedian": 7,
-        "fanOutPercentile": 89.39393939393939,
+        "fanOutPercentile": 89.70588235294117,
         "fanOutTimesMedian": 7,
-        "cyclomaticPercentile": 95.45454545454545,
+        "cyclomaticPercentile": 95.58823529411765,
         "cyclomaticTimesMedian": 20,
-        "maxMemberCyclomaticPercentile": 95.45454545454545,
+        "maxMemberCyclomaticPercentile": 95.58823529411765,
         "maxMemberCyclomaticTimesMedian": 13,
-        "dsmPercentile": 98.48484848484848,
+        "dsmPercentile": 98.52941176470588,
         "dsmTimesMedian": null,
-        "dataShapePercentile": 98.48484848484848,
-        "solutionFanInPercentile": 93.68932038834951,
-        "solutionMaxMemberCyclomaticPercentile": 97.0873786407767
+        "dataShapePercentile": 98.52941176470588,
+        "solutionFanInPercentile": 93.71980676328502,
+        "solutionMaxMemberCyclomaticPercentile": 97.10144927536231
       },
       "fanIn": 7,
       "fanOut": 7,
@@ -16239,8 +16239,8 @@
         "dsmPercentile": 95.83333333333333,
         "dsmTimesMedian": null,
         "dataShapePercentile": 95.83333333333333,
-        "solutionFanInPercentile": 97.33009708737865,
-        "solutionMaxMemberCyclomaticPercentile": 98.30097087378641
+        "solutionFanInPercentile": 97.34299516908213,
+        "solutionMaxMemberCyclomaticPercentile": 98.30917874396135
       },
       "fanIn": 11,
       "fanOut": 0,
@@ -16350,8 +16350,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 30,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -16391,21 +16391,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 86.36363636363636,
+        "fanOutPercentile": 86.76470588235294,
         "fanOutTimesMedian": 6,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 37.878787878787875,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 6,
@@ -16572,21 +16572,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 19.696969696969695,
+        "fanInPercentile": 20.58823529411765,
         "fanInTimesMedian": 0,
-        "fanOutPercentile": 62.121212121212125,
+        "fanOutPercentile": 63.23529411764706,
         "fanOutTimesMedian": 2,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 74.24242424242425,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 75,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -16676,8 +16676,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -16767,8 +16767,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 27.77777777777778,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -16863,21 +16863,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 16.666666666666668,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 16.176470588235293,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -16936,21 +16936,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 7.575757575757576,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 7.352941176470588,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -17022,8 +17022,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17113,8 +17113,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17204,8 +17204,8 @@
         "dsmPercentile": 83.33333333333333,
         "dsmTimesMedian": null,
         "dataShapePercentile": 83.33333333333333,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17313,8 +17313,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17404,8 +17404,8 @@
         "dsmPercentile": 33.333333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 33.333333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17495,8 +17495,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17586,8 +17586,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17677,8 +17677,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17768,8 +17768,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17859,8 +17859,8 @@
         "dsmPercentile": 33.333333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 33.333333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -17950,8 +17950,8 @@
         "dsmPercentile": 33.333333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 33.333333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -18041,8 +18041,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -18132,8 +18132,8 @@
         "dsmPercentile": 83.33333333333333,
         "dsmTimesMedian": null,
         "dataShapePercentile": 83.33333333333333,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -18241,8 +18241,8 @@
         "dsmPercentile": 33.333333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 33.333333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -18332,8 +18332,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -18410,21 +18410,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 87.87878787878788,
+        "fanInPercentile": 88.23529411764706,
         "fanInTimesMedian": 7,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 98.48484848484848,
+        "cyclomaticPercentile": 98.52941176470588,
         "cyclomaticTimesMedian": 22,
-        "maxMemberCyclomaticPercentile": 98.48484848484848,
+        "maxMemberCyclomaticPercentile": 98.52941176470588,
         "maxMemberCyclomaticTimesMedian": 22,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 81.81818181818181,
-        "solutionFanInPercentile": 93.68932038834951,
-        "solutionMaxMemberCyclomaticPercentile": 99.75728155339806
+        "dataShapePercentile": 82.3529411764706,
+        "solutionFanInPercentile": 93.71980676328502,
+        "solutionMaxMemberCyclomaticPercentile": 99.7584541062802
       },
       "fanIn": 7,
       "fanOut": 1,
@@ -18514,8 +18514,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -18605,8 +18605,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 66.66666666666667,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 92.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 92.27053140096618
       },
       "fanIn": 1,
       "fanOut": 5,
@@ -18768,8 +18768,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -18841,8 +18841,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -18968,8 +18968,8 @@
         "dsmPercentile": 90,
         "dsmTimesMedian": null,
         "dataShapePercentile": 90,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -19066,21 +19066,21 @@
       "kindEvidence": "external-ns:System.Data",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 87.87878787878788,
+        "fanInPercentile": 88.23529411764706,
         "fanInTimesMedian": 7,
-        "fanOutPercentile": 15.151515151515152,
+        "fanOutPercentile": 16.176470588235293,
         "fanOutTimesMedian": 0,
-        "cyclomaticPercentile": 86.36363636363636,
+        "cyclomaticPercentile": 86.76470588235294,
         "cyclomaticTimesMedian": 5,
-        "maxMemberCyclomaticPercentile": 86.36363636363636,
+        "maxMemberCyclomaticPercentile": 86.76470588235294,
         "maxMemberCyclomaticTimesMedian": 3,
-        "dsmPercentile": 83.33333333333333,
+        "dsmPercentile": 83.82352941176471,
         "dsmTimesMedian": null,
-        "dataShapePercentile": 74.24242424242425,
-        "solutionFanInPercentile": 93.68932038834951,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "dataShapePercentile": 75,
+        "solutionFanInPercentile": 93.71980676328502,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 7,
       "fanOut": 0,
@@ -19208,8 +19208,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 90,
-        "solutionFanInPercentile": 88.3495145631068,
-        "solutionMaxMemberCyclomaticPercentile": 90.04854368932038
+        "solutionFanInPercentile": 88.40579710144928,
+        "solutionMaxMemberCyclomaticPercentile": 90.09661835748793
       },
       "fanIn": 5,
       "fanOut": 1,
@@ -19299,8 +19299,8 @@
         "dsmPercentile": 37.5,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 62.5,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 7,
@@ -19426,8 +19426,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -19517,8 +19517,8 @@
         "dsmPercentile": 42.857142857142854,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -19628,8 +19628,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 27.77777777777778,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -19737,8 +19737,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 91.66666666666667,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -19846,8 +19846,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 41.666666666666664,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -19937,8 +19937,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 41.666666666666664,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20028,8 +20028,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 41.666666666666664,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20119,8 +20119,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 41.666666666666664,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20210,8 +20210,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 41.666666666666664,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -20301,8 +20301,8 @@
         "dsmPercentile": 45.833333333333336,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 45.833333333333336,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20392,8 +20392,8 @@
         "dsmPercentile": 42.857142857142854,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 87.13592233009709
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 87.19806763285024
       },
       "fanIn": 1,
       "fanOut": 7,
@@ -20503,8 +20503,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 27.77777777777778,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 79.36893203883496
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 79.46859903381643
       },
       "fanIn": 1,
       "fanOut": 2,
@@ -20599,21 +20599,21 @@
       "kindEvidence": "no classifying evidence",
       "cohort": "ns:TestBed.Core",
       "cohortBasis": "namespace",
-      "cohortSize": 33,
+      "cohortSize": 34,
       "statistics": {
-        "fanInPercentile": 53.03030303030303,
+        "fanInPercentile": 54.411764705882355,
         "fanInTimesMedian": 1,
-        "fanOutPercentile": 42.42424242424242,
+        "fanOutPercentile": 44.11764705882353,
         "fanOutTimesMedian": 1,
-        "cyclomaticPercentile": 39.39393939393939,
+        "cyclomaticPercentile": 39.705882352941174,
         "cyclomaticTimesMedian": 1,
-        "maxMemberCyclomaticPercentile": 42.42424242424242,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
         "maxMemberCyclomaticTimesMedian": 1,
-        "dsmPercentile": 40.90909090909091,
+        "dsmPercentile": 41.1764705882353,
         "dsmTimesMedian": 1,
-        "dataShapePercentile": 7.575757575757576,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "dataShapePercentile": 7.352941176470588,
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20656,6 +20656,79 @@
       ]
     },
     {
+      "id": "type|Core|global::TestBed.Core.UnanalysedEdgeTrap",
+      "name": "UnanalysedEdgeTrap",
+      "fullyQualifiedName": "global::TestBed.Core.UnanalysedEdgeTrap",
+      "namespace": "TestBed.Core",
+      "assembly": "Core",
+      "project": "Core",
+      "keyword": "Class",
+      "isAbstract": false,
+      "location": {
+        "file": "TestBed/Core/UnanalysedEdgeTrap.cs",
+        "line": 19
+      },
+      "kind": "Internal",
+      "kindEvidence": "no classifying evidence",
+      "cohort": "ns:TestBed.Core",
+      "cohortBasis": "namespace",
+      "cohortSize": 34,
+      "statistics": {
+        "fanInPercentile": 20.58823529411765,
+        "fanInTimesMedian": 0,
+        "fanOutPercentile": 16.176470588235293,
+        "fanOutTimesMedian": 0,
+        "cyclomaticPercentile": 39.705882352941174,
+        "cyclomaticTimesMedian": 1,
+        "maxMemberCyclomaticPercentile": 42.64705882352941,
+        "maxMemberCyclomaticTimesMedian": 1,
+        "dsmPercentile": 41.1764705882353,
+        "dsmTimesMedian": 1,
+        "dataShapePercentile": 38.23529411764706,
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
+      },
+      "fanIn": 0,
+      "fanOut": 0,
+      "effectiveFanOut": 0,
+      "inboundReferences": 0,
+      "instability": null,
+      "instabilityRaw": null,
+      "cyclomatic": 1,
+      "maxMemberCyclomatic": 1,
+      "mostComplexMember": "member|Core|global::TestBed.Core.UnanalysedEdgeTrap|M:TestBed.Core.UnanalysedEdgeTrap.Sample(TestBed.Core.Areas.HelpPage.HelpPageSampleGenerator)",
+      "dsm": 0,
+      "transform": 0,
+      "staticMutations": 0,
+      "memberCount": 1,
+      "publicMemberCount": 1,
+      "executableMemberCount": 1,
+      "parameterCount": 1,
+      "dataShape": 2,
+      "linesOfCode": 4,
+      "externalNamespaces": [],
+      "members": [
+        {
+          "id": "member|Core|global::TestBed.Core.UnanalysedEdgeTrap|M:TestBed.Core.UnanalysedEdgeTrap.Sample(TestBed.Core.Areas.HelpPage.HelpPageSampleGenerator)",
+          "name": "Sample",
+          "signature": "global::TestBed.Core.UnanalysedEdgeTrap.Sample(global::TestBed.Core.Areas.HelpPage.HelpPageSampleGenerator)",
+          "kind": "Method",
+          "accessibility": "Public",
+          "location": {
+            "file": "TestBed/Core/UnanalysedEdgeTrap.cs",
+            "line": 21
+          },
+          "cyclomatic": 1,
+          "dsm": 0,
+          "transform": 0,
+          "staticMutations": 0,
+          "maxNestingDepth": 0,
+          "parameterCount": 1,
+          "linesOfCode": 1
+        }
+      ]
+    },
+    {
       "id": "type|Core|global::TestBed.Core.ValidateStep",
       "name": "ValidateStep",
       "fullyQualifiedName": "global::TestBed.Core.ValidateStep",
@@ -20685,8 +20758,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 97.81553398058253,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 97.82608695652173,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 13,
       "fanOut": 0,
@@ -20758,8 +20831,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 89.5631067961165
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 89.61352657004831
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20849,8 +20922,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -20940,8 +21013,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -21031,8 +21104,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 50,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -21104,8 +21177,8 @@
         "dsmPercentile": 50,
         "dsmTimesMedian": 1,
         "dataShapePercentile": 16.666666666666668,
-        "solutionFanInPercentile": 79.12621359223301,
-        "solutionMaxMemberCyclomaticPercentile": 8.980582524271844
+        "solutionFanInPercentile": 79.22705314009661,
+        "solutionMaxMemberCyclomaticPercentile": 8.93719806763285
       },
       "fanIn": 2,
       "fanOut": 0,
@@ -21177,8 +21250,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 2,
@@ -21322,8 +21395,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 1,
       "fanOut": 1,
@@ -21413,8 +21486,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -21504,8 +21577,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 42.23300970873787
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 42.270531400966185
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -21595,8 +21668,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 98.7864077669903
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 98.79227053140097
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -21690,8 +21763,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -21763,8 +21836,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -21854,8 +21927,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 53.15533980582524,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 53.38164251207729,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 1,
       "fanOut": 0,
@@ -21963,8 +22036,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 71.60194174757281
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 71.73913043478261
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -22054,8 +22127,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 97.0873786407767
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 97.10144927536231
       },
       "fanIn": 0,
       "fanOut": 0,
@@ -22183,8 +22256,8 @@
         "dsmPercentile": null,
         "dsmTimesMedian": null,
         "dataShapePercentile": null,
-        "solutionFanInPercentile": 15.29126213592233,
-        "solutionMaxMemberCyclomaticPercentile": 83.00970873786407
+        "solutionFanInPercentile": 15.458937198067632,
+        "solutionMaxMemberCyclomaticPercentile": 83.09178743961353
       },
       "fanIn": 0,
       "fanOut": 1,
@@ -28021,7 +28094,7 @@
       "receipts": [
         {
           "name": "CohortSize",
-          "value": 49,
+          "value": 50,
           "gate": null
         },
         {
@@ -28061,7 +28134,7 @@
         },
         {
           "name": "CyclomaticPctl",
-          "value": 98.9795918367347,
+          "value": 99,
           "gate": null
         },
         {
@@ -28179,7 +28252,7 @@
       "receipts": [
         {
           "name": "CohortSize",
-          "value": 49,
+          "value": 50,
           "gate": null
         },
         {
@@ -28219,7 +28292,7 @@
         },
         {
           "name": "CyclomaticPctl",
-          "value": 96.93877551020408,
+          "value": 97,
           "gate": null
         },
         {
@@ -30309,17 +30382,17 @@
         },
         {
           "name": "FanInSolutionRankLimit",
-          "value": 10.8,
+          "value": 10.850000000000001,
           "gate": null
         },
         {
           "name": "FanInSolutionPctl",
-          "value": 99.27184466019418,
+          "value": 99.27536231884058,
           "gate": null
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         },
         {
@@ -30384,17 +30457,17 @@
         },
         {
           "name": "FanInSolutionRankLimit",
-          "value": 10.8,
+          "value": 10.850000000000001,
           "gate": null
         },
         {
           "name": "FanInSolutionPctl",
-          "value": 98.7864077669903,
+          "value": 98.79227053140097,
           "gate": null
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         },
         {
@@ -30458,17 +30531,17 @@
         },
         {
           "name": "FanInSolutionRankLimit",
-          "value": 10.8,
+          "value": 10.850000000000001,
           "gate": null
         },
         {
           "name": "FanInSolutionPctl",
-          "value": 98.30097087378641,
+          "value": 98.30917874396135,
           "gate": null
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         },
         {
@@ -30528,17 +30601,17 @@
         },
         {
           "name": "FanInSolutionRankLimit",
-          "value": 10.8,
+          "value": 10.850000000000001,
           "gate": null
         },
         {
           "name": "FanInSolutionPctl",
-          "value": 95.87378640776699,
+          "value": 95.89371980676329,
           "gate": null
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         },
         {
@@ -36657,12 +36730,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 95.87378640776699,
+          "value": 95.89371980676329,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -36682,7 +36755,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -36724,12 +36797,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 95.87378640776699,
+          "value": 95.89371980676329,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -36749,7 +36822,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -36791,12 +36864,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 95.87378640776699,
+          "value": 95.89371980676329,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -36816,7 +36889,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -36858,12 +36931,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 94.90291262135922,
+          "value": 94.92753623188406,
           "gate": null
         },
         {
@@ -36883,7 +36956,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -36925,12 +36998,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 98.7864077669903,
+          "value": 98.79227053140097,
           "gate": null
         },
         {
@@ -36950,7 +37023,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -36992,12 +37065,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 97.0873786407767,
+          "value": 97.10144927536231,
           "gate": null
         },
         {
@@ -37017,7 +37090,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37059,12 +37132,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 88.3495145631068,
+          "value": 88.40579710144928,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37084,7 +37157,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37126,12 +37199,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 88.3495145631068,
+          "value": 88.40579710144928,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37151,7 +37224,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37193,12 +37266,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 83.49514563106796,
+          "value": 83.57487922705315,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 8.980582524271844,
+          "value": 8.93719806763285,
           "gate": null
         },
         {
@@ -37218,7 +37291,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37258,12 +37331,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 79.12621359223301,
+          "value": 79.22705314009661,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 8.980582524271844,
+          "value": 8.93719806763285,
           "gate": null
         },
         {
@@ -37283,7 +37356,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37325,12 +37398,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37350,7 +37423,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37392,12 +37465,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37417,7 +37490,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37459,12 +37532,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37484,7 +37557,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37526,12 +37599,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 83.00970873786407,
+          "value": 83.09178743961353,
           "gate": null
         },
         {
@@ -37551,7 +37624,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37593,12 +37666,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 89.5631067961165,
+          "value": 89.61352657004831,
           "gate": null
         },
         {
@@ -37618,7 +37691,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37660,12 +37733,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37685,7 +37758,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37727,12 +37800,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37752,7 +37825,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37794,12 +37867,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -37819,7 +37892,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37861,12 +37934,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -37886,7 +37959,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37928,12 +38001,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 53.15533980582524,
+          "value": 53.38164251207729,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -37953,7 +38026,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -37995,12 +38068,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -38020,7 +38093,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -38062,12 +38135,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -38087,7 +38160,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -38129,12 +38202,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 42.23300970873787,
+          "value": 42.270531400966185,
           "gate": null
         },
         {
@@ -38154,7 +38227,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -38196,12 +38269,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -38221,7 +38294,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -38263,12 +38336,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -38288,7 +38361,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -38330,12 +38403,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 71.60194174757281,
+          "value": 71.73913043478261,
           "gate": null
         },
         {
@@ -38355,7 +38428,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],
@@ -38397,12 +38470,12 @@
         },
         {
           "name": "GlobalFanInPctl",
-          "value": 15.29126213592233,
+          "value": 15.458937198067632,
           "gate": null
         },
         {
           "name": "GlobalMaxCcPctl",
-          "value": 83.00970873786407,
+          "value": 83.09178743961353,
           "gate": null
         },
         {
@@ -38422,7 +38495,7 @@
         },
         {
           "name": "SolutionTypeCount",
-          "value": 206,
+          "value": 207,
           "gate": null
         }
       ],

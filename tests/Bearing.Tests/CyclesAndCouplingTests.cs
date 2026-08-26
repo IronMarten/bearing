@@ -67,7 +67,7 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         // P10 adds two interfaces, IScaleHead and ITariffWindow — the abstractions its two
         // namespaces hold each other by, which is what makes the cycle Coupling.
         Assert.Equal(14, analysed.AbstractTypes);   // P3's four *Facet interfaces, X14's IIdentityWicket, A9's TallyProbe, P10's two
-        Assert.Equal(199, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193 → P10 197 → P11 199
+        Assert.Equal(200, analysed.TotalTypes);   // …P3 188 → member identity 191 → A9 layer 3 193 → P10 197 → P11 199 → D63's UnanalysedEdgeTrap 200
         Assert.Equal(0, analysed.Instability);                   // maximally stable
         Assert.Equal(MainSequenceZone.Pain, analysed.Zone);      // stable and concrete
 

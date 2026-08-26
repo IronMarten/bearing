@@ -63,6 +63,11 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .fld{min-width:0}
 .anat .name{font-size:1.3rem;margin-right:.5rem}
 .name{font-weight:600}
+.nb{margin-top:.5rem}
+.nbh{margin:.35rem 0 0;font-size:.82rem;line-height:1.5;max-width:60ch}
+.nbc{color:var(--muted);font-variant-numeric:tabular-nums}
+.nbd>summary{cursor:pointer;color:var(--accent);font-size:.74rem;margin-top:.15rem}
+.nbt{margin:.25rem 0 0;font-size:.76rem;line-height:1.5;color:var(--muted);max-width:70ch}
 .rail{margin:1.5rem 0 0;border-top:1px solid var(--line)}
 .row{padding:.9rem 0;border-bottom:1px solid var(--line)}
 .kind{display:block;color:var(--accent);font-size:.76rem;line-height:1.25}

@@ -253,6 +253,23 @@ false; P4 has since taken the fixture from nine boundaries to fifteen with nothi
 into the new suffix cohort and shrank an unrelated peer population 33 → 32. Check the trailing word
 against the fixture before choosing it.
 
+### The plant that made D63 observable
+
+**`Core/UnanalysedEdgeTrap.cs`, landed 2026-08-26.** It references
+`Areas/HelpPage/HelpPageSampleGenerator`, which the default path exclusions remove — so the walk
+records an outbound reference to a symbol that is in the solution and has no node. **That was the
+one shape this fixture could not produce**, and it is why 538 tests could not see a `FanOut` column
+disagreeing with `edges.csv` on 1.0% of nopCommerce's types and 6.7% of Jellyfin's.
+
+**It adds a type and a method and no edge**, which is the point: the reference it makes is exactly
+the one that cannot become one. `Coverage.EdgesToUnanalysedTypes` moves off zero for the first time,
+so the disclosure that reports it is exercised as well.
+
+> **It is a gate and was checked as one.** Removing the prune in `ModelBuilder.Build` fails
+> `NeighbourhoodTests.Reconciles_with_fan_in_and_fan_out` and nothing else. Before the plant that
+> same test passed either way, which is §4's whole point — an assertion that cannot fail is not a
+> gate, however green it is.
+
 ### Three things a `-` in the sweep table can mean
 
 P7 and P8 found all three, and leading with which one is the difference between retiring a gate and
@@ -360,12 +377,19 @@ Tidying it up changes the expected answers.
 
 ### Current known answers
 
-- **200 type rows**, **380 edges**, **209 method-like members**, 2 excluded, **zero load
+- **207 type rows**, **386 edges**, **217 method-like members**, 2 excluded, **zero load
   warnings**, **1 skipped project** (`Core.Tests`). Held by
   `StructureTests.Fixture_shape_is_stable` (the first three),
   `StructureTests.Scaffolded_code_is_excluded_by_default` and
   `StructureTests.Solution_loads_with_no_warnings` — every figure on this line has a named test
   beside it, which is the only form in which it is worth writing down.
+
+  > **The sixth drift was found on 2026-08-26 and was not caused by a plant.** The line read
+  > *200 / 380 / 209* while the test beside it pinned *207 / 386 / 217* — it had been stale before
+  > that day's work touched it, and nothing failed, because a sentence in a document is not held by
+  > the test it cites. **The paragraph below is right and was not enough**: quoting fewer figures
+  > slows the drift and does not stop it. What would stop it is generating this line from the
+  > assertions rather than restating them, and that is worth doing the next time it goes stale.
 
   > **It went stale twice more on 2026-08-21, within hours of being corrected**, because A9 landed
   > two plants after the correction. That is the fourth and fifth drift of this line. **The lesson

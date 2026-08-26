@@ -126,7 +126,11 @@ public sealed class StructureTests(CoreWalkFixture core)
         // specimen and its suppression row could not fail. The two properties are members and are
         // not method-like, which is why this line moves by two rather than by four. Nothing that
         // already existed gains fan-in: the pair references only itself.
-        Assert.Equal(206, core.Model.Types.Count);
+        // 207 since D63's plant: UnanalysedEdgeTrap references a type the path exclusions remove,
+        // which is the one shape the fixture could not produce and the reason 538 tests could not
+        // see FanOut disagreeing with the edge list. It adds a type and no edge — the reference it
+        // makes is exactly the one that cannot become one.
+        Assert.Equal(207, core.Model.Types.Count);
 
         // Unchanged at 362 across the retirement, and not by luck: an Edge is a (from, to) pair
         // however many references it carries, and separating the collided declarations moved
@@ -158,7 +162,9 @@ public sealed class StructureTests(CoreWalkFixture core)
         // property. The two held fields are the whole point of the plant and neither is counted by
         // this line, which is why the count is not the thing that proves the plant landed —
         // CyclesAndCouplingTests is.
-        Assert.Equal(216, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
+        // 217 since D63's plant: UnanalysedEdgeTrap.Sample is its one method-like member, and the
+        // reference it makes is to an excluded type, so it adds a method here and no edge anywhere.
+        Assert.Equal(217, core.Model.Types.Sum(t => t.Members.Count(m => m.IsMethodLike)));
     }
 
     // ---- Generated code exclusion -------------------------------------------------

@@ -357,6 +357,8 @@ public static class HtmlReport
             page.Append($"<div class=\"fld\"><p class=\"sub mono\">{Html.Text(claim.Evidence)}</p></div>\n");
         }
 
+        HtmlNeighbours.Render(page, model, finding);
+
         page.Append("</div>\n");
     }
 
@@ -385,6 +387,8 @@ public static class HtmlReport
             page.Append($"<p class=\"where\">{Html.Text(where)}</p>");
 
         page.Append($"<p class=\"claim\">{Html.Text(claim.Sentence)}</p></div>\n");
+
+        HtmlNeighbours.Render(page, model, finding);
 
         page.Append("</div>\n");
     }

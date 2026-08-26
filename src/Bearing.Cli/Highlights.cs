@@ -70,12 +70,71 @@ internal static class Highlights
 
             yield return $"   {claim.Subject} — {claim.Sentence}";
             yield return $"     {Where(model, finding, claim)}{Rest(finding.Kind, total)}";
+
+            foreach (var line in Connects(model, finding)) yield return line;
         }
 
         yield return "";
         yield return "   Each one is the strongest row of its section. The rest of that section is";
         yield return "   below. --json and --csv carry the model every claim was computed from —";
         yield return "   each type, member and dependency — rather than the claims themselves.";
+    }
+
+    /// <summary>
+    /// A8 — what the lead connects to, one hop out, complete at project level.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The same neighbourhood the page renders, at the granularity this medium can carry.</b>
+    /// <see cref="Neighbourhoods"/> is the one derivation, so the two renderers cannot disagree
+    /// about who depends on what. What differs is depth: the page folds the type names behind a
+    /// <c>details</c>, and 1,247 names is not something a terminal report should print — the
+    /// complaint A11 round 1 opened with was <i>"a wall of text"</i>.
+    /// </para>
+    /// <para>
+    /// <b>Complete at the level the acceptance sentence asks about, which is projects.</b>
+    /// <c>TECHREQ-job-a.md</c> §5.5 grades <i>"what does this depend on, and what depends on
+    /// it"</i>, and every project is named with its count — nothing is capped and no group is
+    /// dropped. The type names are in <c>--html</c> and in <c>edges.csv</c>, and the trailer above
+    /// already says where the full model is. <b>This is a shorter rendering of one judgement and
+    /// never a smaller one</b>, which is the distinction D46 cost a week.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> Connects(SolutionModel model, Finding finding)
+    {
+        if (Neighbourhoods.Of(model, finding.Subject) is not { } hood) yield break;
+
+        var name = hood.Subject.Name;
+
+        foreach (var line in Sentences.Wrap(
+            Direction($"{name} depends on", hood.DependsOn, hood.DependsOnCount), "     "))
+            yield return line;
+
+        foreach (var line in Sentences.Wrap(
+            Direction($"{name} is depended on by", hood.DependedOnBy, hood.DependedOnByCount), "     "))
+            yield return line;
+    }
+
+    /// <summary>
+    /// One direction of the neighbourhood, and the empty case is printed rather than omitted.
+    /// </summary>
+    /// <remarks>
+    /// <b>A direction that is silently absent cannot be told from one that is zero</b>, and the
+    /// difference is the whole claim on a load-bearing type — <i>"11 types depend on it, it depends
+    /// on nothing"</i> is only checkable if the nothing is stated. Invariant 8 in one line, and it
+    /// is also what keeps this renderer and the page from disagreeing: the page prints the empty
+    /// case, so omitting it here would make the terminal emptier than the HTML, which is D46.
+    /// </remarks>
+    private static string Direction(string heading, IReadOnlyList<NeighbourGroup> groups, int total)
+    {
+        if (total == 0) return $"{heading}: nothing in this solution";
+
+        // A no-break space, because Sentences.Wrap splits on ' ' and a project separated from its
+        // own count across a line break reads as a project with no number and a stray one.
+        var where = string.Join(", ", groups.Select(g => $"{g.Project} {g.Types.Count}"));
+
+        return $"{heading}: {Sentences.Plural(total, "type")} in "
+             + $"{Sentences.Plural(groups.Count, "project")} — {where}";
     }
 
     /// <summary>
