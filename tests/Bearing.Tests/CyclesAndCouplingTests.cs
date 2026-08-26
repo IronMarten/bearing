@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -267,6 +267,60 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         var pair = Assert.Single(reading.Pairs);
         Assert.Equal(9, pair.Weight);
         Assert.Equal("Shop.Customers", pair.First);
+    }
+
+    /// <summary>
+    /// The coupling reading covers the namespaces in its pairs, not the component it was taken in.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §58.</b> One holding pair makes the whole component
+    /// <see cref="CycleShape.Coupling"/> — which is right, because a cycle silenced costs the
+    /// reader the finding — but the sentence that followed described every member as a sibling
+    /// holding state. On Umbraco that put 14 pairs of evidence under a claim about <b>363</b>
+    /// namespaces; the same gap is on the other two solutions, at 10 of 30 and 2 of 18, so it is
+    /// the reading and not one codebase.
+    /// </para>
+    /// <para>
+    /// This is that arithmetic on six members and one pair. <c>Coupled</c> is what the report may
+    /// say holds; <c>members</c> is what reaches, and the two are different sizes.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_coupling_reading_covers_only_the_namespaces_that_hold()
+    {
+        string[] members =
+            ["Shop.Billing", "Shop.Catalog", "Shop.Customers", "Shop.Orders", "Shop.Shipping", "Shop.Tax"];
+
+        var reading = CycleShapes.Read(
+            members,
+            OneAssembly(members),
+            Held(("Shop.Orders", "Shop.Customers", 6), ("Shop.Customers", "Shop.Orders", 3)));
+
+        Assert.Equal(CycleShape.Coupling, reading.Shape);
+        Assert.Single(reading.Pairs);
+
+        // Two of the six, and they are the two in the pair -- not the first two by name, which is
+        // what the report used to show.
+        Assert.Equal(["Shop.Customers", "Shop.Orders"], reading.Coupled);
+        Assert.True(reading.Coupled.Count < members.Length);
+    }
+
+    /// <summary>A reading with no pairs claims no coupling at all.</summary>
+    /// <remarks>
+    /// The other side of §58: the bound has to be empty where there is no evidence, or the
+    /// sentence would go back to being about the component.
+    /// </remarks>
+    [Fact]
+    public void A_reading_with_no_held_pairs_couples_nothing()
+    {
+        var reading = CycleShapes.Read(
+            ["Web.Models.Catalog", "Web.Models.Orders"],
+            OneAssembly("Web.Models.Catalog", "Web.Models.Orders"),
+            Held());
+
+        Assert.Empty(reading.Pairs);
+        Assert.Empty(reading.Coupled);
     }
 
     /// <summary>

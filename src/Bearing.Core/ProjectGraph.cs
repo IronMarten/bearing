@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace IronMarten.Bearing;
 
@@ -53,10 +53,14 @@ public sealed class ProjectGraph
 {
     private ProjectGraph(
         IReadOnlyList<(string Project, IReadOnlyList<string> DependsOn)> dependencies,
-        IReadOnlyList<ProjectGroup> groups)
+        IReadOnlyList<ProjectGroup> groups,
+        IReadOnlyList<(int From, int To)> reduction,
+        int implied)
     {
         Dependencies = dependencies;
         Groups = groups;
+        Reduction = reduction;
+        Implied = implied;
     }
 
     /// <summary>Every analysed project and what it depends on, both ordered by name.</summary>
@@ -66,6 +70,49 @@ public sealed class ProjectGraph
     /// The boxes to draw: folded, layered, ordered by layer and then by first project name.
     /// </summary>
     public IReadOnlyList<ProjectGroup> Groups { get; }
+
+    /// <summary>
+    /// The dependencies between boxes that carry reachability nothing else carries — the
+    /// transitive reduction, as index pairs into <see cref="Groups"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A claim about the graph, which is why it is here and not in the renderer</b> — the same
+    /// argument the fold is in Core on. The transitive reduction of a DAG is unique and preserves
+    /// reachability exactly, so a drawing of it says precisely what a drawing of every edge says
+    /// about what depends on what. It is not a suppression and there is no threshold in it.
+    /// </para>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §53.</b> Boxes are painted after edges and are opaque, so an edge
+    /// that skips a layer is not drawn <i>over</i> the box in between — it is cut in half by it,
+    /// and the two visible stubs read as <c>A → C</c> and <c>C → B</c>. A direct dependency
+    /// becomes a chain through a project it never names. Measured on three solutions, the edges
+    /// that get cut are almost exactly the edges that skip a layer: <b>18 of 29 on nopCommerce, 81
+    /// of 98 on Jellyfin, 27 of 44 on Umbraco</b>. Every one of them is transitively implied,
+    /// which is why the reduction is the fix rather than routing — nopCommerce and Umbraco fall to
+    /// <b>0 and 2</b>, and the reader loses no reachability to get there.
+    /// </para>
+    /// <para>
+    /// <b>Routing was measured first and does not fit.</b> An edge crossing a row has to pass
+    /// through the gutters between its boxes, and on all three solutions some band is
+    /// oversubscribed: nopCommerce needs 7 lines through 6 lanes, Umbraco 12 through 7, and
+    /// Jellyfin 41 through 8. There is no routing of every edge that this geometry can hold, so
+    /// drawing fewer edges is not a shortcut past the layout engine — it is the only thing left
+    /// that does not lie.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<(int From, int To)> Reduction { get; }
+
+    /// <summary>
+    /// How many box-to-box dependencies <see cref="Reduction"/> leaves for a path to carry.
+    /// </summary>
+    /// <remarks>
+    /// <b>The drawing has to disclose this and both renderers need the same number.</b> A picture
+    /// that quietly shows a third of the edges is the <c>docs/DEFECTS.md</c> §47 shape — an
+    /// artifact telling a reader it holds everything when it holds a subset. The count is the
+    /// model's so that the sentence cannot disagree with the drawing.
+    /// </remarks>
+    public int Implied { get; }
 
     /// <summary>How many layers deep the solution is. A flat solution is 1.</summary>
     public int Depth => Groups.Count == 0 ? 0 : Groups.Max(g => g.Layer) + 1;
@@ -121,8 +168,10 @@ public sealed class ProjectGraph
             .ToList();
 
         var (layers, componentOf, componentSize) = Layers(dependsOn);
+        var groups = Fold(dependsOn, layers, componentOf, componentSize);
+        var (reduction, implied) = Reduce(groups);
 
-        return new ProjectGraph(dependencies, Fold(dependsOn, layers, componentOf, componentSize));
+        return new ProjectGraph(dependencies, groups, reduction, implied);
     }
 
     /// <summary>
@@ -183,6 +232,77 @@ public sealed class ProjectGraph
         var sizes = components.Select((c, i) => (i, c.Count)).ToDictionary(c => c.i, c => c.Count);
 
         return (layers, componentOf, sizes);
+    }
+
+    /// <summary>
+    /// Which dependencies between boxes a drawing has to show, and how many it may leave to a path.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The box graph is a DAG by construction and does not need condensing again: every dependency
+    /// runs to a strictly lower layer, because layering already condensed the cycles and a box's
+    /// own members are excluded from its <see cref="ProjectGroup.DependsOn"/>. Two boxes in one
+    /// layer therefore cannot reach each other, which is what makes the reachability walk below
+    /// terminate without a visited set doing the work.
+    /// </para>
+    /// <para>
+    /// An edge is dropped when some <i>other</i> dependency of the same box already reaches its
+    /// target. That is the transitive reduction, and on a DAG it is unique — so this is a function
+    /// of the graph in the sense <c>docs/ARCHITECTURE.md</c> §5 means, with no tie to break and no
+    /// traversal order to inherit.
+    /// </para>
+    /// </remarks>
+    private static (List<(int From, int To)> Reduction, int Implied) Reduce(List<ProjectGroup> groups)
+    {
+        var boxOf = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var i = 0; i < groups.Count; i++)
+            foreach (var project in groups[i].Projects)
+                boxOf[project] = i;
+
+        var edges = new List<HashSet<int>>(groups.Count);
+        for (var i = 0; i < groups.Count; i++)
+        {
+            var targets = new HashSet<int>();
+            foreach (var dependency in groups[i].DependsOn)
+                if (boxOf.TryGetValue(dependency, out var box) && box != i)
+                    targets.Add(box);
+
+            edges.Add(targets);
+        }
+
+        var reach = new Dictionary<int, HashSet<int>>();
+
+        HashSet<int> Reaches(int box)
+        {
+            if (reach.TryGetValue(box, out var known)) return known;
+
+            var all = new HashSet<int>();
+            foreach (var next in edges[box])
+            {
+                all.Add(next);
+                all.UnionWith(Reaches(next));
+            }
+
+            return reach[box] = all;
+        }
+
+        var reduction = new List<(int From, int To)>();
+        var implied = 0;
+
+        for (var i = 0; i < groups.Count; i++)
+            foreach (var target in edges[i].OrderBy(t => t))
+            {
+                // Reachable through a sibling dependency, so a path already carries it.
+                if (edges[i].Any(other => other != target && Reaches(other).Contains(target)))
+                {
+                    implied++;
+                    continue;
+                }
+
+                reduction.Add((i, target));
+            }
+
+        return (reduction, implied);
     }
 
     /// <summary>

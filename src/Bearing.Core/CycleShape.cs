@@ -99,7 +99,37 @@ public sealed record ShapeReading(
     CycleShape Shape,
     IReadOnlyList<string> Projects,
     string? Anchor,
-    IReadOnlyList<HeldPair> Pairs);
+    IReadOnlyList<HeldPair> Pairs)
+{
+    /// <summary>
+    /// The namespaces the <see cref="CycleShape.Coupling"/> reading is actually about: those named
+    /// in <c>Pairs</c>, ordinally ordered. Empty for every other shape.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §58.</b> The shape is decided by whether <i>any</i> sibling pair
+    /// holds, and was then applied to the whole component: Umbraco's namespace graph has one
+    /// strongly-connected component of <b>363</b>, and the section called all of them siblings that
+    /// hold each other as state on the evidence of 14 pairs spanning <b>15</b> namespaces — 4% of
+    /// what the sentence covered. The same gap is on the other two solutions, so it is the reading
+    /// rather than Umbraco: nopCommerce 10 of 30, Jellyfin 2 of 18.
+    /// </para>
+    /// <para>
+    /// <b>The remedy is to bound the claim, not to re-judge the component.</b> Whether a component
+    /// that large is a fact about the codebase or a finding about it is a question with no
+    /// measurement behind it; which namespaces the evidence covers is arithmetic. So the component
+    /// keeps its size and its membership — it is true that all 363 reach each other — and the
+    /// sentence about holding state is made over exactly the set that holds.
+    /// </para>
+    /// <para>
+    /// <b>The framework namespace falls out of the headline as a consequence.</b>
+    /// <c>Microsoft.Extensions.Hosting</c> is in Umbraco's component by the model's definition and
+    /// stays there, but it is in no holding pair, so it is no longer named as evidence of coupling
+    /// in Umbraco's own architecture. That was §58's second face and it needed no rule of its own.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<string> Coupled => CycleShapes.Coupled(Pairs);
+}
 
 /// <summary>
 /// A namespace cycle and the reading of it.
@@ -123,6 +153,36 @@ public sealed record ShapedCycle(
 {
     /// <summary>Whether this is the kind of cycle the section exists to report.</summary>
     public bool IsReportable => Shape == CycleShape.Coupling;
+
+    /// <summary>
+    /// The namespaces the <see cref="CycleShape.Coupling"/> reading is actually about: those named
+    /// in <c>Pairs</c>, ordinally ordered. Empty for every other shape.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §58.</b> The shape is decided by whether <i>any</i> sibling pair
+    /// holds, and was then applied to the whole component: Umbraco's namespace graph has one
+    /// strongly-connected component of <b>363</b>, and the section called all of them siblings that
+    /// hold each other as state on the evidence of 14 pairs spanning <b>15</b> namespaces — 4% of
+    /// what the sentence covered. The same gap is on the other two solutions, so it is the reading
+    /// rather than Umbraco: nopCommerce 10 of 30, Jellyfin 2 of 18.
+    /// </para>
+    /// <para>
+    /// <b>The remedy is to bound the claim, not to re-judge the component.</b> Whether a component
+    /// that large is a fact about the codebase or a finding about it is a question with no
+    /// measurement behind it; which namespaces the evidence covers is arithmetic. So the component
+    /// keeps its size and its membership — it is true that all 363 reach each other — and the
+    /// sentence about holding state is made over exactly the set that holds.
+    /// </para>
+    /// <para>
+    /// <b>The framework namespace falls out of the headline as a consequence.</b>
+    /// <c>Microsoft.Extensions.Hosting</c> is in Umbraco's component by the model's definition and
+    /// stays there, but it is in no holding pair, so it is no longer named as evidence of coupling
+    /// in Umbraco's own architecture. That was §58's second face and it needed no rule of its own.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<string> Coupled => CycleShapes.Coupled(Pairs);
+
 }
 
 /// <summary>
@@ -329,6 +389,25 @@ public static class CycleShapes
     /// itself; two sibling feature namespaces holding each other is two components that cannot be
     /// separated. Both are cycles and only the second is a finding.
     /// </remarks>
+    /// <summary>
+    /// The distinct namespaces named in <paramref name="pairs"/>, ordinally ordered.
+    /// </summary>
+    /// <remarks>
+    /// One implementation for <see cref="ShapeReading.Coupled"/> and
+    /// <see cref="ShapedCycle.Coupled"/>, so the reading and the cycle it is attached to cannot
+    /// come to disagree about which namespaces the evidence covers — the arrangement
+    /// <c>docs/DEFECTS.md</c> §46 came out of, avoided here by there being one of it.
+    /// </remarks>
+    public static IReadOnlyList<string> Coupled(IReadOnlyList<HeldPair> pairs)
+    {
+        ArgumentNullException.ThrowIfNull(pairs);
+
+        return [.. pairs
+            .SelectMany(pair => new[] { pair.First, pair.Second })
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(name => name, StringComparer.Ordinal)];
+    }
+
     private static bool AreSiblings(string first, string second) =>
         !first.StartsWith(second + ".", StringComparison.Ordinal) &&
         !second.StartsWith(first + ".", StringComparison.Ordinal);
