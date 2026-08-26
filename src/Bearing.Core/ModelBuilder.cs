@@ -470,6 +470,16 @@ internal sealed class ModelBuilder
             target.InboundReferenceCount += references.Count;
         }
 
+        // D63. Outbound was added during the walk, which knows the target is in the solution and
+        // cannot yet know whether it got a node; the loop above adds inbound and skips what did
+        // not resolve. That asymmetry made FanOut count references the edge list does not carry
+        // and FanIn not -- so a type's FanOut column disagreed with the edges the same run emits,
+        // on 1.0% of nopCommerce's types and 6.7% of Jellyfin's, always upward. Pruned here rather
+        // than at the call site because here is the first place that can know. What was dropped is
+        // still counted, as Coverage.EdgesToUnanalysedTypes, and that number does not move.
+        foreach (var type in _types.Values)
+            type.RetainOutbound(o => _subjects.ContainsKey(o.Canonical));
+
         var insulating = _types.Values
             .Where(t => t.IsAbstractOrInterface
                         || string.Equals(t.Classification.Kind, TypeKinds.Contract, StringComparison.Ordinal))

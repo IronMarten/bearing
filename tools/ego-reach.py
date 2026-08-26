@@ -39,13 +39,13 @@ Exit code is 1 if `edges.csv` and the model's own edge list disagree at all --
 if that fires, this is not measuring the model's graph and every figure below is
 void.
 
-It also prints, without failing on it, how far a type's `FanOut` column sits
-from the edges the same run emits. They are not the same number: `FanOut` counts
-distinct outbound references and the edge list carries only the edges whose
-target is an analysed type, so the column runs 1-7 higher on 1.0% of
-nopCommerce's types, 1.5% of Umbraco's and 6.7% of Jellyfin's, never lower.
-**A drill-down must be drawn from the edge list and captioned from it too** --
-`fan-out 139` printed beside 136 drawn boxes is D50's defect in a new place.
+It also reconciles a type's `FanOut` column against the edges the same run emits.
+Those disagreed until 2026-08-26 -- the column ran 1-10 higher on 1.0% of
+nopCommerce's types, 1.5% of Umbraco's and 6.7% of Jellyfin's, because outbound
+was collected during the walk and inbound in `Build`, which is the first place
+that can know whether the target got a node. That was **D63**, it is fixed, and
+a non-zero count on this line is a regression of it. The suite cannot see it:
+the fixture has no edge to an unanalysed type.
 """
 import csv, json, statistics, sys
 from collections import defaultdict
@@ -112,10 +112,13 @@ def main(csv_dir, model_path):
 
     skew = [(int(r["FanOut"]) - len(out[r["Id"]]), r["Name"]) for r in rows]
     off = [s for s in skew if s[0] != 0]
-    print(f"  FanOut column vs drawable edges: {len(off)} types differ "
-          f"({len(off) / len(rows) * 100:.1f}%), "
-          f"by {min(d for d, _ in off) if off else 0} to {max(d for d, _ in off) if off else 0}; "
-          f"the column counts references the edge list cannot draw")
+    if off:
+        print(f"  FanOut column vs drawable edges: {len(off)} types differ "
+              f"({len(off) / len(rows) * 100:.1f}%), by {min(d for d, _ in off)} to "
+              f"{max(d for d, _ in off)} -- D63, and it was fixed on 2026-08-26; a non-zero "
+              f"count here is a regression of it")
+    else:
+        print("  FanOut column reconciles with the edge list on every type -- D63")
 
     findings = [f for f in model["findings"]
                 if f.get("status") == "reported"

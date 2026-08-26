@@ -467,6 +467,33 @@ public sealed class TypeNode
     internal void AddInbound(SubjectRef from) => _inbound.Add(from);
 
     internal void AddOutbound(SubjectRef to) => _outbound.Add(to);
+
+    /// <summary>
+    /// Drops outbound entries whose target the walk never built a node for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Outbound and inbound were counted at different times and by different tests, and the
+    /// numbers disagreed because of it.</b> Outbound is added during the walk, which knows the
+    /// target is in the solution and cannot yet know whether it got a node; inbound is added in
+    /// <c>ModelBuilder.Build</c>, which can, and skips what did not resolve. So
+    /// <see cref="FanOut"/> counted references the graph does not carry while <see cref="FanIn"/>
+    /// did not — on 1.0% of nopCommerce's types, 1.5% of Umbraco's and 6.7% of Jellyfin's, by 1 to
+    /// 10 and never downward.
+    /// </para>
+    /// <para>
+    /// <b>The consequence was a column that cannot be joined to the file beside it.</b>
+    /// <c>CsvOutput</c> says the <c>Id</c> columns are what join <c>types.csv</c> to
+    /// <c>edges.csv</c>; a reader who joined them could not reproduce <c>FanOut</c> and was told
+    /// nothing about why. <b>What was dropped is still counted</b> — that is
+    /// <see cref="Coverage.EdgesToUnanalysedTypes"/>, and it is unchanged. This only stops the
+    /// number naming them from claiming them as edges.
+    /// </para>
+    /// </remarks>
+    internal void RetainOutbound(Func<SubjectRef, bool> resolved)
+    {
+        foreach (var gone in _outbound.Where(o => !resolved(o)).ToList()) _outbound.Remove(gone);
+    }
 }
 
 /// <summary>A project in the analysed solution.</summary>
