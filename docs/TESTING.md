@@ -1245,3 +1245,113 @@ caught what a suite over a synthetic fixture structurally could not.
 
 `SeamTests.The_seam_test_is_actually_looking_at_something` exists for this reason: every
 other assertion in that file passes trivially against an assembly that is missing or empty.
+
+---
+
+## 10. What pins a behaviour, and what does not
+
+**A claim about the shipped tool needs a test that owns the behaviour, and a pin against a frozen
+implementation is not one.** `KnownDefectTests` and the equivalence suite both went at R2 with the
+frozen probe they asserted against, and neither is a loss: **a pin against a frozen implementation
+cannot fail when the live one starts doing the right thing.** The worked example is in git — Core
+had been keying type identity correctly since `ModelBuilder` adopted `SubjectRef`, and the pin
+stayed green throughout, so it could not tell you whether the wrong behaviour was still there.
+
+What replaces a pin is an ordinary test in the suite that owns the behaviour, naming what that
+behaviour must be. Anything still wrong and still worth watching needs one of those.
+
+**The divergence to watch is between renderers.** The terminal report and the HTML are two
+renderers over one model and they do not carry the same disclosures. Two defects a week apart were
+both of that shape, and so is the rule they produced: **a suppression is allowed to make a section
+shorter; it is not allowed to make it emptier in one renderer than in the other.** Look for it
+wherever a change removes a population and puts evidence in its place.
+
+**What catches both directions is asserting against something outside the pair.** The two renderers
+can also agree and both be wrong — each told the reader, in its own words, that the exports carried
+every finding, when the exports carried the model and no findings at all. A renderer-parity check
+catches the first failure and passes the second.
+
+---
+
+## 11. How defects have actually been found
+
+Worth recording, because the methods generalise where the individual defects do not.
+
+**Planting a case corrects the requirement more often than it confirms it** — three times out of
+four, twice over, across the fixture plants and the suppression matrix. Making a finding fire is
+how you learn whether its threshold is real. Three defects were found by trying to make a
+suppression row fire, not by reading the code.
+
+**Two of those were unreachable by arithmetic rather than by tuning**, which no amount of running
+the tool would have revealed. That is the origin of §8's review question *"can this fire at all?"*,
+and of §9.
+
+**Using a value is how you learn whether it means what it is named.** One was found by reaching for
+`MethodMetrics.Id` as a sort key — not by the audit that was looking for exactly this class of
+problem, which had passed over it because nothing read it.
+
+**Suppressions interact through the population, not just through the code.** One suppression's test
+plant had to be built from existing boundary types, because adding a new one would have moved
+`boundaries.Count` and disarmed another defect's row before it could be examined.
+
+**Running the tool on a solution that is not the fixture found three defects in one pass.** All
+three came from `bearing ./Bearing.sln` — 89 types, 4.5s — and none of them could have come from
+the suite. Two were agreed on by both implementations, which makes them invisible to an equivalence
+check, and pinned by a snapshot, which records them as intended. The third needs a population the
+fixture does not have: TestBed has 19 contact points, so the case where the count is zero and the
+integration map is not has never rendered. **A fixture answers the questions it was built to
+answer.** The complement — *is this output addressed to a user, and does it read as one thing* — has
+no test and probably cannot have one, which is an argument for running the shipped binary on real
+solutions as a scheduled activity rather than as a demonstration.
+
+**That complement does have a test. It is just not an automated one, and it found six defects in
+one session.** They came from handing the report to two developers who had never seen the codebase
+and had not built the tool, and asking them to answer questions about it. Three things about the
+method are worth keeping:
+
+**The author is the wrong reader, and knows too much to stop being one.** The three found by running
+the binary were the best the author's own eyes could do, and they were real. The six sat in the same
+output afterwards and were invisible from inside, because every one of them is a question about what
+a label means to someone who does not know the model behind it. There is no amount of careful
+re-reading that recovers not knowing something.
+
+**Ask for a task, never for an opinion.** Every one of these came out of someone trying to answer a
+question and failing, or asking what a thing was *for* while trying to use it. None came from asking
+whether the report was good; that question was never put, on purpose, and would have produced
+politeness instead.
+
+**A pre-registered bar is what makes a bad result usable.** That session's headline outcome — nobody
+could answer the build spec's acceptance question — was graded against a rule written down before
+anyone was booked, including what each outcome would mean for the work. Without that, the temptation
+to re-read the result as *"they needed more time"* is close to irresistible, and the same session
+yields nothing.
+
+**The same method ran again a fortnight later and found six more.** Five .NET developers who had
+never seen the solution, one room, own laptops, **answers written privately to the facilitator
+rather than spoken**. Four things it added to the three lessons above:
+
+**Written answers are worth the awkwardness of collecting them.** The first round was two people
+answering out loud, where the second answer can be an echo. The second round's best reading of the
+mosaic — one that tied it straight back to the plot's own *"118 of 547 named"* — came from someone
+writing alone, and the sentence the room converged on afterwards was **cruder than what one
+participant had already written**. Without the private answers that reading would not be in the
+record at all, and the mosaic would have looked worse than it is.
+
+**A defect can be sitting in the geometry rather than in the words.** Five of the six were wording,
+the class this method has always been good for. **The sixth was not**: it took a participant saying
+*indirect* about a direct dependency, and then opening the SVG and measuring, to find that 18 of 29
+edges crossed a box they had nothing to do with. **The report was read by five people and the
+drawing was read by none of them** — the question *what does this line pass through* is one nobody
+thinks to ask, which is why it survived every freeze and both reference solutions.
+
+**A short answer is not a shallow one, and scoring it as one inverts a result.** *"The ones with the
+biggest dots"* was first written up as the pre-registered misread of dot area as severity. It was
+not: another task in the same session recorded that every participant knew area was the type count,
+and the question being answered — *which part would you least want to change* — rewards exactly that
+compression. **Check whether another task in the same session already disconfirms an error before
+recording it.**
+
+**Verification cuts both ways, and that is what makes it useful.** In the same write-up, one
+reported reaction turned out to be a real defect the moment the artifact was opened, and two turned
+out to be nothing — the misread above, and a loose paraphrase of an axis whose caption states the
+share correctly three times. **Neither outcome is available without opening the file.**
