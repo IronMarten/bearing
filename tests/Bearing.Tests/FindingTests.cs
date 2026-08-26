@@ -54,10 +54,11 @@ public sealed class FindingTests(CoreWalkFixture core)
             .Select(f => f.Subject.Canonical)
             .ToHashSet(StringComparer.Ordinal);
 
-        // Seven since P7: the near-miss families reach method level with methods their types do
-        // not reach type level with, which widens the margin this test measures rather than
-        // changing what it claims.
-        Assert.Equal(8, byMethod.Except(byType, StringComparer.Ordinal).Count());
+        // Nine since D10. The near-miss families reach method level with methods their types do
+        // not reach type level with, and letting thin cohorts nominate widens that again: a
+        // group of three members can support a method-level claim where the three types it sits
+        // in cannot support a type-level one. The margin moves; the claim does not.
+        Assert.Equal(9, byMethod.Except(byType, StringComparer.Ordinal).Count());
     }
 
     /// <summary>
@@ -645,11 +646,11 @@ public sealed class FindingTests(CoreWalkFixture core)
             .Select(f => f.ValueOf("CyclomaticXMedian"))
             .ToList();
 
-        // Back to one pair at X16, and that is the margin this test exists to watch rather than a
-        // number to keep updating. P7 had taken it to two; the dispersion gate removes the members
-        // whose ratios tied at the low end, because a tie just above a peer median is exactly what
-        // it is built to refuse. One pair still exercises the tiebreak, and the remark above says
-        // what losing it would cost — so if this reaches zero, plant, do not relax the assertion.
-        Assert.Equal(1, ranks.Count - ranks.Distinct().Count());
+        // Two pairs again at D10, which took it back up rather than down. X16's dispersion gate
+        // had removed the members tied just above a peer median — exactly what it is built to
+        // refuse — and D10 then admitted the thin cohorts the floor had been silencing, which tie
+        // readily because a group of three has few distinct ratios to offer. The margin is what
+        // this test watches; if it reaches zero, plant, do not relax the assertion.
+        Assert.Equal(2, ranks.Count - ranks.Distinct().Count());
     }
 }

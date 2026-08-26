@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 
 namespace Bearing.Tests;
 
@@ -169,40 +169,45 @@ public sealed class SuppressionTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// The control for §15 exists only because <c>DEFECTS.md</c> §10 is still live.
+    /// The breaks-alone control survives on its own merits, and no longer on a live defect.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>RoutingDepot</c> is the type that survives breaks alone, and it survives because its
-    /// cohort is three. §10: breaks alone runs over all types while its concealed-decision
-    /// exclusion reads a cohort-gated population, so a small peer group drops a type out of
-    /// concealed decision and straight into breaks alone. Core inherits that — the exclusion is a
-    /// suppression row now, but the nomination it searches for is still never made.
+    /// <b>This replaces a test that pinned the opposite.</b> <c>RoutingDepot</c> used to be the
+    /// survivor, and it survived <i>because</i> <c>DEFECTS.md</c> §10 was live: its cohort of three
+    /// stripped its concealed-decision nomination, so suppression row 2 had nothing to suppress
+    /// with. The old test's own remark said the day §10 was fixed the survivor would leave and a
+    /// replacement had to be planted <b>in the same change, not discovered afterwards</b>. This is
+    /// that change; <c>SurchargeEvaluator</c> is that replacement, and it was planted long before
+    /// and never pinned — the register recorded it as pinned and no test named it.
     /// </para>
     /// <para>
-    /// <b>This is worth pinning because fixing §10 costs the §15 control.</b> The day a
-    /// below-floor type can be nominated as a concealed decision, <c>RoutingDepot</c> leaves
-    /// breaks alone, the finding empties on this fixture, and the divergence test above starts
-    /// asserting an absence rather than a difference. A replacement control has to be planted in
-    /// the same change, not discovered afterwards.
+    /// The difference that matters: <c>SurchargeEvaluator</c> has a peer group of six, so its
+    /// survival does not depend on any gate being wrong. It is simply not a concealed decision.
     /// </para>
     /// </remarks>
     [Fact]
-    public void The_surviving_control_survives_because_of_a_different_live_defect()
+    public void The_breaks_alone_control_does_not_depend_on_a_defect()
     {
-        var depot = core.Model.Types.Single(t => t.Name == "RoutingDepot");
         var policy = core.Model.Policy;
-
-        Assert.True(depot.CohortSize < policy.MinCohort);
-        Assert.True(depot.MaxMemberCyclomatic >= policy.MinDecisionCc);
-
-        // Every condition for a concealed decision except a viable peer group, so the suppression
-        // finds nothing to suppress with.
         var detected = Analysis.Detected(core.Model);
-        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionType, depot.Subject));
-        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, depot.Subject));
-        Assert.Null(SilencingRuleFor("RoutingDepot"));
+
+        // The old survivor has left, which is §10 being fixed rather than a regression.
+        var depot = core.Model.Types.Single(t => t.Name == "RoutingDepot");
+        Assert.Equal(3, depot.CohortSize);
+        Assert.True(
+            detected.ContainsAbout(FindingKind.ConcealedDecisionType, depot.Subject)
+            || detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, depot.Subject));
+        Assert.NotNull(SilencingRuleFor("RoutingDepot"));
+
+        // And the replacement survives with a peer group large enough that no floor is involved.
+        var control = core.Model.Types.Single(t => t.Name == "SurchargeEvaluator");
+        Assert.True(control.CohortSize >= policy.MinCohort);
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionType, control.Subject));
+        Assert.False(detected.ContainsAbout(FindingKind.ConcealedDecisionMethod, control.Subject));
+        Assert.Null(SilencingRuleFor("SurchargeEvaluator"));
     }
+
 
     /// <summary>
     /// Row 6 of the suppression matrix, asserted against the model rather than against wording.
@@ -239,34 +244,59 @@ public sealed class SuppressionTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// Row 7: no peer group, no relative claim. Invariants 6 and 8.
+    /// Row 7: no usable peer group, no relative claim. Invariants 6 and 8.
     /// </summary>
     /// <remarks>
-    /// PricingVault is planted so the cohort floor is the only thing between it and a nomination.
-    /// Every other condition is asserted here from Core's own numbers, so absence can only be the
-    /// gate — without that half, a type that quietly stopped qualifying for an unrelated reason
-    /// would keep this test passing.
     /// <para>
-    /// The probe's companion test moves the floor and watches the finding come back. That control
-    /// cannot be run against Core here, because cohort <i>assignment</i> reads
-    /// <c>MinCohort</c> during the walk: a different floor is a different set of peer groups, so
-    /// it needs a second walk rather than a second render. <c>SuppressionTests</c> holds the
-    /// moving-threshold half on the oracle until that walk is cheap enough to run twice.
+    /// <b>Row 7 used to be implemented as <c>MinCohort</c> and it was doing more than row 7 asks.</b>
+    /// <c>DEFECTS.md</c> §10: a floor of five silenced peer groups of three, which are small and
+    /// real, and the silence sent those types into breaks alone instead — two findings
+    /// contradicting each other about one component. What row 7 actually says is that a type with
+    /// <i>no</i> peer group makes no relative claim, and that survives the fix.
+    /// </para>
+    /// <para>
+    /// <b>Both halves are now enforced by arithmetic rather than by a constant</b>, which is why
+    /// there is no replacement threshold to tune: <c>Distribution.Read</c> answers null below two
+    /// values, and the dispersion gate cannot fire at two — with values <c>a &lt; b</c> the median
+    /// is their midpoint and the MAD half their gap, so <c>median + k·MAD</c> exceeds <c>b</c> for
+    /// every <c>k &gt; 1</c>. The three cases below are the three sizes that matters at.
     /// </para>
     /// </remarks>
     [Fact]
-    public void A_type_below_the_cohort_floor_makes_no_relative_claim()
+    public void A_type_with_no_usable_peer_group_makes_no_relative_claim()
     {
-        var vault = core.Model.Types.Single(t => t.Name == "PricingVault");
         var policy = core.Model.Policy;
+        var nominated = Analysis.FindingsFor(core.Model).OfKind(FindingKind.ConcealedDecisionType)
+            .Select(f => f.Subject)
+            .ToHashSet();
 
-        Assert.True(vault.CohortSize < policy.MinCohort);
-        Assert.True(vault.MaxMemberCyclomatic >= policy.MinDecisionCc);
+        // No peers at all. cc 18 and alone in kind:DataAccess, so nothing but the absence of a
+        // group is stopping it — this is row 7 itself.
+        var peerless = core.Model.Types.Single(t => t.Name == "OrderRepository");
+        Assert.Equal(1, peerless.CohortSize);
+        Assert.True(peerless.MaxMemberCyclomatic >= policy.MinDecisionCc);
+        Assert.DoesNotContain(peerless.Subject, nominated);
 
-        Assert.DoesNotContain(
-            Analysis.FindingsFor(core.Model).OfKind(FindingKind.ConcealedDecisionType),
-            f => f.Subject == vault.Subject);
+        // One peer, so no TYPE-level claim: refused by the MAD arithmetic above rather than by a
+        // floor, and so it holds whatever MinCohort is set to. It does earn a method-level one —
+        // "the most complex of the 3 methods in the 2 types whose name ends in Tag" — and that is
+        // not an inconsistency, it is the two arms reading two populations. The type arm compares
+        // two types; the method arm compares three methods, which is a group large enough to have
+        // spread. Selected by assembly because PayloadTag is one of the planted name collisions
+        // and Data declares a second one at cc 2.
+        var pair = core.Model.Types.Single(t => t.Name == "PayloadTag" && t.Assembly == "Tools");
+        Assert.Equal(2, pair.CohortSize);
+        Assert.True(pair.MaxMemberCyclomatic >= policy.MinDecisionCc);
+        Assert.DoesNotContain(pair.Subject, nominated);
+
+        // Two peers, and it does claim. This is the case §10 was about: the floor used to strip
+        // this nomination and hand the type to breaks alone. §62 is what makes the claim honest at
+        // this size — one of three reads as a third of its group, not as a rarity.
+        var thin = core.Model.Types.Single(t => t.Name == "PricingVault");
+        Assert.Equal(3, thin.CohortSize);
+        Assert.Contains(thin.Subject, nominated);
     }
+
 
     /// <summary>
     /// The ceiling is a gate in both directions, which the proportional form could never be.

@@ -52,90 +52,8 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Six open. Roughly severity-ordered, and the numbers are identity — they are never reused and
+*Five open. Roughly severity-ordered, and the numbers are identity — they are never reused and
 never renumbered.*
-
-### 10. The cohort floor strips a suppression it was never meant to touch
-
-
-`breaksAlone` runs over all types — "no cohort required" — but reads its concealed-decision
-exclusion from a list built out of the cohort-gated `eligible`. A small peer group therefore
-drops a type out of concealed decision and straight into breaks alone. `RoutingDepot` is told it
-breaks alone at cc 12 purely because it has three peers instead of five, and *lowering*
-`--min-cohort` to 3 removes the contradiction.
-
-Violates invariant 3 — two findings contradicting each other about one component.
-
-**Core inherits it, and that is not an oversight.** Making suppression a declared rule (defect 15)
-does not help: the rule searches for a concealed-decision nomination that the cohort floor stops
-anyone from making. Fixing it means deciding what a below-floor type may be nominated *as*, which
-is `ARCHITECTURE.md` §11's thresholds-global-vs-calibrated question, not a local repair.
-
-~~**Fixing it costs defect 15's control.**~~ **It did, and no longer does.** `RoutingDepot`
-survives breaks alone precisely because its cohort of three strips its concealed-decision
-nomination, so the day a below-floor type can be nominated it leaves the finding — and until
-`Core/Rating/Evaluators.cs` was planted it was the *only* survivor, which would have left §15's
-divergence test asserting an absence rather than a difference. `SurchargeEvaluator` is the
-replacement: it survives on a peer group of six, so its survival does not depend on this defect.
-Both are pinned, and fixing this one can now proceed on its own.
-Pinned: `The_surviving_control_survives_because_of_a_different_live_defect`.
-
-Pinned: `The_cohort_floor_strips_the_concealed_decision_suppression_from_breaks_alone`.
-
-**Measured 2026-08-21: incidence on both reference solutions is zero.** Cross-referencing every
-breaks-alone finding, uncapped, against its cohort size: nopCommerce 0 of 27, Jellyfin 0 of 14. Not
-one sits in a below-floor cohort. `RoutingDepot` is a TestBed plant; the invariant-3 violation is
-real and pinned and it does not occur in the wild.
-
-**And the obvious repair is not available.** Lowering the floor looks like it fixes this — it does
-on the fixture — but `MinCohort` also selects *which basis* a type is compared against, so moving
-it 5 → 3 re-bases 155 of Jellyfin's 1,502 types. `ConditionProcessor` leaves breaks alone at 3 with
-nothing gated at all: it moves from `ns:MediaBrowser.Model.Dlna` (8 peers) to `suffix:Processor`
-(3), where three peers make cc 80 an outlier. A fix aimed here would have changed every percentile
-in the report and been credited with the wrong mechanism.
-
-**The parameter split is done** — `CohortBasisFloor` owns selection, `MinCohort` keeps sufficiency
-— and it does not close this. Letting thin cohorts nominate runs into `ConcealedTopRank`, which is
-3: `Reading.Rank` is midrank from the top, so in a cohort of three the ranks are 1, 2 and 3 and the
-gate admits every member. The gate that exists to stop the finding growing with the size of the
-codebase goes vacuous at exactly the cohort sizes this entry is about.
-
-**That is the third repair in a row to open a new one, and the recurrence is the finding.** This is
-one of ten entries — §2, §9, §10, §14, §17, §19, §28, §33, §34, §38 — that are the same design
-decision failing, each repaired locally by adding or moving a threshold on *cohort size*. Measured
-on both solutions, size is the wrong variable: 88% of nopCommerce's method cohorts have a median of
-0 or 1, so `3x median` **is** `cc >= 3`; 74% have zero dispersion; and `base:BaseNopModel` has
-**1,656 members with MAD 0**. A cohort of three and a cohort of 1,656 fail identically.
-
-~~**So this is a symptom and it should not be repaired again.** It carries zero field incidence and it
-now waits on X16.~~ **Both halves of that are now false. Re-measured 2026-08-26.**
-
-**It has field incidence, and the earlier zero was a two-solution zero.** Reported breaks-alone
-findings sitting in a below-floor cohort: nopCommerce **0 of 27**, Jellyfin **0 of 20** — and
-**Umbraco 2 of 57**, which did not exist as a reference solution when the 2026-08-21 measurement was
-taken. `DocumentPatcher` is a real instance: cohort `suffix:Patcher`, two types, `cc` 13, and
-lowering the floor moves it out of breaks alone and into concealed decision exactly as this entry
-predicts. `PackageInstallation` is **not** one — it survives at a floor of 2, so it genuinely is not
-a concealed decision and its breaks-alone finding is no contradiction.
-
-**And X16 has cleared the blocker.** This entry recorded that letting thin cohorts nominate *"runs
-into `ConcealedTopRank`, which is 3: in a cohort of three the ranks are 1, 2 and 3 and the gate
-admits every member."* The gate is now `min(ConcealedTopRank, TopRankLimit(ConcealedTopShare))`, so
-a cohort of three admits **rank 1.1** — the unique maximum — and a dispersion test has to pass
-besides. **The gate is no longer vacuous at the sizes this entry is about.**
-
-**The repair was built and measured, and it is not landing on its own.** Removing `MinCohort`'s
-gating role from both `ConcealedDecision` arms costs **+2, +3 and +6 findings** on the three
-solutions, takes Umbraco's breaks-alone 57 → 56, and closes the contradiction. **What stops it is
-the half X3 left behind, not the gate.** Below-floor types currently make no relative claim *by
-design* — `SuppressionTests.A_type_below_the_cohort_floor_makes_no_relative_claim` is that decision
-with a test on it — and the newly admitted findings render percentile language a thin cohort cannot
-support: `pctl` 83.3 in a cohort of three, which `Sentences.TopPercent` prints as **"top 17%"**.
-
-**So the shape of the fix is two things, and the second one is X3's remainder**: let thin cohorts
-nominate, *and* degrade the sentence to a count — X3's own words, *"a cohort of three earns `cc 80
-against 3 peers, median 4` and never `top 5%`"*. Do not land the first half alone; it trades an
-invariant-3 contradiction for an invariant-6 one, and it deletes a named invariant to do it.
 
 ### 44. Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye
 
@@ -394,7 +312,7 @@ that tells them apart.
 
 ## Closed
 
-**Index only — the prose is in git.** Fifty-six entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Fifty-seven entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -409,6 +327,7 @@ forty-seven in full is the commit before this one.
 | 7 | 1.4–2.0% of edges point at absent types | fixed in Core at A2, and the rate was the least of it |
 | 8 | `.slnx` solutions do not load at all | fixed |
 | 9 | Change cost gates on `minCohort` where it means a fan-in floor | fixed in Core |
+| 10 | The cohort floor strips a suppression it was never meant to touch | fixed 2026-08-26 — `MinCohort` no longer gates nomination in either `ConcealedDecision` arm, so no type is dropped out of concealed decision and into breaks alone. Nothing replaces it: `Distribution.Read` refuses below two values and the dispersion gate cannot fire at two |
 | 11 | The layer-span collapse hides the anomaly it shares a signature with | fixed in Core |
 | 12 | `WIDEST CONTRACT SURFACE` can never be suppressed, at any boundary count | fixed in Core |
 | 13 | `MethodMetrics.Id` is not an identifier — it is the bare method name | fixed |

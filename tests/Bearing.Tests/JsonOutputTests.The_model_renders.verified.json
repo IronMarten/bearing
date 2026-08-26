@@ -28007,7 +28007,7 @@
         {
           "name": "CohortSize",
           "value": 49,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28085,7 +28085,7 @@
         {
           "name": "CohortSize",
           "value": 13,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28163,7 +28163,7 @@
         {
           "name": "CohortSize",
           "value": 49,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28226,6 +28226,84 @@
       "relations": []
     },
     {
+      "key": "ConcealedDecisionMethod|member|Core|global::TestBed.Core.Depots.RoutingDepot|M:TestBed.Core.Depots.RoutingDepot.Route(System.Int32,System.String,System.Boolean,System.Boolean)",
+      "kind": "ConcealedDecisionMethod",
+      "class": "claim",
+      "status": "reported",
+      "suppressedBy": null,
+      "subject": {
+        "kind": "Member",
+        "canonical": "member|Core|global::TestBed.Core.Depots.RoutingDepot|M:TestBed.Core.Depots.RoutingDepot.Route(System.Int32,System.String,System.Boolean,System.Boolean)",
+        "members": null,
+        "declaringType": "type|Core|global::TestBed.Core.Depots.RoutingDepot"
+      },
+      "receipts": [
+        {
+          "name": "CohortSize",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "Cyclomatic",
+          "value": 12,
+          "gate": "MinDecisionCc"
+        },
+        {
+          "name": "CyclomaticXMedian",
+          "value": 12,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticRank",
+          "value": 1,
+          "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 1.1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "MedianCohortCyclomatic",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticPctl",
+          "value": 83.33333333333333,
+          "gate": null
+        },
+        {
+          "name": "Dsm",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "MaxNestingDepth",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "LinesOfCode",
+          "value": 19,
+          "gate": null
+        }
+      ],
+      "qualifiers": [],
+      "participants": [],
+      "relations": []
+    },
+    {
       "key": "ConcealedDecisionMethod|member|Core|global::TestBed.Core.ShipmentController|M:TestBed.Core.ShipmentController.Post(TestBed.Core.RawResponse,TestBed.Core.NormalizationContext,System.String,System.Int32)",
       "kind": "ConcealedDecisionMethod",
       "class": "claim",
@@ -28241,7 +28319,7 @@
         {
           "name": "CohortSize",
           "value": 8,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28319,7 +28397,7 @@
         {
           "name": "CohortSize",
           "value": 8,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28397,7 +28475,7 @@
         {
           "name": "CohortSize",
           "value": 5,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28460,6 +28538,162 @@
       "relations": []
     },
     {
+      "key": "ConcealedDecisionMethod|member|Core|global::TestBed.Core.Vaults.PricingVault|M:TestBed.Core.Vaults.PricingVault.Price(System.Int32,System.String,System.Boolean)",
+      "kind": "ConcealedDecisionMethod",
+      "class": "claim",
+      "status": "reported",
+      "suppressedBy": null,
+      "subject": {
+        "kind": "Member",
+        "canonical": "member|Core|global::TestBed.Core.Vaults.PricingVault|M:TestBed.Core.Vaults.PricingVault.Price(System.Int32,System.String,System.Boolean)",
+        "members": null,
+        "declaringType": "type|Core|global::TestBed.Core.Vaults.PricingVault"
+      },
+      "receipts": [
+        {
+          "name": "CohortSize",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "Cyclomatic",
+          "value": 8,
+          "gate": "MinDecisionCc"
+        },
+        {
+          "name": "CyclomaticXMedian",
+          "value": 8,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticRank",
+          "value": 1,
+          "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 1.1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "MedianCohortCyclomatic",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticPctl",
+          "value": 83.33333333333333,
+          "gate": null
+        },
+        {
+          "name": "Dsm",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "MaxNestingDepth",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "LinesOfCode",
+          "value": 15,
+          "gate": null
+        }
+      ],
+      "qualifiers": [],
+      "participants": [],
+      "relations": []
+    },
+    {
+      "key": "ConcealedDecisionMethod|member|Tools|global::TestBed.Shared.PayloadTag|M:TestBed.Shared.PayloadTag.Score(System.String,System.Int32,System.Boolean,System.Boolean)",
+      "kind": "ConcealedDecisionMethod",
+      "class": "claim",
+      "status": "reported",
+      "suppressedBy": null,
+      "subject": {
+        "kind": "Member",
+        "canonical": "member|Tools|global::TestBed.Shared.PayloadTag|M:TestBed.Shared.PayloadTag.Score(System.String,System.Int32,System.Boolean,System.Boolean)",
+        "members": null,
+        "declaringType": "type|Tools|global::TestBed.Shared.PayloadTag"
+      },
+      "receipts": [
+        {
+          "name": "CohortSize",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "Cyclomatic",
+          "value": 13,
+          "gate": "MinDecisionCc"
+        },
+        {
+          "name": "CyclomaticXMedian",
+          "value": 6.5,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticRank",
+          "value": 1,
+          "gate": "ConcealedTopRank"
+        },
+        {
+          "name": "CyclomaticTopRankLimit",
+          "value": 1.1,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticOutlierFloor",
+          "value": 5,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortCyclomaticMad",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "MedianCohortCyclomatic",
+          "value": 2,
+          "gate": null
+        },
+        {
+          "name": "CyclomaticPctl",
+          "value": 83.33333333333333,
+          "gate": null
+        },
+        {
+          "name": "Dsm",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "MaxNestingDepth",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "LinesOfCode",
+          "value": 21,
+          "gate": null
+        }
+      ],
+      "qualifiers": [],
+      "participants": [],
+      "relations": []
+    },
+    {
       "key": "ConcealedDecisionMethod|member|Core|global::TestBed.Core.Calibration.MarkCaliper|M:TestBed.Core.Calibration.MarkCaliper.Sweep(System.Int32,System.Boolean,System.Boolean,System.Boolean)",
       "kind": "ConcealedDecisionMethod",
       "class": "claim",
@@ -28475,7 +28709,7 @@
         {
           "name": "CohortSize",
           "value": 11,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28553,7 +28787,7 @@
         {
           "name": "CohortSize",
           "value": 11,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28631,7 +28865,7 @@
         {
           "name": "CohortSize",
           "value": 9,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28709,7 +28943,7 @@
         {
           "name": "CohortSize",
           "value": 9,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28787,7 +29021,7 @@
         {
           "name": "CohortSize",
           "value": 8,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28865,7 +29099,7 @@
         {
           "name": "CohortSize",
           "value": 5,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -28943,7 +29177,7 @@
         {
           "name": "CohortSize",
           "value": 6,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "Cyclomatic",
@@ -29006,6 +29240,92 @@
       "relations": []
     },
     {
+      "key": "ConcealedDecisionType|type|Core|global::TestBed.Core.Depots.RoutingDepot",
+      "kind": "ConcealedDecisionType",
+      "class": "claim",
+      "status": "reported",
+      "suppressedBy": null,
+      "subject": {
+        "kind": "TypeDeclaration",
+        "canonical": "type|Core|global::TestBed.Core.Depots.RoutingDepot",
+        "members": null,
+        "declaringType": null
+      },
+      "receipts": [
+        {
+          "name": "CohortSize",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomatic",
+          "value": 12,
+          "gate": "MinDecisionCc"
+        },
+        {
+          "name": "MaxMemberCyclomaticXMedian",
+          "value": 12,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "FanInXMedian",
+          "value": 1,
+          "gate": "ConcealedFanInCeiling"
+        },
+        {
+          "name": "FanOutXMedian",
+          "value": 2,
+          "gate": "ConcealedFanOutCeiling"
+        },
+        {
+          "name": "MaxMemberCyclomaticPctl",
+          "value": 83.33333333333333,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 33.333333333333336,
+          "gate": null
+        },
+        {
+          "name": "FanIn",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "FanOut",
+          "value": 4,
+          "gate": null
+        },
+        {
+          "name": "Dsm",
+          "value": 0,
+          "gate": null
+        }
+      ],
+      "qualifiers": [
+        {
+          "name": "low-absolute-connectivity",
+          "holds": true,
+          "gate": "MinFanIn"
+        }
+      ],
+      "participants": [
+        "member|Core|global::TestBed.Core.Depots.RoutingDepot|M:TestBed.Core.Depots.RoutingDepot.Route(System.Int32,System.String,System.Boolean,System.Boolean)"
+      ],
+      "relations": []
+    },
+    {
       "key": "ConcealedDecisionType|type|Core|global::TestBed.Core.ShipmentController",
       "kind": "ConcealedDecisionType",
       "class": "claim",
@@ -29021,7 +29341,7 @@
         {
           "name": "CohortSize",
           "value": 8,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -29107,7 +29427,7 @@
         {
           "name": "CohortSize",
           "value": 5,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -29178,6 +29498,92 @@
       "relations": []
     },
     {
+      "key": "ConcealedDecisionType|type|Core|global::TestBed.Core.Vaults.PricingVault",
+      "kind": "ConcealedDecisionType",
+      "class": "claim",
+      "status": "reported",
+      "suppressedBy": null,
+      "subject": {
+        "kind": "TypeDeclaration",
+        "canonical": "type|Core|global::TestBed.Core.Vaults.PricingVault",
+        "members": null,
+        "declaringType": null
+      },
+      "receipts": [
+        {
+          "name": "CohortSize",
+          "value": 3,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomatic",
+          "value": 8,
+          "gate": "MinDecisionCc"
+        },
+        {
+          "name": "MaxMemberCyclomaticXMedian",
+          "value": 8,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticOutlierFloor",
+          "value": 1,
+          "gate": "ConcealedDispersionFactor"
+        },
+        {
+          "name": "CohortMaxMemberCyclomaticMad",
+          "value": 0,
+          "gate": null
+        },
+        {
+          "name": "FanInXMedian",
+          "value": 1,
+          "gate": "ConcealedFanInCeiling"
+        },
+        {
+          "name": "FanOutXMedian",
+          "value": 1,
+          "gate": "ConcealedFanOutCeiling"
+        },
+        {
+          "name": "MaxMemberCyclomaticPctl",
+          "value": 83.33333333333333,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 33.333333333333336,
+          "gate": null
+        },
+        {
+          "name": "FanIn",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "FanOut",
+          "value": 1,
+          "gate": null
+        },
+        {
+          "name": "Dsm",
+          "value": 0,
+          "gate": null
+        }
+      ],
+      "qualifiers": [
+        {
+          "name": "low-absolute-connectivity",
+          "holds": true,
+          "gate": "MinFanIn"
+        }
+      ],
+      "participants": [
+        "member|Core|global::TestBed.Core.Vaults.PricingVault|M:TestBed.Core.Vaults.PricingVault.Price(System.Int32,System.String,System.Boolean)"
+      ],
+      "relations": []
+    },
+    {
       "key": "ConcealedDecisionType|type|Core|global::TestBed.Core.AuthenticationMiddleware",
       "kind": "ConcealedDecisionType",
       "class": "claim",
@@ -29193,7 +29599,7 @@
         {
           "name": "CohortSize",
           "value": 8,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -29279,7 +29685,7 @@
         {
           "name": "CohortSize",
           "value": 9,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -29365,7 +29771,7 @@
         {
           "name": "CohortSize",
           "value": 7,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -29451,7 +29857,7 @@
         {
           "name": "CohortSize",
           "value": 5,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -29537,7 +29943,7 @@
         {
           "name": "CohortSize",
           "value": 6,
-          "gate": "MinCohort"
+          "gate": null
         },
         {
           "name": "MaxMemberCyclomatic",
@@ -30380,8 +30786,12 @@
       "key": "BreaksAlone|type|Core|global::TestBed.Core.Depots.RoutingDepot",
       "kind": "BreaksAlone",
       "class": "claim",
-      "status": "reported",
-      "suppressedBy": null,
+      "status": "suppressed",
+      "suppressedBy": {
+        "rule": "breaks-alone-decides-something",
+        "invariant": "3",
+        "reason": "structural isolation is not safety when a component decides something \u2014 a normalizer that picks the wrong option propagates into the data going out the door, not through the call graph"
+      },
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Depots.RoutingDepot",

@@ -53,7 +53,18 @@ public static class ConcealedDecision
         foreach (var group in population.GroupBy(x => x.Type.Cohort.Key, StringComparer.Ordinal))
         {
             var peers = group.ToList();
-            if (peers.Count < policy.MinCohort) continue;
+            // D10. This used to be `peers.Count < policy.MinCohort`, and the floor decided
+            // NOMINATION rather than only comparability: a type dropped out of concealed decision
+            // for having three peers instead of five, and straight into breaks alone, because
+            // suppression row 2 reads the concealed-decision set. Two findings then contradicted
+            // each other about one component, which is invariant 3.
+            //
+            // Nothing replaces it, and that is the point. `Distribution.Read` already answers null
+            // below two values, and the dispersion gate cannot fire at two: with values a < b the
+            // median is their midpoint and the MAD is half their gap, so `median + k*MAD` exceeds
+            // b for any k > 1. A cohort of two is refused by the arithmetic rather than by a
+            // constant, and a cohort of three earns the claim its own numbers support -- which
+            // since §62 is an honest "top 33%" rather than a percentile that flattered it.
 
             var complexity = Distribution.Of(peers.Select(p => (double)p.Member.Cyclomatic));
 
@@ -96,7 +107,9 @@ public static class ConcealedDecision
                 found.Add((reading.TimesMedian, member.Cyclomatic, new Finding(
                     new FindingKey(FindingKind.ConcealedDecisionMethod, member.Subject),
                     [
-                        Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
+                        // Context, not a gate, since D10 -- MinCohort no longer decides who is
+                        // nominated here. It still gates BlastRadius and ChangeCost.
+                        Receipt.Of("CohortSize", peers.Count),
                         Receipt.Gated("Cyclomatic", member.Cyclomatic, nameof(AnalysisPolicy.MinDecisionCc)),
                         // Evidence, not a gate, since X16. It still leads the sentence and still
                         // orders the section; what it no longer does is decide — which is also
@@ -147,7 +160,18 @@ public static class ConcealedDecision
         foreach (var group in model.Types.GroupBy(t => t.Cohort.Key, StringComparer.Ordinal))
         {
             var peers = group.ToList();
-            if (peers.Count < policy.MinCohort) continue;
+            // D10. This used to be `peers.Count < policy.MinCohort`, and the floor decided
+            // NOMINATION rather than only comparability: a type dropped out of concealed decision
+            // for having three peers instead of five, and straight into breaks alone, because
+            // suppression row 2 reads the concealed-decision set. Two findings then contradicted
+            // each other about one component, which is invariant 3.
+            //
+            // Nothing replaces it, and that is the point. `Distribution.Read` already answers null
+            // below two values, and the dispersion gate cannot fire at two: with values a < b the
+            // median is their midpoint and the MAD is half their gap, so `median + k*MAD` exceeds
+            // b for any k > 1. A cohort of two is refused by the arithmetic rather than by a
+            // constant, and a cohort of three earns the claim its own numbers support -- which
+            // since §62 is an honest "top 33%" rather than a percentile that flattered it.
 
             var complexity = Distribution.Of(peers.Select(t => (double)t.MaxMemberCyclomatic));
             var fanIn = Distribution.Of(peers.Select(t => (double)t.FanIn));
@@ -173,7 +197,9 @@ public static class ConcealedDecision
                 found.Add((cc.TimesMedian, type.MaxMemberCyclomatic, new Finding(
                     new FindingKey(FindingKind.ConcealedDecisionType, type.Subject),
                     [
-                        Receipt.Gated("CohortSize", peers.Count, nameof(AnalysisPolicy.MinCohort)),
+                        // Context, not a gate, since D10 -- MinCohort no longer decides who is
+                        // nominated here. It still gates BlastRadius and ChangeCost.
+                        Receipt.Of("CohortSize", peers.Count),
                         Receipt.Gated("MaxMemberCyclomatic", type.MaxMemberCyclomatic, nameof(AnalysisPolicy.MinDecisionCc)),
                         // Evidence since X16, not a gate — see the method arm.
                         // Evidence since X16 — see the method arm.

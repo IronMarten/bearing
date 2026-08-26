@@ -99,24 +99,33 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// No two type-level nominations tie, so their ordering tiebreak is never exercised.
+    /// Type-level nominations tie, so their ordering tiebreak is exercised — which it was not.
     /// </summary>
     /// <remarks>
-    /// The five nominations sit at 12, 8, 5, 4.333 and 3.5 times their peer median, so the sort
-    /// is decided entirely by rank and the <c>ThenBy</c> on identity could be deleted without
-    /// failing anything. Method level does tie, twice, which is what currently covers the
-    /// tiebreak at all — but a tiebreak covered on one finding and not the other is one
-    /// reimplementation away from being covered on neither.
+    /// <para>
+    /// <b>This assertion used to run the other way, and <c>DEFECTS.md</c> §10 inverted it.</b> The
+    /// nominations sat at 12, 8, 5, 4.333 and 3.5 times their peer median — all distinct — so the
+    /// sort was decided entirely by rank and the <c>ThenBy</c> on identity could have been deleted
+    /// without failing anything. The remark then said what the gap cost: <i>a tiebreak covered on
+    /// one finding and not the other is one reimplementation away from being covered on neither</i>.
+    /// </para>
+    /// <para>
+    /// Letting thin cohorts nominate closed it without being aimed at it. A peer group of three
+    /// offers few distinct ratios, so two of the newly admitted nominations share one and the
+    /// tiebreak now decides an order at both levels. <b>Asserted as an exact tie count rather than
+    /// as "at least one", because the value of this is the margin</b> — the same reason
+    /// <c>FindingTests.The_fixture_ties_method_level_findings</c> counts pairs.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void Type_level_concealed_decisions_never_tie()
+    public void Type_level_concealed_decisions_tie_so_the_tiebreak_is_exercised()
     {
         var ranks = Analysis.FindingsFor(core.Model)
             .OfKind(FindingKind.ConcealedDecisionType)
             .Select(f => f.ValueOf("MaxMemberCyclomaticXMedian"))
             .ToList();
 
-        Assert.Equal(ranks.Count, ranks.Distinct().Count());
+        Assert.Equal(1, ranks.Count - ranks.Distinct().Count());
     }
 
     /// <summary>

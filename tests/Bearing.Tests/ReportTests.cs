@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -492,12 +492,14 @@ public sealed class ReportTests(CoreWalkFixture core)
             .Where(line => line.Contains("not shown of", StringComparison.Ordinal))
             .ToList();
 
-        // Three caps bite on this fixture and all three say so. It was one until A9, which added
+        // Four caps bite on this fixture and all four say so. It was one until A9, which added
         // two: the dead-code section caps its collapsed carriers and its individual members
         // separately, because they are two lists and one shared cap would let either crowd the
-        // other out. Asserted as a set rather than loosened to "at least one", because a section
-        // that silently stopped disclosing would still pass that — docs/DEFECTS.md §3.
-        Assert.Equal(3, disclosures.Count);
+        // other out. D10 added the fourth — letting thin cohorts nominate takes method-level
+        // concealed decision to 16 against a --top of 15, so the section drops one and discloses
+        // it. Asserted as a set rather than loosened to "at least one", because a section that
+        // silently stopped disclosing would still pass that — docs/DEFECTS.md §3.
+        Assert.Equal(4, disclosures.Count);
         // P10 takes the peerless population 22 -> 25: ScaleHead alone under suffix:Head, and the
         // two *Window types under a suffix cohort of two. IScaleHead is NOT among them — it is
         // cohorted by architectural kind, into kind:Contract, which is the one existing cohort
