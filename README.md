@@ -1,4 +1,4 @@
-# Bearing
+﻿# Bearing
 
 **Get your bearings in a .NET codebase.**
 
@@ -49,12 +49,18 @@ about — components with no peer group, excluded generated code, projects that 
 load. A tool that quietly says nothing about the riskiest thing in your codebase is worse
 than no tool.
 
-**A finding you have decided about stays decided.** Put its key in `.bearing-acknowledged`
+**A finding you have decided about stays decided.** Put its key in `.bearing/acknowledged`
 beside your solution, commit the file, and the claim stops being made — so a second run tells
 you what is *new* rather than repeating what you already looked at. Keys come from `--json`,
 where every finding carries the one it is identified by; a note after a tab records why, which
 is the half that is still worth reading a year later. The report always says how many findings
 the file kept out of it, because a tool that can be told to go quiet has to say when it has.
+
+**One file per solution, beside the solution — not one per repository.** A repository with two
+solutions gets two, and that is the point: what is fine in one is a claim about that analysis, and
+a single shared file would have to tell them apart by name. It is a line-per-finding text file
+precisely so that a pull request reviewing it shows what was dismissed and why, in your words,
+rather than a re-indented array.
 
 **Acknowledging is not deleting.** The claim stays in `--json` with its evidence, marked
 `acknowledged`, and an entry that stops matching anything — which is what a rename does — is

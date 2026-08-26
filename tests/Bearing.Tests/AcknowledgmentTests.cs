@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
@@ -301,7 +301,7 @@ public sealed class AcknowledgmentTests(CoreWalkFixture core)
 
         Assert.Contains("1 finding marked known and fine", terminal, StringComparison.Ordinal);
         Assert.Contains("is not shown above", terminal, StringComparison.Ordinal);
-        Assert.Contains(Acknowledgments.DefaultFileName, terminal, StringComparison.Ordinal);
+        Assert.Contains(Acknowledgments.DisplayName, terminal, StringComparison.Ordinal);
 
         Assert.Contains("1 finding", page, StringComparison.Ordinal);
         Assert.Contains("not shown on this page", page, StringComparison.Ordinal);
@@ -403,10 +403,43 @@ public sealed class AcknowledgmentTests(CoreWalkFixture core)
 
         Assert.Equal(
             Path.Combine(
-                Path.GetDirectoryName(RepoPaths.TestBedSolution)!, Acknowledgments.DefaultFileName),
+                Path.GetDirectoryName(RepoPaths.TestBedSolution)!,
+                Acknowledgments.DefaultDirectoryName,
+                Acknowledgments.DefaultFileName),
             invocation.AcknowledgePath);
 
         Assert.False(invocation.AcknowledgeExplicit);
+    }
+
+    /// <summary>
+    /// The report names a path a reader can open, not a bare file name.
+    /// </summary>
+    /// <remarks>
+    /// <b>This stopped being free when the file moved into a directory.</b> While it was
+    /// <c>.bearing-acknowledged</c>, the file name was the whole answer; <c>acknowledged</c> on its
+    /// own names nothing. A user who pointed <c>--acknowledge</c> elsewhere gets the whole path,
+    /// because for them the location is the fact rather than a default they can assume.
+    /// </remarks>
+    [Fact]
+    public void The_default_file_is_named_relative_to_the_solution_and_a_given_one_is_not()
+    {
+        var solution = RepoPaths.TestBedSolution;
+
+        Assert.Equal(
+            Acknowledgments.DisplayName,
+            Acknowledgments.Naming(Acknowledgments.DefaultPathFor(solution), solution));
+
+        // Under the solution but not the default location: still relative, still openable.
+        Assert.Equal(
+            "known.txt",
+            Acknowledgments.Naming(
+                Path.Combine(Path.GetDirectoryName(solution)!, "known.txt"), solution));
+
+        var elsewhere = Path.Combine(Path.GetTempPath(), "known.txt");
+        Assert.Equal(Path.GetFullPath(elsewhere), Acknowledgments.Naming(elsewhere, solution));
+
+        // No file read: the name to print is where one would have been.
+        Assert.Equal(Acknowledgments.DisplayName, Acknowledgments.Naming(null, solution));
     }
 
     [Fact]
@@ -431,8 +464,7 @@ public sealed class AcknowledgmentTests(CoreWalkFixture core)
     {
         var finding = Analysis.Judge(core.Model).Reported.All[0];
 
-        var path = Path.Combine(
-            Path.GetDirectoryName(RepoPaths.TestBedSolution)!, Acknowledgments.DefaultFileName);
+        var path = Acknowledgments.DefaultPathFor(RepoPaths.TestBedSolution);
 
         return (
             Analysis.Judge(core.Model, Acknowledgments.Of([finding.Key.Canonical], path)),

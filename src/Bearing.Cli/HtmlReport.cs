@@ -81,7 +81,7 @@ public static class HtmlReport
             Everything(page, model, findings);
         }
 
-        Acknowledged(page, judgement);
+        Acknowledged(page, model, judgement);
         Footer(page, model);
 
         page.Append("</div>\n</body>\n</html>\n");
@@ -1206,13 +1206,13 @@ public static class HtmlReport
     /// usually not the person who wrote the acknowledgment file. <c>Report.Acknowledged</c> carries
     /// the rest of the argument, including why nothing is said when there is nothing to say.
     /// </remarks>
-    private static void Acknowledged(StringBuilder page, Judgement judgement)
+    private static void Acknowledged(StringBuilder page, SolutionModel model, Judgement judgement)
     {
         var known = judgement.Acknowledgments;
         if (known.Count == 0) return;
 
         var silenced = judgement.AcknowledgedCount;
-        var file = known.Path is { } path ? Path.GetFileName(path) : Acknowledgments.DefaultFileName;
+        var file = Acknowledgments.Naming(known.Path, model.SolutionPath);
 
         page.Append("<h2>Acknowledged</h2>\n");
 

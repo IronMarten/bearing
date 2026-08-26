@@ -17,7 +17,7 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="AcknowledgePath">
 /// The acknowledgment file to judge against — <c>PRD-free-tier.md</c> §10.3. Always set when there
 /// is a solution: either what <c>--acknowledge</c> named, or
-/// <see cref="Acknowledgments.DefaultFileName"/> beside the solution.
+/// <see cref="Acknowledgments.DefaultPathFor"/> — <c>.bearing/acknowledged</c> beside the solution.
 /// </param>
 /// <param name="AcknowledgeExplicit">
 /// Whether the user named that file. It decides what a missing one means: the default not being
@@ -278,9 +278,7 @@ public static class CommandLine
             // Beside the solution when the user did not say, because the file is meant to be
             // committed next to the thing it describes and found without a flag. A run that needs
             // to be told where its own acknowledgments live is one nobody will make twice.
-            AcknowledgePath: acknowledgePath
-                ?? Path.Combine(
-                    Path.GetDirectoryName(solutionPath) ?? ".", Acknowledgments.DefaultFileName),
+            AcknowledgePath: acknowledgePath ?? Acknowledgments.DefaultPathFor(solutionPath),
             AcknowledgeExplicit: acknowledgePath is not null,
             Full: full,
             Profile: profile);
@@ -309,7 +307,7 @@ public static class CommandLine
         yield return "  --mosaic <file.svg>        also write the mosaic: every type as one cell";
         yield return "  --plot <file.svg>          also write the plot: projects by reach and density";
         yield return "  --acknowledge <file>       findings marked known and fine, one key per line";
-        yield return $"                             (default: {Acknowledgments.DefaultFileName} beside the solution)";
+        yield return $"                             (default: {Acknowledgments.DisplayName} beside the solution)";
         yield return "  --full                     enumerate every finding instead of one per kind";
         yield return "  --profile                  also print, to stderr, where the run's time went";
         yield return "  --version                  print the version and exit";

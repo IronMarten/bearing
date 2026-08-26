@@ -89,7 +89,7 @@ public static class Report
         // Last, beside the other disclosure, and for the same reason: it qualifies everything above
         // it. A reader who cannot see that the report is withholding claims on their own past
         // instruction cannot tell a quiet run from a silenced one.
-        foreach (var line in Acknowledged(judgement)) yield return line;
+        foreach (var line in Acknowledged(model, judgement)) yield return line;
 
         yield return "";
     }
@@ -174,13 +174,13 @@ public static class Report
     /// so is what lets a reader recognise a re-flagged component as one they had already dismissed.
     /// </para>
     /// </remarks>
-    private static IEnumerable<string> Acknowledged(Judgement judgement)
+    private static IEnumerable<string> Acknowledged(SolutionModel model, Judgement judgement)
     {
         var known = judgement.Acknowledgments;
         if (known.Count == 0) yield break;
 
         var silenced = judgement.AcknowledgedCount;
-        var file = known.Path is { } path ? Path.GetFileName(path) : Acknowledgments.DefaultFileName;
+        var file = Acknowledgments.Naming(known.Path, model.SolutionPath);
 
         yield return "";
         yield return "-- ACKNOWLEDGED ------------------------------------------------";

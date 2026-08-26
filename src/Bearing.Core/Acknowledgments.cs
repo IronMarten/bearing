@@ -59,10 +59,47 @@ public sealed record Acknowledgment(string Key, string? Note, int Line);
 public sealed class Acknowledgments
 {
     /// <summary>
-    /// What the file is called when the user does not say. Sits beside the solution, and is meant
-    /// to be committed — the accumulation is the point.
+    /// The directory Bearing's committed files live in, beside the solution.
     /// </summary>
-    public const string DefaultFileName = ".bearing-acknowledged";
+    /// <remarks>
+    /// <para>
+    /// <b>A directory rather than a bare dotfile, because it will not be the only file in it.</b>
+    /// The paid tier keeps its policy beside this one and collects the directory in CI, and two
+    /// files a customer maintains together should not be in two places for no reason.
+    /// </para>
+    /// <para>
+    /// <b>Beside the solution, not at a repository root, and the multi-solution case decides it.</b>
+    /// The cardinality is one per analysis unit — one per solution — and this makes that structural
+    /// instead of conventional. A single directory at a repository root serving several solutions
+    /// has to tell their files apart by name, and a naming convention is the same class of thing as
+    /// a canonicalisation rule: a second place two implementations can disagree about what a file
+    /// is. It also costs nothing to find. Bearing analyses a solution and has no notion of a
+    /// repository; discovering a root means depending on git, which would be a real coupling bought
+    /// for a cosmetic gain, and would fail outside a checkout.
+    /// </para>
+    /// <para>
+    /// <b>The two are not the same directory as often as they look.</b> nopCommerce's solution is at
+    /// <c>src/NopCommerce.sln</c>, with a second under <c>src/Build/</c> — so a repository root and
+    /// a solution directory differ in the ordinary case, not an exotic one. Jellyfin and Umbraco
+    /// both keep theirs at the root, where the question does not arise.
+    /// </para>
+    /// <para>
+    /// <b>And it keeps <see cref="Judgement.Unmatched"/> meaning what it says.</b> One file serving
+    /// several solutions reports every key the current run's solution does not contain as unmatched,
+    /// which turns a rename signal into noise proportional to how much of the repository this run
+    /// is not looking at.
+    /// </para>
+    /// </remarks>
+    public const string DefaultDirectoryName = ".bearing";
+
+    /// <summary>
+    /// What the file is called when the user does not say. Meant to be committed — the accumulation
+    /// is the point.
+    /// </summary>
+    public const string DefaultFileName = "acknowledged";
+
+    /// <summary>How the file is written when a report or a message names it.</summary>
+    public const string DisplayName = DefaultDirectoryName + "/" + DefaultFileName;
 
     private const char NoteSeparator = '\t';
     private const char Comment = '#';
@@ -149,6 +186,43 @@ public sealed class Acknowledgments
         }
 
         return all.Count == 0 && path is null ? None : new Acknowledgments(all, byKey, path);
+    }
+
+    /// <summary>
+    /// Where the file sits for a given solution when the user does not say.
+    /// </summary>
+    public static string DefaultPathFor(string solutionPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(solutionPath);
+
+        return System.IO.Path.Combine(
+            System.IO.Path.GetDirectoryName(solutionPath) ?? ".", DefaultDirectoryName, DefaultFileName);
+    }
+
+    /// <summary>
+    /// How to name <paramref name="path"/> in a report, given the solution it was read for.
+    /// </summary>
+    /// <remarks>
+    /// <b>Relative to the solution when it is under it, and the whole path otherwise.</b> The file
+    /// name alone stopped being enough the moment it became <c>acknowledged</c> inside a directory:
+    /// a report telling a reader that <i>acknowledged</i> withheld three findings has named nothing
+    /// they can open. A user who pointed <c>--acknowledge</c> somewhere else gets the path they
+    /// gave, because for them the location is the fact.
+    /// </remarks>
+    public static string Naming(string? path, string solutionPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(solutionPath);
+
+        if (path is null) return DisplayName;
+
+        var root = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(solutionPath));
+        if (root is null) return path;
+
+        var full = System.IO.Path.GetFullPath(path);
+
+        return full.StartsWith(root + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+            ? full[(root.Length + 1)..].Replace(System.IO.Path.DirectorySeparatorChar, '/')
+            : full;
     }
 
     /// <summary>The entry dismissing <paramref name="key"/>, or <see langword="null"/> if none does.</summary>
