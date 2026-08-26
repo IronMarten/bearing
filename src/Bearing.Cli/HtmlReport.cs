@@ -536,6 +536,23 @@ public static class HtmlReport
 
         page.Append($"{Html.Count(graph.Depth)} layer(s) deep.</p>\n");
 
+        // docs/DEFECTS.md §53 and §45. Both sentences are about what the drawing is not saying,
+        // and both numbers come from the model rather than from counting the SVG, so the caption
+        // cannot drift away from the picture it explains -- §46's failure in the direction where
+        // the prose is the half that goes stale.
+        if (graph.Implied > 0)
+            page.Append("<p class=\"sub\">Lines show the dependencies that carry the shape: ")
+                .Append(Html.Text(Sentences.Plural(graph.Implied, "further dependency")))
+                .Append($" {Sentences.Do(graph.Implied, "runs", "run")} between boxes ")
+                .Append("that a path here already joins, and drawing them would cross the boxes ")
+                .Append("in between. Every one of them is in the exported model.</p>\n");
+
+        if (ArchitectureDiagram.Wraps(graph))
+            page.Append("<p class=\"sub\">A layer too wide for one row is drawn as several, set ")
+                .Append("close together with no rule between them. The dashed rules mark the ")
+                .Append("boundaries that are real: everything above one depends on something ")
+                .Append("below it.</p>\n");
+
         Key(page, model);
 
         page.Append("<div class=\"scroll\">\n").Append(ArchitectureDiagram.Render(model)).Append("</div>\n");
@@ -690,8 +707,12 @@ public static class HtmlReport
         var held = reportable.ToDictionary(c => c.Cycle, c => c);
 
         CycleGroup(page, "Namespaces", [.. reportable.Select(c => c.Cycle)],
-            "Sibling namespaces that hold each other as state, so neither can be layered, "
-            + "understood or extracted without the other.",
+            // docs/DEFECTS.md §58. The blurb made the holding claim over every name listed
+            // under it, and the list is a component: 363 names on Umbraco, 15 of them in a
+            // holding pair. Holding is now claimed where Holding() states it, over the set
+            // that holds.
+            "Namespaces that reach each other, and the sibling pairs inside them that hold "
+            + "each other as state. The pairs are the part that no file move fixes.",
             id => Name(model, id),
             cycle => held.TryGetValue(cycle, out var shapedCycle) ? Holding(shapedCycle) : []);
 
@@ -781,6 +802,10 @@ public static class HtmlReport
     /// </remarks>
     private static IEnumerable<string> Holding(ShapedCycle cycle)
     {
+        // docs/DEFECTS.md §58. The bound first, in the model's words, so this renderer and the
+        // text one cannot state the two populations differently.
+        yield return Sentences.CoupledWithin(cycle.Coupled.Count, cycle.Cycle.Size, cycle.Pairs.Count);
+
         // Six, as the text report shows six: enough to see where the weight sits without the pair
         // list outgrowing the membership it is evidence for. The remainder is stated rather than
         // dropped, which is docs/DEFECTS.md §3's rule.

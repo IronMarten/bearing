@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
@@ -29,6 +29,56 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
 
     [Fact]
     public Task The_diagram_renders() => Verify(Svg, extension: "svg");
+
+    /// <summary>
+    /// Every edge is painted after every box, so a line that crosses one stays a line.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §53, and the paint order was the whole mechanism.</b> Boxes are
+    /// opaque. Painted last, they cut any line that passes behind them into two stubs, and two
+    /// stubs either side of a box read as a dependency into it and another out of it — so a direct
+    /// dependency reads as a chain through a project it never names. It is not a rare case:
+    /// drawing every edge put <b>18 of 29</b> lines through a box on nopCommerce, <b>81 of 98</b>
+    /// on Jellyfin and <b>27 of 44</b> on Umbraco.
+    /// </para>
+    /// <para>
+    /// <b>The fixture cannot show the misreading</b> — three projects in a chain, no line has
+    /// anything to cross — so this asserts the property the fix is, which is document order.
+    /// <c>ProjectGraphTests</c> holds the other half, the reduction that makes the remaining
+    /// crossings few enough to live with.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Edges_are_painted_over_the_boxes_rather_than_under_them()
+    {
+        var svg = Svg;
+
+        var lastBox = svg.LastIndexOf("<rect", StringComparison.Ordinal);
+        var firstEdge = svg.IndexOf("<path class=\"ed\"", StringComparison.Ordinal);
+
+        Assert.True(lastBox >= 0, "the fixture draws boxes");
+        Assert.True(firstEdge >= 0, "the fixture draws at least one dependency");
+        Assert.True(firstEdge > lastBox, "an edge painted before a box is hidden by it");
+    }
+
+    /// <summary>
+    /// Nothing wraps on the fixture, so the drawing spends no ink saying which gaps are real.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §45.</b> The dashed rules exist to tell a layer boundary from a
+    /// wrapped one, and where no layer wrapped there is no such distinction to draw — the same
+    /// rule <see cref="ArchitectureDiagram.Tinted"/> follows, which is to key what fired rather
+    /// than what exists. nopCommerce and Umbraco draw none; Jellyfin draws seven.
+    /// <c>ProjectGraphTests</c> holds the wrapping case, which needs a layer the fixture cannot
+    /// have.
+    /// </remarks>
+    [Fact]
+    public void A_drawing_with_no_wrapped_layer_draws_no_layer_rules()
+    {
+        Assert.False(ArchitectureDiagram.Wraps(core.Model.ProjectGraph));
+        Assert.DoesNotContain("class=\"lr\"", Svg, StringComparison.Ordinal);
+    }
 
     /// <summary>It is well-formed XML, which is what makes it an image rather than a string.</summary>
     /// <remarks>

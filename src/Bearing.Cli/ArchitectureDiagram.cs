@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace IronMarten.Bearing.Cli;
@@ -38,6 +38,18 @@ namespace IronMarten.Bearing.Cli;
 /// costs height and no width at all.
 /// </para>
 /// </remarks>
+/// <summary>
+/// One row of the project map.
+/// </summary>
+/// <param name="Layer">The layer its boxes belong to.</param>
+/// <param name="Boxes">Each box on it, named by its first project, left to right.</param>
+/// <param name="Continues">
+/// Whether this row continues the layer above rather than depending on it — <c>docs/DEFECTS.md</c>
+/// §45. False for every row of a layer that fitted in one, and for the first row of one that did
+/// not.
+/// </param>
+public readonly record struct Row(int Layer, IReadOnlyList<string> Boxes, bool Continues);
+
 public static class ArchitectureDiagram
 {
     private const int BoxWidth = 168;
@@ -76,6 +88,38 @@ public static class ArchitectureDiagram
     /// </remarks>
     private const int MaxPerRow = 5;
 
+    /// <summary>
+    /// The gap between two rows of the <i>same</i> layer, against <see cref="GapY"/> between one
+    /// layer and the next.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §45.</b> A row means <i>depends on the row below</i> everywhere
+    /// else on this drawing, so a wrapped layer drawn at the ordinary gap states a dependency the
+    /// code does not have. Jellyfin's layer 4 holds eleven boxes and wraps into three rows, which
+    /// is most of the extra height in a ten-row drawing of eight layers.
+    /// </para>
+    /// <para>
+    /// <b>The two boundaries are distinguishable with certainty, which is why nothing here is a
+    /// judgement.</b> Between two genuinely adjacent layers there is always at least one edge —
+    /// <c>DepthOf</c> is a longest path, so a box at depth <i>d</i> has a dependency at
+    /// <i>d</i>-1. Between two rows of one layer there are never any, because an edge between
+    /// boxes at equal depth would make the depths differ, and a mutual pair is one box already.
+    /// Measured on Jellyfin: 1, 1, 2, 11, 1, 2 and 2 edges across the seven layer boundaries, and
+    /// 0 across all six ordered pairs of the wrapped rows.
+    /// </para>
+    /// <para>
+    /// <b>The width bound was measured and rejected.</b> Bounding the layering at five removes the
+    /// wrap by drawing seven of Jellyfin's twenty-one boxes deeper than they are —
+    /// <c>MediaBrowser.XbmcMetadata</c> by two layers — which trades a misstatement a reader can
+    /// check against the edges for one that leaves no trace. The counter-example this defect was
+    /// filed with pointed the other way and was measured on the wrong graph: it bounds
+    /// nopCommerce's twenty-seven <i>projects</i>, where the drawing lays out ten <i>boxes</i>
+    /// whose widest layer is three, so the bound never engages there at all.
+    /// </para>
+    /// </remarks>
+    private const int WrapGapY = 12;
+
     /// <summary>How tall a box has to be to hold what it says.</summary>
     private static int HeightOf(ProjectGroup group) =>
         group.Size <= 1 ? BoxHeight : MembersTop + (group.Size * MemberLine) + 8;
@@ -105,13 +149,22 @@ public static class ArchitectureDiagram
         svg.Append(".ad .nm{font-size:13px;font-weight:600;fill:#1a1a1a}\n");
         svg.Append(".ad .sm{font-size:10.5px;fill:#6b6b6b}\n");
         svg.Append(".ad .mb{font-size:11px;fill:#3a3a3a}\n");
-        svg.Append(".ad .ed{stroke:#c2c0bb;stroke-width:1.2;fill:none}\n");
+        svg.Append(".ad .ed{stroke:#b9b7b2;stroke-width:1.1;fill:none;opacity:.72}\n");
+        svg.Append(".ad .lr{stroke:#dedcd7;stroke-width:1;stroke-dasharray:2 6}\n");
         svg.Append("@media(prefers-color-scheme:dark){.ad .bx{fill:#1d1e22;stroke:#3c3f47}.ad .bx.pain{fill:#2c2219;stroke:#c88a4a}");
-        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .mb{fill:#c9c8c5}.ad .ed{stroke:#4a4d55}}\n");
+        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .mb{fill:#c9c8c5}.ad .ed{stroke:#5a5e68}.ad .lr{stroke:#33363d}}\n");
         svg.Append("</style>\n");
 
-        Edges(svg, placed);
+        LayerRules(svg, placed, width);
+
+        // Boxes first, then edges over them -- docs/DEFECTS.md §53. The paint order was the whole
+        // mechanism: an opaque box painted last cuts a line that skips a layer into two stubs, and
+        // two stubs either side of a box read as a dependency into it and another out. A line
+        // drawn over the box is continuous, so a reader can trace it to the box it actually names.
+        // It crosses a label to do that, which is uglier and true -- the trade Labels already
+        // makes for the same reason.
         Boxes(svg, placed, zones, Labels(graph));
+        Edges(svg, graph, placed);
 
         svg.Append("</svg>\n");
         return svg.ToString();
@@ -139,32 +192,72 @@ public static class ArchitectureDiagram
     private static List<Placed> Place(ProjectGraph graph)
     {
         var placed = new List<Placed>();
+        var indexOf = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var i = 0; i < graph.Groups.Count; i++) indexOf[graph.Groups[i].Projects[0]] = i;
+
         var byLayer = graph.Groups.GroupBy(g => g.Layer).OrderByDescending(l => l.Key).ToList();
         var y = Margin;
+        var first = true;
 
-        foreach (var layer in byLayer)
+        // The plan is Rows', so the geometry and the caption that explains it come from one
+        // reading of the graph rather than two -- docs/DEFECTS.md §46's arrangement, avoided.
+        foreach (var row in Rows(graph))
         {
-            var groups = layer.ToList();
+            // docs/DEFECTS.md §45. The second and later rows of one layer are the same layer, so
+            // the gap above them must not be the gap that means "depends on".
+            if (!first) y += row.Continues ? WrapGapY : GapY;
+            first = false;
 
-            for (var start = 0; start < groups.Count; start += MaxPerRow)
+            var boxes = row.Boxes.Select(b => graph.Groups[indexOf[b]]).ToList();
+            var rowWidth = (boxes.Count * BoxWidth) + ((boxes.Count - 1) * GapX);
+            var x = Margin + Math.Max(0, (Widest(byLayer) - rowWidth) / 2);
+
+            foreach (var group in boxes)
             {
-                var row = groups.Skip(start).Take(MaxPerRow).ToList();
-                var rowWidth = (row.Count * BoxWidth) + ((row.Count - 1) * GapX);
-                var x = Margin + Math.Max(0, (Widest(byLayer) - rowWidth) / 2);
-
-                foreach (var group in row)
-                {
-                    placed.Add(new Placed(group, x, y));
-                    x += BoxWidth + GapX;
-                }
-
-                // The row is as tall as its tallest box, so a folded box listing seven projects
-                // pushes the layer below it down rather than overlapping it.
-                y += row.Max(HeightOf) + GapY;
+                placed.Add(new Placed(group, x, y, indexOf[group.Projects[0]], row.Continues));
+                x += BoxWidth + GapX;
             }
+
+            // The row is as tall as its tallest box, so a folded box listing seven projects
+            // pushes the layer below it down rather than overlapping it.
+            y += boxes.Max(HeightOf);
         }
 
         return placed;
+    }
+
+    /// <summary>
+    /// A faint rule across each boundary that really is a layer boundary, drawn only when some
+    /// layer wrapped.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><c>docs/DEFECTS.md</c> §45, and the half of it a smaller gap cannot carry.</b> Tightening
+    /// the gap inside a wrapped layer stops the drawing <i>asserting</i> a dependency there; it
+    /// does not tell a reader which of the remaining gaps to trust. The rule is that sentence, in
+    /// the picture rather than under it — everything above one depends on something below it, and
+    /// there is a rule at every boundary where that holds.
+    /// </para>
+    /// <para>
+    /// <b>What wrapped rather than what exists</b>, which is the rule
+    /// <see cref="Tinted"/> already follows. Where no layer is wider than
+    /// <see cref="MaxPerRow"/> every gap is a layer boundary and the geometry says so on its own,
+    /// so ink spent distinguishing them would be ink spent on a distinction that is not there.
+    /// nopCommerce and Umbraco draw no rules; Jellyfin draws seven.
+    /// </para>
+    /// </remarks>
+    private static void LayerRules(StringBuilder svg, List<Placed> placed, int width)
+    {
+        if (!placed.Any(p => p.Continues)) return;
+
+        // One rule per boundary, not one per box: a row of five non-continuing boxes shares a Y.
+        var tops = placed.Where(p => !p.Continues).Select(p => p.Y).Distinct().Order().Skip(1);
+
+        foreach (var top in tops)
+        {
+            var y = top - (GapY / 2);
+            svg.Append(CultureInfo.InvariantCulture, $"<path class=\"lr\" d=\"M0 {y} L{width} {y}\"/>\n");
+        }
     }
 
     private static int Widest(List<IGrouping<int, ProjectGroup>> layers)
@@ -174,40 +267,48 @@ public static class ArchitectureDiagram
     }
 
     /// <summary>
-    /// One line per dependency between boxes.
+    /// One line per dependency the drawing has to carry.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>No arrowheads and no routing.</b> Every edge runs from a higher box to a lower one
     /// because that is what the layering means, so an arrowhead would restate the layout at the
-    /// cost of ink — and orthogonal routing on a folded graph is the layout engine §10 decided
-    /// against. A straight line between box edges is honest about being a straight line.
+    /// cost of ink — and orthogonal routing on a folded graph is the layout engine
+    /// <c>docs/ARCHITECTURE.md</c> §10 decided against. A straight line between box edges is
+    /// honest about being a straight line.
+    /// </para>
+    /// <para>
+    /// <b>Only <see cref="ProjectGraph.Reduction"/> is drawn — <c>docs/DEFECTS.md</c> §53.</b>
+    /// Boxes are painted after edges and are opaque, so a line that skips a layer is cut in half
+    /// by the box it passes behind, and the two stubs read as a chain through a project the
+    /// dependency never names. Drawing every edge put 18 of 29 lines through a box on nopCommerce,
+    /// 81 of 98 on Jellyfin and 27 of 44 on Umbraco. The reduction is not a filter over that: it
+    /// is every dependency whose reachability no other path already carries, so what a reader can
+    /// trace out of the picture is unchanged, and nopCommerce and Umbraco come down to 0 and 2.
+    /// </para>
+    /// <para>
+    /// <b>The rest are disclosed, not dropped</b> — <see cref="ProjectGraph.Implied"/> is what the
+    /// caption says, and it is the model's number so that the sentence and the drawing cannot come
+    /// to disagree. <c>docs/DEFECTS.md</c> §47 is the shape being avoided: an artifact that shows
+    /// a subset while telling the reader it shows everything.
+    /// </para>
     /// </remarks>
-    private static void Edges(StringBuilder svg, List<Placed> placed)
+    private static void Edges(StringBuilder svg, ProjectGraph graph, List<Placed> placed)
     {
-        var boxOf = new Dictionary<string, Placed>(StringComparer.Ordinal);
-        foreach (var box in placed)
-            foreach (var project in box.Group.Projects)
-                boxOf[project] = box;
+        var geometry = placed.ToDictionary(p => p.Index);
 
-        var drawn = new HashSet<(int, int)>();
+        foreach (var (from, to) in graph.Reduction)
+        {
+            if (!geometry.TryGetValue(from, out var box)) continue;
+            if (!geometry.TryGetValue(to, out var into)) continue;
 
-        foreach (var box in placed)
-            foreach (var target in box.Group.DependsOn)
-            {
-                if (!boxOf.TryGetValue(target, out var into)) continue;
-                if (ReferenceEquals(into.Group.Projects, box.Group.Projects)) continue;
+            var x1 = box.X + (BoxWidth / 2);
+            var y1 = box.Y + HeightOf(box.Group);
+            var x2 = into.X + (BoxWidth / 2);
+            var y2 = into.Y;
 
-                // Two projects in one folded box reaching the same target is one line, not several.
-                var key = (placed.IndexOf(box), placed.IndexOf(into));
-                if (!drawn.Add(key)) continue;
-
-                var x1 = box.X + (BoxWidth / 2);
-                var y1 = box.Y + HeightOf(box.Group);
-                var x2 = into.X + (BoxWidth / 2);
-                var y2 = into.Y;
-
-                svg.Append(CultureInfo.InvariantCulture, $"<path class=\"ed\" d=\"M{x1} {y1} C{x1} {y1 + 20} {x2} {y2 - 20} {x2} {y2}\"/>\n");
-            }
+            svg.Append(CultureInfo.InvariantCulture, $"<path class=\"ed\" d=\"M{x1} {y1} C{x1} {y1 + 20} {x2} {y2 - 20} {x2} {y2}\"/>\n");
+        }
     }
 
     /// <summary>The zone a box is tinted for: the first extreme any project inside it sits in.</summary>
@@ -347,6 +448,56 @@ public static class ArchitectureDiagram
     }
 
     /// <summary>
+    /// Whether any layer was too wide for one row, so the drawing had to wrap it.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §45.</b> The caption that explains the dashed rules must appear
+    /// exactly when the rules do, and this is recomputed from the graph for the same reason
+    /// <see cref="Tinted"/> and <see cref="Folded"/> are: a caption and the drawing it explains
+    /// must not be able to disagree about whether the thing being explained is on the page.
+    /// </remarks>
+    public static bool Wraps(ProjectGraph graph) => Rows(graph).Any(row => row.Continues);
+
+    /// <summary>
+    /// The rows the drawing lays out, deepest layer first: which boxes are on each, which layer
+    /// they belong to, and whether the row continues the one above rather than sitting under it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Public, and taking a <see cref="ProjectGraph"/> rather than a
+    /// <see cref="SolutionModel"/>, for the reason <see cref="ProjectGraph.Of"/> takes
+    /// primitives</b> — the shapes worth asserting about this layout are not in the fixture and
+    /// cannot be put there. The fixture has three projects; the case
+    /// <c>docs/DEFECTS.md</c> §45 is about is a layer of eleven, and a test that could only run
+    /// against three would be asserting that nothing wraps.
+    /// </para>
+    /// <para>
+    /// Recomputed by every caller rather than cached, which is the arrangement
+    /// <see cref="Folded"/> and <see cref="Tinted"/> already use: the drawing, the rules on it and
+    /// the caption under it must not be able to disagree about which boundaries are real.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<Row> Rows(ProjectGraph graph)
+    {
+        ArgumentNullException.ThrowIfNull(graph);
+
+        var rows = new List<Row>();
+
+        foreach (var layer in graph.Groups.GroupBy(g => g.Layer).OrderByDescending(l => l.Key))
+        {
+            var groups = layer.ToList();
+
+            for (var start = 0; start < groups.Count; start += MaxPerRow)
+                rows.Add(new Row(
+                    layer.Key,
+                    [.. groups.Skip(start).Take(MaxPerRow).Select(g => g.Projects[0])],
+                    start > 0));
+        }
+
+        return rows;
+    }
+
+    /// <summary>
     /// Short labels, chosen so that no two projects get the same one.
     /// </summary>
     /// <remarks>
@@ -390,5 +541,11 @@ public static class ArchitectureDiagram
             StringComparer.Ordinal);
     }
 
-    private readonly record struct Placed(ProjectGroup Group, int X, int Y);
+    /// <param name="Index">Which of <see cref="ProjectGraph.Groups"/> this box is, so the
+    /// reduction's index pairs can be resolved to geometry.</param>
+    /// <param name="Continues">
+    /// Whether this box is on a second or later row of a layer that was too wide for one — so the
+    /// gap above it is not a layer boundary and means nothing.
+    /// </param>
+    private readonly record struct Placed(ProjectGroup Group, int X, int Y, int Index, bool Continues);
 }

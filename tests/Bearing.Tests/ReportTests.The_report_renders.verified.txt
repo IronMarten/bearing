@@ -218,10 +218,12 @@ Every claim shows the numbers behind it.
    (a member can be in several of those, so they do not sum to the number set aside)
 
 -- CIRCULAR REFERENCES -----------------------------------------
-   NAMESPACE CYCLES — sibling namespaces that hold each other as state,
-   so neither can be layered, understood or extracted without the other:
-     2 namespaces: TestBed.Core.Tariffs <-> TestBed.Core.Weighing
+   NAMESPACE CYCLES — namespaces that reach each other, and the sibling pairs
+   inside them that hold each other as state. The pairs are the part that
+   no file move fixes:
+     2 namespaces reach each other: TestBed.Core.Tariffs, TestBed.Core.Weighing
        loop: TestBed.Core.Tariffs -> TestBed.Core.Weighing -> TestBed.Core.Tariffs
+       2 of those namespaces hold each other as state, in 1 sibling pair:
        TestBed.Core.Tariffs <-> TestBed.Core.Weighing — 2 held references
 
    MUTUALLY DEPENDENT, NOT REPORTED ABOVE — these components are real, and

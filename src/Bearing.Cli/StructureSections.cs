@@ -257,8 +257,13 @@ internal static class StructureSections
     {
         yield return "";
         yield return "-- CIRCULAR REFERENCES -----------------------------------------";
-        yield return "   NAMESPACE CYCLES — sibling namespaces that hold each other as state,";
-        yield return "   so neither can be layered, understood or extracted without the other:";
+        // docs/DEFECTS.md §58. The heading used to make the holding claim over everything listed
+        // beneath it, and what is listed beneath it is a component -- 363 namespaces on Umbraco
+        // against 14 pairs of evidence. The component and the pairs are two populations and the
+        // heading now names them as two.
+        yield return "   NAMESPACE CYCLES — namespaces that reach each other, and the sibling pairs";
+        yield return "   inside them that hold each other as state. The pairs are the part that";
+        yield return "   no file move fixes:";
 
         // Recovered by asking the model which namespaces it has rather than by taking the
         // canonical form apart. A SubjectRef's string is an identity, not a display name, and
@@ -279,8 +284,13 @@ internal static class StructureSections
 
         foreach (var shapedCycle in shownCycles)
         {
-            yield return "     " + Members(shapedCycle.Cycle, "namespaces", NamespacesPerCycle, " <-> ", NamespaceName);
+            // " <-> " between members said each named pair holds the other, which is the claim
+            // the pairs below carry and the membership does not: on Umbraco none of the six
+            // namespaces this line has room for is in a holding pair at all.
+            yield return "     " + Members(shapedCycle.Cycle, "namespaces reach each other", NamespacesPerCycle, ", ", NamespaceName);
             yield return "       " + Loop(shapedCycle.Cycle, NamespaceName);
+            yield return "       " + Sentences.CoupledWithin(
+                shapedCycle.Coupled.Count, shapedCycle.Cycle.Size, shapedCycle.Pairs.Count);
 
             foreach (var pair in shapedCycle.Pairs.Take(HeldPairsPerCycle))
                 yield return $"       {pair.First} <-> {pair.Second} — "

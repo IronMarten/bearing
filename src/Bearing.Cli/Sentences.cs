@@ -48,6 +48,21 @@ public static class Sentences
     public static string Plural(double count, string noun) =>
         count == 1 ? $"1 {noun}" : $"{Whole(count)} {Plurals(noun)}";
 
+    /// <summary>
+    /// How much of a namespace cycle the coupling evidence actually covers.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>docs/DEFECTS.md</c> §58</b>, and it lives here because both renderers say it. The
+    /// component's size is one claim and the held pairs are a different, smaller one; running them
+    /// together is what let a reading taken from 14 pairs describe 363 namespaces. Stating the two
+    /// populations in one sentence is what stops them merging again.
+    /// </remarks>
+    public static string CoupledWithin(int coupled, int size, int pairs) =>
+        $"{Plural(coupled, "of those namespace")} hold each other as state, in "
+        + $"{Plural(pairs, "sibling pair")}"
+        + (coupled < size ? $" — the other {Whole(size - coupled)} are here because they reach them" : "")
+        + ":";
+
     /// <summary>The plural of <paramref name="noun"/>, for the English this tool writes.</summary>
     /// <remarks>
     /// Two rules beyond the default, which is all the tool's vocabulary needs: a consonant before a
