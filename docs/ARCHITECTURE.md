@@ -490,6 +490,19 @@ the private `TECHREQ-job-a.md` §10.
 Distinct from [`DEFECTS.md`](DEFECTS.md): that is behaviour known to be wrong, with a remedy
 already understood. These are questions with no answer yet.
 
+- **What a renderer is handed: the surviving findings, or the model as well.** The export half is
+  settled — `Program` judges once, the export gets the whole judged set and the report the
+  surviving half, so a suppressed row reaches the file. The renderer half is not. The circular
+  references section still reaches **past the finding set into the model** to draw what was
+  suppressed, which is how it renders the *mutually dependent, not reported* list at all: a
+  suppressed finding is not in the set a renderer is handed, and `HeldPair` survives because that
+  list needs it. **So there are two ways a renderer learns about a suppressed thing and only one of
+  them is declared.** Either every renderer takes the judged set and filters it — which makes the
+  suppressed set a first-class input rather than something recovered — or reaching into the model
+  is the sanctioned route and the seam should say so. It has not bitten yet, and it is the kind of
+  thing that bites as a `DEFECTS.md` §46: one renderer recovering a population the other does not.
+  `SCHEMA-findings-export.md` §6 is where the not-reported list is specified. **Belongs to whoever next touches that seam.**
+
 - **~~Whether `SignificantKinds` stays at three.~~ Answered — X4, and the floor stays at 3.** Kept
   here because the measurement is the reusable part. There are exactly three and `--min-kind-span`
   is 3, so every spanning type necessarily carries the same signature: the `GroupBy` in

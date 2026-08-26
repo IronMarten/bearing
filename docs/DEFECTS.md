@@ -137,6 +137,11 @@ that looks calibrated and is coupled to something it has no relationship with.
 
 ## Closed
 
+> **Most `docs/DEFECTS.md §N` references in `src/` now point at index rows, and that is fine** —
+> they are prose in doc comments, and this index is what keeps them resolvable. **If a closed entry
+> is ever restored to full prose, restore it in place** rather than renumbering: the numbers are
+> identity, and `ArchitectureDiagram.cs` alone cites nine of them.
+
 **Index only — the prose is in git.** Sixty-one entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — then D56 and D57, all closed 2026-08-25 — and D45, D53 and D58, closed together on 2026-08-26 by the rule recorded above and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
