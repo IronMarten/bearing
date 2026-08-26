@@ -58,11 +58,27 @@ public static class JsonOutput
     /// <c>id</c> used to look like. It is not a key, and members can share one.
     /// </para>
     /// <para>
-    /// <b>2.2 adds acknowledgment memory — A10.</b> <c>status</c> emits the third value §4 reserved
-    /// for it, findings gain <c>acknowledgedBy</c>, and a top-level <c>acknowledgments</c> block
-    /// carries the file the run was judged against. Additive, so a 2.1 reader keeps working — but a
-    /// 2.1 reader treating <c>status</c> as a two-value enum will not, which is exactly why §4
-    /// wrote the value down before anything emitted it.
+    /// <b>2.1 also carries acknowledgment memory — A10, added 2026-08-26 without moving the
+    /// version.</b> <c>status</c> emits the third value §4 reserved for it, findings gain
+    /// <c>acknowledgedBy</c>, and a top-level <c>acknowledgments</c> block carries the file the run
+    /// was judged against.
+    /// </para>
+    /// <para>
+    /// <b>It rode 2.1 rather than becoming 2.2 because 2.1 has never been published.</b> Nothing has
+    /// been released to NuGet, so no 2.1 file exists that was not produced on a machine that can
+    /// produce another — the two stored exports were regenerated with these fields on the day. §2's
+    /// own argument, applied a second time: *a key added inside a bump that is already happening
+    /// costs nothing; the same key added after that bump ships is a change against a surface a
+    /// consumer has read.* Splitting these across two versions would have handed the first consumer
+    /// two shapes to write against where the facts supported one.
+    /// </para>
+    /// <para>
+    /// <b>The one thing that would have made it a real bump, and the reason to check before
+    /// assuming.</b> <c>status</c> stopped being a two-value enum, and <c>suppressedBy == null</c>
+    /// stopped implying <i>reported</i>. That is not additive for a reader that had already been
+    /// written, which is exactly why §4 wrote the value down before anything emitted it — and why
+    /// the question worth asking was never "is this additive" but "has anyone read the old shape
+    /// yet". Nobody had.
     /// </para>
     /// <para>
     /// <b>The block is not optional, and §1 is the reason.</b> The report says how many findings the
@@ -72,7 +88,7 @@ public static class JsonOutput
     /// eleven and eight acknowledged.
     /// </para>
     /// </remarks>
-    public const string SchemaVersion = "2.2";
+    public const string SchemaVersion = "2.1";
 
     private static readonly JsonSerializerOptions Options = new()
     {
