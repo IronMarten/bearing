@@ -544,8 +544,8 @@ public static class HtmlReport
             page.Append("<p class=\"sub\">Lines show the dependencies that carry the shape: ")
                 .Append(Html.Text(Sentences.Plural(graph.Implied, "further dependency")))
                 .Append($" {Sentences.Do(graph.Implied, "runs", "run")} between boxes ")
-                .Append("that a path here already joins, and drawing them would cross the boxes ")
-                .Append("in between. Every one of them is in the exported model.</p>\n");
+                .Append("that a path here already joins, so a line for each would cross the ")
+                .Append("boxes in between and add no reachability.</p>\n");
 
         if (ArchitectureDiagram.Wraps(graph))
             page.Append("<p class=\"sub\">A layer too wide for one row is drawn as several, set ")
