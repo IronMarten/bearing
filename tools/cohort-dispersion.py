@@ -22,7 +22,7 @@ re-run rather than an argument.
 
 Defaults mirror AnalysisPolicy: MinCohort 5, OutlierFactor 3.0.
 """
-import csv, sys, collections, statistics, os
+import csv, sys, collections, statistics, os, random
 
 MIN_COHORT = 5
 OUTLIER_FACTOR = 3.0
@@ -105,8 +105,73 @@ def report(d):
             print(f"      {k[:52]:52s} n={len(v):5d} median={median(v):g} MAD={mad(v):g} max={max(v)}")
 
 
+BUCKETS = [(5, 9), (10, 24), (25, 99), (100, 499), (500, 10 ** 9)]
+
+
+def bucket_label(lo, hi):
+    return f"{lo}-{hi}" if hi < 10 ** 9 else f"{lo}+"
+
+
+def null_model(d, draws=300, seed=11):
+    """Does cohort SIZE predict zero dispersion, or does the estimator produce that
+    on its own?
+
+    MAD is a median of absolute deviations over a small, discrete, heavily
+    zero-inflated variable. At n=5 it is 0 whenever three of five values equal the
+    median -- likely when the median is 0 or 1 and cc is a small integer. So a
+    downward trend in MAD-0 share against cohort size is expected with no
+    relationship present at all.
+
+    This holds the cohort sizes fixed, reshuffles every cc value across them, and
+    recomputes the trend. Whatever the null reproduces is the estimator, not a
+    property of peer groups. Run it before reading a size trend as a correlation:
+    on nopCommerce the null falls 26% -> 0% across the buckets unaided.
+    """
+    rng = random.Random(seed)
+    types, members = load(d)
+    cohort_of = {t["Id"]: t["Cohort"] for t in types}
+    pool = collections.defaultdict(list)
+    for m in members:
+        if m["Kind"] in METHOD_LIKE and cohort_of.get(m["DeclaringType"]):
+            pool[cohort_of[m["DeclaringType"]]].append(int(m["Cyclomatic"]))
+    gated = [v for v in pool.values() if len(v) >= MIN_COHORT]
+    sizes = [len(v) for v in gated]
+    values = [x for v in gated for x in v]
+
+    def shares(groups):
+        out = {}
+        for lo, hi in BUCKETS:
+            b = [v for v in groups if lo <= len(v) <= hi]
+            out[bucket_label(lo, hi)] = (sum(1 for v in b if mad(v) == 0), len(b))
+        return out
+
+    observed = shares(gated)
+    drawn = collections.defaultdict(list)
+    for _ in range(draws):
+        rng.shuffle(values)
+        groups, i = [], 0
+        for s in sizes:
+            groups.append(values[i:i + s])
+            i += s
+        for k, (z, c) in shares(groups).items():
+            if c:
+                drawn[k].append(z / c)
+
+    print()
+    print(f"  size vs zero dispersion, against a null of the same sizes ({draws} draws)")
+    for lo, hi in BUCKETS:
+        k = bucket_label(lo, hi)
+        z, c = observed[k]
+        if not c:
+            continue
+        n = drawn[k]
+        print(f"    size {k:<8} cohorts={c:4d}  observed={z/c:5.0%}   "
+              f"null={sum(n)/len(n):5.0%}  [{min(n):.0%}-{max(n):.0%}]")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     for d in sys.argv[1:]:
         report(d)
+        null_model(d)

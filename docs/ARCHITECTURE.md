@@ -627,26 +627,49 @@ already understood. These are questions with no answer yet.
   | what ships produces there | **23 findings** | **17** | **72** |
   | …because the median is 0, so the ratio is undefined | 1,427 (46% of the gated population) | 388 (28%) | 1,636 (27%) |
 
-  **Size and dispersion are correlated, monotonically, on all three — so the recorded reason is
-  wrong and the conclusion survives anyway.** Share of cohorts with MAD 0, by size:
+  **Size does not predict dispersion, and *uncorrelated* is the right word for it.** Share of
+  cohorts with MAD 0 by size, against a null that holds the cohort sizes fixed and reshuffles every
+  `cc` value across them — `tools/cohort-dispersion.py`, 300 draws:
 
-  | cohort size | nopCommerce | Jellyfin | Umbraco |
-  |---|---|---|---|
-  | 5–9 | 90% | 60% | 66% |
-  | 10–24 | 53% | 52% | 57% |
-  | 25–99 | 70% | 49% | 56% |
-  | 100–499 | 45% | 33% | 41% |
-  | 500+ | **0%** | **0%** | 38% |
+  | cohort size | nopCommerce | *null* | Jellyfin | *null* | Umbraco | *null* |
+  |---|---|---|---|---|---|---|
+  | 5–9 | 90% (n=10) | *26%* | 60% (n=25) | *29%* | 66% (n=44) | *47%* |
+  | 10–24 | 53% (n=19) | *10%* | 52% (n=31) | *19%* | 57% (n=103) | *44%* |
+  | 25–99 | **70%** (n=27) | *2%* | 49% (n=37) | *9%* | 56% (n=90) | *48%* |
+  | 100–499 | 45% (n=11) | *0%* | 33% (n=9) | *1%* | 41% (n=32) | *49%* |
+  | 500+ | 0% (**n=3**) | *0%* | 0% (**n=2**) | *0%* | 38% (n=8) | *52%* |
 
-  This said *size is uncorrelated* and *a cohort of 3 and a cohort of 1,656 fail identically*.
-  Neither is true: the trend is monotone on all three, and no cohort above 500 members has zero
-  dispersion on either reference solution. **What is true is that the correlation is far too weak to
-  gate on** — 45% of nopCommerce's 100–499 cohorts and 38% of Umbraco's 500+ still have MAD 0, so a
-  size threshold misclassifies about half the large cohorts. **The size hypothesis dies on the
-  misclassification rate, not on a 1,656-member counterexample the gate never sees.** That is why
-  each fix holds at the size it was measured against and breaks at the next one: **every one of them
-  is a threshold on a proxy that is real and weak**, which is more dangerous than one that is
-  unrelated, because it works often enough to look calibrated.
+  **A first reading of the left-hand columns called this a real but weak correlation. It is not one,
+  and the null column is why.** MAD is a median of absolute deviations over a small, discrete,
+  heavily zero-inflated variable — at n=5 it is 0 whenever three of five values equal the median,
+  which is likely when the median is 0 or 1 and `cc` is a small integer. **So MAD-0 share falls with
+  size by arithmetic**: with the relationship destroyed, nopCommerce's null still falls 26% → 0%
+  across the buckets. Any observed downward trend is confounded by the estimator and cannot be read
+  as a property of peer groups.
+
+  Two other reasons the trend is not there to be read. **It is not monotone** — nopCommerce goes 90%,
+  53%, **70%**, 45%. And **the tails are empty**: *no cohort above 500 members has zero dispersion*
+  rests on **three cohorts** and **two**. Umbraco is the only solution with a usable 500+ bucket, at
+  eight, and it reads 38% rather than 0%.
+
+  **So the original wording stands and its evidence does not.** *A cohort of 3 and a cohort of 1,656
+  fail identically* is the right conclusion, reached the wrong way: the counterexample it names is
+  from the pooled-all-members population, and what actually supports it is that dispersion is not
+  recoverable from size in any bucket with enough cohorts to look at. **Every gate in this family is
+  a threshold on a proxy that carries no signal**, which is why each fix holds at the size it was
+  measured against and breaks at the next one.
+
+  > **What the null model did establish, and it is not about size.** On nopCommerce and Jellyfin the
+  > observed share exceeds the null at every bucket, hugely — **70% against 2%** at size 25–99. Real
+  > cohorts are far more homogeneous than random groups of the same size, so **`Cohorts.Assign` is
+  > doing real work** and this is the first independent evidence of it.
+  >
+  > **On Umbraco it is nearly not.** Its null sits at 44–52% at every size, because **50% of its
+  > method-like members have `cc` exactly 1 and 64% are ≤ 1**, so a random group of any size is
+  > about as likely to have MAD 0 as a real cohort. **That is a live constraint on the gate below**:
+  > if MAD = 0 is the trigger for the no-spread branch, on Umbraco it fires about as often on
+  > arbitrary groupings as on peer groups, and the branch is not discriminating there. It is the
+  > most useful thing this measurement found and it needs answering before the branch is built.
 
   **The variable is dispersion.** With spread, an outlier is an outlier at any n; without it, nobody
   is, at any n. Stated that way the family collapses into one rule, and the rule *removes*
