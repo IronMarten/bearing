@@ -183,6 +183,9 @@ public static class ConcealedDecision
                         Receipt.Gated("FanInXMedian", inbound.TimesMedian, nameof(AnalysisPolicy.ConcealedFanInCeiling)),
                         Receipt.Gated("FanOutXMedian", outbound.TimesMedian, nameof(AnalysisPolicy.ConcealedFanOutCeiling)),
                         Receipt.Of("MaxMemberCyclomaticPctl", cc.Percentile),
+                        // The share the sentence claims, published so prose and export carry one
+                        // number rather than two that disagree. Midrank stays above it for sorting.
+                        Receipt.Of("MaxMemberCyclomaticTopShare", complexity.TopShareOf(type.MaxMemberCyclomatic)),
                         Receipt.Of("FanIn", type.FanIn),
                         Receipt.Of("FanOut", type.FanOut),
                         Receipt.Of("Dsm", type.Dsm),

@@ -394,7 +394,7 @@ that tells them apart.
 
 ## Closed
 
-**Index only — the prose is in git.** Fifty-five entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
+**Index only — the prose is in git.** Fifty-six entries: forty-four removed 2026-08-24, plus D55 and D59, then A11 round 2's presentation list — D48, D49, D50, D51, D52 and D60 — and then D56 and D57, all closed 2026-08-25 and indexed the same way. Status is as the
 entry last recorded it, except where this table says otherwise. The last revision carrying all
 forty-seven in full is the commit before this one.
 
@@ -455,6 +455,7 @@ forty-seven in full is the commit before this one.
 | 56 | Nothing tells the reader that a project's references did not resolve | fixed 2026-08-25 |
 | 57 | Two types with one fully-qualified name render as one type contradicting itself | fixed 2026-08-25; the entry's reason for surviving was wrong, see below |
 | 61 | `TimesMedian >= OutlierFactor` is satisfied by definition at a zero median | closed 2026-08-25 by X16 — the ratio no longer gates, so there is no tautological gate to fire |
+| 62 | A "top N%" claim is made from a midrank, so it is twice as extreme as the group allows | fixed 2026-08-26 — `Distribution.TopShareOf` is the claim statistic, `PercentileOf` stays the ordering one; the reasoning is beside the code and the rule is `ClaimsTests.No_claim_is_more_extreme_than_one_member_of_its_peer_group` |
 
 > **D56 shipped with a wider meaning than it was filed with, and the widening was measured.** The
 > entry proposed counting `CS0246`/`CS0234`/`CS0012` as *"this project's references did not

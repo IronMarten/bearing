@@ -247,6 +247,48 @@ public sealed class Distribution
         return 100.0 * (below + (0.5 * equal)) / _sorted.Length;
     }
 
+    /// <summary>
+    /// The share of the group at or above a value, as a percentage — the statistic a
+    /// <i>"top N%"</i> sentence is making a claim about.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Distinct from <see cref="PercentileOf"/> on purpose, and the two answer different
+    /// questions.</b> Midrank is a <i>position</i>: it splits the ties around a value, which is
+    /// what makes it the right thing to sort and gate on. This is a <i>population</i>: how many of
+    /// the group are at least this extreme. A reader told <i>"top 8%"</i> takes it as one in
+    /// twelve, and the claim it is attached to is one of six.
+    /// </para>
+    /// <para>
+    /// <b>The gap is midrank counting half of the value's own tie band as below it.</b> A unique
+    /// maximum of six has five below and one equal, so midrank reports
+    /// <c>(5 + 0.5)/6 = 92nd</c> percentile and the sentence prints the remaining 8%. It is the
+    /// midpoint of that member's own band rather than its top edge, which is correct for ordering
+    /// and false as a share. Measured on the three reference solutions: 60, 60 and 136 type-level
+    /// findings print a percentage that moves under this, the median printed share going 13% → 16%,
+    /// 13% → 17% and 9% → 12%.
+    /// </para>
+    /// <para>
+    /// <b>It also degrades honestly where midrank flattered.</b> A cohort of three yields 33% and a
+    /// cohort of two yields 50%, so a thin peer group reports its own thinness and no threshold has
+    /// to decide when a percentage stops being worth printing — <c>ARCHITECTURE.md</c> §11's
+    /// argument against gating on cohort size, arriving in the sentence layer. And where
+    /// <see cref="PercentileOf"/>'s remarks worry about eight tied normalizers reading as
+    /// top-percentile, this reports them as <b>100%</b>, which is what they are.
+    /// </para>
+    /// </remarks>
+    public double TopShareOf(double value)
+    {
+        if (_sorted.Length == 0) return 0;
+
+        var atOrAbove = 0;
+        foreach (var x in _sorted)
+            if (x >= value)
+                atOrAbove++;
+
+        return 100.0 * atOrAbove / _sorted.Length;
+    }
+
     /// <summary>The value as a multiple of the median. See <see cref="Reading.TimesMedian"/>.</summary>
     public double TimesMedianOf(double value) =>
         Median <= 0

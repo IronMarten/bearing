@@ -25,6 +25,48 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     private FindingSet Findings => Analysis.FindingsFor(core.Model);
 
     /// <summary>
+    /// No claim about a peer group is more extreme than one member of that group.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>docs/DEFECTS.md</c> §62. <see cref="Distribution.PercentileOf"/> is a midrank, so it
+    /// splits a value's own tie band and reports the middle of it: a unique maximum of six lands
+    /// at the 92nd percentile and the sentence printed <i>"top 8%"</i>, which a reader takes as one
+    /// in twelve. Midrank is right for ordering and wrong for a claim, and the two were the same
+    /// number for as long as only one of them was printed.
+    /// </para>
+    /// <para>
+    /// <b>Stated as a property rather than as the seven corrected numbers</b>, because the numbers
+    /// are in the snapshots and the rule is not: <b>a share of a group of N cannot be smaller than
+    /// <c>1/N</c></b>, since the subject of the claim is itself a member. That holds at every
+    /// cohort size, needs no threshold for when a peer group is too thin to describe, and fails on
+    /// the midrank formula at every cohort where the top value is unique — which is most of them.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_claim_is_more_extreme_than_one_member_of_its_peer_group()
+    {
+        var claims = Findings.OfKind(FindingKind.ConcealedDecisionType)
+            .Select(f => (Finding: f, Share: f.ValueOf("MaxMemberCyclomaticTopShare"), Size: f.ValueOf("CohortSize")))
+            .ToList();
+
+        Assert.NotEmpty(claims);
+
+        foreach (var (finding, share, size) in claims)
+        {
+            Assert.NotNull(share);
+            Assert.NotNull(size);
+
+            // One member of a cohort of N is 100/N percent of it, and nothing the tool says about
+            // a single subject may claim to be rarer than that.
+            Assert.True(
+                share >= (100.0 / size!.Value) - 1e-9,
+                $"{finding.Subject.Canonical} claims top {share}% of a cohort of {size}, "
+                + $"where one member is {100.0 / size.Value}%");
+        }
+    }
+
+    /// <summary>
     /// No sentence puts an "x" after a ratio that does not exist.
     /// </summary>
     /// <remarks>

@@ -253,7 +253,10 @@ public static class Claims
         if (model.Find(finding.Subject) is not { } type) return Claim.None;
 
         var times = finding.ValueOf("MaxMemberCyclomaticXMedian") ?? 0;
-        var percentile = finding.ValueOf("MaxMemberCyclomaticPctl") ?? 0;
+        // The share at or above, not the midrank percentile beside it in the receipts. A unique
+        // maximum of six is one in six; midrank splits its own tie band and prints "top 8%", which
+        // a reader takes as one in twelve. docs/DEFECTS.md §62.
+        var topShare = finding.ValueOf("MaxMemberCyclomaticTopShare") ?? 100;
 
         // "Looks like plumbing" only holds when connectivity is low in ABSOLUTE terms. The gate is
         // relative, so in a cohort where every member is heavily used "ordinary for its peers"
@@ -281,7 +284,7 @@ public static class Claims
         return new Claim(
             Sentences.Member(type.Name, type.MostComplexMember?.Name ?? ""),
             $"{opening}{basis}{Sentences.PeerGroup(type.Cohort, type.CohortSize)}.",
-            $"top {Sentences.TopPercent(percentile)}; cc {type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
+            $"top {Sentences.TopShare(topShare)}; cc {type.MaxMemberCyclomatic}, dsm {type.Dsm}, "
             + $"fan-in {type.FanIn}, fan-out {type.FanOut}",
             at is { IsKnown: true } known
                 ? $"{Path.GetFileName(known.File)}:{known.Line}"

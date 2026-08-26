@@ -29059,6 +29059,11 @@
           "gate": null
         },
         {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 12.5,
+          "gate": null
+        },
+        {
           "name": "FanIn",
           "value": 0,
           "gate": null
@@ -29137,6 +29142,11 @@
         {
           "name": "MaxMemberCyclomaticPctl",
           "value": 90,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 20,
           "gate": null
         },
         {
@@ -29221,6 +29231,11 @@
           "gate": null
         },
         {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 37.5,
+          "gate": null
+        },
+        {
           "name": "FanIn",
           "value": 0,
           "gate": null
@@ -29299,6 +29314,11 @@
         {
           "name": "MaxMemberCyclomaticPctl",
           "value": 88.88888888888889,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 22.22222222222222,
           "gate": null
         },
         {
@@ -29383,6 +29403,11 @@
           "gate": null
         },
         {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 14.285714285714286,
+          "gate": null
+        },
+        {
           "name": "FanIn",
           "value": 1,
           "gate": null
@@ -29464,6 +29489,11 @@
           "gate": null
         },
         {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 20,
+          "gate": null
+        },
+        {
           "name": "FanIn",
           "value": 2,
           "gate": null
@@ -29542,6 +29572,11 @@
         {
           "name": "MaxMemberCyclomaticPctl",
           "value": 91.66666666666667,
+          "gate": null
+        },
+        {
+          "name": "MaxMemberCyclomaticTopShare",
+          "value": 16.666666666666668,
           "gate": null
         },
         {

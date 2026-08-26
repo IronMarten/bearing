@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace IronMarten.Bearing.Cli;
@@ -313,6 +313,27 @@ public static class Sentences
     /// </remarks>
     public static string TopPercent(double percentile) =>
         $"{Math.Max(1, Math.Round(100 - percentile)):0}%";
+
+    /// <summary>
+    /// The same phrasing from a share that is already the share — see
+    /// <see cref="Distribution.TopShareOf"/>, which is the statistic a <i>"top N%"</i> claim is
+    /// about where <see cref="Distribution.PercentileOf"/> is the one to sort on.
+    /// </summary>
+    /// <remarks>
+    /// Kept separate from <see cref="TopPercent"/> rather than folded into it, because the two
+    /// take different quantities and a single method would be one <c>100 - x</c> away from
+    /// printing a complement by accident. The floor at 1% is shared: a share that rounds to zero
+    /// is still a member of the group, and <i>"top 0%"</i> claims a population with nothing in it.
+    /// <para>
+    /// <b>Rounded up, unlike <see cref="TopPercent"/>, and for the reason this method exists.</b>
+    /// One of eight is 12.5%, and <c>Math.Round</c> prints it as <i>"top 12%"</i> — half a point
+    /// more extreme than the group supports, which is a smaller version of the error
+    /// <c>docs/DEFECTS.md</c> §62 is about. Rounding away from zero is the direction that cannot
+    /// overstate, and the cost is that an exact 12.5% reads as 13%.
+    /// </para>
+    /// </remarks>
+    public static string TopShare(double share) =>
+        $"{Math.Max(1, Math.Ceiling(share)):0}%";
 
     /// <summary>
     /// A peer group, named the way the reader would name it.
