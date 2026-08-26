@@ -285,6 +285,8 @@ public static class ArchitectureDiagram
     /// 81 of 98 on Jellyfin and 27 of 44 on Umbraco. The reduction is not a filter over that: it
     /// is every dependency whose reachability no other path already carries, so what a reader can
     /// trace out of the picture is unchanged, and nopCommerce and Umbraco come down to 0 and 2.
+    /// <b><c>tools/map-geometry.py</c> re-measures all of that off a shipped SVG</b>, so these
+    /// numbers are a re-run rather than something remembered.
     /// </para>
     /// <para>
     /// <b>The rest are disclosed, not dropped</b> — <see cref="ProjectGraph.Implied"/> is what the

@@ -1,4 +1,4 @@
-# Testing
+﻿# Testing
 
 ```
 dotnet test Bearing.sln
@@ -1303,6 +1303,16 @@ integration map is not has never rendered. **A fixture answers the questions it 
 answer.** The complement — *is this output addressed to a user, and does it read as one thing* — has
 no test and probably cannot have one, which is an argument for running the shipped binary on real
 solutions as a scheduled activity rather than as a demonstration.
+
+**`tools/map-geometry.py` is that activity for one artifact.** Three defects lived in the project
+map and every one was invisible to this suite, because the fixture is three projects in a chain and
+cannot produce a wrapped layer, a layer-skipping edge, or a drawing whose edge set is a subset. It
+reads a shipped `--diagram` SVG — the artifact, not a reimplementation of the code that made it —
+counts the lines crossing a box they have nothing to do with, and checks that the drawing is still
+drawing the transitive reduction and still marking every layer boundary an edge proves. Give it the
+matching `--json` and it re-derives the model half and exits non-zero when the two disagree. **Run
+it when the layout changes**: the figures those fixes are recorded with are otherwise figures with
+no test beside them, which §6 says to assume are stale.
 
 **That complement does have a test. It is just not an automated one, and it found six defects in
 one session.** They came from handing the report to two developers who had never seen the codebase
