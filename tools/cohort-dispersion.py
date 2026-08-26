@@ -169,9 +169,72 @@ def null_model(d, draws=300, seed=11):
               f"null={sum(n)/len(n):5.0%}  [{min(n):.0%}-{max(n):.0%}]")
 
 
+
+
+MIN_DECISION_CC = 5
+CONCEALED_TOP_RANK = 3
+
+
+def rank_of(sorted_values, x):
+    """Distribution.RankOf: midrank from the top -- strictly above, plus half the ties,
+    plus a half."""
+    above = sum(1 for y in sorted_values if y > x)
+    equal = sum(1 for y in sorted_values if y == x)
+    return above + 0.5 * equal + 0.5
+
+
+def decompose(d):
+    """Which of ConcealedDecision.AtMethodLevel's three gates actually decides?
+
+    The finding is a conjunction: an ABSOLUTE floor (MinDecisionCc, cc >= 5), the
+    cohort-relative RATIO (TimesMedian >= OutlierFactor), and a RANK gate
+    (Rank <= ConcealedTopRank). X16 is written as a question about the ratio, so it
+    is worth knowing what the ratio contributes over the other two.
+
+    Counterfactuals here drop one gate at a time. This does not model the fan-in and
+    fan-out ceilings or suppression, so it lands a few findings above what the export
+    carries -- 102 against 103 on nopCommerce, 363 against 366 on Umbraco.
+    """
+    types, members = load(d)
+    cohort_of = {t["Id"]: t["Cohort"] for t in types}
+    pool = collections.defaultdict(list)
+    for m in members:
+        if m["Kind"] in METHOD_LIKE and cohort_of.get(m["DeclaringType"]):
+            pool[cohort_of[m["DeclaringType"]]].append(int(m["Cyclomatic"]))
+    gated = [v for v in pool.values() if len(v) >= MIN_COHORT]
+
+    n = floor = ships = no_ratio = no_floor = no_rank = 0
+    for v in gated:
+        sv = sorted(v)
+        md = median(v)
+        for x in v:
+            n += 1
+            a = x >= MIN_DECISION_CC
+            b = md > 0 and x / md >= OUTLIER_FACTOR
+            c = rank_of(sv, x) <= CONCEALED_TOP_RANK
+            floor += a
+            ships += a and b and c
+            no_ratio += a and c
+            no_floor += b and c
+            no_rank += a and b
+
+    print()
+    print("  which gate decides (member level)")
+    print(f"    population                                {n}")
+    print(f"    absolute floor cc >= {MIN_DECISION_CC} alone            {floor}")
+    print(f"    all three -- what ships                   {ships}")
+    print(f"    drop the RATIO   (floor + rank)           {no_ratio}"
+          f"   {(no_ratio - ships) / ships:+.0%}")
+    print(f"    drop the FLOOR   (ratio + rank)           {no_floor}"
+          f"   {(no_floor - ships) / ships:+.0%}")
+    print(f"    drop the RANK    (floor + ratio)          {no_rank}"
+          f"   {(no_rank - ships) / ships:+.0%}")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     for d in sys.argv[1:]:
         report(d)
         null_model(d)
+        decompose(d)

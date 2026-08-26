@@ -713,6 +713,49 @@ already understood. These are questions with no answer yet.
   namespace-cycle repair of the same day: classify by what is actually there instead of
   thresholding an aggregate.
 
+  **Which gate actually decides — measured 2026-08-25, and it redirects this entry.**
+  `ConcealedDecision.AtMethodLevel` is a conjunction of three gates, not one: an **absolute floor**
+  (`MinDecisionCc`, `cc >= 5`), the **cohort-relative ratio** (`TimesMedian >= OutlierFactor`), and
+  a **rank gate** (`Rank <= ConcealedTopRank`). X16 is written as a question about the ratio. Drop
+  one at a time, member level, `tools/cohort-dispersion.py`:
+
+  | | nopCommerce | Jellyfin | Umbraco |
+  |---|---|---|---|
+  | population in gated cohorts | 9,144 | 5,454 | 19,137 |
+  | **all three — what ships** | **102** | **165** | **363** |
+  | drop the **ratio** | 108 — **+6%** | 177 — **+7%** | 405 — **+12%** |
+  | drop the **floor** | 125 — +23% | 186 — +13% | 473 — +30% |
+  | drop the **rank** | 1,090 — +969% | 822 — +398% | 1,767 — +387% |
+
+  (Reconstruction from `--csv`; it does not model the fan-in/fan-out ceilings or suppression, so it
+  lands 102 against the export's 103 and 363 against 366.)
+
+  **The cohort-relative ratio is the least load-bearing of the three.** Removing it entirely moves
+  the shipped output by 6–12%; removing the absolute floor moves it two to three times as much, and
+  removing the rank gate multiplies it by four to ten. The comment beside `MinDecisionCc` already
+  says as much — *"`cc >= 5` decides 82% of nominations by itself"* — and this is that claim
+  measured on three solutions rather than one.
+
+  **And what ships is not noisy, which is the other half of the correction.** The shipped
+  `ConcealedDecisionMethod` findings have a median `cc` of **14** on nopCommerce and **11** on
+  Umbraco, a minimum of exactly 5, and **none at all below `cc` 5**. The `cc 3` flood the ratio
+  generates — its single most common candidate on all three solutions — never reaches the export.
+
+  **So the premise of this entry needs restating.** It is not *the relative claim is noisy and badly
+  gated*: the output is clean. It is that **the relative claim is barely gating anything, and the
+  correctness that exists comes from an absolute floor that §2 says does not travel between
+  codebases, plus a rank gate that §10 shows goes vacuous at small cohorts.** The finding is very
+  nearly `cc >= 5 AND top-3 in its cohort`, and the cohort-relative sentence it is reported in
+  describes the gate that contributes least.
+
+  **That moves the decision.** Swapping the ratio's statistic for a dispersion-based one — the
+  direction below — is aimed at the gate with 6–12% of the leverage. The measurement points at two
+  other questions instead: whether **rank** should be the cohort-relative gate outright, since it is
+  ordinal, needs no median, is defined where `TimesMedian` is undefined, and is already doing the
+  work; and whether the **absolute floor** should be calibrated rather than constant, which is §2's
+  question and has never been asked of `MinDecisionCc`. **Neither is decided here, and the entry's
+  original direction is not withdrawn — it is now the third-ranked option rather than the only one.**
+
   **Scope, corrected 2026-08-25.** This read *expected to close §10, §14, §28, §34, §38*, and
   **nine of the ten entries above are already closed** — each by the local repair this decision
   exists to remove. Only **§10** is live. So the deliverable is: **§10 closes; §14, §28, §34 and §38
