@@ -107,8 +107,35 @@ on both solutions, size is the wrong variable: 88% of nopCommerce's method cohor
 0 or 1, so `3x median` **is** `cc >= 3`; 74% have zero dispersion; and `base:BaseNopModel` has
 **1,656 members with MAD 0**. A cohort of three and a cohort of 1,656 fail identically.
 
-**So this is a symptom and it should not be repaired again.** It carries zero field incidence and it
-now waits on **X16** — how a cohort-relative claim is gated at all — in `ARCHITECTURE.md` §11.
+~~**So this is a symptom and it should not be repaired again.** It carries zero field incidence and it
+now waits on X16.~~ **Both halves of that are now false. Re-measured 2026-08-26.**
+
+**It has field incidence, and the earlier zero was a two-solution zero.** Reported breaks-alone
+findings sitting in a below-floor cohort: nopCommerce **0 of 27**, Jellyfin **0 of 20** — and
+**Umbraco 2 of 57**, which did not exist as a reference solution when the 2026-08-21 measurement was
+taken. `DocumentPatcher` is a real instance: cohort `suffix:Patcher`, two types, `cc` 13, and
+lowering the floor moves it out of breaks alone and into concealed decision exactly as this entry
+predicts. `PackageInstallation` is **not** one — it survives at a floor of 2, so it genuinely is not
+a concealed decision and its breaks-alone finding is no contradiction.
+
+**And X16 has cleared the blocker.** This entry recorded that letting thin cohorts nominate *"runs
+into `ConcealedTopRank`, which is 3: in a cohort of three the ranks are 1, 2 and 3 and the gate
+admits every member."* The gate is now `min(ConcealedTopRank, TopRankLimit(ConcealedTopShare))`, so
+a cohort of three admits **rank 1.1** — the unique maximum — and a dispersion test has to pass
+besides. **The gate is no longer vacuous at the sizes this entry is about.**
+
+**The repair was built and measured, and it is not landing on its own.** Removing `MinCohort`'s
+gating role from both `ConcealedDecision` arms costs **+2, +3 and +6 findings** on the three
+solutions, takes Umbraco's breaks-alone 57 → 56, and closes the contradiction. **What stops it is
+the half X3 left behind, not the gate.** Below-floor types currently make no relative claim *by
+design* — `SuppressionTests.A_type_below_the_cohort_floor_makes_no_relative_claim` is that decision
+with a test on it — and the newly admitted findings render percentile language a thin cohort cannot
+support: `pctl` 83.3 in a cohort of three, which `Sentences.TopPercent` prints as **"top 17%"**.
+
+**So the shape of the fix is two things, and the second one is X3's remainder**: let thin cohorts
+nominate, *and* degrade the sentence to a count — X3's own words, *"a cohort of three earns `cc 80
+against 3 peers, median 4` and never `top 5%`"*. Do not land the first half alone; it trades an
+invariant-3 contradiction for an invariant-6 one, and it deletes a named invariant to do it.
 
 ### 44. Every channel of the reach plot is normalised to its own run, so two reports cannot be compared by eye
 
