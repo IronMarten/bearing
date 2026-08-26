@@ -697,13 +697,18 @@ already understood. These are questions with no answer yet.
   statistic applied twice — the spread branch is a straight improvement and the no-spread branch
   needs the different *sentence*, not a different threshold.
 
-  **The no-spread branch is the majority of the type-level population, which this entry did not
-  know.** 70% of nopCommerce's gated type-level population lives in zero-dispersion cohorts, 46% of
-  Jellyfin's and 47% of Umbraco's — and the shipped gate produces 23, 17 and 72 findings from them,
-  because a median of 0 makes the ratio undefined. **The claim there is not weak, it is absent.**
-  That is the strongest argument for the direction below and it is an argument about coverage rather
-  than about noise: there is a population the tool currently says nothing at all about, and on
-  nopCommerce it is most of the types it looked at.
+  ~~**The no-spread branch is the majority of the type-level population**~~ — **the population claim
+  holds and the mechanism was wrong, corrected 2026-08-25.** 70% of nopCommerce's gated type-level
+  population does live in zero-dispersion cohorts, 46% of Jellyfin's and 47% of Umbraco's. **What is
+  not true is that a median of 0 silences the claim.** `Distribution.TimesMedianOf` returns
+  `PositiveInfinity` there and `Read` only returns null for a group below `IsComparable`, so
+  `TimesMedian >= OutlierFactor` is satisfied **by definition** — a zero-median cohort is
+  auto-*admitted*, not blocked. The first version of this paragraph had it exactly backwards.
+
+  **That error is now `DEFECTS.md` §61**, because modelling it the wrong way produced 102 findings
+  where the tool emits 103, and the missing one was a finding gated on an infinity that the export
+  publishes as `null`. 7 such on nopCommerce, 5 on Jellyfin, 23 on Umbraco, across three finding
+  kinds and two gates. **§28 fixed the rendering half of this and never reached the detector.**
 
   **What the trap points at is the actual answer: let the claim follow the distribution rather than
   making a threshold chase the size.** A type at cc 12 among 1,656 peers all at 0 is a finding, and
@@ -723,12 +728,13 @@ already understood. These are questions with no answer yet.
   |---|---|---|---|
   | population in gated cohorts | 9,144 | 5,454 | 19,137 |
   | **all three — what ships** | **102** | **165** | **363** |
-  | drop the **ratio** | 108 — **+6%** | 177 — **+7%** | 405 — **+12%** |
-  | drop the **floor** | 125 — +23% | 186 — +13% | 473 — +30% |
-  | drop the **rank** | 1,090 — +969% | 822 — +398% | 1,767 — +387% |
+  | drop the **ratio** | 108 — **+5%** | 177 — **+6%** | 405 — **+11%** |
+  | drop the **floor** | 132 — +28% | 191 — +14% | 493 — +35% |
+  | drop the **rank** | 1,091 — +959% | 824 — +393% | 1,770 — +384% |
 
-  (Reconstruction from `--csv`; it does not model the fan-in/fan-out ceilings or suppression, so it
-  lands 102 against the export's 103 and 363 against 366.)
+  (Reconstruction from `--csv`. With `TimesMedianOf`'s infinity modelled correctly it reproduces the
+  export exactly — 103 and 366. The first pass modelled a zero median as *blocked* rather than
+  *auto-admitted*, landed one short on nopCommerce, and that one finding is now §61.)
 
   **The cohort-relative ratio is the least load-bearing of the three.** Removing it entirely moves
   the shipped output by 6–12%; removing the absolute floor moves it two to three times as much, and

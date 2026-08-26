@@ -52,7 +52,7 @@ change removes a population and adds evidence in its place.
 
 ## The register
 
-*Six open. Roughly severity-ordered, and the numbers are identity — they are never reused and
+*Seven open. Roughly severity-ordered, and the numbers are identity — they are never reused and
 never renumbered.*
 
 ### 10. The cohort floor strips a suppression it was never meant to touch
@@ -364,6 +364,46 @@ declares a type in it. It reads as the framework being part of the cycle.
 **Defect 45's missing rule is the same rule**, in the namespace layer instead of the map layer: a
 component this large is either a layering problem or a fact about the codebase, and there is nothing
 that tells them apart.
+
+### 61. A finding ships gated on a value its own receipt reports as absent
+
+`Distribution.TimesMedianOf` returns `PositiveInfinity` when the median is zero, so
+`TimesMedian >= OutlierFactor` is satisfied **by definition** for any positive value in a
+zero-median cohort. The detector treats that as an outlier test passing. The export then writes the
+same quantity as `null`, because §28 settled that an undefined ratio is the *absence* of a
+measurement rather than a large one.
+
+Both halves are defensible and together they publish a finding whose stated justification is blank.
+`Nop.Services.Plugins.PluginManager<TPlugin>.LoadPluginBySystemNameAsync`, shipped:
+
+```
+CohortSize                37   gatedBy=MinCohort
+Cyclomatic                 6   gatedBy=MinDecisionCc
+CyclomaticXMedian       null   gatedBy=OutlierFactor     <-- gated on nothing
+CyclomaticRank             1   gatedBy=ConcealedTopRank
+MedianCohortCyclomatic     0
+```
+
+**Measured on three solutions, from the shipped `--json`:** 7 on nopCommerce of 1,015 findings, 5 on
+Jellyfin of 777, 23 on Umbraco of 2,029. **It is a class, not a site** — three finding kinds
+(`ConcealedDecisionType`, `ConcealedDecisionMethod`, `BugBlastRadius`) and two gates
+(`OutlierFactor`, `BlastFanInMultiple`).
+
+**§28 is where this came from and its fix was half of one.** §28 is recorded as *"a ratio against a
+zero median renders as `∞`"*, fixed by blanking it — in `CohortStatistics`, which is the projection
+the *renderers and the export* read. `ConcealedDecision` calls `Distribution.TimesMedianOf`
+directly and never saw the fix. **Two code paths hold the same quantity and disagree about whether
+it exists**, which is `ARCHITECTURE.md` §3's shape.
+
+**The deliverable is a property rather than a repair**, and the export is where it belongs:
+*no finding may carry a gated receipt whose value is null.* That is one contract test in
+`SCHEMA-findings-export.md` §8's family, it fails today on all three solutions, and it closes the
+class rather than the three kinds. **What the detector should do at a zero median is X16's
+question** — the honest reading there is a count, *"cc 6 where all 37 peers are 0"*, not a ratio —
+so do not close this by picking a substitute constant for the infinity.
+
+**Found while decomposing X16's gates**, by modelling the ratio as *undefined therefore blocked* and
+getting 102 findings where the tool emits 103. The single missing finding was this one.
 
 ## Closed
 
