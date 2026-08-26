@@ -1,5 +1,5 @@
 ﻿{
-  "schemaVersion": "2.1",
+  "schemaVersion": "2.2",
   "tool": {
     "name": "bearing",
     "version": "0.0.0"
@@ -27330,6 +27330,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.AuthenticationMiddleware",
@@ -27377,6 +27378,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.PolicyBridge",
@@ -27425,6 +27427,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.PublicIntakeConduit",
@@ -27473,6 +27476,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.PublicRelayConduit",
@@ -27521,6 +27525,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.QuoteController",
@@ -27568,6 +27573,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.DocumentController",
@@ -27615,6 +27621,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.RateController",
@@ -27662,6 +27669,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.TrackingController",
@@ -27709,6 +27717,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.EgressConduit",
@@ -27757,6 +27766,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.IntakeConduit",
@@ -27805,6 +27815,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.MirrorConduit",
@@ -27853,6 +27864,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.RelayConduit",
@@ -27901,6 +27913,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.ReplayConduit",
@@ -27949,6 +27962,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.SyncConduit",
@@ -27997,6 +28011,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TariffCalculator|M:TestBed.Core.TariffCalculator.Apply(System.Decimal,System.String,System.Int32,System.Boolean,System.Boolean)",
@@ -28075,6 +28090,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ShipmentLedger|M:TestBed.Core.ShipmentLedger.Record(System.String,System.Decimal)",
@@ -28153,6 +28169,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ShipmentCoordinator|M:TestBed.Core.ShipmentCoordinator.Coordinate(TestBed.Core.RawResponse,TestBed.Core.NormalizationContext,System.String)",
@@ -28231,6 +28248,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.RoutingDepot|M:TestBed.Core.Depots.RoutingDepot.Route(System.Int32,System.String,System.Boolean,System.Boolean)",
@@ -28309,6 +28327,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ShipmentController|M:TestBed.Core.ShipmentController.Post(TestBed.Core.RawResponse,TestBed.Core.NormalizationContext,System.String,System.Int32)",
@@ -28387,6 +28406,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ReconciliationController|M:TestBed.Core.ReconciliationController.Reconcile(System.Int32,System.String,System.Boolean)",
@@ -28465,6 +28485,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ThroughputGauge|M:TestBed.Core.ThroughputGauge.Sample(System.Int32,System.String,System.Boolean)",
@@ -28543,6 +28564,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Vaults.PricingVault|M:TestBed.Core.Vaults.PricingVault.Price(System.Int32,System.String,System.Boolean)",
@@ -28621,6 +28643,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Tools|global::TestBed.Shared.PayloadTag|M:TestBed.Shared.PayloadTag.Score(System.String,System.Int32,System.Boolean,System.Boolean)",
@@ -28699,6 +28722,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Calibration.MarkCaliper|M:TestBed.Core.Calibration.MarkCaliper.Sweep(System.Int32,System.Boolean,System.Boolean,System.Boolean)",
@@ -28777,6 +28801,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Calibration.LandCaliper|M:TestBed.Core.Calibration.LandCaliper.Sweep(System.Int32,System.Boolean,System.Boolean)",
@@ -28855,6 +28880,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.MethodReconciler|M:TestBed.Core.MethodReconciler.Reconcile(System.Int32,System.String,System.Boolean,System.Boolean)",
@@ -28933,6 +28959,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.RateReconciler|M:TestBed.Core.RateReconciler.Reconcile(System.Int32,System.String,System.Boolean,System.Boolean)",
@@ -29011,6 +29038,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.GuaranteedServiceNormalizer|M:TestBed.Core.GuaranteedServiceNormalizer.Normalize(TestBed.Core.RawResponse,TestBed.Core.NormalizationContext)",
@@ -29089,6 +29117,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Calibration.DriftSonde|M:TestBed.Core.Calibration.DriftSonde.Correct(System.Int32,System.String,System.Boolean)",
@@ -29167,6 +29196,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Projections.SettlementProjection|M:TestBed.Core.Projections.SettlementProjection.Settle(System.Decimal,System.Int32,System.String,System.Boolean,System.Boolean)",
@@ -29245,6 +29275,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Depots.RoutingDepot",
@@ -29331,6 +29362,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentController",
@@ -29417,6 +29449,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ThroughputGauge",
@@ -29503,6 +29536,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Vaults.PricingVault",
@@ -29589,6 +29623,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.AuthenticationMiddleware",
@@ -29675,6 +29710,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.RateReconciler",
@@ -29761,6 +29797,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.GuaranteedServiceNormalizer",
@@ -29847,6 +29884,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Calibration.DriftSonde",
@@ -29933,6 +29971,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Traits.CustomsTrait",
@@ -30019,6 +30058,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentLedger",
@@ -30099,6 +30139,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Calibration.SpanCaliper",
@@ -30173,6 +30214,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Projections.SettlementProjection",
@@ -30247,6 +30289,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.NormalizationContext",
@@ -30321,6 +30364,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.RawResponse",
@@ -30394,6 +30438,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.NormalizedResponse",
@@ -30463,6 +30508,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
@@ -30525,6 +30571,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentLedger",
@@ -30580,6 +30627,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Projections.SettlementProjection",
@@ -30635,6 +30683,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.TariffCalculator",
@@ -30694,6 +30743,7 @@
         "invariant": "3",
         "reason": "structural isolation is not safety when a component decides something \u2014 a normalizer that picks the wrong option propagates into the data going out the door, not through the call graph"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.MethodReconciler",
@@ -30743,6 +30793,7 @@
         "invariant": "3",
         "reason": "structural isolation is not safety when a component decides something \u2014 a normalizer that picks the wrong option propagates into the data going out the door, not through the call graph"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.RateReconciler",
@@ -30792,6 +30843,7 @@
         "invariant": "3",
         "reason": "structural isolation is not safety when a component decides something \u2014 a normalizer that picks the wrong option propagates into the data going out the door, not through the call graph"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Depots.RoutingDepot",
@@ -30841,6 +30893,7 @@
         "invariant": "4",
         "reason": "that is unreferenced code, a different finding, not reassurance"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Rating.DetentionEvaluator",
@@ -30890,6 +30943,7 @@
         "invariant": "4",
         "reason": "the tool cannot see external consumers, and \u0022isolated\u0022 is the one claim it must not get wrong at an edge"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentController",
@@ -30939,6 +30993,7 @@
         "invariant": "4",
         "reason": "that is unreferenced code, a different finding, not reassurance"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.AuditReconciler",
@@ -30984,6 +31039,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Rating.SurchargeEvaluator",
@@ -31033,6 +31089,7 @@
         "invariant": "4",
         "reason": "the tool cannot see external consumers, and \u0022isolated\u0022 is the one claim it must not get wrong at an edge"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ReconciliationController",
@@ -31078,6 +31135,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.TariffReconciler",
@@ -31123,6 +31181,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentCoordinator",
@@ -31189,6 +31248,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Dispatch.DispatchRegistry",
@@ -31255,6 +31315,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Router",
@@ -31321,6 +31382,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.QuoteAssembler",
@@ -31352,6 +31414,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Dispatch.DispatchCounter",
@@ -31382,6 +31445,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentController",
@@ -31446,6 +31510,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.ShipmentController",
@@ -31493,6 +31558,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.DocumentController",
@@ -31540,6 +31606,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.QuoteController",
@@ -31587,6 +31654,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.RateController",
@@ -31634,6 +31702,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.TrackingController",
@@ -31681,6 +31750,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.AuthenticationMiddleware",
@@ -31728,6 +31798,7 @@
         "invariant": "2",
         "reason": "it is not discriminating, so it is noise \u2014 the section promises to name what stands out and a list of seven is not that"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.CarrierGateway",
@@ -31771,6 +31842,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.IdentityTurnstile|E:TestBed.Core.IdentityTurnstile.Turned",
@@ -31830,6 +31902,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.IdentityTurnstile|M:TestBed.Core.IdentityTurnstile.TryAdmit(System.String,System.String)",
@@ -31889,6 +31962,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.SettlementProbe|M:TestBed.Core.SettlementProbe.Replay(System.String)",
@@ -31948,6 +32022,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.SettlementProbe|M:TestBed.Core.SettlementProbe.AfterLoad(System.Runtime.Serialization.StreamingContext)",
@@ -32007,6 +32082,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.AuditReconciler|F:TestBed.Core.AuditReconciler._enrich",
@@ -32066,6 +32142,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.AuditReconciler|F:TestBed.Core.AuditReconciler._price",
@@ -32125,6 +32202,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.AuditReconciler|F:TestBed.Core.AuditReconciler._route",
@@ -32184,6 +32262,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.AuditReconciler|F:TestBed.Core.AuditReconciler._validate",
@@ -32243,6 +32322,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.LabelDepot|F:TestBed.Core.Depots.LabelDepot._normalize",
@@ -32302,6 +32382,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.LabelDepot|F:TestBed.Core.Depots.LabelDepot._validate",
@@ -32361,6 +32442,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.ManifestDepot|F:TestBed.Core.Depots.ManifestDepot._normalize",
@@ -32420,6 +32502,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.ManifestDepot|F:TestBed.Core.Depots.ManifestDepot._validate",
@@ -32479,6 +32562,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.RoutingDepot|F:TestBed.Core.Depots.RoutingDepot._enrich",
@@ -32538,6 +32622,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.RoutingDepot|F:TestBed.Core.Depots.RoutingDepot._price",
@@ -32597,6 +32682,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Depots.RoutingDepot|F:TestBed.Core.Depots.RoutingDepot._validate",
@@ -32656,6 +32742,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.DepthGauge|F:TestBed.Core.DepthGauge._normalize",
@@ -32715,6 +32802,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.DocumentController|F:TestBed.Core.DocumentController._carrier",
@@ -32774,6 +32862,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.DocumentReconciler|F:TestBed.Core.DocumentReconciler._validate",
@@ -32833,6 +32922,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ErrorGauge|F:TestBed.Core.ErrorGauge._normalize",
@@ -32892,6 +32982,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.IIdentityWicket|M:TestBed.Core.IIdentityWicket.Admit(System.String)",
@@ -32951,6 +33042,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.IdentityTurnstile|F:TestBed.Core.IdentityTurnstile.MaxAdmissions",
@@ -33010,6 +33102,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.IdentityTurnstile|P:TestBed.Core.IdentityTurnstile.Admissions",
@@ -33069,6 +33162,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.IdentityTurnstile|P:TestBed.Core.IdentityTurnstile.Refusals",
@@ -33128,6 +33222,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.LatencyGauge|F:TestBed.Core.LatencyGauge._normalize",
@@ -33187,6 +33282,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.EgressConduit|F:TestBed.Core.Layering.EgressConduit._archive",
@@ -33246,6 +33342,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.EgressConduit|F:TestBed.Core.Layering.EgressConduit._beacon",
@@ -33305,6 +33402,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.EgressConduit|F:TestBed.Core.Layering.EgressConduit._endpoint",
@@ -33364,6 +33462,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.IntakeConduit|F:TestBed.Core.Layering.IntakeConduit._archive",
@@ -33423,6 +33522,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.IntakeConduit|F:TestBed.Core.Layering.IntakeConduit._beacon",
@@ -33482,6 +33582,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.IntakeConduit|F:TestBed.Core.Layering.IntakeConduit._endpoint",
@@ -33541,6 +33642,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.MirrorConduit|F:TestBed.Core.Layering.MirrorConduit._archive",
@@ -33600,6 +33702,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.MirrorConduit|F:TestBed.Core.Layering.MirrorConduit._beacon",
@@ -33659,6 +33762,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.MirrorConduit|F:TestBed.Core.Layering.MirrorConduit._endpoint",
@@ -33718,6 +33822,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.PublicIntakeConduit|F:TestBed.Core.Layering.PublicIntakeConduit._archive",
@@ -33777,6 +33882,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.PublicIntakeConduit|F:TestBed.Core.Layering.PublicIntakeConduit._beacon",
@@ -33836,6 +33942,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.PublicIntakeConduit|F:TestBed.Core.Layering.PublicIntakeConduit._endpoint",
@@ -33895,6 +34002,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.PublicRelayConduit|F:TestBed.Core.Layering.PublicRelayConduit._archive",
@@ -33954,6 +34062,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.PublicRelayConduit|F:TestBed.Core.Layering.PublicRelayConduit._beacon",
@@ -34013,6 +34122,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.PublicRelayConduit|F:TestBed.Core.Layering.PublicRelayConduit._endpoint",
@@ -34072,6 +34182,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.RelayConduit|F:TestBed.Core.Layering.RelayConduit._archive",
@@ -34131,6 +34242,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.RelayConduit|F:TestBed.Core.Layering.RelayConduit._beacon",
@@ -34190,6 +34302,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.RelayConduit|F:TestBed.Core.Layering.RelayConduit._endpoint",
@@ -34249,6 +34362,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.ReplayConduit|F:TestBed.Core.Layering.ReplayConduit._archive",
@@ -34308,6 +34422,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.ReplayConduit|F:TestBed.Core.Layering.ReplayConduit._beacon",
@@ -34367,6 +34482,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.ReplayConduit|F:TestBed.Core.Layering.ReplayConduit._endpoint",
@@ -34426,6 +34542,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.SyncConduit|F:TestBed.Core.Layering.SyncConduit._archive",
@@ -34485,6 +34602,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.SyncConduit|F:TestBed.Core.Layering.SyncConduit._beacon",
@@ -34544,6 +34662,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Layering.SyncConduit|F:TestBed.Core.Layering.SyncConduit._endpoint",
@@ -34603,6 +34722,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.MethodReconciler|F:TestBed.Core.MethodReconciler._audit",
@@ -34662,6 +34782,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.MethodReconciler|F:TestBed.Core.MethodReconciler._enrich",
@@ -34721,6 +34842,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.MethodReconciler|F:TestBed.Core.MethodReconciler._price",
@@ -34780,6 +34902,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.MethodReconciler|F:TestBed.Core.MethodReconciler._route",
@@ -34839,6 +34962,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.MethodReconciler|F:TestBed.Core.MethodReconciler._validate",
@@ -34898,6 +35022,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.PolicyBridge|F:TestBed.Core.PolicyBridge._carrier",
@@ -34957,6 +35082,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.PolicyBridge|F:TestBed.Core.PolicyBridge._quotes",
@@ -35016,6 +35142,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.PolicyBridge|F:TestBed.Core.PolicyBridge._tenants",
@@ -35075,6 +35202,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.QueueGauge|F:TestBed.Core.QueueGauge._normalize",
@@ -35134,6 +35262,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.QuoteController|F:TestBed.Core.QuoteController._carrier",
@@ -35193,6 +35322,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.QuoteReconciler|F:TestBed.Core.QuoteReconciler._validate",
@@ -35252,6 +35382,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.RateController|F:TestBed.Core.RateController._carrier",
@@ -35311,6 +35442,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.RateReconciler|F:TestBed.Core.RateReconciler._enrich",
@@ -35370,6 +35502,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.RateReconciler|F:TestBed.Core.RateReconciler._price",
@@ -35429,6 +35562,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.RateReconciler|F:TestBed.Core.RateReconciler._validate",
@@ -35488,6 +35622,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ReconciliationController|F:TestBed.Core.ReconciliationController._enrich",
@@ -35547,6 +35682,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ReconciliationController|F:TestBed.Core.ReconciliationController._price",
@@ -35606,6 +35742,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ReconciliationController|F:TestBed.Core.ReconciliationController._route",
@@ -35665,6 +35802,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ReconciliationController|F:TestBed.Core.ReconciliationController._validate",
@@ -35724,6 +35862,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.SettlementProbe|M:TestBed.Core.SettlementProbe.OnReplayed",
@@ -35783,6 +35922,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.ShipmentCoordinator|F:TestBed.Core.ShipmentCoordinator._gateway",
@@ -35842,6 +35982,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.SurchargeReconciler|F:TestBed.Core.SurchargeReconciler._validate",
@@ -35901,6 +36042,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TallyProbe|M:TestBed.Core.TallyProbe.Sample",
@@ -35960,6 +36102,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TariffReconciler|F:TestBed.Core.TariffReconciler._enrich",
@@ -36019,6 +36162,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TariffReconciler|F:TestBed.Core.TariffReconciler._price",
@@ -36078,6 +36222,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TariffReconciler|F:TestBed.Core.TariffReconciler._route",
@@ -36137,6 +36282,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TariffReconciler|F:TestBed.Core.TariffReconciler._validate",
@@ -36196,6 +36342,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TrackingController|F:TestBed.Core.TrackingController._carrier",
@@ -36255,6 +36402,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TrackingReconciler|F:TestBed.Core.TrackingReconciler._validate",
@@ -36314,6 +36462,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.TransitReconciler|F:TestBed.Core.TransitReconciler._validate",
@@ -36373,6 +36522,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Vaults.SessionVault|F:TestBed.Core.Vaults.SessionVault._normalize",
@@ -36432,6 +36582,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Member",
         "canonical": "member|Core|global::TestBed.Core.Vaults.TokenVault|F:TestBed.Core.Vaults.TokenVault._normalize",
@@ -36491,6 +36642,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -36557,6 +36709,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.LayeringBeacon",
@@ -36623,6 +36776,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
@@ -36689,6 +36843,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Depots.RoutingDepot",
@@ -36755,6 +36910,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Data|global::TestBed.Data.OrderRepository",
@@ -36821,6 +36977,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Tools|global::TestBed.Shared.PayloadTag",
@@ -36887,6 +37044,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Dispatch.DispatchCounter",
@@ -36953,6 +37111,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Dispatch.DispatchRegistry",
@@ -37019,6 +37178,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Layering.RouteAttribute",
@@ -37083,6 +37243,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Tariffs.ITariffWindow",
@@ -37149,6 +37310,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Berths.BerthPlacard",
@@ -37215,6 +37377,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Depots.LabelDepot",
@@ -37281,6 +37444,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Depots.ManifestDepot",
@@ -37347,6 +37511,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Pricing.SurchargeTable",
@@ -37413,6 +37578,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Vaults.PricingVault",
@@ -37479,6 +37645,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Vaults.SessionVault",
@@ -37545,6 +37712,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Vaults.TokenVault",
@@ -37611,6 +37779,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Yards.YardDocket",
@@ -37677,6 +37846,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Interop.CarrierTwin",
@@ -37743,6 +37913,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Data|global::TestBed.Interop.TagArchive",
@@ -37809,6 +37980,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Tariffs.TariffWindow",
@@ -37875,6 +38047,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Core.Weighing.ScaleHead",
@@ -37941,6 +38114,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Core|global::TestBed.Interop.TwinRelay",
@@ -38007,6 +38181,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Data|global::TestBed.Data.RateRepository",
@@ -38073,6 +38248,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Data|global::TestBed.Interop.CarrierTwin",
@@ -38139,6 +38315,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Data|global::TestBed.Shared.PayloadTag",
@@ -38205,6 +38382,7 @@
       "class": "disclosure",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "TypeDeclaration",
         "canonical": "type|Tools|global::TestBed.Tools.PayloadAuditor",
@@ -38271,6 +38449,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Set",
         "canonical": "set|namespace\\|TestBed.Core.Tariffs|namespace\\|TestBed.Core.Weighing",
@@ -38328,6 +38507,7 @@
         "invariant": "2",
         "reason": "peers naming each other\u0027s entities and holding none of them \u2014 reporting it asks a reader to break a dependency that costs nothing to keep"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Set",
         "canonical": "set|namespace\\|TestBed.Core.Berths|namespace\\|TestBed.Core.Yards",
@@ -38374,6 +38554,7 @@
         "invariant": "2",
         "reason": "one assembly\u0027s own folders \u2014 the assembly is the unit anyone extracts, so a loop inside one has nothing to break"
       },
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Set",
         "canonical": "set|namespace\\|TestBed.Core|namespace\\|TestBed.Core.Depots|namespace\\|TestBed.Core.Pricing|namespace\\|TestBed.Core.Vaults",
@@ -38418,6 +38599,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Set",
         "canonical": "set|type\\|Core\\|global::TestBed.Core.Tangles.AlphaNode|type\\|Core\\|global::TestBed.Core.Tangles.BetaNode|type\\|Core\\|global::TestBed.Core.Tangles.DeltaNode|type\\|Core\\|global::TestBed.Core.Tangles.EpsilonNode|type\\|Core\\|global::TestBed.Core.Tangles.EtaNode|type\\|Core\\|global::TestBed.Core.Tangles.GammaNode|type\\|Core\\|global::TestBed.Core.Tangles.IotaNode|type\\|Core\\|global::TestBed.Core.Tangles.ThetaNode|type\\|Core\\|global::TestBed.Core.Tangles.ZetaNode",
@@ -38503,6 +38685,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Set",
         "canonical": "set|type\\|Core\\|global::TestBed.Core.AccessorialNormalizer|type\\|Core\\|global::TestBed.Core.AddressNormalizer|type\\|Core\\|global::TestBed.Core.RateNormalizer|type\\|Core\\|global::TestBed.Core.ReferenceNormalizer|type\\|Core\\|global::TestBed.Core.Router|type\\|Core\\|global::TestBed.Core.ShipmentCoordinator|type\\|Core\\|global::TestBed.Core.TrackingNormalizer|type\\|Core\\|global::TestBed.Core.TransitNormalizer",
@@ -38607,6 +38790,7 @@
       "class": "claim",
       "status": "reported",
       "suppressedBy": null,
+      "acknowledgedBy": null,
       "subject": {
         "kind": "Set",
         "canonical": "set|type\\|Core\\|global::TestBed.Core.Tangles.EastLink|type\\|Core\\|global::TestBed.Core.Tangles.NorthLink|type\\|Core\\|global::TestBed.Core.Tangles.SouthLink|type\\|Core\\|global::TestBed.Core.Tangles.WestLink",
@@ -38657,6 +38841,12 @@
       ]
     }
   ],
+  "acknowledgments": {
+    "path": null,
+    "entries": 0,
+    "silenced": 0,
+    "unmatched": []
+  },
   "configuration": {
     "includeTests": false,
     "defaultExcludesCleared": false,

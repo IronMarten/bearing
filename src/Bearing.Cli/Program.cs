@@ -78,11 +78,33 @@ internal static class Program
             return 2;
         }
 
+        // Read before the walk, so a typo in --acknowledge costs nothing. A default file that is
+        // not there is the ordinary first run and means an empty set; a named one that is not there
+        // is a typo, and silently analysing as though the user had acknowledged nothing is the
+        // worst of the three ways to handle it.
+        Acknowledgments acknowledged;
+        try
+        {
+            acknowledged = Acknowledgments.Read(invocation.AcknowledgePath!);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Console.Error.WriteLine($"Could not read {invocation.AcknowledgePath}: {ex.Message}");
+            return 2;
+        }
+
+        if (invocation.AcknowledgeExplicit && acknowledged.Path is null)
+        {
+            Console.Error.WriteLine($"Acknowledgment file not found: {invocation.AcknowledgePath}");
+            return 2;
+        }
+
         if (!RegisterMSBuild()) return 3;
 
         try
         {
-            return await AnalyseAsync(options, invocation, startup, clock).ConfigureAwait(false);
+            return await AnalyseAsync(options, invocation, acknowledged, startup, clock)
+                .ConfigureAwait(false);
         }
         catch (SolutionLoadException ex)
         {
@@ -108,6 +130,7 @@ internal static class Program
     private static async Task<int> AnalyseAsync(
         WalkOptions options,
         Invocation invocation,
+        Acknowledgments acknowledged,
         TimeSpan startup,
         System.Diagnostics.Stopwatch clock)
     {
@@ -136,7 +159,7 @@ internal static class Program
         // Judged once, and the report reads the surviving half of it. The export needs the
         // suppressed rows too -- SCHEMA-findings-export.md §1 -- and asking Analysis twice would
         // re-run every detector to reach a subset of what the first answer already carried.
-        var judgement = Analysis.Judge(model);
+        var judgement = Analysis.Judge(model, acknowledged);
         stages.Add(new ProfileStage(
             "analysis", Lap(), Sentences.Plural(judgement.Reported.Count, "finding")));
 

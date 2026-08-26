@@ -1205,6 +1205,20 @@ Both new gates were mutation-tested when they were written: a `Console.WriteLine
 same for the next one — a snapshot suite that silently stopped covering anything looks
 exactly like a passing suite.
 
+**A10 is the recent one, and it caught its own vacuity twice.** `JudgementSeamTests` withholds a
+claim for a reason no cycle shape carries, and both renderers were reverted to
+`ShapedCycle.IsReportable` in turn to watch each fail — the terminal and the HTML side separately,
+because a mutation that only proves one of them proves the seam for one of them.
+
+`AcknowledgmentTests` needed two corrections before it asserted anything. It first looked for the
+acknowledged component's name in the whole report and found it, because a type can be named by a
+section that makes no claim about it; the assertion is now that the report names it **fewer** times,
+which is what A10 actually promises. And its name resolver went through `SolutionModel.Find`, which
+answers for types and quietly returns nothing for a namespace — so the cycle kinds, the entire reason
+the test exists, were asserting over an empty list. **Both were found by a guard that refuses to
+assert on an empty set of names**, which is the cheapest form this section's rule takes: if a test
+can pass by having nothing to look at, make having nothing to look at a failure.
+
 **R2 is the worked example.** Every port off the probe was checked by measurement rather than by
 reading: the numbers came from a real run of the tool against the fixture, not from the
 assertions being replaced, and `OrderingTests` was verified by reverting the fix it depends on

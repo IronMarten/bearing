@@ -38,13 +38,29 @@ internal static class CycleViews
     }
 
     /// <summary>
-    /// The members of <paramref name="all"/> whose claim of this kind did not, each with the
-    /// judgement that stopped it.
+    /// The members of <paramref name="all"/> a suppression row withheld, each with the row.
     /// </summary>
-    internal static IReadOnlyList<(T Shape, Judged Judged)> Withheld<T>(
+    /// <remarks>
+    /// <para>
+    /// <b>Suppressed, not merely withheld, and the difference is the whole of A10.</b> The
+    /// <i>mutually dependent, not reported</i> list is the tool explaining its own withholding — it
+    /// names each component and the row that set it aside so a reader can disagree. A finding the
+    /// <i>user</i> marked known and fine has no place on it: listing that component by name, under a
+    /// heading, is re-flagging it, which is the thing acknowledgment memory exists to stop.
+    /// </para>
+    /// <para>
+    /// It is still disclosed, by count and in its own section, so the run does not go quiet about
+    /// having gone quiet. <c>Report.Acknowledged</c> carries that.
+    /// </para>
+    /// <para>
+    /// The two sets were identical until A10 shipped, which is why nothing had to choose before.
+    /// </para>
+    /// </remarks>
+    internal static IReadOnlyList<(T Shape, Judged Judged)> Suppressed<T>(
         Judgement judgement, FindingKind kind, IEnumerable<T> all, Func<T, SubjectRef> subject)
     {
         var withheld = judgement.WithheldOfKind(kind)
+            .Where(j => j.IsSuppressed)
             .ToDictionary(j => j.Finding.Subject.Canonical, j => j, StringComparer.Ordinal);
 
         return

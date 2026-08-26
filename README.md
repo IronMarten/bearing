@@ -49,6 +49,17 @@ about — components with no peer group, excluded generated code, projects that 
 load. A tool that quietly says nothing about the riskiest thing in your codebase is worse
 than no tool.
 
+**A finding you have decided about stays decided.** Put its key in `.bearing-acknowledged`
+beside your solution, commit the file, and the claim stops being made — so a second run tells
+you what is *new* rather than repeating what you already looked at. Keys come from `--json`,
+where every finding carries the one it is identified by; a note after a tab records why, which
+is the half that is still worth reading a year later. The report always says how many findings
+the file kept out of it, because a tool that can be told to go quiet has to say when it has.
+
+**Acknowledging is not deleting.** The claim stays in `--json` with its evidence, marked
+`acknowledged`, and an entry that stops matching anything — which is what a rename does — is
+reported rather than dropped.
+
 **The JSON and CSV are unstable while the tool is 0.x.** `--json` carries a `schemaVersion`,
 independent of the tool's version and moved only when a consumer would have to change to keep
 reading. Pin against it if you build on the output. The shape is not a public contract before

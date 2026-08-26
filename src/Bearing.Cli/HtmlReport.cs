@@ -81,6 +81,7 @@ public static class HtmlReport
             Everything(page, model, findings);
         }
 
+        Acknowledged(page, judgement);
         Footer(page, model);
 
         page.Append("</div>\n</body>\n</html>\n");
@@ -726,7 +727,7 @@ public static class HtmlReport
 
         NotLayering(
             page,
-            CycleViews.Withheld(judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject),
+            CycleViews.Suppressed(judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject),
             id => Name(model, id));
 
         // Off the finding, through CycleEvidence, exactly as the terminal renderer does it. Both
@@ -1195,6 +1196,42 @@ public static class HtmlReport
     }
 
     // ----------------------------------------------------------------------- footer ----
+
+    /// <summary>
+    /// What the user's own file kept off this page — the same disclosure the terminal makes.
+    /// </summary>
+    /// <remarks>
+    /// <b>Both surfaces or neither.</b> A shareable artifact that quietly omits what the person who
+    /// ran it had already dismissed is the worse half of the pair: the reader of an HTML report is
+    /// usually not the person who wrote the acknowledgment file. <c>Report.Acknowledged</c> carries
+    /// the rest of the argument, including why nothing is said when there is nothing to say.
+    /// </remarks>
+    private static void Acknowledged(StringBuilder page, Judgement judgement)
+    {
+        var known = judgement.Acknowledgments;
+        if (known.Count == 0) return;
+
+        var silenced = judgement.AcknowledgedCount;
+        var file = known.Path is { } path ? Path.GetFileName(path) : Acknowledgments.DefaultFileName;
+
+        page.Append("<h2>Acknowledged</h2>\n");
+
+        page.Append(silenced == 0
+            ? $"<p class=\"lede\">Nothing was silenced by <span class=\"mono\">{Html.Text(file)}</span> "
+              + $"this run, though it holds {Html.Count(known.Count)} "
+              + $"{Sentences.Do(known.Count, "entry", "entries")}.</p>\n"
+            : $"<p class=\"lede\">{Html.Count(silenced)} {Sentences.Do(silenced, "finding", "findings")} "
+              + $"marked known and fine in <span class=\"mono\">{Html.Text(file)}</span> "
+              + $"{Sentences.Do(silenced, "is", "are")} not shown on this page. Delete a line from that "
+              + "file to see its finding again.</p>\n");
+
+        if (judgement.Unmatched.Count == 0) return;
+
+        page.Append($"<p class=\"sub\">{Html.Count(judgement.Unmatched.Count)} ")
+            .Append($"{Sentences.Do(judgement.Unmatched.Count, "entry", "entries")} in that file matched ")
+            .Append("nothing this run. A rename produces a new key, so a finding one of them silenced ")
+            .Append("may be above under a new one.</p>\n");
+    }
 
     private static void Footer(StringBuilder page, SolutionModel model)
     {

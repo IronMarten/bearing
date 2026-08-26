@@ -14,6 +14,15 @@ namespace IronMarten.Bearing.Cli;
 /// <param name="DiagramPath">Where to write the architecture diagram as SVG, or null.</param>
 /// <param name="MosaicPath">Where to write the mosaic as SVG, or null.</param>
 /// <param name="PlotPath">Where to write the plot as SVG, or null.</param>
+/// <param name="AcknowledgePath">
+/// The acknowledgment file to judge against — <c>PRD-free-tier.md</c> §10.3. Always set when there
+/// is a solution: either what <c>--acknowledge</c> named, or
+/// <see cref="Acknowledgments.DefaultFileName"/> beside the solution.
+/// </param>
+/// <param name="AcknowledgeExplicit">
+/// Whether the user named that file. It decides what a missing one means: the default not being
+/// there is the ordinary first run, and a named file not being there is a typo worth stopping for.
+/// </param>
 /// <param name="Full">Whether the report enumerates every finding rather than leading with one per kind.</param>
 /// <param name="Profile">Whether to print, to stderr, where the run's time went.</param>
 /// <remarks>
@@ -32,6 +41,8 @@ public sealed record Invocation(
     string? DiagramPath = null,
     string? MosaicPath = null,
     string? PlotPath = null,
+    string? AcknowledgePath = null,
+    bool AcknowledgeExplicit = false,
     bool Full = false,
     bool Profile = false);
 
@@ -153,6 +164,7 @@ public static class CommandLine
         string? diagramPath = null;
         string? mosaicPath = null;
         string? plotPath = null;
+        string? acknowledgePath = null;
         var full = false;
         var profile = false;
 
@@ -212,6 +224,10 @@ public static class CommandLine
                 case "--plot":
                     plotPath = Path.GetFullPath(Next(args, ref i, arg));
                     continue;
+
+                case "--acknowledge":
+                    acknowledgePath = Path.GetFullPath(Next(args, ref i, arg));
+                    continue;
             }
 
             if (PropertyBehind(arg) is not null)
@@ -259,6 +275,13 @@ public static class CommandLine
             DiagramPath: diagramPath,
             MosaicPath: mosaicPath,
             PlotPath: plotPath,
+            // Beside the solution when the user did not say, because the file is meant to be
+            // committed next to the thing it describes and found without a flag. A run that needs
+            // to be told where its own acknowledgments live is one nobody will make twice.
+            AcknowledgePath: acknowledgePath
+                ?? Path.Combine(
+                    Path.GetDirectoryName(solutionPath) ?? ".", Acknowledgments.DefaultFileName),
+            AcknowledgeExplicit: acknowledgePath is not null,
             Full: full,
             Profile: profile);
     }
@@ -285,6 +308,8 @@ public static class CommandLine
         yield return "  --diagram <file.svg>       also write the project map, for pasting into chat";
         yield return "  --mosaic <file.svg>        also write the mosaic: every type as one cell";
         yield return "  --plot <file.svg>          also write the plot: projects by reach and density";
+        yield return "  --acknowledge <file>       findings marked known and fine, one key per line";
+        yield return $"                             (default: {Acknowledgments.DefaultFileName} beside the solution)";
         yield return "  --full                     enumerate every finding instead of one per kind";
         yield return "  --profile                  also print, to stderr, where the run's time went";
         yield return "  --version                  print the version and exit";

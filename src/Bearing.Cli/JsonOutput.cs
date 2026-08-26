@@ -57,8 +57,22 @@ public static class JsonOutput
     /// The readable form did not disappear with it: <c>signature</c> is new in 2.0 and carries what
     /// <c>id</c> used to look like. It is not a key, and members can share one.
     /// </para>
+    /// <para>
+    /// <b>2.2 adds acknowledgment memory — A10.</b> <c>status</c> emits the third value §4 reserved
+    /// for it, findings gain <c>acknowledgedBy</c>, and a top-level <c>acknowledgments</c> block
+    /// carries the file the run was judged against. Additive, so a 2.1 reader keeps working — but a
+    /// 2.1 reader treating <c>status</c> as a two-value enum will not, which is exactly why §4
+    /// wrote the value down before anything emitted it.
+    /// </para>
+    /// <para>
+    /// <b>The block is not optional, and §1 is the reason.</b> The report says how many findings the
+    /// user's file kept out of it and how many entries matched nothing; a file that carried neither
+    /// would leave the export a subset of what the report rendered, on the one axis where the
+    /// difference is invisible — a consumer cannot tell a solution with three findings from one with
+    /// eleven and eight acknowledged.
+    /// </para>
     /// </remarks>
-    public const string SchemaVersion = "2.1";
+    public const string SchemaVersion = "2.2";
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -131,6 +145,7 @@ public static class JsonOutput
             [.. model.ExternalDependencies.Select(d => new External(d.Namespace, d.TypesTouching))],
             Boundary(model),
             [.. judgement.All.Select(Finding)],
+            Acknowledgments(judgement),
             Configuration(options ?? new WalkOptions { SolutionPath = model.SolutionPath }));
 
     private static CoverageBlock Coverage(Coverage coverage) =>
@@ -302,6 +317,7 @@ public static class JsonOutput
         IReadOnlyList<External> ExternalDependencies,
         BoundaryBlock Boundary,
         IReadOnlyList<FindingBlock> Findings,
+        AcknowledgmentsBlock Acknowledgments,
         ConfigurationBlock Configuration);
 
     private sealed record Tool(string Name, string Version);
@@ -496,9 +512,22 @@ public static class JsonOutput
             // and FindingKind gained three members the day before this shipped.
             judged.Finding.Kind.ToString(),
             Claims.IsRiskClaim(judged.Finding.Kind) ? "claim" : "disclosure",
-            judged.IsReported ? "reported" : "suppressed",
+            // Three values, and the order is the order the judgement is made in: a row answers
+            // before the user's file does, so a claim the tool was never going to make reads as
+            // suppressed even when an entry also names it. §4, and Judged carries the argument.
+            judged switch
+            {
+                { IsSuppressed: true } => "suppressed",
+                { IsAcknowledged: true } => "acknowledged",
+                _ => "reported",
+            },
             judged.SilencedBy is { } rule
                 ? new SuppressedByBlock(rule.Name, rule.Invariant, rule.Reason)
+                : null,
+            // Emitted even when the row above already silenced the claim, because an entry that has
+            // gone inert is a fact about the user's file rather than about this run.
+            judged.Acknowledged is { } entry
+                ? new AcknowledgedByBlock(entry.Note, entry.Line)
                 : null,
             Subject(judged.Finding.Subject),
             [.. judged.Finding.Receipts.Select(Receipt)],
@@ -540,6 +569,21 @@ public static class JsonOutput
     /// omission structural: a fourth walk setting is a compile-visible gap here rather than
     /// something a writer has to remember.
     /// </remarks>
+    /// <summary>
+    /// The acknowledgment file, as data — <c>SCHEMA-findings-export.md</c> §4.
+    /// </summary>
+    /// <remarks>
+    /// <b>Present on every run, with nulls and zeroes when there was no file.</b> The alternative is
+    /// a key that appears only sometimes, which makes <i>nothing acknowledged</i> and <i>an older
+    /// tool wrote this</i> the same observation to a consumer joining across runs.
+    /// </remarks>
+    private static AcknowledgmentsBlock Acknowledgments(Judgement judgement) =>
+        new(
+            judgement.Acknowledgments.Path,
+            judgement.Acknowledgments.Count,
+            judgement.AcknowledgedCount,
+            [.. judgement.Unmatched.Select(a => new UnmatchedBlock(a.Key, a.Note, a.Line))]);
+
     private static ConfigurationBlock Configuration(WalkOptions options) =>
         new(options.IncludeTests, options.DefaultExcludesCleared, options.ExcludedPathFragments);
 
@@ -549,6 +593,7 @@ public static class JsonOutput
         string Class,
         string Status,
         SuppressedByBlock? SuppressedBy,
+        AcknowledgedByBlock? AcknowledgedBy,
         SubjectBlock Subject,
         IReadOnlyList<ReceiptBlock> Receipts,
         IReadOnlyList<QualifierBlock> Qualifiers,
@@ -609,6 +654,42 @@ public static class JsonOutput
     /// something went quiet.
     /// </param>
     private sealed record SuppressedByBlock(string Rule, string Invariant, string Reason);
+
+    /// <summary>
+    /// Where the acknowledgment came from — <c>SCHEMA-findings-export.md</c> §4.
+    /// </summary>
+    /// <param name="Note">
+    /// Why the user said it was fine, or <see langword="null"/> if they did not say. The field this
+    /// block exists for: a consumer counting acknowledgments learns how many, and only the note
+    /// says whether the reason still holds.
+    /// </param>
+    /// <param name="Line">
+    /// Which line of the file, 1-based. Provenance and not identity — the finding's own
+    /// <c>key</c> is the identity, and a line number in a key is the class of thing
+    /// <c>FindingKey</c> excludes.
+    /// </param>
+    private sealed record AcknowledgedByBlock(string? Note, int Line);
+
+    /// <summary>
+    /// The acknowledgment file this run was judged against.
+    /// </summary>
+    /// <param name="Path">Where it was read from, or <see langword="null"/> when there was none.</param>
+    /// <param name="Entries">How many acknowledgments it holds.</param>
+    /// <param name="Silenced">
+    /// How many claims it kept out of the report — entries a suppression row would have withheld
+    /// anyway are not counted, so this is what the reader would otherwise have seen.
+    /// </param>
+    /// <param name="Unmatched">
+    /// Entries that matched no claim this run made. A rename produces a new key, so these are how a
+    /// consumer tells a component the user dismissed from one that has come back under a new name.
+    /// </param>
+    private sealed record AcknowledgmentsBlock(
+        string? Path,
+        int Entries,
+        int Silenced,
+        IReadOnlyList<UnmatchedBlock> Unmatched);
+
+    private sealed record UnmatchedBlock(string Key, string? Note, int Line);
 
     private sealed record ConfigurationBlock(
         bool IncludeTests,

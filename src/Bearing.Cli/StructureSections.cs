@@ -296,7 +296,7 @@ internal static class StructureSections
         var shaped = model.ShapedNamespaceCycles;
         var reportable = CycleViews.Reported(
             judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject);
-        var setAside = CycleViews.Withheld(
+        var setAside = CycleViews.Suppressed(
             judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject);
 
         if (reportable.Count == 0)

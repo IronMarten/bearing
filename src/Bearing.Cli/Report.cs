@@ -86,6 +86,11 @@ public static class Report
         // reason not to.
         foreach (var line in StructureSections.NotAnalysed(model.Coverage)) yield return line;
 
+        // Last, beside the other disclosure, and for the same reason: it qualifies everything above
+        // it. A reader who cannot see that the report is withholding claims on their own past
+        // instruction cannot tell a quiet run from a silenced one.
+        foreach (var line in Acknowledged(judgement)) yield return line;
+
         yield return "";
     }
 
@@ -144,6 +149,58 @@ public static class Report
                      + "Unusual findings first, then structure.";
         yield return "Every claim shows the numbers behind it.";
         yield return "================================================================";
+    }
+
+    /// <summary>
+    /// What the user's own file kept out of the report — <c>PRD-free-tier.md</c> §10.3.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The section this file's own discipline requires.</b> <c>TECHREQ-job-b.md</c> §4: a
+    /// suppression that cannot be observed to withhold anything is worse than none. That was
+    /// written about the matrix and it is more true of a file a user edited months ago — nothing
+    /// else in the run distinguishes <i>this solution has three findings</i> from <i>this solution
+    /// has eleven and you silenced eight of them</i>.
+    /// </para>
+    /// <para>
+    /// <b>Absent rather than empty when there is nothing to say.</b> A run with no file has
+    /// withheld nothing, so there is no absence to disclose and a line saying <i>0 acknowledged</i>
+    /// on every first run is noise against invariant 2.
+    /// </para>
+    /// <para>
+    /// <b>The unmatched count is here and not in a warning</b>, because it is not a failure. A key
+    /// stops matching when its subject is renamed — <c>FindingKey</c> records that as the price of
+    /// not building rename detection — and the finding is then back above under a new key. Saying
+    /// so is what lets a reader recognise a re-flagged component as one they had already dismissed.
+    /// </para>
+    /// </remarks>
+    private static IEnumerable<string> Acknowledged(Judgement judgement)
+    {
+        var known = judgement.Acknowledgments;
+        if (known.Count == 0) yield break;
+
+        var silenced = judgement.AcknowledgedCount;
+        var file = known.Path is { } path ? Path.GetFileName(path) : Acknowledgments.DefaultFileName;
+
+        yield return "";
+        yield return "-- ACKNOWLEDGED ------------------------------------------------";
+
+        yield return silenced == 0
+            ? $"   Nothing was silenced by {file} this run, though it holds "
+              + $"{Sentences.Plural(known.Count, "entry")}."
+            : $"   {Sentences.Plural(silenced, "finding")} marked known and fine in {file} "
+              + (silenced == 1 ? "is" : "are") + " not shown above.";
+
+        if (silenced > 0)
+            yield return "   Delete a line from that file to see its finding again.";
+
+        if (judgement.Unmatched.Count == 0) yield break;
+
+        yield return $"   {Sentences.Plural(judgement.Unmatched.Count, "entry")} in that file matched "
+                     + "nothing this run. A rename produces a new key,";
+        yield return "   so a finding "
+                     + Sentences.Do(judgement.Unmatched.Count, "it", "one of them")
+                     + " silenced may be back above under a new one.";
     }
 
     private static IEnumerable<string> BoundaryNominations(SolutionModel model, FindingSet findings)

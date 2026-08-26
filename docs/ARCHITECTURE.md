@@ -437,6 +437,8 @@ decision from whether it is versioned.
 | Every threshold is a named value on `AnalysisPolicy`, including the thirteen that were literals | a policy carrying ten of twenty-three misrepresents which policy produced a finding, which is the failure it exists to prevent |
 | `StableThreshold` and `IsolatedThreshold` are independent | the defaults are 0.2 and 0.8 and the symmetry is coincidence, not maintained. They gate different findings over different populations; deriving one from the other would make one flag move two findings |
 | A method-level concealed decision suppresses breaks-alone on its declaring type | the reason the suppression exists is behavioural, and behaviour lives in methods — so the level that *nominated* it is not what decides. `SubjectRef` walks member → declaring type to express it. Implemented: `Suppression.Rules`, `breaks-alone-decides-something`, asking `ContainsAbout` at both levels |
+| A renderer is handed the judgement, and takes its population from it | Answered by A10, 2026-08-26 — the entry that had to touch the seam. A renderer's population and its reported-or-withheld decision come from `Judgement`; the model is read only for display detail, looked up by subject. Both circular-reference sections took their population from `model.ShapedNamespaceCycles` and split it on `ShapedCycle.IsReportable`, which is a renderer re-deciding from the shape what the matrix had decided over the whole finding set. They agreed because both cycle rows happen to test that shape, and nothing held them to it. Acknowledgment memory is what turned that from renderer drift waiting to happen into a defect: a population re-derived from the model cannot see the user's file, so those sections would have kept printing a finding the user had dismissed, with nothing failing. `JudgementSeamTests` withholds a claim for a reason no shape carries |
+| The *mutually dependent, not reported* list is driven by suppression, not by everything withheld | A10, and the two sets were identical until it shipped. That list is the tool explaining its own withholding, so it names each component and the row that set it aside. A finding the **user** marked known and fine has no place on it — listing that component by name under a heading is re-flagging it, which is what acknowledgment memory exists to stop. It is still disclosed, by count, in its own section |
 | Every emitted artifact is ordered by a total key | a stable sort on a non-total key reproduces on one machine without being a property of the tool, and Core is a reimplementation that will not inherit the probe's enumeration order. `TESTING.md` §5 |
 | A finding carries receipts, qualifiers and participants; the rest of the record stays deferred | §4 — each of the three is load-bearing for a finding that has already moved, and none anticipates the findings pane |
 | Detection and suppression are separate passes over the whole finding set | §4 — a detector that can only be correct if it runs after another one is the probe's ordering dependence with different syntax |
@@ -484,24 +486,17 @@ decision from whether it is versioned.
 
 ## 11. Decisions still open
 
-These are live, and each one changes code that has not been written yet. Full context in
-the private `TECHREQ-job-a.md` §10.
+**None, as of 2026-08-26.** The last one — what a renderer is handed when a finding has been
+withheld — was answered by A10 and is recorded in §10, where decisions taken live. Full context for
+anything that reopens is in the private `TECHREQ-job-a.md` §10.
 
-Distinct from a known defect, which is behaviour already understood to be wrong with a remedy
-in hand. These are questions with no answer yet.
+A decision here is distinct from a known defect, which is behaviour already understood to be wrong
+with a remedy in hand. These are questions with no answer yet, and there are currently none.
 
-- **What a renderer is handed: the surviving findings, or the model as well.** The export half is
-  settled — `Program` judges once, the export gets the whole judged set and the report the
-  surviving half, so a suppressed row reaches the file. The renderer half is not. The circular
-  references section still reaches **past the finding set into the model** to draw what was
-  suppressed, which is how it renders the *mutually dependent, not reported* list at all: a
-  suppressed finding is not in the set a renderer is handed, and `HeldPair` survives because that
-  list needs it. **So there are two ways a renderer learns about a suppressed thing and only one of
-  them is declared.** Either every renderer takes the judged set and filters it — which makes the
-  suppressed set a first-class input rather than something recovered — or reaching into the model
-  is the sanctioned route and the seam should say so. It has not bitten yet, and it is the kind of
-  thing that bites as renderer drift: one renderer recovering a population the other does not.
-  `SCHEMA-findings-export.md` §6 is where the not-reported list is specified. **Belongs to whoever next touches that seam.**
+**Everything below is answered and kept for its measurement**, which is the reusable part and the
+reason these are not simply deleted. Each says what settled it. **A struck-through heading means the
+question is closed**; if the section grows an unstruck one, that is a live decision again.
+
 
 - **~~Whether `SignificantKinds` stays at three.~~ Answered — X4, and the floor stays at 3.** Kept
   here because the measurement is the reusable part. There are exactly three and `--min-kind-span`

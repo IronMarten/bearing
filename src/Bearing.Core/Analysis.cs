@@ -28,7 +28,7 @@
 /// </para>
 /// </remarks>
 /// <summary>
-/// One claim, and the suppression row that silenced it — or <see langword="null"/> if none did.
+/// One claim, and whatever stopped it being reported — a suppression row, or the user.
 /// </summary>
 /// <param name="Finding">The claim.</param>
 /// <param name="SilencedBy">
@@ -36,13 +36,40 @@
 /// than every row: <see cref="Suppression.Silencing"/> stops at the first match, and a finding is
 /// removed once however many reasons there are to remove it.
 /// </param>
-public sealed record Judged(Finding Finding, SuppressionRule? SilencedBy)
+/// <param name="Acknowledged">
+/// The user's entry marking this claim <i>known and fine</i>, or <see langword="null"/> if there is
+/// none — <see cref="Acknowledgments"/>.
+/// </param>
+/// <remarks>
+/// <para>
+/// <b>Two fields and not one, because they are two different facts about a claim.</b> Suppressed
+/// means Bearing decided the claim would be wrong. Acknowledged means Bearing stands by it and the
+/// user has dismissed it. One "went quiet" field would tell a consumer of the export that the tool
+/// withheld something it actually said, which is the class of lie
+/// <c>SCHEMA-findings-export.md</c> §1 exists to make impossible.
+/// </para>
+/// <para>
+/// <b>The matrix is asked first, and a claim can carry both.</b> Acknowledging a claim the tool was
+/// never going to make is a no-op, so the row answers before the file does; the entry is still
+/// recorded, because an acknowledgment that has gone inert is what
+/// <see cref="Judgement.Unmatched"/> exists to surface. <see cref="IsSuppressed"/> and
+/// <see cref="IsAcknowledged"/> are therefore not exclusive, and only <see cref="IsReported"/> is a
+/// renderer's question.
+/// </para>
+/// </remarks>
+public sealed record Judged(
+    Finding Finding,
+    SuppressionRule? SilencedBy,
+    Acknowledgment? Acknowledged = null)
 {
     /// <summary>Whether this claim reaches the reader — the only question a renderer asks.</summary>
-    public bool IsReported => SilencedBy is null;
+    public bool IsReported => SilencedBy is null && Acknowledged is null;
 
     /// <summary>Whether a suppression row decided the claim would be wrong.</summary>
     public bool IsSuppressed => SilencedBy is not null;
+
+    /// <summary>Whether the user marked this claim known and fine.</summary>
+    public bool IsAcknowledged => Acknowledged is not null;
 }
 
 /// <summary>
@@ -79,17 +106,25 @@ public sealed class Judgement
     /// The suite does exactly that: re-judging one silenced finding as reported and re-rendering is
     /// how the export is shown to follow the matrix without a second walk.
     /// </remarks>
-    public Judgement(IReadOnlyList<Judged> all)
+    /// <param name="all">Every claim the run made, judged.</param>
+    /// <param name="acknowledgments">
+    /// The file it was judged against, or <see langword="null"/> for none.
+    /// </param>
+    public Judgement(IReadOnlyList<Judged> all, Acknowledgments? acknowledgments = null)
     {
         ArgumentNullException.ThrowIfNull(all);
 
         All = all;
+        Acknowledgments = acknowledgments ?? Acknowledgments.None;
         Reported = FindingSet.Of(all.Where(j => j.IsReported).Select(j => j.Finding));
         Withheld = [.. all.Where(j => !j.IsReported)];
 
         _withheldByKind = Withheld
             .GroupBy(j => j.Finding.Kind.ToString(), StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.Ordinal);
+
+        var claimed = all.Select(j => j.Finding.Key.Canonical).ToHashSet(StringComparer.Ordinal);
+        Unmatched = [.. Acknowledgments.All.Where(a => !claimed.Contains(a.Key))];
     }
 
     /// <summary>Every claim the detectors made, judged.</summary>
@@ -100,6 +135,29 @@ public sealed class Judgement
 
     /// <summary>The claims that do not.</summary>
     public IReadOnlyList<Judged> Withheld { get; }
+
+    /// <summary>The file this run was judged against.</summary>
+    public Acknowledgments Acknowledgments { get; }
+
+    /// <summary>
+    /// Entries in that file that matched no claim this run made.
+    /// </summary>
+    /// <remarks>
+    /// <b>Surfaced rather than ignored, because the commonest cause is a rename.</b>
+    /// <see cref="FindingKey"/> records the trade: a rename produces a new key, so the
+    /// acknowledgment is lost and the finding comes back as new — the right default for drift and
+    /// the wrong one here. An entry that has stopped matching is the user's only signal that it
+    /// happened, and a file that silently accumulates dead lines stops being reviewable, which is
+    /// the one property that made it worth committing.
+    /// </remarks>
+    public IReadOnlyList<Acknowledgment> Unmatched { get; }
+
+    /// <summary>How many claims the user's file silenced this run.</summary>
+    /// <remarks>
+    /// Claims a row would have withheld anyway are not counted. What this reports is what the
+    /// reader would otherwise have seen.
+    /// </remarks>
+    public int AcknowledgedCount => All.Count(j => j.IsAcknowledged && !j.IsSuppressed);
 
     /// <summary>The withheld claims of one kind, in emission order.</summary>
     public IReadOnlyList<Judged> WithheldOfKind(FindingKind kind) =>
@@ -166,17 +224,28 @@ public static class Analysis
     /// was <i>fixed</i> — which reads as an improvement it did not earn.
     /// </para>
     /// </remarks>
-    public static Judgement Judge(SolutionModel model)
+    /// <param name="model">The solution to judge.</param>
+    /// <param name="acknowledgments">
+    /// What the user has already marked known and fine, or <see langword="null"/> for nothing — a
+    /// run with no file, which is every first run. A default rather than a required argument
+    /// because an unacknowledged run is a whole run and not a degraded one.
+    /// </param>
+    public static Judgement Judge(SolutionModel model, Acknowledgments? acknowledgments = null)
     {
         ArgumentNullException.ThrowIfNull(model);
 
+        var known = acknowledgments ?? Acknowledgments.None;
         var detected = Detected(model);
 
         return new Judgement(
-        [
-            .. detected.All.Select(finding =>
-                new Judged(finding, Suppression.Silencing(finding, detected, model)))
-        ]);
+            [
+                .. detected.All.Select(finding =>
+                    new Judged(
+                        finding,
+                        Suppression.Silencing(finding, detected, model),
+                        known.For(finding.Key)))
+            ],
+            known);
     }
 
     /// <summary>
