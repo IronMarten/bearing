@@ -585,30 +585,102 @@ already understood. These are questions with no answer yet.
   `undefinedx its peer median`. Each was repaired locally and each repair added or moved a
   threshold. **That recurrence is the finding.**
 
-  **Measured 2026-08-21, method cohorts on both reference solutions:**
+  ~~**Measured 2026-08-21, method cohorts on both reference solutions.**~~ **Re-derived 2026-08-25 on
+  three, and the 2026-08-21 table was taken on a population the gate does not read.** It is kept
+  below struck through, because the correction is the reusable part.
 
-  | | nopCommerce (139 cohorts) | Jellyfin (156) |
+  | ~~2026-08-21~~ | ~~nopCommerce (139 cohorts)~~ | ~~Jellyfin (156)~~ |
   |---|---|---|
-  | peer median is 0 or 1 — so `3x median` **is** `cc >= 3` | 123 (88%) | 127 (81%) |
-  | zero dispersion, MAD = 0 | 104 (74%) | 100 (64%) |
-  | largest cohort | `suffix:Service` n=2,927 median 1 MAD 1 max 93 | `suffix:Manager` n=1,339 median 1 MAD 1 max 56 |
-  | second | `base:BaseNopModel` **n=1,656 median 0 MAD 0** max 12 | `suffix:Info` n=927 median 0 MAD 0 max 45 |
+  | ~~peer median is 0 or 1~~ | ~~123 (88%)~~ | ~~127 (81%)~~ |
+  | ~~zero dispersion, MAD = 0~~ | ~~104 (74%)~~ | ~~100 (64%)~~ |
+  | ~~largest cohort~~ | ~~`suffix:Service` n=2,927~~ | ~~`suffix:Manager` n=1,339~~ |
+  | ~~second~~ | ~~`base:BaseNopModel` n=1,656 median 0 MAD 0~~ | ~~`suffix:Info` n=927~~ |
 
-  **A cohort of 1,656 with zero dispersion is what kills the size hypothesis.** Every gate in this
-  family thresholds *cohort size* — a floor, a ceiling, a rank limit, a minimum decision count — and
-  size is uncorrelated with whether the peer distribution supports a comparative claim at all. A
-  cohort of 3 and a cohort of 1,656 fail identically. That is why each fix holds at the size it was
-  measured against and breaks at the next one: **every one of them is a threshold on a proxy.**
+  **The population was wrong.** `ConcealedDecision.AtMethodLevel` reads `IsMethodLike` — `Method` and
+  `Constructor` — and drops groups below `MinCohort`. The old table pooled **every** member kind,
+  fields and properties included, and applied no floor: its *139 cohorts* for nopCommerce reproduces
+  exactly on that pooling and on no other. Fields and properties carry `cc` 0, so the pooling is what
+  drove the median to 0 and the MAD to 0. **The gate's own population is 105 cohorts, 70 of them
+  above the floor.**
+
+  **Its marquee counterexample does not exist in that population.** `base:BaseNopModel` is quoted as
+  *1,656 members with MAD 0*; method-like, it is **n=124, median 1, MAD 0, max 9**. And the largest
+  cohort reads `n=2,927` where the shipped binary emits **2,909** — which is the number `DEFECTS.md`
+  §34 carries for the same cohort in the same file.
+
+  **Re-derived 2026-08-25, `tools/cohort-dispersion.py` over `--csv` output, defaults, at or above
+  `MinCohort` 5.** nopCommerce is `cloned-realworld/nop` at 2024-08-27, which is what every figure in
+  this file has always meant by the name; `nopCurrent` is a different and larger solution.
+
+  | member level — cc of method-like members | nopCommerce (3,209 types) | Jellyfin (1,545) | Umbraco (6,230) |
+  |---|---|---|---|
+  | cohorts at or above the floor | 70 | 104 | 277 |
+  | peer median is 0 or 1 | 58 (83%) | 62 (60%) | 204 (74%) |
+  | zero dispersion, MAD = 0 | 43 (61%) | 52 (50%) | 154 (56%) |
+  | population living in those cohorts | 1,917 of 9,144 (21%) | 1,665 of 5,454 (31%) | 8,376 of 19,137 (44%) |
+
+  | type level — MaxMemberCyclomatic of types | nopCommerce | Jellyfin | Umbraco |
+  |---|---|---|---|
+  | cohorts at or above the floor | 95 | 90 | 278 |
+  | zero dispersion, MAD = 0 | 62 (65%) | 42 (47%) | 147 (53%) |
+  | **population living in those cohorts** | **2,159 of 3,102 (70%)** | 648 of 1,413 (46%) | 2,840 of 6,069 (47%) |
+  | what ships produces there | **23 findings** | **17** | **72** |
+  | …because the median is 0, so the ratio is undefined | 1,427 (46% of the gated population) | 388 (28%) | 1,636 (27%) |
+
+  **Size and dispersion are correlated, monotonically, on all three — so the recorded reason is
+  wrong and the conclusion survives anyway.** Share of cohorts with MAD 0, by size:
+
+  | cohort size | nopCommerce | Jellyfin | Umbraco |
+  |---|---|---|---|
+  | 5–9 | 90% | 60% | 66% |
+  | 10–24 | 53% | 52% | 57% |
+  | 25–99 | 70% | 49% | 56% |
+  | 100–499 | 45% | 33% | 41% |
+  | 500+ | **0%** | **0%** | 38% |
+
+  This said *size is uncorrelated* and *a cohort of 3 and a cohort of 1,656 fail identically*.
+  Neither is true: the trend is monotone on all three, and no cohort above 500 members has zero
+  dispersion on either reference solution. **What is true is that the correlation is far too weak to
+  gate on** — 45% of nopCommerce's 100–499 cohorts and 38% of Umbraco's 500+ still have MAD 0, so a
+  size threshold misclassifies about half the large cohorts. **The size hypothesis dies on the
+  misclassification rate, not on a 1,656-member counterexample the gate never sees.** That is why
+  each fix holds at the size it was measured against and breaks at the next one: **every one of them
+  is a threshold on a proxy that is real and weak**, which is more dangerous than one that is
+  unrelated, because it works often enough to look calibrated.
 
   **The variable is dispersion.** With spread, an outlier is an outlier at any n; without it, nobody
   is, at any n. Stated that way the family collapses into one rule, and the rule *removes*
   thresholds — `ConcealedTopRank` exists to control volume that median-1 cohorts create, and
   `MinCohort`'s gating role exists to control the thin end of the same problem.
 
-  **The trap, found while working it through and recorded so it is not rediscovered.** A naive
-  dispersion gate is *worse* than what ships: at MAD = 0 the scale estimate collapses, so
-  `median + k·MAD` is the median and everything above it fires — across 74% of nopCommerce's
-  cohorts. Swapping the statistic is not the fix.
+  **The trap, found while working it through and recorded so it is not rediscovered. Measured
+  2026-08-25, and it is real and sharper than this said.** At MAD = 0 the scale estimate collapses,
+  so `median + k·MAD` is the median and everything above it fires. Counted inside the MAD-0 cohorts
+  only, which is the comparison the claim is about — findings from a naive gate against what ships:
+
+  | | nopCommerce | Jellyfin | Umbraco |
+  |---|---|---|---|
+  | member level | 429 vs 286 — **1.5x** | 529 vs 337 — **1.6x** | 2,398 vs 1,300 — **1.8x** |
+  | type level | 426 vs 23 — **18.5x** | 102 vs 17 — **6.0x** | 401 vs 72 — **5.6x** |
+
+  **Swapping the statistic is not the fix**, and the type-level row is why: what ships produces
+  almost nothing in those cohorts, so a naive replacement is not a tightening that went too far, it
+  is a flood where there was silence.
+
+  **But in the cohorts that do have spread, dispersion is the tighter gate, and that is new.**
+  `median + k·MAD` against `3x median`, MAD > 0 only: nopCommerce 996 vs 1,491 at member level and
+  197 vs 231 at type level; Jellyfin 618 vs 885 and 135 vs 159; Umbraco 1,312 vs 2,308 and 439 vs
+  615. **15% to 43% fewer on every solution and both levels.** So the two branches are not one
+  statistic applied twice — the spread branch is a straight improvement and the no-spread branch
+  needs the different *sentence*, not a different threshold.
+
+  **The no-spread branch is the majority of the type-level population, which this entry did not
+  know.** 70% of nopCommerce's gated type-level population lives in zero-dispersion cohorts, 46% of
+  Jellyfin's and 47% of Umbraco's — and the shipped gate produces 23, 17 and 72 findings from them,
+  because a median of 0 makes the ratio undefined. **The claim there is not weak, it is absent.**
+  That is the strongest argument for the direction below and it is an argument about coverage rather
+  than about noise: there is a population the tool currently says nothing at all about, and on
+  nopCommerce it is most of the types it looked at.
 
   **What the trap points at is the actual answer: let the claim follow the distribution rather than
   making a threshold chase the size.** A type at cc 12 among 1,656 peers all at 0 is a finding, and
