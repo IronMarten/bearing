@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -27,7 +27,7 @@ public sealed class AbsoluteGateTests(CoreWalkFixture core)
     private FindingSet Findings => Analysis.FindingsFor(core.Model);
 
     private string Text =>
-        string.Join("\n", IronMarten.Bearing.Cli.Report.For(core.Model, Findings));
+        string.Join("\n", IronMarten.Bearing.Cli.Report.For(core.Model, Analysis.Judge(core.Model)));
 
     /// <summary>
     /// The report with its line breaks and indentation collapsed to single spaces.

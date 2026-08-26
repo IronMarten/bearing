@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing.Cli;
+﻿namespace IronMarten.Bearing.Cli;
 
 /// <summary>
 /// The terminal report: the order of the sections, and nothing else.
@@ -25,10 +25,25 @@ namespace IronMarten.Bearing.Cli;
 public static class Report
 {
     /// <summary>Renders the whole report.</summary>
-    public static IEnumerable<string> For(SolutionModel model, FindingSet findings)
+    /// <param name="model">The solution.</param>
+    /// <param name="judgement">
+    /// Every claim the run made and what stopped each of the ones that went quiet.
+    /// </param>
+    /// <remarks>
+    /// <b>A <see cref="Judgement"/> rather than a <see cref="FindingSet"/>, which is
+    /// <c>docs/ARCHITECTURE.md</c> §11 answered.</b> Most sections want only the survivors and take
+    /// them from <see cref="Judgement.Reported"/> below. The circular-references section wants the
+    /// withheld half too — it lists what it set aside, which is the whole reason the question was
+    /// open — and it used to recover that population from the model instead. One renderer reaching
+    /// past the finding set into the model, while the other did not, is renderer drift with nothing
+    /// to catch it.
+    /// </remarks>
+    public static IEnumerable<string> For(SolutionModel model, Judgement judgement)
     {
         ArgumentNullException.ThrowIfNull(model);
-        ArgumentNullException.ThrowIfNull(findings);
+        ArgumentNullException.ThrowIfNull(judgement);
+
+        var findings = judgement.Reported;
 
         foreach (var line in Header(model)) yield return line;
 
@@ -59,7 +74,7 @@ public static class Report
         // someone's first impression, which is an argument for placement as much as for wording.
         foreach (var line in FindingSections.NoStaticReferencesFound(model, findings)) yield return line;
 
-        foreach (var line in StructureSections.CircularReferences(model, findings)) yield return line;
+        foreach (var line in StructureSections.CircularReferences(model, judgement)) yield return line;
         foreach (var line in FindingSections.SharedMutableState(model, findings)) yield return line;
         foreach (var line in StructureSections.ProjectStability(model)) yield return line;
         foreach (var line in StructureSections.UnreferencedProjects(model)) yield return line;

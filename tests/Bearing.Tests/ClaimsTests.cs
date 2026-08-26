@@ -168,9 +168,9 @@ public sealed class ClaimsTests(CoreWalkFixture core)
     public void The_terminal_and_the_page_word_a_lead_claim_identically()
     {
         var findings = Findings;
-        var terminal = string.Join("\n", Report.For(core.Model, findings));
+        var terminal = string.Join("\n", Report.For(core.Model, Analysis.Judge(core.Model)));
         var page = HtmlReport.Render(
-            core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         var leading = Selection.Exemplars(findings).Where(f => Claims.IsRiskClaim(f.Kind)).ToList();
 

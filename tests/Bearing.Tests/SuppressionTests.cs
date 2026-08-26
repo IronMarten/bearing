@@ -94,11 +94,11 @@ public sealed class SuppressionTests(CoreWalkFixture core)
 
         Assert.Equal(
             Analysis.FindingsFor(core.Model).All.Select(f => f.Key.Canonical).Order(StringComparer.Ordinal),
-            judged.Where(j => j.IsReported).Select(j => j.Finding.Key.Canonical).Order(StringComparer.Ordinal));
+            judged.Reported.All.Select(f => f.Key.Canonical).Order(StringComparer.Ordinal));
 
-        Assert.Equal(Analysis.Detected(core.Model).Count, judged.Count);
+        Assert.Equal(Analysis.Detected(core.Model).Count, judged.All.Count);
 
-        var silenced = judged.Where(j => !j.IsReported).ToList();
+        var silenced = judged.Withheld.ToList();
 
         Assert.NotEmpty(silenced);
         Assert.All(silenced, j => Assert.Contains(j.SilencedBy!, Suppression.Rules));

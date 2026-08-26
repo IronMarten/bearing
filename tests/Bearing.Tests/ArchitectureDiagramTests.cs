@@ -177,7 +177,7 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     public void The_html_report_embeds_the_same_drawing()
     {
         var page = HtmlReport.Render(
-            core.Model, Analysis.FindingsFor(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         Assert.Contains(Svg, page, StringComparison.Ordinal);
     }

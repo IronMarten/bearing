@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -275,7 +275,7 @@ public sealed class TilesTests(CoreWalkFixture core)
     {
         var findings = Findings;
         var page = HtmlReport.Render(
-            core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         var caption = page[page.IndexOf("</svg>", StringComparison.Ordinal)..page.IndexOf("<h2>", StringComparison.Ordinal)];
 

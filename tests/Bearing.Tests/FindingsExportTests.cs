@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
@@ -20,10 +20,12 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
 {
     private static readonly DateTimeOffset Instant = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-    private IReadOnlyList<Judged> Judged => Analysis.Judge(core.Model);
+    private Judgement Judgement => Analysis.Judge(core.Model);
+
+    private IReadOnlyList<Judged> Judged => Judgement.All;
 
     private JsonElement Root =>
-        JsonDocument.Parse(JsonOutput.Render(core.Model, Judged, Instant)).RootElement;
+        JsonDocument.Parse(JsonOutput.Render(core.Model, Judgement, Instant)).RootElement;
 
     private IReadOnlyList<JsonElement> Findings =>
         [.. Root.GetProperty("findings").EnumerateArray()];
@@ -117,8 +119,8 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
         var findings = Analysis.FindingsFor(core.Model);
         var rendered = string.Join(
             "\n",
-            string.Join("\n", Report.For(core.Model, findings)),
-            HtmlReport.Render(core.Model, findings, Instant, full: true));
+            string.Join("\n", Report.For(core.Model, Analysis.Judge(core.Model))),
+            HtmlReport.Render(core.Model, Analysis.Judge(core.Model), Instant, full: true));
 
         var exported = Findings.Select(KindOf).ToHashSet(StringComparer.Ordinal);
 
@@ -462,7 +464,7 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
             .ToList();
 
         Assert.NotEqual(
-            JsonOutput.Render(core.Model, judged, Instant),
-            JsonOutput.Render(core.Model, loosened, Instant));
+            JsonOutput.Render(core.Model, new Judgement(judged), Instant),
+            JsonOutput.Render(core.Model, new Judgement(loosened), Instant));
     }
 }

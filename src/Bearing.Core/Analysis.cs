@@ -1,4 +1,4 @@
-namespace IronMarten.Bearing;
+﻿namespace IronMarten.Bearing;
 
 /// <summary>
 /// The findings layer: <c>model → claims</c>.
@@ -38,8 +38,72 @@ namespace IronMarten.Bearing;
 /// </param>
 public sealed record Judged(Finding Finding, SuppressionRule? SilencedBy)
 {
-    /// <summary>Whether this claim survived the suppression matrix.</summary>
+    /// <summary>Whether this claim reaches the reader — the only question a renderer asks.</summary>
     public bool IsReported => SilencedBy is null;
+
+    /// <summary>Whether a suppression row decided the claim would be wrong.</summary>
+    public bool IsSuppressed => SilencedBy is not null;
+}
+
+/// <summary>
+/// Everything one run judged: every claim the detectors made, and what stopped each of the ones
+/// that went quiet.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>This is what a renderer is handed</b>, and saying so is the answer to the decision
+/// <c>docs/ARCHITECTURE.md</c> §11 held open. A renderer takes its <i>population</i> and its
+/// <i>reported-or-withheld</i> decision from here, and goes to the <see cref="SolutionModel"/> only
+/// for display detail, looked up by subject. The alternative — recovering a withheld population
+/// from the model, which is how the circular-references sections drew both their lists — leaves two
+/// undeclared routes by which a renderer learns that a claim went quiet, and nothing holding two
+/// renderers to the same one.
+/// </para>
+/// <para>
+/// <b>The rule is worth more than the tidiness, because the model cannot answer the question.</b>
+/// <c>ShapedCycle.IsReportable</c> is a property of the shape and it re-derives, in a renderer, a
+/// decision the suppression matrix already made — which is the rule-in-a-renderer
+/// <c>docs/ARCHITECTURE.md</c> §3 forbids, and which agrees with the matrix only for as long as
+/// nobody adds a row. Every input to <i>whether this claim is reported</i> that is not a property of
+/// the shape is invisible to it.
+/// </para>
+/// </remarks>
+public sealed class Judgement
+{
+    private readonly Dictionary<string, List<Judged>> _withheldByKind;
+
+    /// <summary>Indexes a run's judgements.</summary>
+    /// <remarks>
+    /// Public, because this is a projection and not a decision — everything here is derived from
+    /// the list, so a caller holding judgements it has altered can ask the same questions of them.
+    /// The suite does exactly that: re-judging one silenced finding as reported and re-rendering is
+    /// how the export is shown to follow the matrix without a second walk.
+    /// </remarks>
+    public Judgement(IReadOnlyList<Judged> all)
+    {
+        ArgumentNullException.ThrowIfNull(all);
+
+        All = all;
+        Reported = FindingSet.Of(all.Where(j => j.IsReported).Select(j => j.Finding));
+        Withheld = [.. all.Where(j => !j.IsReported)];
+
+        _withheldByKind = Withheld
+            .GroupBy(j => j.Finding.Kind.ToString(), StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.Ordinal);
+    }
+
+    /// <summary>Every claim the detectors made, judged.</summary>
+    public IReadOnlyList<Judged> All { get; }
+
+    /// <summary>The claims that reach the reader.</summary>
+    public FindingSet Reported { get; }
+
+    /// <summary>The claims that do not.</summary>
+    public IReadOnlyList<Judged> Withheld { get; }
+
+    /// <summary>The withheld claims of one kind, in emission order.</summary>
+    public IReadOnlyList<Judged> WithheldOfKind(FindingKind kind) =>
+        _withheldByKind.TryGetValue(kind.ToString(), out var found) ? found : [];
 }
 
 public static class Analysis
@@ -80,27 +144,10 @@ public static class Analysis
     /// because the reported set is the common question. Nothing about its result has changed.
     /// </remarks>
     public static FindingSet FindingsFor(SolutionModel model) =>
-        FindingsFor(Judge(model));
+        Judge(model).Reported;
 
     /// <summary>
-    /// The reported half of a judgement already made.
-    /// </summary>
-    /// <remarks>
-    /// <b>So a caller that needs both does not analyse twice.</b> The findings export takes the
-    /// judgements and the report takes the survivors, and they are the same run: calling
-    /// <see cref="Judge"/> and <see cref="FindingsFor(SolutionModel)"/> beside each other would run
-    /// every detector and the whole suppression matrix a second time to arrive at a subset of what
-    /// the first call already held.
-    /// </remarks>
-    public static FindingSet FindingsFor(IReadOnlyList<Judged> judged)
-    {
-        ArgumentNullException.ThrowIfNull(judged);
-
-        return FindingSet.Of(judged.Where(j => j.IsReported).Select(j => j.Finding));
-    }
-
-    /// <summary>
-    /// Every claim the detectors made, each with the row that silenced it or <see langword="null"/>.
+    /// Every claim the detectors made, each with whatever stopped it being reported.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -119,17 +166,17 @@ public static class Analysis
     /// was <i>fixed</i> — which reads as an improvement it did not earn.
     /// </para>
     /// </remarks>
-    public static IReadOnlyList<Judged> Judge(SolutionModel model)
+    public static Judgement Judge(SolutionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
 
         var detected = Detected(model);
 
-        return
+        return new Judgement(
         [
             .. detected.All.Select(finding =>
                 new Judged(finding, Suppression.Silencing(finding, detected, model)))
-        ];
+        ]);
     }
 
     /// <summary>

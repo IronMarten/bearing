@@ -75,10 +75,10 @@ public static class JsonOutput
     /// its input — the same rule <see cref="ToolInfo.ReadVersion"/> is written to, and the reason
     /// this file can be snapshotted at all.
     /// </param>
-    /// <param name="judged">
-    /// Every judgement the run made, reported and suppressed alike — <c>Analysis.Judge</c>.
+    /// <param name="judgement">
+    /// Every judgement the run made, reported and withheld alike — <c>Analysis.Judge</c>.
     /// <c>SCHEMA-findings-export.md</c> §1: the export is a superset of what the report renders, so
-    /// it takes the judgements rather than the surviving set.
+    /// it takes the judgement rather than the surviving set.
     /// </param>
     /// <param name="options">
     /// How the run was configured, for the <c>configuration</c> block. Optional because a caller
@@ -86,21 +86,21 @@ public static class JsonOutput
     /// </param>
     public static string Render(
         SolutionModel model,
-        IReadOnlyList<Judged> judged,
+        Judgement judgement,
         DateTimeOffset generatedAt,
         WalkOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(model);
-        ArgumentNullException.ThrowIfNull(judged);
+        ArgumentNullException.ThrowIfNull(judgement);
 
-        return JsonSerializer.Serialize(DocumentFor(model, judged, generatedAt, options), Options);
+        return JsonSerializer.Serialize(DocumentFor(model, judgement, generatedAt, options), Options);
     }
 
     /// <summary>Renders the model and writes it to <paramref name="path"/>.</summary>
     public static void Write(
         string path,
         SolutionModel model,
-        IReadOnlyList<Judged> judged,
+        Judgement judgement,
         DateTimeOffset generatedAt,
         WalkOptions? options = null)
     {
@@ -109,12 +109,12 @@ public static class JsonOutput
         // UTF-8 with no BOM. A BOM is what makes a JSON file that parses everywhere except in
         // the one tool the user reaches for first.
         File.WriteAllText(
-            path, Render(model, judged, generatedAt, options), new System.Text.UTF8Encoding(false));
+            path, Render(model, judgement, generatedAt, options), new System.Text.UTF8Encoding(false));
     }
 
     private static Document DocumentFor(
         SolutionModel model,
-        IReadOnlyList<Judged> judged,
+        Judgement judgement,
         DateTimeOffset generatedAt,
         WalkOptions? options) =>
         new(
@@ -130,7 +130,7 @@ public static class JsonOutput
             Cycles(model),
             [.. model.ExternalDependencies.Select(d => new External(d.Namespace, d.TypesTouching))],
             Boundary(model),
-            [.. judged.Select(Finding)],
+            [.. judgement.All.Select(Finding)],
             Configuration(options ?? new WalkOptions { SolutionPath = model.SolutionPath }));
 
     private static CoverageBlock Coverage(Coverage coverage) =>

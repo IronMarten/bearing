@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
@@ -255,7 +255,7 @@ public sealed class MosaicTests(CoreWalkFixture core)
     public void The_html_report_embeds_the_same_drawing()
     {
         var page = HtmlReport.Render(
-            core.Model, Findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         Assert.Contains(Svg, page, StringComparison.Ordinal);
     }
@@ -345,7 +345,7 @@ public sealed class MosaicTests(CoreWalkFixture core)
             "the fixture no longer paints more ink than cells, so this asserts nothing");
 
         var page = HtmlReport.Render(
-            core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         Assert.Contains("Read it by count and not by area", page, StringComparison.Ordinal);
         Assert.Contains(

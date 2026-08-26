@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using Microsoft.Build.Locator;
 
@@ -136,20 +136,20 @@ internal static class Program
         // Judged once, and the report reads the surviving half of it. The export needs the
         // suppressed rows too -- SCHEMA-findings-export.md §1 -- and asking Analysis twice would
         // re-run every detector to reach a subset of what the first answer already carried.
-        var judged = Analysis.Judge(model);
-        var findings = Analysis.FindingsFor(judged);
-        stages.Add(new ProfileStage("analysis", Lap(), Sentences.Plural(findings.All.Count, "finding")));
+        var judgement = Analysis.Judge(model);
+        stages.Add(new ProfileStage(
+            "analysis", Lap(), Sentences.Plural(judgement.Reported.Count, "finding")));
 
         // Rendering and writing are one stage because they are one act: Report.For is lazy, so
         // the lines are produced by the loop that prints them and there is no seam to time.
-        foreach (var line in Report.For(model, findings)) Console.WriteLine(line);
+        foreach (var line in Report.For(model, judgement)) Console.WriteLine(line);
         stages.Add(new ProfileStage("report", Lap(), "terminal"));
 
         // After the report, and to stderr, so that neither the file nor the note about it can
         // land in the middle of output somebody is piping.
         if (invocation.JsonPath is { } json)
         {
-            JsonOutput.Write(json, model, judged, DateTimeOffset.UtcNow, options);
+            JsonOutput.Write(json, model, judgement, DateTimeOffset.UtcNow, options);
             Console.Error.WriteLine($"Wrote {json}");
             stages.Add(new ProfileStage("json", Lap()));
         }
@@ -163,7 +163,7 @@ internal static class Program
 
         if (invocation.HtmlPath is { } html)
         {
-            HtmlReport.Write(html, model, findings, DateTimeOffset.UtcNow, invocation.Full);
+            HtmlReport.Write(html, model, judgement, DateTimeOffset.UtcNow, invocation.Full);
             Console.Error.WriteLine($"Wrote {html}");
             stages.Add(new ProfileStage("html", Lap()));
         }
@@ -177,14 +177,14 @@ internal static class Program
 
         if (invocation.MosaicPath is { } mosaic)
         {
-            Mosaic.Write(mosaic, model, findings);
+            Mosaic.Write(mosaic, model, judgement.Reported);
             Console.Error.WriteLine($"Wrote {mosaic}");
             stages.Add(new ProfileStage("mosaic", Lap()));
         }
 
         if (invocation.PlotPath is { } plot)
         {
-            ReachPlot.Write(plot, model, findings);
+            ReachPlot.Write(plot, model, judgement.Reported);
             Console.Error.WriteLine($"Wrote {plot}");
             stages.Add(new ProfileStage("plot", Lap()));
         }

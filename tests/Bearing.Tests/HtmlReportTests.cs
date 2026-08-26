@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
@@ -26,7 +26,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
 {
     private static readonly DateTimeOffset Instant = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-    private string Page => HtmlReport.Render(core.Model, Analysis.FindingsFor(core.Model), Instant);
+    private string Page => HtmlReport.Render(core.Model, Analysis.Judge(core.Model), Instant);
 
     /// <summary>
     /// Every rule an inlined drawing brings with it is scoped to that drawing.
@@ -111,7 +111,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     /// sections are. What the default page does instead is <c>HighlightsTests</c>'.
     /// </remarks>
     private string FullPage =>
-        HtmlReport.Render(core.Model, Analysis.FindingsFor(core.Model), Instant, full: true);
+        HtmlReport.Render(core.Model, Analysis.Judge(core.Model), Instant, full: true);
 
     [Fact]
     public Task The_report_renders() => Verify(Page, extension: "html");
@@ -319,7 +319,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
     public void A_capped_findings_list_says_what_it_dropped()
     {
         var model = core.WalkWith(AnalysisPolicy.Default with { Top = 2 });
-        var page = HtmlReport.Render(model, Analysis.FindingsFor(model), Instant, full: true);
+        var page = HtmlReport.Render(model, Analysis.Judge(model), Instant, full: true);
 
         Assert.Contains("Showing 2 of", page, StringComparison.Ordinal);
         Assert.Contains("--top", page, StringComparison.Ordinal);
@@ -430,7 +430,7 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
         try
         {
             var path = Path.Combine(directory.FullName, "report.html");
-            HtmlReport.Write(path, core.Model, Analysis.FindingsFor(core.Model), Instant);
+            HtmlReport.Write(path, core.Model, Analysis.Judge(core.Model), Instant);
 
             Assert.NotEqual<byte[]>([0xEF, 0xBB, 0xBF], File.ReadAllBytes(path).Take(3).ToArray());
             Assert.StartsWith("<!doctype html>", File.ReadAllText(path), StringComparison.Ordinal);

@@ -49,7 +49,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
 
     /// <summary>The whole terminal report, for the two tests that assert an absence from it.</summary>
     private string ReportText() =>
-        string.Join("\n", Report.For(core.Model, Analysis.FindingsFor(core.Model)));
+        string.Join("\n", Report.For(core.Model, Analysis.Judge(core.Model)));
 
     /// <summary>
     /// Every type nominated as a concealed decision at type level is also nominated at method
@@ -979,7 +979,7 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
 
         Assert.Equal(0, constructors);
 
-        var text = string.Join(Environment.NewLine, Report.For(core.Model, findings));
+        var text = string.Join(Environment.NewLine, Report.For(core.Model, Analysis.Judge(core.Model)));
         Assert.DoesNotContain("..ctor", text, StringComparison.Ordinal);
     }
 

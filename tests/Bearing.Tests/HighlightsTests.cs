@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
@@ -19,10 +19,10 @@ public sealed class HighlightsTests(CoreWalkFixture core)
 {
     private FindingSet Findings => Analysis.FindingsFor(core.Model);
 
-    private string Terminal => string.Join("\n", Report.For(core.Model, Findings));
+    private string Terminal => string.Join("\n", Report.For(core.Model, Analysis.Judge(core.Model)));
 
     private string Page => HtmlReport.Render(
-        core.Model, Findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
     /// <summary>Both renderers lead with every risk kind that fired, and with no other.</summary>
     [Fact]
@@ -139,8 +139,8 @@ public sealed class HighlightsTests(CoreWalkFixture core)
         var findings = Findings;
         var at = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-        var brief = HtmlReport.Render(core.Model, findings, at);
-        var full = HtmlReport.Render(core.Model, findings, at, full: true);
+        var brief = HtmlReport.Render(core.Model, Analysis.Judge(core.Model), at);
+        var full = HtmlReport.Render(core.Model, Analysis.Judge(core.Model), at, full: true);
 
         Assert.Contains("<h2>Everything else</h2>", brief, StringComparison.Ordinal);
         Assert.Contains("--full", brief, StringComparison.Ordinal);
@@ -175,7 +175,7 @@ public sealed class HighlightsTests(CoreWalkFixture core)
         if (coverage.Count == 0) return;
 
         var brief = HtmlReport.Render(
-            core.Model, findings, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            core.Model, Analysis.Judge(core.Model), new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         Assert.Contains($"{coverage.Count} of this solution's", brief, StringComparison.Ordinal);
         Assert.Contains("too small to compare them against", brief, StringComparison.Ordinal);

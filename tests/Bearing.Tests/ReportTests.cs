@@ -24,7 +24,7 @@ namespace Bearing.Tests;
 public sealed class ReportTests(CoreWalkFixture core)
 {
     private IReadOnlyList<string> Lines =>
-        Report.For(core.Model, Analysis.FindingsFor(core.Model)).ToList();
+        Report.For(core.Model, Analysis.Judge(core.Model)).ToList();
 
     private string Text => string.Join(Environment.NewLine, Lines);
 
@@ -460,7 +460,7 @@ public sealed class ReportTests(CoreWalkFixture core)
         var narrow = core.Model.Policy with { Top = 2 };
         var model = core.WalkWith(narrow);
 
-        var text = string.Join(Environment.NewLine, Report.For(model, Analysis.FindingsFor(model)));
+        var text = string.Join(Environment.NewLine, Report.For(model, Analysis.Judge(model)));
 
         Assert.Contains("not shown of", text, StringComparison.Ordinal);
         Assert.Contains("raise --top", text, StringComparison.Ordinal);

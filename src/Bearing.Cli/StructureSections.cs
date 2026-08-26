@@ -4,9 +4,18 @@
 /// Job A's sections: what the solution is, rather than what is unusual about it.
 /// </summary>
 /// <remarks>
+/// <para>
 /// Every one of these reads a projection on <see cref="SolutionModel"/> and makes no claim about
-/// any subject. None of them can be suppressed, because there is nothing to be wrong about — a
-/// cycle either exists or does not.
+/// any subject.
+/// </para>
+/// <para>
+/// <b>Circular references are the exception, and were always going to be.</b> This remark used to
+/// end "none of them can be suppressed, because there is nothing to be wrong about — a cycle either
+/// exists or does not", which stopped being true when <c>TECHREQ-job-b.md</c> §3.12 made cycles
+/// findings: they acquire identity, receipts, qualifiers and suppression like every other claim, and
+/// two rows silence them. So that section takes its population from the <see cref="Judgement"/> and
+/// reads the model only for the shape it draws — <see cref="CycleViews"/>.
+/// </para>
 /// </remarks>
 internal static class StructureSections
 {
@@ -117,13 +126,17 @@ internal static class StructureSections
     /// the reported set.
     /// </summary>
     /// <remarks>
-    /// <b>Empty is a real answer here and not a miss.</b> The namespace group renders suppressed
-    /// cycles in its <i>not reported</i> list, and a suppressed finding is not in the set the
-    /// renderers are handed — so this returns nothing for those, which is why the namespace side
-    /// still reads its held pairs off the shape rather than off a finding.
+    /// <b>Asked of every judgement and not of the reported half.</b> This used to take a
+    /// <see cref="FindingSet"/>, which held only the survivors — so a withheld cycle had no
+    /// relations to read and the <i>not reported</i> list had to recover its evidence from the
+    /// shape instead. That was the second, undeclared route into a suppressed population that
+    /// <c>docs/ARCHITECTURE.md</c> §11 named. Empty is still a real answer, for a cycle no detector
+    /// claimed anything about.
     /// </remarks>
-    private static IReadOnlyList<Relation> Relations(FindingSet findings, FindingKind kind, Cycle cycle) =>
-        findings.OfKind(kind).FirstOrDefault(f => f.Subject.Equals(cycle.Subject))?.Relations ?? [];
+    private static IReadOnlyList<Relation> Relations(Judgement judgement, FindingKind kind, Cycle cycle) =>
+        judgement.All
+            .Select(j => j.Finding)
+            .FirstOrDefault(f => f.Kind == kind && f.Subject.Equals(cycle.Subject))?.Relations ?? [];
 
     private static string Holds(
         ShapedTangle tangle, IReadOnlyList<Relation> relations, Func<SubjectRef, string> name)
@@ -142,7 +155,7 @@ internal static class StructureSections
     }
 
     private static IEnumerable<string> NotLayering(
-        IReadOnlyList<ShapedCycle> cycles, int top, Func<SubjectRef, string> name)
+        IReadOnlyList<(ShapedCycle Shape, Judged Judged)> cycles, int top, Func<SubjectRef, string> name)
     {
         if (cycles.Count == 0) yield break;
 
@@ -152,21 +165,26 @@ internal static class StructureSections
 
         var (shown, disclosure) = Sentences.Cap(cycles, top, "cycle", "     ");
 
-        foreach (var cycle in shown)
+        foreach (var (cycle, judged) in shown)
         {
             var label = cycle.Anchor ?? name(cycle.Cycle.Members[0]);
 
-            var reason = cycle.Shape switch
+            // Switched on the row that fired rather than on the shape. Both readings agree today,
+            // because both cycle rows test a shape -- and that is the coincidence
+            // docs/ARCHITECTURE.md §11 is about: a renderer deciding for itself why something went
+            // quiet agrees with the matrix only for as long as every reason is one it can see. The
+            // project name still comes off the shape, which is display detail and nothing else.
+            var reason = judged.SilencedBy?.Name switch
             {
-                CycleShape.FolderLayout =>
+                "cycle-is-folder-layout" =>
                     $"one assembly's own folders, all in {cycle.Projects[0]}",
-                CycleShape.SharedTypes =>
+                "cycle-is-shared-types" =>
                     "peers naming each other's entities or models, holding none of them",
 
-                // Coupling never reaches here — IsReportable is exactly that case — and the arm
-                // exists so that adding a shape without deciding how to say it fails visibly
-                // rather than printing an empty reason.
-                _ => "unclassified",
+                // A row this section has no wording for, which is a visible failure rather than an
+                // empty reason. The null arm is not dead either: a claim can go quiet without a row
+                // silencing it.
+                _ => "not reported",
             };
 
             yield return $"     {label} — {Sentences.Plural(cycle.Cycle.Size, "namespace")}, {reason}";
@@ -253,7 +271,7 @@ internal static class StructureSections
             yield return $"     ({map.PlumbingReferences} language/runtime references omitted as plumbing)";
     }
 
-    internal static IEnumerable<string> CircularReferences(SolutionModel model, FindingSet findings)
+    internal static IEnumerable<string> CircularReferences(SolutionModel model, Judgement judgement)
     {
         yield return "";
         yield return "-- CIRCULAR REFERENCES -----------------------------------------";
@@ -273,9 +291,13 @@ internal static class StructureSections
 
         string NamespaceName(SubjectRef id) => namespaceNames.GetValueOrDefault(id, id.Canonical);
 
+        // Both halves off the judgement, not off ShapedCycle.IsReportable — docs/ARCHITECTURE.md
+        // §11, and CycleViews carries the argument.
         var shaped = model.ShapedNamespaceCycles;
-        var reportable = shaped.Where(c => c.IsReportable).ToList();
-        var setAside = shaped.Where(c => !c.IsReportable).ToList();
+        var reportable = CycleViews.Reported(
+            judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject);
+        var setAside = CycleViews.Withheld(
+            judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject);
 
         if (reportable.Count == 0)
             yield return "     (none — no two peer namespaces hold each other)";
@@ -310,7 +332,13 @@ internal static class StructureSections
         yield return "   MSBuild: only project references cannot cycle, and this is the type";
         yield return "   graph aggregated, which is finer than the references are:";
 
-        var projectCycles = model.ProjectCycles;
+        // The population, like the namespace half above, is what the judgement reported rather
+        // than what the model holds. No row silences a project cycle today; the section still asks,
+        // because "no rule withholds this kind" is a fact about the matrix as it stands and not a
+        // property of the section.
+        var projectCycles = CycleViews.Reported(
+            judgement, FindingKind.ProjectCycle, model.ProjectCycles, c => c.Subject);
+
         if (projectCycles.Count == 0)
             yield return "     (none — every cross-project dependency runs one way)";
 
@@ -334,7 +362,7 @@ internal static class StructureSections
             // CycleEvidence rather than here — one renderer once kept
             // evidence the other lost, so neither of these two may hold its own copy of either.
             foreach (var link in CycleEvidence
-                         .ProjectLinks(model, Relations(findings, FindingKind.ProjectCycle, cycle))
+                         .ProjectLinks(model, Relations(judgement, FindingKind.ProjectCycle, cycle))
                          .Take(ProjectLinksPerCycle))
             {
                 var carrier = link.Example is { } via
@@ -352,11 +380,14 @@ internal static class StructureSections
         yield return $"   TYPE TANGLES — {model.Policy.MinTangle}+ types that all reach each other, so none of";
         yield return "   them can be tested or changed in isolation:";
 
-        if (model.TypeTangles.Count == 0)
+        var tangles = CycleViews.Reported(
+            judgement, FindingKind.TypeTangle, model.ShapedTypeTangles, t => t.Tangle.Subject);
+
+        if (tangles.Count == 0)
             yield return "     (none — mutual pairs and triples are ordinary and not reported)";
 
         var (shownTangles, tangleDisclosure) = Sentences.Cap(
-            model.ShapedTypeTangles, model.Policy.Top, "tangle", "     ");
+            tangles, model.Policy.Top, "tangle", "     ");
 
         string TypeName(SubjectRef id) => model.Find(id)?.Name ?? id.Canonical;
 
@@ -366,7 +397,7 @@ internal static class StructureSections
             yield return "     " + Members(tangle, "types", TypesPerTangle, ", ", TypeName);
             yield return "       " + Loop(tangle, TypeName);
             yield return "       " + Holds(
-                shapedTangle, Relations(findings, FindingKind.TypeTangle, tangle), TypeName);
+                shapedTangle, Relations(judgement, FindingKind.TypeTangle, tangle), TypeName);
         }
 
         foreach (var line in tangleDisclosure) yield return line;

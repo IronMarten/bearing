@@ -35,16 +35,20 @@ public static class HtmlReport
 {
     /// <summary>Renders the whole report as one HTML document.</summary>
     /// <param name="model">The analysed solution.</param>
-    /// <param name="findings">Its findings, already suppressed.</param>
+    /// <param name="judgement">Every claim the run made, and what stopped the quiet ones.</param>
     /// <param name="generatedAt">
     /// When the run happened — a parameter, not a clock read, for the reason
     /// <see cref="JsonOutput.Render"/> gives.
     /// </param>
     public static string Render(
-        SolutionModel model, FindingSet findings, DateTimeOffset generatedAt, bool full = false)
+        SolutionModel model, Judgement judgement, DateTimeOffset generatedAt, bool full = false)
     {
         ArgumentNullException.ThrowIfNull(model);
-        ArgumentNullException.ThrowIfNull(findings);
+        ArgumentNullException.ThrowIfNull(judgement);
+
+        // The survivors, for every section but one. docs/ARCHITECTURE.md §11: the judgement is what
+        // a renderer is handed, and Cycles() is the section that needs the other half of it.
+        var findings = judgement.Reported;
 
         var page = new StringBuilder();
         var solution = Path.GetFileName(model.SolutionPath);
@@ -57,7 +61,7 @@ public static class HtmlReport
         Header(page, model, solution, findings, generatedAt);
         Picture(page, model, findings);
         Risks(page, model, findings);
-        Orientation(page, model, findings);
+        Orientation(page, model, judgement);
 
         // Tier 4. The enumeration is the artifact A11 round 1 called "a wall of text", and it lives
         // behind a flag for CI and for whoever wants it. `PRD-free-tier.md` §9's anti-metric is that
@@ -85,11 +89,11 @@ public static class HtmlReport
 
     /// <summary>Renders the report and writes it to <paramref name="path"/>.</summary>
     public static void Write(
-        string path, SolutionModel model, FindingSet findings, DateTimeOffset generatedAt, bool full = false)
+        string path, SolutionModel model, Judgement judgement, DateTimeOffset generatedAt, bool full = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        File.WriteAllText(path, Render(model, findings, generatedAt, full), new UTF8Encoding(false));
+        File.WriteAllText(path, Render(model, judgement, generatedAt, full), new UTF8Encoding(false));
     }
 
     // ------------------------------------------------------------------------ header ----
@@ -485,7 +489,7 @@ public static class HtmlReport
 
     // ------------------------------------------------------------------- orientation ----
 
-    private static void Orientation(StringBuilder page, SolutionModel model, FindingSet findings)
+    private static void Orientation(StringBuilder page, SolutionModel model, Judgement judgement)
     {
         page.Append("<h2>Orientation</h2>\n");
 
@@ -496,11 +500,11 @@ public static class HtmlReport
         // every type this run analysed is on the page, and most of it is pale. It sits under the
         // project graph because both are pictures of the whole solution, and the graph is the one
         // people ask for.
-        Census(page, model, findings);
+        Census(page, model, judgement.Reported);
 
         Projects(page, model);
         Integrations(page, model);
-        Cycles(page, model, findings);
+        Cycles(page, model, judgement);
         Coverage(page, model);
     }
 
@@ -698,12 +702,16 @@ public static class HtmlReport
                 .Append("framework plumbing were filtered out of that list rather than dropped silently.</p>\n");
     }
 
-    private static void Cycles(StringBuilder page, SolutionModel model, FindingSet findings)
+    private static void Cycles(StringBuilder page, SolutionModel model, Judgement judgement)
     {
         page.Append("<h3>Circular references</h3>\n");
 
+        // Both halves off the judgement rather than off ShapedCycle.IsReportable, and by the same
+        // helper the terminal renderer uses -- docs/ARCHITECTURE.md §11, argued in CycleViews. These
+        // two sections agreeing was a coincidence of both re-deriving one shape test.
         var shaped = model.ShapedNamespaceCycles;
-        var reportable = shaped.Where(c => c.IsReportable).ToList();
+        var reportable = CycleViews.Reported(
+            judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject);
         var held = reportable.ToDictionary(c => c.Cycle, c => c);
 
         CycleGroup(page, "Namespaces", [.. reportable.Select(c => c.Cycle)],
@@ -716,16 +724,20 @@ public static class HtmlReport
             id => Name(model, id),
             cycle => held.TryGetValue(cycle, out var shapedCycle) ? Holding(shapedCycle) : []);
 
-        NotLayering(page, [.. shaped.Where(c => !c.IsReportable)], id => Name(model, id));
+        NotLayering(
+            page,
+            CycleViews.Withheld(judgement, FindingKind.NamespaceCycle, shaped, c => c.Cycle.Subject),
+            id => Name(model, id));
 
         // Off the finding, through CycleEvidence, exactly as the terminal renderer does it. Both
         // used to recompute this from model.Edges independently, which is the arrangement
         // that let the two renderers drift apart.
-        CycleGroup(page, "Projects", model.ProjectCycles,
+        CycleGroup(page, "Projects",
+            CycleViews.Reported(judgement, FindingKind.ProjectCycle, model.ProjectCycles, c => c.Subject),
             "Two projects each naming a type in the other. Legal MSBuild — only project references cannot cycle.",
             id => Name(model, id),
             cycle => CycleEvidence
-                .ProjectLinks(model, Relations(findings, FindingKind.ProjectCycle, cycle))
+                .ProjectLinks(model, Relations(judgement, FindingKind.ProjectCycle, cycle))
                 .Take(6)
                 .Select(link => $"{link.From} → {link.To}: {link.Weight} reference(s)"
                                 + (link.Example is { } via
@@ -734,11 +746,12 @@ public static class HtmlReport
 
         var holds = model.ShapedTypeTangles.ToDictionary(t => t.Tangle, t => t);
 
-        CycleGroup(page, $"Type tangles ({Html.Number(model.Policy.MinTangle)}+)", model.TypeTangles,
+        CycleGroup(page, $"Type tangles ({Html.Number(model.Policy.MinTangle)}+)",
+            CycleViews.Reported(judgement, FindingKind.TypeTangle, model.TypeTangles, c => c.Subject),
             "Groups of types that all reach each other, so none of them can be tested or changed alone.",
             id => Name(model, id),
             cycle => holds.TryGetValue(cycle, out var shaped)
-                ? [Holds(shaped, Relations(findings, FindingKind.TypeTangle, cycle), id => Name(model, id))]
+                ? [Holds(shaped, Relations(judgement, FindingKind.TypeTangle, cycle), id => Name(model, id))]
                 : []);
     }
 
@@ -752,7 +765,9 @@ public static class HtmlReport
     /// they are not lesser findings — they are components about which there is nothing to do.
     /// </remarks>
     private static void NotLayering(
-        StringBuilder page, IReadOnlyList<ShapedCycle> cycles, Func<SubjectRef, string> name)
+        StringBuilder page,
+        IReadOnlyList<(ShapedCycle Shape, Judged Judged)> cycles,
+        Func<SubjectRef, string> name)
     {
         if (cycles.Count == 0) return;
 
@@ -762,15 +777,17 @@ public static class HtmlReport
 
         page.Append("<ul class=\"sub\">\n");
 
-        foreach (var cycle in cycles)
+        foreach (var (cycle, judged) in cycles)
         {
             var label = cycle.Anchor ?? name(cycle.Cycle.Members[0]);
 
-            var reason = cycle.Shape switch
+            // The row that fired, not the shape it happens to test -- the same switch the terminal
+            // renderer makes, on the same input, which is what stops the two drifting.
+            var reason = judged.SilencedBy?.Name switch
             {
-                CycleShape.FolderLayout => $"one assembly's own folders, all in {cycle.Projects[0]}",
-                CycleShape.SharedTypes => "peers naming each other's entities or models, holding none of them",
-                _ => "unclassified",
+                "cycle-is-folder-layout" => $"one assembly's own folders, all in {cycle.Projects[0]}",
+                "cycle-is-shared-types" => "peers naming each other's entities or models, holding none of them",
+                _ => "not reported",
             };
 
             page.Append($"<li>{Html.Text(label)} — {Html.Count(cycle.Cycle.Size)} namespace(s), ")
@@ -826,11 +843,13 @@ public static class HtmlReport
     /// nothing breaks; if the shape did, that would be two reports disagreeing about the code.
     /// </remarks>
     /// <summary>
-    /// A cycle finding's relations, or empty when it was suppressed and is not in the reported set.
+    /// A cycle finding's relations, asked of every judgement rather than of the reported half.
     /// <c>StructureSections</c> carries the same helper and the same reason.
     /// </summary>
-    private static IReadOnlyList<Relation> Relations(FindingSet findings, FindingKind kind, Cycle cycle) =>
-        findings.OfKind(kind).FirstOrDefault(f => f.Subject.Equals(cycle.Subject))?.Relations ?? [];
+    private static IReadOnlyList<Relation> Relations(Judgement judgement, FindingKind kind, Cycle cycle) =>
+        judgement.All
+            .Select(j => j.Finding)
+            .FirstOrDefault(f => f.Kind == kind && f.Subject.Equals(cycle.Subject))?.Relations ?? [];
 
     private static string Holds(
         ShapedTangle tangle, IReadOnlyList<Relation> relations, Func<SubjectRef, string> name)

@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -40,8 +40,8 @@ public sealed class ProseTests(CoreWalkFixture core)
     {
         var findings = Analysis.FindingsFor(core.Model);
 
-        var terminal = string.Join("\n", Report.For(core.Model, findings));
-        var html = HtmlReport.Render(core.Model, findings, Instant, full: true);
+        var terminal = string.Join("\n", Report.For(core.Model, Analysis.Judge(core.Model)));
+        var html = HtmlReport.Render(core.Model, Analysis.Judge(core.Model), Instant, full: true);
 
         foreach (var (surface, text) in new[] { ("terminal", terminal), ("html", html) })
         {

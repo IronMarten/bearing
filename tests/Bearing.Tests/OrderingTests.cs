@@ -1,4 +1,4 @@
-using IronMarten.Bearing;
+﻿using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -89,7 +89,7 @@ public sealed class OrderingTests(CoreWalkFixture core)
     /// </summary>
     [Fact]
     public void The_report_does_not_depend_on_declaration_order() =>
-        AssertStable(model => string.Join("\n", Report.For(model, Analysis.FindingsFor(model))));
+        AssertStable(model => string.Join("\n", Report.For(model, Analysis.Judge(model))));
 
     /// <summary>
     /// Renders both walks and requires the two to be byte-identical.
