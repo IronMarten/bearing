@@ -4,13 +4,30 @@
 dotnet test Bearing.sln
 ```
 
-281 tests, about 10 seconds. The workspace load is the cost centre, not the analysis, so
-the whole suite shares one analyzed fixture.
+**Roughly 550 tests, about two minutes** (measured 2026-08-26: 552 in 1m56s). The workspace
+load is the cost centre, not the analysis, so most of the suite shares one analyzed fixture —
+but `PolicySweepTests` does not, and that is where the two minutes go.
 
 > This figure and the one in `CONTRIBUTING.md` have each been wrong by a wide margin at different
-> times — 43 here against 202 there, when the truth was neither. Nothing holds either of them.
-> Treat both as an order of magnitude, and see §6 for what happens to a number in this repository
-> that no test holds.
+> times — 43 here against 202 there, and both said *281 tests, ~10s* against a real 552 and 1m56s
+> until 2026-08-26. Nothing holds either of them. Treat both as an order of magnitude, and see §6
+> for what happens to a number in this repository that no test holds.
+
+> **Where the time actually goes**, three filtered wall-clock runs on 2026-08-26:
+>
+> | filter | tests | wall clock |
+> |---|---|---|
+> | `ToolInfoTests` (no walk) | 7 | 0.9s — test host startup |
+> | `StructureTests` (one shared walk) | 20 | 3.5s — so one walk ≈ 2.6s |
+> | `PolicySweepTests` | **2** | **82s** |
+> | whole suite | 552 | 116s |
+>
+> **Two tests are 70% of the suite.** The sweep calls `WalkWith` for each of 29 policy values one
+> notch each way, and every distinct policy is a full `MSBuildWorkspace` open plus a Roslyn
+> compile — so it re-loads the workspace about thirty times to move twenty-eight values that, by
+> `WalkOptions`' own comment, the walk does not read. There is no seam that lets anything
+> re-analyse without re-loading, and that is a design gap rather than a slow test: it is also what
+> a `--policy` retune or any drift comparison would pay. Filed as **R2**; undecided.
 
 ---
 
@@ -73,8 +90,14 @@ A failing snapshot writes `<name>.received.<ext>` beside the verified file. Read
 then:
 
 ```
-mv golden/nominations.received.txt golden/nominations.verified.txt
+cd tests/Bearing.Tests
+mv HtmlReportTests.The_report_renders.received.html \
+   HtmlReportTests.The_report_renders.verified.html
 ```
+
+The example named `golden/nominations.*` until 2026-08-26, and `golden/` went with the probe
+at R2 — so anyone following the live instruction in this section got *no such file*. The
+snapshots live beside the test class that writes them, named for the test method.
 
 `*.received.*` is git-ignored. In CI and headless runs set `DiffEngine_Disabled=true` so no
 diff tool is launched.
@@ -220,19 +243,23 @@ project that does not load understates fan-in everywhere it is referenced.
 line by line"*, and the goldens went with the probe — along with the equivalence suite that used to
 confirm a plant disturbed nothing but what it aimed at. What replaces them:
 
-1. **`StructureTests.Fixture_shape_is_stable`** — types, edges and method-like members, currently
-   **204 / 384 / 214**. It fails first, and its numbers must be updated deliberately, with the
-   plant's own contribution stated in the comment the way P6, P7 and P8 each did.
+1. **`StructureTests.Fixture_shape_is_stable`** — types, edges and method-like members. It fails
+   first, and its numbers must be updated deliberately, with the plant's own contribution stated
+   in the comment the way P6, P7 and P8 each did.
 
-   > **These three numbers were `179 / 362 / 186` here until 2026-08-23 and had been wrong for
-   > several plants** — the test said 200 / 380 / 209 when P10 first ran against it. The counts live
-   > in the assertion and its comment; this line is a second copy, and a second copy of a number is
-   > the thing that goes stale. Read the test.
+   > **The figures used to be copied here and they are not any more, which is the fix rather than
+   > an omission.** They read `179 / 362 / 186` until 2026-08-23 and had been wrong for several
+   > plants — the test said 200 / 380 / 209 when P10 first ran against it. Corrected to
+   > `204 / 384 / 214`, they were stale again by 2026-08-26, when the assertion said
+   > `207 / 386 / 217` and §6's own *Current known answers* agreed with the assertion 156 lines
+   > below this box. A second copy of a number is the thing that goes stale, and the remedy is to
+   > stop keeping a fresher copy. **Read the test.**
 2. **The ten Verify snapshots** — three CSVs, the JSON, two HTML reports, the terminal report, the
    diagram, the mosaic, and `PolicySweepTests`. **`PolicySweepTests` is the one that matters most**:
    it fingerprints the finding set under all 28 policy values one notch each way, so a plant that
    quietly moves an unrelated gate shows up there and nowhere else.
-3. **`tools/leave-one-out.sh`**, with the verdict table pasted into this section. Last run after P6.
+3. **`tools/leave-one-out.sh`**, with the verdict table pasted into this section. The table below
+   carries the date it was last run; this line used to carry a second one, and the two disagreed.
 
    > **Do not touch the working tree while it runs, and that includes `git add`.** It deletes each
    > gate in turn and restores it with `git checkout --`, which reads the **index** — so staging its
@@ -252,6 +279,36 @@ false; P4 has since taken the fixture from nine boundaries to fifteen with nothi
 **Naming is part of the constraint**: calling a plant `*Handler` once pulled `SchemaMigrationHandler`
 into the new suffix cohort and shrank an unrelated peer population 33 → 32. Check the trailing word
 against the fixture before choosing it.
+
+### Retiring a gate — the counterpart, and the one that was missing
+
+There was a precise checklist for **adding** to the fixture and none for **taking a gate out**,
+and the asymmetry cost four findings in one audit. R2 retired the probe; `CONTRIBUTING.md`,
+`Directory.Build.props`, `ci.yml` and §3's accept-a-snapshot example all went on describing
+`oracle/` and `golden/` for months. D54 deleted the roll-call gate and was thorough — it caught
+the fixture comment and the sweep table on its own — and two lines still got through, one of them
+a *known answer* in the section this document calls the specification.
+
+So the practice is good and the memory is the unreliable part. Four greps:
+
+1. **Grep the fixture for the plant that existed for the gate.** A plant with nothing left to
+   observe is a shape the fixture is still paying for. Leave it or remove it, but say which.
+2. **Grep this document for the coverage entry that claimed it**, and rewrite the entry rather
+   than striking its heading. A struck-through *"Both filled"* over a body reading *"still
+   uncovered"* is how a dead claim survives being read.
+3. **Grep `docs/`, `CONTRIBUTING.md`, `.github/` and every `Directory.Build.props`** for the
+   gate's name, the flag that moved it, and the directory it lived in. Three of the four M-band
+   items were in build files and workflow headers, not in prose anyone re-reads.
+4. **Re-run the sweep.** `PolicySweepTests` fingerprints the finding set under every policy
+   value, so a deletion that quietly moves an unrelated gate shows up there and nowhere else.
+
+Then say in the commit **what stopped being possible**, not what was removed. A gate deleted
+because it was dead and a gate deleted because its premise was wrong leave the same diff and are
+not the same event.
+
+Historical narrative in this document is exempt, and deliberately: an entry describing how a
+defect was found reads correctly in the past tense and is the record. What has to be rewritten is
+a **live claim** — a known answer, a coverage gap, a procedure someone will follow.
 
 ### The plant that made D63 observable
 
@@ -477,8 +534,9 @@ Tidying it up changes the expected answers.
   (`TenantStore`, `AuditClient`) and `PolicyBridge` (`Internal`, reaching `QuoteController`,
   `TenantStore` and `CarrierGateway`) are patterns of one. **P6 adds the two the section was
   missing**: six `*Conduit` types reaching `LayeringEndpoint`, `LayeringArchive` and
-  `LayeringBeacon` — a pattern of six, the only one past the roll-call threshold of five, and the
-  only nominations whose detail collapses — and `PublicIntakeConduit` / `PublicRelayConduit`, a
+  `LayeringBeacon` — a pattern of six, and the largest the fixture holds (it was planted to
+  exceed a roll-call threshold of five that D54 deleted on 2026-08-26; nothing collapses now,
+  and the six render in full) — and `PublicIntakeConduit` / `PublicRelayConduit`, a
   pattern of two reaching the *identical* three components and separated from the six by nothing
   but their own `ApiBoundary` role. Under the probe's kind-signature grouping all fourteen are one
   pattern and the whole section collapses to a line, which is the collapse stated as loudly as
@@ -535,11 +593,17 @@ fails the day detection lands, which is when each category has to be named.
 > is named anywhere. Both are in the fixture now, one as trap and one as contrast, so the
 > distinction cannot be lost again.
 
-**~~For two existing findings (Job B).~~ Both filled.** The SPANS roll-call collapse branch is
-still uncovered, as are suppression rows 4–7. A section that emits no output produces the same
-bytes whatever its thresholds are — so the goldens carried no record of how either finding
-behaved, and their thresholds could have been changed to any value, or the findings deleted,
-with the suite still green.
+**For two existing findings (Job B) — both filled.** The gap was that a section which emits no
+output produces the same bytes whatever its thresholds are, so the goldens carried no record of
+how either finding behaved: their thresholds could have been changed to any value, or the
+findings deleted, with the suite still green. The two were the SPANS roll-call collapse branch
+and suppression rows 4–7.
+
+> **The entry read *"still uncovered"* under a heading struck through as *"Both filled"* until
+> 2026-08-26**, and by then the first half had stopped existing rather than stopped being
+> uncovered: D54 deleted the roll-call gate outright, having measured that no threshold survives
+> contact with a real solution. Rewritten rather than patched, because a struck-through heading
+> arguing with its own body is what let a dead claim sit in the specification.
 
 Breaks alone was the one that mattered: it carries three suppression rules, including *never
 imply safety at a boundary* and *never contradict yourself about one component*, and removing
@@ -1200,8 +1264,15 @@ work can violate:
 | 6 — blank, never fake | a project with no dependents emits blank I, not 0 |
 | 8 — state the coverage | every view reports exclusions, load failures, and what was skipped |
 
-Invariant 6 is currently enforced in the wrong place — see
-[`ARCHITECTURE.md`](ARCHITECTURE.md) §3.
+Invariant 6 was enforced in the wrong place until X9, and
+[`ARCHITECTURE.md`](ARCHITECTURE.md) §3 keeps the case as its worked example. The rule is on
+the model now — `Distribution.Read` returns `null` below `IsComparable`, so no renderer has a
+fake number to print — and `CohortStatisticsTests.A_type_with_no_usable_peer_group_gets_no_`
+`relative_reading` is the test that says so.
+
+Invariant 8's line in that table was true of six renderers and not of the seventh until C1:
+the architecture diagram drew the projects in the model and stated nothing about the rest,
+in the one artifact specified to travel away from its report.
 
 ## 8. Review questions for any new finding
 

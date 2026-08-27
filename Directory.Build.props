@@ -1,15 +1,16 @@
 <Project>
 
   <!--
-    Repo-wide build settings. Two directories deliberately opt out, and both have their own
+    Repo-wide build settings. One directory deliberately opts out, and it has its own
     Directory.Build.props saying why:
 
-      oracle/          ArchProbe is frozen verbatim as the diff oracle. It carries 32
-                       analyzer warnings. Fixing them would edit the baseline we compare
-                       against, which is the one thing it exists not to do.
       tests/TestBed/   The fixture is deliberately bad code. Its shape IS the expected
                        answer — a god object, a namespace cycle, seven near-identical
                        normalizers. Cleaning it up invalidates every assertion.
+
+    There were two. oracle/ held ArchProbe frozen verbatim as the diff oracle, and it went
+    with the probe at R2 — this comment, CONTRIBUTING.md and ci.yml all went on describing
+    it for three months, which is what M8's retiring-a-gate checklist exists to stop.
 
     Everything else is strict. See CONTRIBUTING.md.
   -->

@@ -1,5 +1,9 @@
-# The gate. Conventions are build errors (CONTRIBUTING.md) and the golden baselines are
-# compared on every run (docs/TESTING.md), so a green build here means both held.
+# The gate. Conventions are build errors (CONTRIBUTING.md) and the whole suite runs on every
+# push, accepted snapshots included (docs/TESTING.md), so a green build here means both held.
+#
+# This said "the golden baselines are compared on every run" until 2026-08-26. There are no
+# golden baselines: they went with the probe at R2. The workflow was always right; only this
+# comment described a gate that no longer existed.
 #
 # This workflow does NOT publish, and must not gain the ability to. NuGet trusted publishing
 # names one workflow file in its policy and only that file can mint a publishing credential;

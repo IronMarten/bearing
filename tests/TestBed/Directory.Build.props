@@ -10,10 +10,16 @@
     cycle between TestBed.Core and TestBed.Core.Pricing, two projects nothing references,
     a type named like data access that is not, and scaffolded code that must be excluded.
 
-    Every assertion in tests/Bearing.Tests is a claim about this exact shape — 51 types,
-    131 edges, 8 cohorts, 2 excluded. Tidying it up, enabling nullable, or letting an
-    analyzer talk anyone into a "harmless" refactor changes the expected answers and
-    breaks the suite for reasons that have nothing to do with Bearing.
+    Every assertion in tests/Bearing.Tests is a claim about this exact shape, and
+    StructureTests.Fixture_shape_is_stable is where the shape is written down. Tidying it
+    up, enabling nullable, or letting an analyzer talk anyone into a "harmless" refactor
+    changes the expected answers and breaks the suite for reasons that have nothing to do
+    with Bearing.
+
+    The counts used to be copied here — "51 types, 131 edges, 8 cohorts, 2 excluded" — and
+    by 2026-08-26 the fixture held 207 types and 386 edges, so the sentence was making its
+    argument with a number four times too small. The argument is stronger for pointing at
+    the test: a copy goes stale, and this one did so silently for eleven plants.
 
     Treat this directory as data. If you need a new case, ADD to it — do not reshape what
     is here, and update the known answers in docs/TESTING.md when you do.

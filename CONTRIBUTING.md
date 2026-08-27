@@ -2,7 +2,7 @@
 
 ```
 dotnet build Bearing.sln      # warnings are errors
-dotnet test  Bearing.sln      # 281 tests, ~10s
+dotnet test  Bearing.sln      # ~550 tests, ~2 minutes (docs/TESTING.md has the breakdown)
 ```
 
 Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first — it is short, and it explains
@@ -25,14 +25,12 @@ export PATH="$DOTNET_ROOT:$PATH"
 `TreatWarningsAsErrors`, .NET analyzers at `latest-Recommended`, and code style enforced in
 build. A convention that only warns is a convention nobody follows by the third month.
 
-Two directories opt out, and each has a `Directory.Build.props` saying why in full:
+One directory opts out, and it has a `Directory.Build.props` saying why in full:
 
-- **`oracle/`** — the probe is frozen verbatim as the diff oracle. It carries 32 analyzer
-  warnings and every one is a fair comment. Acting on any of them edits the implementation
-  whose output the golden baselines are the record of. CA1305 in particular is not
-  cosmetic: adding an `IFormatProvider` can change rendered decimals in `nominations.txt`,
-  which is a behaviour change disguised as a lint fix.
 - **`tests/TestBed/`** — the fixture's defects are the specification.
+
+There were two. `oracle/` held the probe frozen verbatim as the diff oracle, and it was
+retired at R2 along with the golden baselines it existed to produce.
 
 If you need a suppression elsewhere, put it in `.editorconfig` with a comment explaining
 what the rule is right about and why it does not apply here. Every existing suppression has
@@ -93,11 +91,13 @@ parses `@'…'` as a stray `@` plus a quoted string, which leaks a `@` as the co
 
 Assert against the model, never against report wording — `Report.cs` is the layer being
 replaced, and tests coupled to its sentences would die exactly when they are needed. The
-golden snapshots are the deliberate exception.
+accepted snapshots are the deliberate exception.
 
 If you add a case to `tests/TestBed/`, **add, do not reshape**, and record the known answer
 in [`docs/TESTING.md`](docs/TESTING.md) §6. Every assertion in the suite is a claim about
-the fixture's exact shape — 51 types, 131 edges, 8 cohorts, 2 excluded.
+the fixture's exact shape, and `StructureTests.Fixture_shape_is_stable` is where that shape
+is written down — read it there rather than from a copy. This sentence carried one until
+2026-08-26 and it was four times too small.
 
 Then mutation-test the assertion: break the thing on purpose and confirm it fails. A gate
 that cannot fail is worse than no gate, because it looks like coverage.

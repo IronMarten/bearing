@@ -120,16 +120,26 @@ asserting on prose, which matters because the prose is the part most likely to c
 A rule enforced in a renderer is a rule that does not exist.
 
 Invariant 6 says *blank, never fake* — a statistic with no meaningful basis is emitted
-empty. A cohort of one holds `CyclomaticPctl = 50` in the model, because midrank puts a
-single element tying with itself at exactly the median. Only the CSV writer blanks it.
-Every other renderer — JSON, HTML, graph tooltips — will emit `50`, and the most extreme
-outlier in a codebase will read as perfectly average.
+empty. **This is the worked example, and it is written in the past tense because the defect
+was fixed at X9. Read it for the shape, not as a description of the code.**
 
-That is invariant 6 breaking silently in the new output surfaces, and the fix is not to
+A cohort of one *held* `CyclomaticPctl = 50` in the model, because midrank puts a single
+element tying with itself at exactly the median. Only the CSV writer blanked it. Every
+other renderer — JSON, HTML, graph tooltips — would emit `50`, and the most extreme outlier
+in a codebase would read as perfectly average.
+
+That is invariant 6 breaking silently in the new output surfaces, and the fix was not to
 repeat the rule in each writer. **Rules about what a number means belong in the model.**
-`StructureTests.A_cohort_of_one_is_rendered_blank_never_as_a_percentile` currently pins
-both halves — the model's `50` and the CSV's blank — so the day the rule moves, the test
-says so.
+X9 moved the readings onto the model as nullable: `Distribution.Read` returns `null` below
+`IsComparable`, so there is no `50` for a renderer to find. `CohortStatisticsTests.`
+`A_type_with_no_usable_peer_group_gets_no_relative_reading` asserts all eleven readings are
+absent for every peerless type, which is the rule stated where it now lives.
+`StructureTests.A_cohort_of_one_is_written_blank_never_as_a_percentile` is what remains of
+the original: the CSV half alone, and its own doc comment says so.
+
+The corollary itself has not moved. A rule enforced in a renderer is still a rule that does
+not exist; this section keeps the case that proved it because a fixed defect is the
+cheapest way to teach one.
 
 ## 4. The structure model
 
@@ -314,10 +324,13 @@ set is listed says the opposite.
 > `Participant(Subject, Role)` becomes necessary in Core. That is a model change touching every
 > detector, so it should be made deliberately and not discovered.
 
-**One thing to clean up rather than a finding:** kind → title and kind → explanation now exist
-twice in the Cli, once in `FindingSections` as section headers and once in `HtmlReport`. Both are
-words and both belong in the Cli, so §3 is not violated — but they will drift, and the next
-renderer should read from one copy.
+**~~One thing to clean up rather than a finding~~ — done.** Kind → title and kind → explanation
+existed twice in the Cli, once in `FindingSections` and once in `HtmlReport`. Both were words and
+both belonged in the Cli, so §3 was never violated — but they would drift. They are
+`Claims.KindName` / `Claims.KindBlurb` now, one copy read by both renderers, and
+`ClaimsTests.Every_kind_is_named_and_described` asserts every kind is worded so a new one fails
+the suite until it is. The paragraph stayed here describing the work as outstanding after it was
+finished, which is the M band's failure in the opposite direction.
 
 **Detection and suppression are separate passes** (`Analysis`). Every detector sees the model
 and nothing else, so no detector can depend on having run after another one; relationships
@@ -371,7 +384,14 @@ is worthless even when it is correct.
   `base:DbContext`, `external-ns:Azure.Messaging` next to the value, not just the value.
 - **Classification data is declarative, not a switch statement.** Which external namespaces
   are plumbing and which are integrations is a long tail that otherwise accretes forever in
-  one method. It belongs in a data file that can be read, diffed and extended.
+  one method. It belongs somewhere that can be read, diffed and extended — `FrameworkNamespaces`
+  and `TypeKinds`, which are static classes holding lists and constants rather than the *data
+  file* this line asked for until 2026-08-26. **The code is right and the letter of the rule was
+  wrong**: those meet the intent and gain two properties a JSON file would not have. A mistyped
+  entry is a build error rather than a rule that silently never matches, and
+  `FrameworkNamespacesTests` fails if an entry is removed, so `LinqToDB` and `FluentMigrator`
+  cannot be quietly trimmed back. Declarative is the requirement; a separate file was only ever
+  one way to get there.
 - **Thresholds are a named, versioned policy object.** `--min-fan-in 5`, `--high-cc 10`,
   `--outlier-factor 3.0`, `--min-decision-cc 5`, `--min-tangle 4` are judgment calls;
   several were arrived at by watching one specific false positive, and the reasoning
