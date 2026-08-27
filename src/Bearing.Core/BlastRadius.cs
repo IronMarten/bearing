@@ -38,6 +38,32 @@ public static class BlastRadius
         foreach (var group in model.Types.GroupBy(t => t.Cohort.Key, StringComparer.Ordinal))
         {
             var peers = group.ToList();
+
+            // RETAINED DELIBERATELY, and it is not what six leave-one-out runs make it look like.
+            //
+            // It is the only DEAD verdict in the table — delete it and the fixture's report is
+            // byte-identical and the suite stays green — and X16 named its deletion as part of
+            // that decision's deliverable. Both are true and neither is a reason to delete it.
+            //
+            // THIS GATE IS THE SUPPRESSION. MinCohort is 5 and Distribution.IsComparable is 2, so
+            // removing it admits cohorts of 2, 3 and 4 — which is exactly the population
+            // NoPeerGroup claims, since that fires on CohortSize < MinCohort. There is no
+            // suppression rule covering the overlap; all six were checked. The gate is what keeps
+            // the two detectors partitioned, and it does it by reading the same policy value they
+            // both key on, so they cannot drift apart.
+            //
+            // Measured 2026-08-27 by deleting it and running all three reference solutions:
+            // Nop.Core.MimeTypes, cohort size 4, comes back with BOTH findings reported and
+            // neither suppressed — "top of its peer group, rank 1 of 4, 3.9x the median" and "no
+            // usable peer group" about one type in one report. That is invariant 3, which the
+            // README carries as a design constraint. Jellyfin and Umbraco produce none, so it is
+            // one component in three solutions and it is still one too many.
+            //
+            // The fixture cannot see this: TestBed's below-floor cohorts do not clear MinFanIn,
+            // BlastFanInMultiple, the rank limit and BlastComplexityPercentile together. Six runs
+            // agreeing did not make the gate safe to remove, they made it consistently
+            // unobservable — which is docs/TESTING.md §9's distinction between a gate that does
+            // nothing and a gate nothing here can watch.
             if (peers.Count < policy.MinCohort) continue;
 
             var fanIn = Distribution.Of(peers.Select(t => (double)t.FanIn));

@@ -319,6 +319,61 @@ public sealed class SuppressionTests(CoreWalkFixture core)
         Assert.Empty(SurfacesUnder(core.Model.Policy with { MaxNamedSurfaces = 6 }));
     }
 
+    /// <summary>
+    /// Nothing is both at the top of its peer group and without one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Invariant 3, on the pair that has no suppression rule between them.</b>
+    /// <c>NoPeerGroup</c> fires on <c>CohortSize &lt; MinCohort</c> and <c>BlastRadius</c> fires on
+    /// <c>peers.Count &gt;= MinCohort</c>: the two are partitioned because both key on the same
+    /// policy value, and the partition lives in <c>BlastRadius</c>'s cohort floor rather than in
+    /// <c>Suppression.Rules</c>. Deleting that floor is what the leave-one-out table has invited
+    /// for six consecutive runs, and it produces the contradiction — <c>Nop.Core.MimeTypes</c>,
+    /// cohort of 4, carrying both findings reported and neither suppressed.
+    /// </para>
+    /// <para>
+    /// <b>Asserted at a raised floor, because at defaults the fixture cannot show it.</b> TestBed's
+    /// below-floor cohorts do not clear <c>MinFanIn</c>, the multiple, the rank limit and the
+    /// complexity percentile together, so this passes vacuously at <c>MinCohort = 5</c> — which is
+    /// precisely why the gate reads as dead. Raising the floor enlarges the below-floor population
+    /// until the fixture can produce the case, which is <c>docs/TESTING.md</c>'s
+    /// constructed-population remedy applied through a policy rather than a plant.
+    /// </para>
+    /// <para>
+    /// <b>The control:</b> delete <c>BlastRadius</c>'s <c>if (peers.Count &lt; policy.MinCohort)</c>
+    /// and this fails while every snapshot stays green, because no snapshot is taken at a raised
+    /// floor.
+    /// </para>
+    /// </remarks>
+    [Theory]
+    [InlineData(5)]
+    [InlineData(12)]
+    [InlineData(25)]
+    public void No_component_is_both_top_of_its_peer_group_and_without_one(int minCohort)
+    {
+        var model = core.WalkWith(core.Model.Policy with { MinCohort = minCohort });
+        var findings = Analysis.FindingsFor(model);
+
+        var peerless = findings.OfKind(FindingKind.Coverage)
+            .Select(f => f.Subject.Canonical)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var topOfGroup = findings.OfKind(FindingKind.BugBlastRadius)
+            .Select(f => f.Subject.Canonical)
+            .ToHashSet(StringComparer.Ordinal);
+
+        // A guard on the guard: at a floor high enough that nothing is comparable, both sets can
+        // empty and the assertion below would hold about nothing.
+        Assert.NotEmpty(peerless);
+
+        var both = peerless.Intersect(topOfGroup, StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
+
+        Assert.True(both.Count == 0,
+            "these carry both 'no usable peer group' and 'top of its peer group', which is "
+            + $"invariant 3 at MinCohort {minCohort}: {string.Join(", ", both)}");
+    }
+
     private static List<string> SurfacesUnder(AnalysisPolicy policy)
     {
         var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })

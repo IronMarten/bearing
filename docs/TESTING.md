@@ -431,15 +431,35 @@ measurement confirms the record rather than adding to it. It survived the X14 pl
 saying: two new types in the biggest cohort did not make a cohort floor observable, so the reason it
 is dead is not a shortage of types.
 
-> **Six runs now, and the sibling that shared its cause is gone.** `ConcealedDecision` carried two
-> `MinCohort` gates of its own until D10 deleted them, on the finding that the floor was not what
-> decided who got nominated there either. `Distribution.Read` already refuses below `IsComparable`,
-> which is why both were redundant — the same reason this one is dead. So the remaining entry is
-> the last `MinCohort` gate in the codebase, and the argument for deleting it is now the argument
-> that was already accepted once for its siblings. `ARCHITECTURE.md` X16 named its deletion as part
-> of that decision's deliverable and shipped without it. **Either delete it or record beside it
-> what it is retained for** — leaving it a sixth time is the choice that costs the most, because a
-> line that reads as a working safeguard and is not is worse than either.
+> **Decided 2026-08-27: it is retained, and `DEAD` is the wrong reading of it.** The decision was
+> taken by deleting it and measuring, which is what six runs of reading the verdict had not done.
+>
+> **The gate is the suppression.** `MinCohort` is 5 and `Distribution.IsComparable` is 2, so
+> removing it admits cohorts of 2, 3 and 4 — exactly the population `NoPeerGroup` claims, since
+> that fires on `CohortSize < MinCohort`. Nothing in `Suppression.Rules` covers the overlap; all
+> six rules were checked. This floor is what partitions the two detectors, and it does it by
+> reading the same policy value they both key on, so they cannot drift apart.
+>
+> **Measured on all three reference solutions with it deleted:** `Nop.Core.MimeTypes`, cohort of
+> 4, comes back carrying **both** findings, both reported, neither suppressed — *"top of its peer
+> group, rank 1 of 4, 3.9× the median"* and *"no usable peer group"*, about one type in one report.
+> That is invariant 3. Jellyfin and Umbraco produce none, so it is one component in three
+> solutions, and one is enough.
+>
+> **What the `DEAD` verdict actually measured** is that TestBed's below-floor cohorts do not clear
+> `MinFanIn`, `BlastFanInMultiple`, the rank limit and `BlastComplexityPercentile` together. Six
+> runs agreeing did not make the gate safe to remove; they made it consistently unobservable. That
+> is §9's distinction between a gate that does nothing and a gate nothing here can watch, and this
+> table cannot tell them apart — **so a `DEAD` row is a question, not a verdict.**
+>
+> **It is watched now.** `SuppressionTests.No_component_is_both_top_of_its_peer_group_and_without_one`
+> asserts the disjointness at a raised floor, which is `TESTING.md`'s constructed-population remedy
+> applied through a policy rather than a plant: at `MinCohort = 5` it passes vacuously — which is
+> why the gate reads as dead — and at 12 and 25 the fixture produces the case. Delete the floor and
+> it fails while every snapshot stays green.
+>
+> X16 named this gate's deletion as part of its deliverable and shipped without it. That was the
+> right call for a reason X16 did not state, and this is the statement.
 
 **Two entries that were on the board as owed plants are not owed.** P1 existed to make blast
 radius' absolute fan-in floor observable and P2 its `FanInXMedian` gate; the two verdicts above are

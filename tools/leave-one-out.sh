@@ -14,8 +14,19 @@
 #   suite-only    the report at defaults is byte-identical, but a test fails — so
 #                 the gate only decides off the default path, and is held solely by
 #                 a test that deliberately moves a threshold to look at it.
-#   DEAD          no change at defaults and the whole suite stays green.  Deletable
-#                 today.  This is the list that matters.
+#   DEAD          no change at defaults and the whole suite stays green.  This is the
+#                 list that matters, AND IT IS A QUESTION RATHER THAN A VERDICT.
+#
+# A DEAD row means "nothing here can watch this gate". It does not mean "this gate does
+# nothing", and the two are only distinguishable by deleting the line and running against
+# real solutions. BlastRadius's MinCohort floor sat DEAD for six consecutive runs and is
+# retained: it is the only thing partitioning blast radius from the no-peer-group finding,
+# there is no suppression rule behind it, and deleting it puts BOTH claims on one type on
+# nopCommerce -- invariant 3, which is the one this repository says would do real damage.
+# See the comment beside the line, and docs/TESTING.md's verdict table.
+#
+# So: before acting on a DEAD row, delete the line and run the three reference solutions.
+# The fixture is what produced the verdict and the fixture is what could not see past it.
 #
 # Usage:  bash tools/leave-one-out.sh [output-dir]
 #

@@ -881,6 +881,21 @@ question is closed**; if the section grows an unstruck one, that is a live decis
   `MinCohort`'s gating use are deleted.** Stated as a count of closures it is a success criterion
   nothing can meet.
 
+  > **Half of that last clause is withdrawn, 2026-08-27.** `MinCohort`'s gating use in
+  > `ConcealedDecision` was deleted by D10 and should have been. **Its gating use in `BlastRadius`
+  > is retained, and deleting it is a defect rather than a deliverable.** It is the only thing
+  > partitioning blast radius from the no-peer-group finding — `IsComparable` is 2 against a floor
+  > of 5, so removing it admits cohorts of 2–4, which is precisely the population `NoPeerGroup`
+  > claims — and no suppression rule covers the overlap. Deleted and measured on all three
+  > reference solutions, `Nop.Core.MimeTypes` returns both claims, both reported: *top of its peer
+  > group* and *no usable peer group*, one type, one report. That is invariant 3.
+  >
+  > The clause was written from the leave-one-out table, where the gate has read `DEAD` for six
+  > consecutive runs. What that measured is that the fixture cannot reach the case, not that the
+  > gate is inert; `SuppressionTests.No_component_is_both_top_of_its_peer_group_and_without_one`
+  > now holds the property at a raised floor, where the fixture can. **X16 shipped without doing
+  > this and was right to.**
+
   **Measured on two solutions, to be re-derived on three.** The table above is 2026-08-21,
   nopCommerce and Jellyfin. Umbraco — 6,230 types — became a reference solution on 2026-08-25 and
   has never been in this measurement. **Unmeasured** — the replacement has not been run end to end,

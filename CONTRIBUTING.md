@@ -5,6 +5,27 @@ dotnet build Bearing.sln      # warnings are errors
 dotnet test  Bearing.sln      # ~550 tests, ~2 minutes (docs/TESTING.md has the breakdown)
 ```
 
+> **This repository is developed against private specifications, and outside contributions
+> are not what it is for.** The source is public so it can be *inspected* — so anyone can
+> read what the tool measures, check a claim against the code that made it, and see the
+> reasoning behind a threshold. That is the goal, and it is a different goal from being
+> contributable to.
+>
+> The practical consequence is in the comments. Source under `src/` and `tests/` cites six
+> documents by name — `PRD-free-tier.md`, `TECHREQ-job-a.md`, `TECHREQ-job-b.md`,
+> `SCHEMA-findings-export.md`, `TASKS.md` and `SESSION-NOTES.md` — and none of them is in
+> this repository, because they are the commercial documents rather than the design ones.
+> **Those citations are load-bearing, not decorative**: `ArchitectureDiagram.cs` cites
+> §5.4 for an acceptance criterion — *legible at screenshot size on a 30-project solution
+> with no interaction* — that the comment does not restate, so an outside reader cannot
+> resolve the bar the code is built to.
+>
+> `ARCHITECTURE.md` §2 states the principle this breaks: *a constraint a reader cannot
+> resolve is not a constraint*. It reproduces the eight invariants for exactly that reason.
+> The rest is not reproduced, and saying so plainly is better than leaving it to read as an
+> oversight. **If you are reading a comment whose citation you cannot follow, the decision
+> it refers to is real and the reasoning is not published — take the code at face value.**
+
 Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first — it is short, and it explains
 why the code is split the way it is. [`docs/TESTING.md`](docs/TESTING.md) covers the suite
 and the two snapshot regimes. Behaviour known to be wrong and deliberately left that way is
