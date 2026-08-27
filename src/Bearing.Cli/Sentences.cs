@@ -215,11 +215,29 @@ public static class Sentences
     /// measure, none of them glossed, and nothing stopping a fourth from inventing a fourth
     /// wording. The phrase is decided here so the picture and the table cannot drift apart, and
     /// <see cref="MainSequence"/> is the sentence that has to accompany it wherever it appears.
+    /// <para>
+    /// <b>Uselessness read <i>"abstract and unused"</i> until 2026-08-26, and <c>unused</c> is one
+    /// of the five words invariant 4 forbids outright.</b> The suite was green because the branch
+    /// never renders — no project in any reference solution reaches the zone — which is
+    /// <c>TESTING.md</c> §9's failure exactly: a gate passing by absence. Re-worded regardless of
+    /// what is decided about the zone itself.
+    /// </para>
+    /// <para>
+    /// <b>Why these two words and not <i>"nothing depends on it"</i>.</b> That was the proposed
+    /// replacement and it trades one wrong claim for another: the zone needs <c>I &gt;= 0.7</c>,
+    /// which unfolds to <c>in &lt;= (3/7) x out</c>, so inbound coupling can be <b>43% of
+    /// outbound</b> and still clear the bar. It is also 34 characters against a 168px map box —
+    /// <see cref="ArchitectureDiagram"/> draws this string as a box subtitle, and width is
+    /// <c>TECHREQ-job-a.md</c> §5.4's acceptance criterion. <i>Unstable and abstract</i> is the
+    /// exact mirror of <i>stable and concrete</i>, uses Martin's own word for the I axis, says
+    /// precisely what the two thresholds test, and implies nothing about whether anything may be
+    /// removed.
+    /// </para>
     /// </remarks>
     public static string Zone(MainSequenceZone zone) => zone switch
     {
         MainSequenceZone.Pain => "stable and concrete",
-        MainSequenceZone.Uselessness => "abstract and unused",
+        MainSequenceZone.Uselessness => "unstable and abstract",
         MainSequenceZone.NearMainSequence => "near the main sequence",
         _ => "",
     };
@@ -234,7 +252,8 @@ public static class Sentences
         MainSequenceZone.Pain =>
             "much depends on it and little of it is abstract, so it is hard to change and hard to extend",
         MainSequenceZone.Uselessness =>
-            "it is mostly abstraction and almost nothing depends on it",
+            "it is mostly abstraction, and less depends on it than it depends on, so the "
+            + "abstraction is not earning its keep",
         _ => "",
     };
 

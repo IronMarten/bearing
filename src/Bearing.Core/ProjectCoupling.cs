@@ -120,6 +120,20 @@ public sealed class ProjectCoupling
             if (Instability is not { } i) return MainSequenceZone.None;
 
             var a = Abstractness;
+
+            // These three are not Bearing's to tune, and that is why they are not in
+            // AnalysisPolicy. 0.3 / 0.7 / 0.3 are the published main-sequence bands — the
+            // boundaries Martin defines the two zones and the tolerable distance by, and the same
+            // numbers any other reader of that work has in mind. Every threshold in the policy
+            // object was set by measurement against a false positive this tool produced; these
+            // were set by somebody else, before it existed, and moving them would mean this
+            // tool's "zone of pain" stopped meaning what the phrase means everywhere else.
+            //
+            // The consequence is deliberate: PolicySweepTests cannot see them and no flag can
+            // move them. A team that disagrees with the bands is disagreeing with the measure
+            // rather than with a setting, and the honest answer is to say so rather than offer a
+            // dial. If that ever changes they become three named policy values carrying their own
+            // measurement, and this comment is the record of what was traded for keeping them.
             if (i <= 0.3 && a <= 0.3) return MainSequenceZone.Pain;
             if (i >= 0.7 && a >= 0.7) return MainSequenceZone.Uselessness;
 
