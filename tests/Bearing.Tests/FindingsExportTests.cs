@@ -351,17 +351,20 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
     /// findings.
     /// </para>
     /// <para>
-    /// <b>It found that §8.3 is half true, and the half that is not is a display cap
-    /// deciding a judgement.</b> The population is uncapped — same keys, same count, at either <c>--top</c>. The
-    /// <i>content</i> is not: <c>RollCallThreshold</c> is <c>Top / RollCallDivisor</c>, so the
-    /// display cap decides whether a layer-span finding carries
+    /// <b>It found that §8.3 was half true, and the half that was not was a display cap deciding a
+    /// judgement.</b> The population was always uncapped — same keys, same count, at either
+    /// <c>--top</c>. The <i>content</i> was not: <c>RollCallThreshold</c> was
+    /// <c>Top / RollCallDivisor</c>, so the cap decided whether a layer-span finding carried
     /// <c>part-of-a-layering-pattern</c>. <c>SCHEMA-findings-export.md</c> §4 says Core has no
-    /// notion of <c>--top</c>; it has one, and this is where that was found.
+    /// notion of <c>--top</c>; it had one, and this is where that was found. **That is D54.**
     /// </para>
     /// <para>
-    /// <b>Asserted as the defect rather than skipped.</b> The inequality below fails the day §54 is
-    /// fixed, which is what a test of a known-wrong behaviour is for — a skip records the gap
-    /// somewhere nothing reads, and a deleted test records it nowhere.
+    /// <b>It was asserted as the defect rather than skipped, and the wager paid.</b> This test
+    /// carried <c>Assert.NotEqual</c> with a note saying it would fail the day D54 was fixed. On
+    /// 2026-08-26 the qualifier was deleted — measuring it to re-base the threshold found it had
+    /// never fired on real code — and this test went red on the same commit. **A skip would have
+    /// recorded the gap where nothing reads it, and a deleted test nowhere at all.** It now asserts
+    /// equality and §8.3 holds whole.
     /// </para>
     /// </remarks>
     [Fact]
@@ -381,17 +384,12 @@ public sealed class FindingsExportTests(CoreWalkFixture core)
         // count, nothing appearing or vanishing with the flag.
         Assert.Equal(Keys(narrow), Keys(wide));
 
-        // And the half that does not, asserted as the defect rather than left as a silence.
-        // RollCallThreshold is Top / RollCallDivisor, so --top decides whether
-        // a layer-span finding carries part-of-a-layering-pattern. A display cap reaching a
-        // judgement is the defect; this line fails the day it is fixed, which is the point of
-        // writing it this way round rather than skipping the test.
-        Assert.NotEqual(FindingsOf(narrow), FindingsOf(wide));
+        // And the half that did not, until 2026-08-26. This line read NotEqual and was written to
+        // fail the day D54 was fixed; it did, and this is that day. The content is now identical
+        // at every --top as well, so §8.3 holds whole.
+        Assert.Equal(FindingsOf(narrow), FindingsOf(wide));
 
-        var flipped = Differing(narrow, wide);
-
-        Assert.All(flipped, k => Assert.StartsWith(nameof(FindingKind.SpansArchitecturalLayers), k, StringComparison.Ordinal));
-        Assert.NotEmpty(flipped);
+        Assert.Empty(Differing(narrow, wide));
     }
 
     private static IReadOnlyList<string> Keys(SolutionModel model) =>

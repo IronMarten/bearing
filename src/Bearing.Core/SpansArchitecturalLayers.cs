@@ -131,12 +131,15 @@ public static class SpansArchitecturalLayers
                     Receipt.Of("PatternGroupSize", groupSize),
                     Receipt.Of("FanIn", candidate.Type.FanIn),
                 ],
-                [
-                    new Qualifier(
-                        Qualifiers.PartOfALayeringPattern,
-                        groupSize > policy.RollCallThreshold,
-                        nameof(AnalysisPolicy.RollCallDivisor)),
-                ],
+                // No qualifier. `part-of-a-layering-pattern` lived here until 2026-08-26 and was
+                // removed with D54: it asked whether groupSize exceeded `Top / RollCallDivisor`,
+                // which is a judgement scaled by a display cap. Measuring it to pick a better
+                // threshold found there is no threshold to pick — every group is size 1 on all
+                // three reference solutions, under identity keying and under every relaxation of
+                // it, so the qualifier was False on all nine real findings and its collapse line
+                // had never printed. The PatternGroupSize receipt stays: it is evidence a reader
+                // can act on, and the ordering below still reads it.
+                [],
                 candidate.Participants));
         });
 

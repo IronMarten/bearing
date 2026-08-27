@@ -110,7 +110,6 @@ public static class CommandLine
         (nameof(AnalysisPolicy.BoundaryTopFraction), (p, v) => p with { BoundaryTopFraction = v }),
         (nameof(AnalysisPolicy.BlastComplexityPercentile), (p, v) => p with { BlastComplexityPercentile = v }),
         (nameof(AnalysisPolicy.ChangeCostTopFraction), (p, v) => p with { ChangeCostTopFraction = v }),
-        (nameof(AnalysisPolicy.RollCallDivisor), (p, v) => p with { RollCallDivisor = (int)v }),
         (nameof(AnalysisPolicy.SurfaceOutlierMultiple), (p, v) => p with { SurfaceOutlierMultiple = v }),
         (nameof(AnalysisPolicy.SurfaceOutlierFloor), (p, v) => p with { SurfaceOutlierFloor = v }),
         (nameof(AnalysisPolicy.MaxNamedSurfaces), (p, v) => p with { MaxNamedSurfaces = (int)v }),

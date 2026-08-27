@@ -29,7 +29,6 @@
     "blastTopFraction": 0.05,
     "blastComplexityPercentile": 70,
     "changeCostTopFraction": 0.05,
-    "rollCallDivisor": 3,
     "surfaceOutlierMultiple": 1.5,
     "surfaceOutlierFloor": 1,
     "maxNamedSurfaces": 5,
@@ -27432,13 +27431,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.TenantStore",
         "type|Core|global::TestBed.Core.AuditClient"
@@ -27480,13 +27473,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.QuoteController",
         "type|Core|global::TestBed.Core.TenantStore",
@@ -27529,13 +27516,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -27578,13 +27559,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -27627,13 +27602,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.TenantStore",
         "type|Core|global::TestBed.Core.CarrierGateway"
@@ -27675,13 +27644,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.TenantStore",
         "type|Core|global::TestBed.Core.CarrierGateway"
@@ -27723,13 +27686,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.TenantStore",
         "type|Core|global::TestBed.Core.CarrierGateway"
@@ -27771,13 +27728,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": false,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.TenantStore",
         "type|Core|global::TestBed.Core.CarrierGateway"
@@ -27819,13 +27770,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": true,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -27868,13 +27813,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": true,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -27917,13 +27856,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": true,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -27966,13 +27899,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": true,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -28015,13 +27942,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": true,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",
@@ -28064,13 +27985,7 @@
           "gate": null
         }
       ],
-      "qualifiers": [
-        {
-          "name": "part-of-a-layering-pattern",
-          "holds": true,
-          "gate": "RollCallDivisor"
-        }
-      ],
+      "qualifiers": [],
       "participants": [
         "type|Core|global::TestBed.Core.Layering.LayeringEndpoint",
         "type|Core|global::TestBed.Core.Layering.LayeringArchive",

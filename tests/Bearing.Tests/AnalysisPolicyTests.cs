@@ -33,7 +33,6 @@ public sealed class AnalysisPolicyTests
         "BlastComplexityPercentile",
         "IsolatedThreshold",
         "BreaksAloneMinFanIn",
-        "RollCallDivisor",
         "SurfaceOutlierMultiple",
         // Renamed when the unreachable suppression was fixed: the gate it named was a proportion,
         // and a proportion cannot sit on a filter proportional to the same distribution. The
@@ -53,10 +52,15 @@ public sealed class AnalysisPolicyTests
     /// the policy had grown to 26, so three values had never been nudged and nothing said so.
     /// This is the test that was missing: adding a gate now fails here, and the fix is to sweep
     /// the new value and update §6 rather than to change the number.
+    /// <para>
+    /// <b>30 → 29 on 2026-08-26</b>, and this is the one direction where changing the number is
+    /// the fix: <c>RollCallDivisor</c> was <i>removed</i> with D54, so the sweep has one fewer
+    /// value to cover rather than one it has missed.
+    /// </para>
     /// </remarks>
     [Fact]
     public void The_policy_carries_the_number_of_values_the_inventory_was_run_over() =>
-        Assert.Equal(30, AnalysisPolicy.Default.Values.Count);
+        Assert.Equal(29, AnalysisPolicy.Default.Values.Count);
 
     /// <summary>
     /// Every named threshold can be moved from the command line.
@@ -160,7 +164,6 @@ public sealed class AnalysisPolicyTests
         Assert.Equal(70, p.BlastComplexityPercentile);           // CyclomaticPctl >= 70
         Assert.Equal(0.8, p.IsolatedThreshold);                  // Instability >= 0.8
         Assert.Equal(1, p.BreaksAloneMinFanIn);                  // FanIn >= 1
-        Assert.Equal(3, p.RollCallDivisor);                      // members.Count > Top / 3
         Assert.Equal(1.5, p.SurfaceOutlierMultiple);             // DataShape >= median * 1.5
         Assert.Equal(1, p.SurfaceOutlierFloor);                  // ...floored at 1
         Assert.Equal(5, p.MaxNamedSurfaces);                     // count <= 5, absolute
@@ -177,8 +180,6 @@ public sealed class AnalysisPolicyTests
         // defaults and away from them.
         var p = AnalysisPolicy.Default;
 
-        Assert.Equal(p.Top / 3, p.RollCallThreshold);
-        Assert.Equal(5, p.RollCallThreshold);
 
 
         foreach (var median in new[] { 0.0, 0.5, 4.0, 12.0 })
@@ -231,7 +232,6 @@ public sealed class AnalysisPolicyTests
         // radius self-limiting, and 2 would quietly make it a roll-call.
         AnalysisPolicy.Default with { BlastTopFraction = 1.5 },
         AnalysisPolicy.Default with { GlobalComplexityPercentile = -1 },
-        AnalysisPolicy.Default with { RollCallDivisor = 0 },
         AnalysisPolicy.Default with { MaxNamedSurfaces = 0 },
         AnalysisPolicy.Default with { MinCohort = 1 },
         AnalysisPolicy.Default with { ConcealedDispersionFactor = double.NaN },

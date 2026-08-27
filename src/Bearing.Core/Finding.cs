@@ -185,19 +185,15 @@ public static class Qualifiers
     /// </remarks>
     public const string TooLargeToHold = "too-large-to-hold";
 
-    /// <summary>
-    /// Enough other components do the same thing, in the same way, that the subject is an instance
-    /// of a pattern rather than an anomaly — so its detail may be collapsed into one line.
-    /// </summary>
-    /// <remarks>
-    /// Row 4 of the suppression matrix, carried as a qualifier for the same reason as row 6: it
-    /// silences <i>detail</i> and not the claim. The probe keeps every collapsed type named in its
-    /// examples list, which is the proof that the finding is not withdrawn — what it loses is the
-    /// per-kind breakdown, and §3.1 says that breakdown is the finding. See
-    /// <see cref="SpansArchitecturalLayers"/> for what makes two subjects the same instance, which
-    /// is the collapse that used to hide the anomaly it shares a signature with.
-    /// </remarks>
-    public const string PartOfALayeringPattern = "part-of-a-layering-pattern";
+    // `PartOfALayeringPattern` was here — row 4 of the suppression matrix, collapsing the detail
+    // of a layer-span finding when enough other components did the same thing in the same way.
+    // Removed 2026-08-26 with D54. It was gated on `Top / RollCallDivisor`, a judgement scaled by
+    // a display cap; measuring it to re-base the threshold found the gate had never fired on real
+    // code at all. Every pattern group is size 1 on nopCommerce, Jellyfin and Umbraco — the
+    // pattern key is the subject's role plus the *identities* it reaches, so two components share
+    // one only by reaching an identical set — and the kind has just two to five findings per
+    // solution, which no "repeated across many" gate can discriminate over. It fired only on the
+    // fixture, where six types were planted to reach the same participants.
 
     /// <summary>
     /// The subject has no peer group, but is extreme by fan-in against the <b>whole solution</b> —

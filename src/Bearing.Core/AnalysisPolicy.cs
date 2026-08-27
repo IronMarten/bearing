@@ -17,10 +17,17 @@
 /// decorative.
 /// </para>
 /// <para>
-/// Two are relations rather than constants — the roll-call threshold scales with
-/// <see cref="Top"/>, and the surface-discrimination ceiling scales with the number of
-/// boundaries in the solution. They are exposed as the divisor that can be tuned plus a method
-/// that applies it, so the knob is nameable without pretending the gate is a fixed number.
+/// One is a relation rather than a constant — the surface-discrimination ceiling scales with the
+/// number of boundaries in the solution. It is exposed as the value that can be tuned plus a
+/// method that applies it, so the knob is nameable without pretending the gate is a fixed number.
+/// </para>
+/// <para>
+/// <b>There were two, and the second is why one is a good number here.</b> The roll-call threshold
+/// was <c>Top / RollCallDivisor</c> — a judgement scaled by a <i>display cap</i>, which is D54.
+/// It was removed on 2026-08-26 rather than re-based, because measuring it found the gate it fed
+/// had never fired on real code: every layer-span pattern group is size 1 on all three reference
+/// solutions, against a threshold of 5. **A relation is worth the extra explaining only when the
+/// thing it scales with is the thing the gate is about.**
 /// </para>
 /// <para>
 /// The drift section carries two further literals — a global-percentile arrival floor and a
@@ -331,20 +338,6 @@ public sealed record AnalysisPolicy
     /// </remarks>
     public double ChangeCostTopFraction { get; init; } = 0.05;
 
-    // ---------------------------------------------------------- roll-call cap ----
-
-    /// <summary>
-    /// Divides <see cref="Top"/> to give the group size above which per-item detail collapses
-    /// into a single pattern line. See <see cref="RollCallThreshold"/>.
-    /// </summary>
-    public int RollCallDivisor { get; init; } = 3;
-
-    /// <summary>
-    /// Group size above which detail collapses to one line — repeated across many types it is a
-    /// pattern, not a list of findings.
-    /// </summary>
-    public int RollCallThreshold => Top / RollCallDivisor;
-
     // ------------------------------------------------------- contract surface ----
 
     /// <summary>Multiple of the median boundary surface above which a contract is unusually wide.</summary>
@@ -435,7 +428,6 @@ public sealed record AnalysisPolicy
         (nameof(BlastTopFraction), BlastTopFraction),
         (nameof(BlastComplexityPercentile), BlastComplexityPercentile),
         (nameof(ChangeCostTopFraction), ChangeCostTopFraction),
-        (nameof(RollCallDivisor), RollCallDivisor),
         (nameof(SurfaceOutlierMultiple), SurfaceOutlierMultiple),
         (nameof(SurfaceOutlierFloor), SurfaceOutlierFloor),
         (nameof(MaxNamedSurfaces), MaxNamedSurfaces),
@@ -514,8 +506,6 @@ public sealed record AnalysisPolicy
         if (ChangeCostTopFraction > 1)
             throw new ArgumentOutOfRangeException(nameof(ChangeCostTopFraction), ChangeCostTopFraction, "ChangeCostTopFraction is a share of the solution and must be within 0..1.");
 
-        if (RollCallDivisor < 1)
-            throw new ArgumentOutOfRangeException(nameof(RollCallDivisor), RollCallDivisor, "RollCallDivisor must be at least 1.");
         // Zero would suppress the section wherever a single wide surface qualifies, which is the
         // finding never speaking rather than speaking too often.
         if (MaxNamedSurfaces < 1)

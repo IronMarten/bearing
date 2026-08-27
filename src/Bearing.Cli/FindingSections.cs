@@ -287,35 +287,14 @@ internal static class FindingSections
             yield break;
         }
 
-        // Collapsed and detailed findings are the same claim worded two ways, and which one
-        // applies is the qualifier's answer rather than a count taken here:
-        // a pattern is a shared dependency set, so the renderer can no longer decide this by
-        // grouping on the kind signature.
-        var collapsed = found.Where(f => f.Holds(Qualifiers.PartOfALayeringPattern)).ToList();
-        var detailed = found.Where(f => !f.Holds(Qualifiers.PartOfALayeringPattern)).ToList();
-
-        foreach (var group in collapsed
-                     .GroupBy(f => Signature(model, f), StringComparer.Ordinal)
-                     .OrderBy(g => g.Count()).ThenBy(g => g.Key, StringComparer.Ordinal))
-        {
-            var names = group
-                .Select(f => model.Find(f.Subject)?.Name ?? "")
-                .Where(n => n.Length > 0)
-                .OrderBy(n => n, StringComparer.Ordinal)
-                .ToList();
-
-            var examples = names.Take(4).ToList();
-
-            yield return $"   {group.Count()} types span {group.Key} — a layering pattern rather than an";
-            yield return $"     anomaly. Examples: {string.Join(", ", examples)}"
-                         + (names.Count > examples.Count
-                             ? $" — {examples.Count} of {names.Count} named"
-                             : "");
-        }
+        // Every finding is detailed. A collapse path lived here until 2026-08-26, folding the
+        // findings that held `part-of-a-layering-pattern` into one line per shared signature; it
+        // went with D54, because the qualifier that fed it was False on every finding of this kind
+        // on all three reference solutions and this branch had never executed on real code.
 
         // The one section whose rows are not one line, because §3.1 says the per-kind breakdown
         // IS the finding. The headline is Claims'; everything under it is this section's.
-        foreach (var finding in detailed)
+        foreach (var finding in found)
         {
             if (model.Find(finding.Subject) is not { } type) continue;
 

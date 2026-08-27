@@ -1070,7 +1070,10 @@ paragraph exists to prevent.
 > so it is not recoverable from history. Two of its rows were also simply out of date: it called
 > `SurfaceOutlierMultiple` *observable upward only* on a boundary population of two qualifiers,
 > which P4 took to seven, and it had no row for `RollCallDivisor` at all — a value that could not
-> have been observable before P6, since nothing collapsed. Re-running over all 26 dissolves the
+> have been observable before P6, since nothing collapsed. **`RollCallDivisor` was then deleted
+> outright on 2026-08-26 with D54**, and the sequence is the lesson: unswept, then swept and
+> observable, then removed for having never fired on anything except the fixture that was built to
+> make it observable. Re-running over all 26 dissolves the
 > question of which three were skipped, and pinning the result as a snapshot means the next drift
 > is a diff to accept rather than a claim that quietly stops being true.
 >
@@ -1090,7 +1093,7 @@ snapshot:
 | `ConcealedFanInCeiling` 2.0 | §3.2 | every nominee is at 0 or infinity, never between |
 | `BlastFanInMultiple` 2.0 | §3.4 | the one nominee is at 11× |
 | `BlastComplexityPercentile` 70 | §3.4 | the one nominee is at 95.8 |
-| `Top` 15 | §3.1 via `RollCallThreshold` | 14/3 and 16/3 both floor to the same threshold. Unchanged by P6 |
+| `Top` 15 | §3.1 via `RollCallThreshold` | **Row retired 2026-08-26 with D54.** It read *14/3 and 16/3 both floor to the same threshold*, which was true and was the wrong reassurance: the threshold moved at other values of `Top`, and a display cap deciding a judgement is the defect however coarse the arithmetic. `RollCallDivisor` and `RollCallThreshold` are gone, so the sweep covers 29 values rather than 30 |
 | `SurfaceDiscriminationDivisor` | §3.10 | **retired, not unported** — D12 replaced the proportional ceiling with `MaxNamedSurfaces`, and Core has no such value to read |
 | `SurfaceOutlierFloor` 1, `SurfaceOutlierMultiple` 1.5, `MaxNamedSurfaces` 5 | §3.10 | **all three are masked by their own suppression.** Seven surfaces qualify against a ceiling of five, so the section is suppressed and every nudge that leaves it suppressed produces the same empty output. `MaxNamedSurfaces` is observable at +2 and the multiple at +0.5, both of which unsuppress it. This is §4's inverse — a suppression working so broadly that the gates underneath stop being tested — and it is why the old *observable upward only* row for the multiple was true when written and false by P4 |
 | `GlobalComplexityFloor` 1 | §3.11 | dead: no below-floor type clears the percentile while failing the floor, so the floor never decides |

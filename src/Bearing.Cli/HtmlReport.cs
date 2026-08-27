@@ -1350,7 +1350,6 @@ public static class HtmlReport
         Qualifiers.LowAbsoluteConnectivity => "genuinely low connectivity",
         Qualifiers.CarriesRealLogic => "carries real logic",
         Qualifiers.TooLargeToHold => "too large to hold at once",
-        Qualifiers.PartOfALayeringPattern => "one of a repeated pattern",
         Qualifiers.PartOfAnUnreadGroup => "one of several unread on its type",
         Qualifiers.AnAttributeMayDirectIt => "an attribute may direct something to it",
         Qualifiers.TestUsageUnobservable => "test usage not visible here",

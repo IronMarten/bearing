@@ -661,90 +661,16 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
         Assert.DoesNotContain(reach, count => count == policy.MinKindSpan - 1);
     }
 
-    /// <summary>
-    /// The roll-call collapse fires, and it fires for the pattern rather than for the pair.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>This branch was owed from the moment the collapse closed.</b> Under the probe's
-    /// kind-signature grouping all six spanning types were one pattern, so the collapsed line was
-    /// the only branch the fixture exercised and the per-type detail branch had none — the opposite
-    /// of what <c>TECHREQ-job-b.md</c> §3.1 and §5 both claimed, and the golden settled it. Core
-    /// groups on the named dependencies instead, the largest group fell to four against a
-    /// threshold of five, and the branches traded places. R1 then rendered the collapse from the
-    /// qualifier, so it was written, unreachable and held by nothing until <c>TASKS.md</c> P6.
-    /// </para>
-    /// <para>
-    /// <b>The plant is <c>TestBed.Core.Layering</c>, and it is one construction answering two
-    /// questions.</b> Eight types reach the identical three components — one per significant kind,
-    /// all three new, because eight shared dependents would otherwise be eight new inbound edges
-    /// on types that already exist. Six of them are <c>Internal</c> and are the group of six the
-    /// threshold needs. The other two are <c>ApiBoundary</c> and differ from the six in nothing
-    /// else, which is what makes the type's own role the whole of the difference between a
-    /// partition of 6 + 2 and one group of 8.
-    /// </para>
-    /// <para>
-    /// The two halves interlock: with the role in the key the six collapse and the pair keeps its
-    /// detail; without it all eight collapse and the pair loses detail it is entitled to. That is
-    /// The collapse failure one level down — a collapse absorbing something that is not an instance of
-    /// the pattern — which is why the pair is the control rather than a second plant.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    public void The_roll_call_collapse_fires_for_the_pattern_and_spares_the_pair()
-    {
-        var policy = core.Model.Policy;
-        var findings = Analysis.FindingsFor(core.Model).OfKind(FindingKind.SpansArchitecturalLayers);
+    // Two roll-call tests lived here and went with D54 on 2026-08-26:
+    // `The_roll_call_collapse_fires_for_the_pattern_and_spares_the_pair` and
+    // `The_roll_call_threshold_decides_in_both_directions`. Both were sound and both were
+    // about a gate that only this fixture could reach. The qualifier they asserted was False
+    // on every layer-span finding on all three reference solutions, because a pattern group is
+    // keyed on the identities a subject reaches and real components never reach an identical
+    // set. Six types were planted here to do exactly that, so the fixture observed a behaviour
+    // the product never exhibited -- which is the inverse of the failure TESTING.md §6 is
+    // usually about, and worth the same care.
 
-        string Name(Finding finding) => core.Model.Find(finding.Subject)!.Name;
-
-        // The six that are a pattern, named rather than counted: a count would still pass if the
-        // collapse started taking the wrong six.
-        Assert.Equal(
-            ["EgressConduit", "IntakeConduit", "MirrorConduit", "RelayConduit", "ReplayConduit", "SyncConduit"],
-            findings
-                .Where(f => f.Holds(Qualifiers.PartOfALayeringPattern))
-                .Select(Name)
-                .Order(StringComparer.Ordinal));
-
-        // The pair reaches the same three components and keeps its detail, because its group has
-        // two members. Both halves asserted — that they are in a group of two, and that the group
-        // being small is what spares them.
-        var pair = findings.Where(f => Name(f).StartsWith("Public", StringComparison.Ordinal)).ToList();
-        Assert.Equal(2, pair.Count);
-        Assert.All(pair, f => Assert.False(f.Holds(Qualifiers.PartOfALayeringPattern)));
-        Assert.All(pair, f => Assert.Equal(2, f.ValueOf("PatternGroupSize")));
-
-        // Six against a threshold of five, which is the smallest group that fires it.
-        Assert.Equal(6, findings.Max(f => f.ValueOf("PatternGroupSize")!.Value));
-        Assert.Equal(5, policy.RollCallThreshold);
-    }
-
-    /// <summary>
-    /// The collapse threshold now decides in both directions, which is what a nudge asks.
-    /// </summary>
-    /// <remarks>
-    /// The leave-one-out question — does the condition discriminate — was already answered, since
-    /// deleting the qualifier changes every spanning type's rendering. The nudge is the other
-    /// question, and before P6 it had no answer at all: with nothing collapsing, the threshold
-    /// could be moved anywhere without moving output. It is asserted here from both sides,
-    /// because a gate observable in one direction only is half a gate — <c>docs/TESTING.md</c> §6
-    /// carries two of those and they are the reason this suite distinguishes them.
-    /// </remarks>
-    [Fact]
-    public void The_roll_call_threshold_decides_in_both_directions()
-    {
-        // Loosening it: a divisor of 2 puts the threshold at 7, above the group of six, and the
-        // pattern stops collapsing.
-        Assert.Empty(CollapsedUnder(core.Model.Policy with { RollCallDivisor = 2 }));
-
-        // Tightening it: a divisor of 4 puts the threshold at 3, and the four boilerplate
-        // controllers — a pattern of four that keeps its detail today — collapse as well.
-        Assert.Equal(
-            ["DocumentController", "EgressConduit", "IntakeConduit", "MirrorConduit", "QuoteController",
-             "RateController", "RelayConduit", "ReplayConduit", "SyncConduit", "TrackingController"],
-            CollapsedUnder(core.Model.Policy with { RollCallDivisor = 4 }));
-    }
 
     /// <summary>
     /// A type's own architectural role is part of what makes two spanning types one finding.
@@ -782,24 +708,12 @@ public sealed class FixtureCoverageTests(CoreWalkFixture core)
         var merged = dependencies.Single(g => g.Count() == 8);
         Assert.Equal(2, merged.Count(f => core.Model.Find(f.Subject)!.Classification.Kind == TypeKinds.ApiBoundary));
 
-        // Eight is past the threshold, so the pair would not merely be regrouped — it would be
-        // collapsed, which is the detail loss the key exists to prevent.
-        Assert.True(merged.Count() > core.Model.Policy.RollCallThreshold);
+        // The pair would not merely be regrouped, it would be reported as two more instances of
+        // an internal relay pattern. That mattered more when a collapse hung off the group size;
+        // with D54 gone the key still decides what `PatternGroupSize` says, which is evidence a
+        // reader acts on and the order the section is printed in.
     }
 
-    /// <summary>The subjects whose layer-span detail collapses under a given policy.</summary>
-    private static List<string> CollapsedUnder(AnalysisPolicy policy)
-    {
-        var model = new SolutionWalker(new WalkOptions { SolutionPath = RepoPaths.TestBedSolution, Policy = policy })
-            .WalkAsync(CancellationToken.None).GetAwaiter().GetResult();
-
-        return Analysis.FindingsFor(model)
-            .OfKind(FindingKind.SpansArchitecturalLayers)
-            .Where(f => f.Holds(Qualifiers.PartOfALayeringPattern))
-            .Select(f => model.Find(f.Subject)!.Name)
-            .Order(StringComparer.Ordinal)
-            .ToList();
-    }
 
     /// <summary>
     /// Coverage's two global gates: one condition is live since P6, and both constants are dead.

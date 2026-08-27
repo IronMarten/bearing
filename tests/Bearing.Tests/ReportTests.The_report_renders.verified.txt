@@ -149,8 +149,6 @@ Every claim shows the numbers behind it.
 -- SPANS ARCHITECTURAL LAYERS (no cohort required) -------------
    (dependencies reaching across 3+ architectural kinds — cross-cutting
     work, whatever the component is named)
-   6 types span ApiBoundary+DataAccess+ExternalCall — a layering pattern rather than an
-     anomaly. Examples: EgressConduit, IntakeConduit, MirrorConduit, RelayConduit — 4 of 6 named
    AuthenticationMiddleware [ApiBoundary] — reaches across 3 kinds:
        ApiBoundary    itself
        DataAccess     TenantStore
@@ -190,6 +188,36 @@ Every claim shows the numbers behind it.
        ApiBoundary    itself
        DataAccess     TenantStore
        ExternalCall   CarrierGateway
+       Check that the name still describes what it does.
+   EgressConduit [Internal] — reaches across 3 kinds:
+       ApiBoundary    LayeringEndpoint
+       DataAccess     LayeringArchive
+       ExternalCall   LayeringBeacon
+       Check that the name still describes what it does.
+   IntakeConduit [Internal] — reaches across 3 kinds:
+       ApiBoundary    LayeringEndpoint
+       DataAccess     LayeringArchive
+       ExternalCall   LayeringBeacon
+       Check that the name still describes what it does.
+   MirrorConduit [Internal] — reaches across 3 kinds:
+       ApiBoundary    LayeringEndpoint
+       DataAccess     LayeringArchive
+       ExternalCall   LayeringBeacon
+       Check that the name still describes what it does.
+   RelayConduit [Internal] — reaches across 3 kinds:
+       ApiBoundary    LayeringEndpoint
+       DataAccess     LayeringArchive
+       ExternalCall   LayeringBeacon
+       Check that the name still describes what it does.
+   ReplayConduit [Internal] — reaches across 3 kinds:
+       ApiBoundary    LayeringEndpoint
+       DataAccess     LayeringArchive
+       ExternalCall   LayeringBeacon
+       Check that the name still describes what it does.
+   SyncConduit [Internal] — reaches across 3 kinds:
+       ApiBoundary    LayeringEndpoint
+       DataAccess     LayeringArchive
+       ExternalCall   LayeringBeacon
        Check that the name still describes what it does.
 
 -- NO STATIC REFERENCES FOUND (no cohort required) -------------
