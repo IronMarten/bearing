@@ -57,6 +57,20 @@ if [ -n "$(git status --short)" ]; then
   exit 1
 fi
 
+# ConcealedDecision moved under this inventory twice and the entries were corrected
+# on 2026-08-26, once the staleness check above was repaired enough to say so:
+#
+#   D10  deleted BOTH `peers.Count < policy.MinCohort` gates. MinCohort is context
+#        here now, not a gate, and the entries are gone rather than re-pointed.
+#   X16  turned the two `TimesMedian < OutlierFactor` ratio gates into dispersion
+#        gates — `!Outlies(...)`, which is median + factor x MAD — and rebased the
+#        method rank gate onto `limit`, the smaller of ConcealedTopRank and a capped
+#        share. Same three decisions, different expressions, so the entries are
+#        re-pointed rather than dropped.
+#
+# The `is not { } x` null-extractions are still deliberately absent, for the same
+# reason the note below gives: commenting one out fails the build.
+#
 # Two entries are deliberately absent. BoundaryMarking's kind filter is
 # `model.Types.Where(IsBoundary)` in both detectors, and commenting an assignment
 # out does not relax a gate, it fails the build — the script's own note for
@@ -76,13 +90,11 @@ BreaksAlone.cs@@1@@if (type.MaxMemberCyclomatic < policy.HighCc) continue;@@High
 ChangeCost.cs@@1@@if (!Eligible.Contains(type.Classification.Kind, StringComparer.Ordinal)) continue;@@Contract-or-ApiBoundary kind filter
 ChangeCost.cs@@1@@if (type.FanIn < policy.MinFanIn) continue;@@MinFanIn floor
 ChangeCost.cs@@1@@if (reading.Rank > limit) continue;@@ChangeCostTopFraction rank gate
-ConcealedDecision.cs@@1@@if (peers.Count < policy.MinCohort) continue;@@MinCohort (method level)
 ConcealedDecision.cs@@1@@if (member.Cyclomatic < policy.MinDecisionCc) continue;@@MinDecisionCc (method level)
-ConcealedDecision.cs@@1@@if (reading.TimesMedian < policy.OutlierFactor) continue;@@OutlierFactor (method level)
-ConcealedDecision.cs@@1@@if (reading.Rank > policy.ConcealedTopRank) continue;@@ConcealedTopRank (method level)
-ConcealedDecision.cs@@2@@if (peers.Count < policy.MinCohort) continue;@@MinCohort (type level)
+ConcealedDecision.cs@@1@@if (reading.Rank > limit) continue;@@ConcealedTopRank/ConcealedTopShare rank gate (method level)
+ConcealedDecision.cs@@1@@if (!Outlies(complexity, member.Cyclomatic, policy)) continue;@@ConcealedDispersionFactor (method level)
 ConcealedDecision.cs@@1@@if (type.MaxMemberCyclomatic < policy.MinDecisionCc) continue;@@MinDecisionCc (type level)
-ConcealedDecision.cs@@1@@if (cc.TimesMedian < policy.OutlierFactor) continue;@@OutlierFactor (type level)
+ConcealedDecision.cs@@1@@if (!Outlies(complexity, type.MaxMemberCyclomatic, policy)) continue;@@ConcealedDispersionFactor (type level)
 ConcealedDecision.cs@@1@@if (inbound.TimesMedian > policy.ConcealedFanInCeiling) continue;@@ConcealedFanInCeiling
 ConcealedDecision.cs@@1@@if (outbound.TimesMedian > policy.ConcealedFanOutCeiling) continue;@@ConcealedFanOutCeiling
 HubOrGodObject.cs@@1@@if (coupling < policy.HubMin) continue;@@HubMin coupling floor
@@ -105,7 +117,16 @@ while IFS= read -r entry; do
   snippet="${rest%%@@*}"; label="${rest##*@@}"
   path="src/Bearing.Core/$file"
 
-  found=$(grep -c -F -- "$snippet" "$path" 2>/dev/null || echo 0)
+  # `|| found=0` and NOT `|| echo 0`, and that one character was the whole bug.
+  # `grep -c` prints 0 AND exits 1 when it matches nothing, so the `||` also fired
+  # and $found became the two-line string "0\n0". `[ "0\n0" -lt 1 ]` is not false,
+  # it is an ERROR — "integer expression expected" — so the if-body never ran, the
+  # entry was not counted stale, and the abort this block exists to perform did not
+  # happen. Found 2026-08-26 with five stale ConcealedDecision entries in the
+  # inventory: D10 removed both MinCohort gates and X16 replaced the two ratio gates
+  # and the rank gate, and this reported none of it. A staleness check that cannot
+  # report staleness is the failure this file's header claims immunity from.
+  found=$(grep -c -F -- "$snippet" "$path" 2>/dev/null) || found=0
   if [ "$found" -lt "$nth" ]; then
     echo "INVENTORY STALE: $file has $found occurrence(s) of, and needs $nth:" >&2
     echo "    $snippet" >&2
