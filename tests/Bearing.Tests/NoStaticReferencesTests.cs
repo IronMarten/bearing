@@ -148,11 +148,7 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
     /// </para>
     /// </remarks>
     [Theory]
-    [InlineData("safe to delete")]
-    [InlineData("safe to remove")]
-    [InlineData("dead code")]
-    [InlineData("unused")]
-    [InlineData("unreachable")]
+    [MemberData(nameof(Invariants.ImplyingSafety), MemberType = typeof(Invariants))]
     public void No_render_ever_implies_that_removing_something_is_safe(string forbidden)
     {
         Assert.DoesNotContain(forbidden, Text, StringComparison.OrdinalIgnoreCase);

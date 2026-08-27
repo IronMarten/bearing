@@ -487,6 +487,41 @@ effective-versus-raw fan-out is a choice of which property to read. Commenting e
 build rather than relaxing a gate. The second is item 4 of the same coverage test and still wants
 the controlled pair in `SESSION-NOTES.md` #22 — that is **P3**.
 
+### The zone of uselessness — kept, and reached by construction
+
+**Decided 2026-08-27.** `MainSequenceZone.Uselessness` needs `I >= 0.7 AND A >= 0.7`, and nothing
+real comes close: across nopCommerce, Jellyfin and Umbraco, **70 projects, 52 clearing the
+instability bar, none clearing the abstractness one**, highest abstractness anywhere **0.39**
+against a threshold of 0.7, and the largest `min(I, A)` **0.36**.
+
+**It is not a shortage of samples, and that is what decided it.** I and A correlate at **r = -0.43**
+over those 70, because the property that makes a project abstract — being the thing others depend
+on — is what drives its instability down. The zone asks for a project that is mostly interfaces
+*and* consumes more than it is consumed by. So no threshold change rescues it: moving 0.7 to 0.4
+still admits nothing.
+
+**Kept, with a constructed population rather than a plant.**
+`CyclesAndCouplingTests.The_zone_of_uselessness_is_reachable_and_implies_no_safety` builds four
+abstractions where three reach out and one consumer reaches back — `A = 1.0`, `I = 0.75` — and
+asserts the zone fires and its wording implies no safety. `ProjectCoupling.ForSolution` takes plain
+tuples, so this needs no fixture, no walk and no plant, and it reaches a case a plant would have to
+be designed around.
+
+> **This is the third remedy, and the cheapest.** A plant would have to be a project shaped against
+> the grain of every real one. A `--min-*` sweep cannot reach it either, since both bands are
+> constants outside `AnalysisPolicy` and deliberately so. Constructing the population directly is
+> what `ProjectCoupling`'s public entry point already allowed.
+
+**What it bought immediately.** The label read *"abstract and unused"* until 2026-08-27, and
+`unused` is one of the five strings invariant 4 forbids. The suite was green because the branch
+never rendered — §9's gate-passing-by-absence, in the invariant with the highest stated stakes.
+Reverting the label to the old wording now fails this test, which is the control.
+
+**The forbidden list is `Invariants.SafetyVocabulary`, in one place**, because this test and
+`NoStaticReferencesTests` both hold it and the second copy would have gone stale by being the
+shorter one — a word dropped from one list is a word forbidden in the report and allowed in the
+label.
+
 ### One gate the fixture cannot observe, and it is not waiting for a plant
 
 **`GlobalComplexityFloor`.** It gates `NoPeerGroup`: a peerless type needs `MaxMemberCyclomatic > 1`

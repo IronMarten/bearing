@@ -840,4 +840,75 @@ public sealed class CyclesAndCouplingTests(CoreWalkFixture core)
         Assert.Equal(model.Integrations.PlumbingReferences, model.Integrations.PlumbingReferences);
     }
 
+    /// <summary>
+    /// The zone of uselessness fires on a population built to reach it, and says nothing that
+    /// implies removing anything is safe.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A constructed population, which is the remedy <c>docs/TESTING.md</c> prescribes for a
+    /// gate no fixture can reach</b> — and this is a gate no fixture can reach on purpose rather
+    /// than by accident. Measured 2026-08-27 across nopCommerce, Jellyfin and Umbraco: **70
+    /// projects, 52 clearing `I >= 0.7`, none clearing `A >= 0.7`**, the highest abstractness
+    /// anywhere 0.39 against a threshold of 0.7, and the largest `min(I, A)` 0.36. Nothing reaches
+    /// half the bar on both axes at once.
+    /// </para>
+    /// <para>
+    /// <b>The reason is structural rather than a shortage of samples, which is why waiting for a
+    /// real example would have been waiting forever.</b> I and A correlate at <b>r = -0.43</b>
+    /// over those 70: the property that makes a project abstract — being the thing others depend
+    /// on — is the property that drives its instability down. The zone asks for a project that is
+    /// mostly interfaces *and* consumes more than it is consumed by, and the two conditions pull
+    /// against each other. It is not unreachable by arithmetic, which is what this test
+    /// demonstrates by reaching it.
+    /// </para>
+    /// <para>
+    /// <b>What it buys is invariant 4 over the zone's wording.</b> Until 2026-08-27 the label read
+    /// <i>"abstract and unused"</i>, and <c>unused</c> is one of the five strings
+    /// <see cref="Invariants.SafetyVocabulary"/> forbids — the suite stayed green because the
+    /// branch never rendered, which is §9's gate-passing-by-absence in the place it does most
+    /// damage. The label is <i>unstable and abstract</i> now, and this is what would have caught
+    /// the old one.
+    /// </para>
+    /// <para>
+    /// The counts are asserted alongside the zone deliberately: if the bands in
+    /// <c>ProjectCoupling.Zone</c> ever move, this construction stops reaching the zone and the
+    /// assertion says which of the two axes stopped clearing, rather than the test quietly
+    /// becoming another thing that cannot fire.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_zone_of_uselessness_is_reachable_and_implies_no_safety()
+    {
+        // Four abstractions. Three of them reach into the consumer, and exactly one consumer type
+        // reaches back — so Ce dominates Ca without being alone, which is what I >= 0.7 asks for
+        // and what "nothing depends on it" would have wrongly claimed.
+        var types = new[]
+        {
+            ("A1", "Abstractions", true), ("A2", "Abstractions", true),
+            ("A3", "Abstractions", true), ("A4", "Abstractions", true),
+            ("C1", "Consumer", false), ("C2", "Consumer", false), ("C3", "Consumer", false),
+        };
+
+        var edges = new[] { ("A1", "C1"), ("A2", "C2"), ("A3", "C3"), ("C1", "A4") };
+
+        var coupling = ProjectCoupling.ForSolution(types, edges)
+            .Single(c => c.Project == "Abstractions");
+
+        Assert.Equal(1.0, coupling.Abstractness);
+        Assert.Equal(0.75, coupling.Instability);
+        Assert.Equal(MainSequenceZone.Uselessness, coupling.Zone);
+
+        var name = IronMarten.Bearing.Cli.Sentences.Zone(coupling.Zone);
+        var gloss = IronMarten.Bearing.Cli.Sentences.ZoneMeans(coupling.Zone);
+
+        Assert.NotEqual("", name);
+        Assert.NotEqual("", gloss);
+
+        foreach (var forbidden in Invariants.SafetyVocabulary)
+        {
+            Assert.DoesNotContain(forbidden, name, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain(forbidden, gloss, StringComparison.OrdinalIgnoreCase);
+        }
+    }
 }
