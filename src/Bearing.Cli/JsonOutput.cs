@@ -68,6 +68,11 @@ public static class JsonOutput
     /// arrived with the fix that stopped Core reading <c>NUGET_PACKAGES</c> itself; the setting
     /// moves the package-versus-unknown classification, so §3 requires it recorded rather than
     /// inferred. Additive, and 2.1 is still unpublished.
+    /// <b>Confirmed 2026-08-27 as a decision rather than an inference</b>: nothing consumes 2.1,
+    /// and the key lands before the first release rather than after it. That is the whole of the
+    /// test this comment applies three times — not <i>is this additive</i>, but <i>has anyone read
+    /// the old shape yet</i>. **After the release build, the answer changes and so does the
+    /// remedy.**
     /// </para>
     /// <para>
     /// <b>It rode 2.1 rather than becoming 2.2 because 2.1 has never been published.</b> Nothing has
