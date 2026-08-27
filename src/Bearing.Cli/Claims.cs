@@ -246,6 +246,96 @@ public static class Claims
         _ => "",
     };
 
+    /// <summary>
+    /// What a finding's participants are <i>to</i> it — the label above the list of names.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A6 settles that this is a function of the kind, which is why a label in the renderer is
+    /// complete.</b> Every finding kind carries exactly one participant relationship, so nothing
+    /// in Core needs a <c>Participant(Subject, Role)</c> — and the day a kind carries two, this is
+    /// the function that stops expressing it and the model change becomes necessary.
+    /// </para>
+    /// <para>
+    /// <b>It lives here rather than in <c>HtmlReport</c>, and it is total rather than defaulted,
+    /// because of what the default was doing.</b> It named four kinds and sent every other one to
+    /// <i>"Most complex member"</i> — right for the six that reach it today, and silently wrong for
+    /// the seventeenth kind whenever it lands. A6 names the god object as the case where the wrong
+    /// label inverts the meaning: mislabel the size arm and the page says the opposite of the
+    /// finding. Six kinds return <see langword="null"/> because they name no participants at all;
+    /// that is a deliberate arm, not a gap, and it is what stops the six being given dead words.
+    /// </para>
+    /// <para>
+    /// The <c>_</c> arm returns the enum's own name, which is not a label anyone would write —
+    /// so <c>ClaimsTests.Every_kind_says_what_its_participants_are</c> fails on a kind that has
+    /// not been through this switch, exactly as <see cref="KindName"/>'s test does.
+    /// </para>
+    /// </remarks>
+    public static string? ParticipantsAre(FindingKind kind) => kind switch
+    {
+        FindingKind.SpansArchitecturalLayers => "Reaches",
+        FindingKind.SharedMutableState => "Written by",
+        FindingKind.ChangeCost => "Changing it reaches",
+        FindingKind.BugBlastRadius => "A defect here reaches",
+
+        // The six that name the type's worst method. Written out rather than left to a default:
+        // this list is the claim that these six and only these six mean "most complex member".
+        FindingKind.BoundaryCarriesLogic => "Most complex member",
+        FindingKind.BreaksAlone => "Most complex member",
+        FindingKind.ConcealedDecisionType => "Most complex member",
+        FindingKind.HubOrGodObject => "Most complex member",
+        FindingKind.LoadBearingAndIntricate => "Most complex member",
+        FindingKind.Coverage => "Most complex member",
+
+        // These name nobody. The three cycle kinds carry their evidence as Relations rather than
+        // as participants — a cycle is about pairs, and Relations is the field that holds a pair —
+        // and the other three are claims about a single member with nothing else to name.
+        FindingKind.ConcealedDecisionMethod => null,
+        FindingKind.WidestContractSurface => null,
+        FindingKind.NoStaticReferences => null,
+        FindingKind.NamespaceCycle => null,
+        FindingKind.ProjectCycle => null,
+        FindingKind.TypeTangle => null,
+
+        _ => kind.ToString(),
+    };
+
+    /// <summary>
+    /// A qualifier, in a reader's words rather than as its kebab-case key.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The same defect as <see cref="ParticipantsAre"/>, one field over.</b> This worded 8 of
+    /// the 11 constants on <c>Qualifiers</c> and defaulted to the raw token, so the page was one
+    /// finding away from rendering the string <c>a-type-hierarchy</c> at a user. Two of the three
+    /// missing are suppression triggers whose findings never render; the third is carried by a
+    /// <i>reported</i> <c>TypeTangle</c> and reached the pane only because
+    /// <see cref="CompetesForLead"/> excludes tangles and <c>Card</c> has one caller. That is a
+    /// two-hop accident rather than a guarantee.
+    /// </para>
+    /// <para>
+    /// The <c>_</c> arm still returns the token, and that is what
+    /// <c>ClaimsTests.Every_qualifier_is_worded</c> looks for: the test enumerates the constants
+    /// on <c>Qualifiers</c> by reflection, so adding one to Core and not wording it here fails the
+    /// suite rather than shipping an identifier.
+    /// </para>
+    /// </remarks>
+    public static string QualifierText(string qualifier) => qualifier switch
+    {
+        Qualifiers.LowAbsoluteConnectivity => "genuinely low connectivity",
+        Qualifiers.CarriesRealLogic => "carries real logic",
+        Qualifiers.TooLargeToHold => "too large to hold at once",
+        Qualifiers.PartOfAnUnreadGroup => "one of several unread on its type",
+        Qualifiers.AnAttributeMayDirectIt => "an attribute may direct something to it",
+        Qualifiers.TestUsageUnobservable => "test usage not visible here",
+        Qualifiers.GloballyExtremeFanIn => "extreme fan-in solution-wide",
+        Qualifiers.GloballyExtremeComplexity => "extreme complexity solution-wide",
+        Qualifiers.OneAssemblysOwnFolders => "one assembly's own folders",
+        Qualifiers.PeersNamingSharedTypes => "peers naming each other's types",
+        Qualifiers.ATypeHierarchy => "a base and its implementations",
+        _ => qualifier,
+    };
+
     // ------------------------------------------------------------------- the sentences ----
 
     private static Claim ConcealedType(SolutionModel model, Finding finding)

@@ -1,4 +1,5 @@
-﻿using IronMarten.Bearing;
+﻿using System.Reflection;
+using IronMarten.Bearing;
 using IronMarten.Bearing.Cli;
 
 namespace Bearing.Tests;
@@ -152,6 +153,79 @@ public sealed class ClaimsTests(CoreWalkFixture core)
             // The name is the reader's, not the enum's. A kind rendering as its own identifier is
             // an internal identifier published at somebody — MaxMemberCyclomaticPctl — one level up.
             Assert.NotEqual(kind.ToString(), Claims.KindName(kind));
+        }
+    }
+
+    /// <summary>
+    /// Every kind says what its participants are to it, including the ones that name none.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>`ARCHITECTURE.md` A6 settles that the relationship is a function of the kind</b>, which
+    /// is what makes a label in a renderer complete rather than a guess. `HtmlReport` held that
+    /// label as a four-arm switch defaulting to <i>"Most complex member"</i> — correct for the six
+    /// kinds that reach the default today, and correct by accident. A6 names the god object as the
+    /// case where the wrong label inverts the meaning: the size arm mislabelled says the opposite
+    /// of what the finding found.
+    /// </para>
+    /// <para>
+    /// The switch is total now and lives in <c>Claims</c> beside <see cref="Claims.KindName"/>,
+    /// and this is <see cref="Every_kind_is_named_and_described"/>'s shape applied to it: the
+    /// <c>_</c> arm returns the enum's own name, so a kind that has not been through the switch
+    /// fails here rather than being labelled by whichever arm it happened to fall into.
+    /// <see langword="null"/> passes, and is the deliberate answer for the six kinds that carry no
+    /// participants — the three cycle kinds hold their evidence as <c>Relations</c> instead.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_kind_says_what_its_participants_are()
+    {
+        foreach (var kind in Enum.GetValues<FindingKind>())
+        {
+            Assert.NotEqual(kind.ToString(), Claims.ParticipantsAre(kind));
+            Assert.NotEqual("", Claims.ParticipantsAre(kind));
+        }
+    }
+
+    /// <summary>
+    /// Every qualifier Core can attach has words, not its kebab-case key.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Enumerated off <c>Qualifiers</c> by reflection rather than listed here</b>, which is the
+    /// whole point: a list would have to be kept in step with Core by the same memory that let
+    /// three constants go unworded. Adding a qualifier to Core and not wording it in the Cli now
+    /// fails the suite.
+    /// </para>
+    /// <para>
+    /// <b>It was one finding away from rendering an identifier at a user.</b>
+    /// <c>ATypeHierarchy</c> is carried by a <i>reported</i> <c>TypeTangle</c> with no suppression
+    /// row; it did not reach the pane only because <c>Claims.CompetesForLead</c> excludes tangles
+    /// and <c>Card</c> has exactly one caller. Two hops, neither of them a rule about this.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_qualifier_is_worded()
+    {
+        var keys = typeof(Qualifiers)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(f => f.IsLiteral && f.FieldType == typeof(string))
+            .Select(f => (string)f.GetRawConstantValue()!)
+            .ToList();
+
+        // A guard on the guard: reflection that finds nothing asserts nothing, and it would look
+        // exactly like a vocabulary with no gaps.
+        Assert.True(keys.Count >= 11, $"only {keys.Count} qualifiers found on Qualifiers");
+
+        foreach (var key in keys)
+        {
+            var worded = Claims.QualifierText(key);
+
+            // Equality with the key, not the absence of a hyphen: "extreme fan-in solution-wide"
+            // is English and carries two. The key is what an unworded qualifier renders as, so
+            // the key is what this looks for.
+            Assert.NotEqual(key, worded);
+            Assert.NotEqual("", worded);
         }
     }
 

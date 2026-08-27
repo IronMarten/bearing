@@ -1050,13 +1050,17 @@ public static class HtmlReport
         {
             page.Append("<div class=\"tags\">\n");
             foreach (var qualifier in holding)
-                page.Append($"<span class=\"tag\">{Html.Text(QualifierText(qualifier.Name))}</span>\n");
+                page.Append($"<span class=\"tag\">{Html.Text(Claims.QualifierText(qualifier.Name))}</span>\n");
             page.Append("</div>\n");
         }
 
-        if (finding.Participants.Count > 0)
+        // The label comes from Claims, which is total over FindingKind and returns null for the
+        // six kinds that name nobody. Both halves are guarded: a kind that carries participants
+        // and has no label renders neither, rather than rendering the list under a borrowed
+        // heading that A6 warns can say the opposite of the finding.
+        if (finding.Participants.Count > 0 && Claims.ParticipantsAre(finding.Kind) is { } relationship)
         {
-            page.Append($"<p class=\"claim sub\">{Html.Text(ParticipantsAre(finding.Kind))}: ");
+            page.Append($"<p class=\"claim sub\">{Html.Text(relationship)}: ");
             page.Append(Html.Text(string.Join(", ", finding.Participants.Select(p => Display(model, p)))));
             page.Append("</p>\n");
         }
@@ -1336,25 +1340,4 @@ public static class HtmlReport
     /// by whoever breaks it.
     /// </para>
     /// </remarks>
-    private static string ParticipantsAre(FindingKind kind) => kind switch
-    {
-        FindingKind.SpansArchitecturalLayers => "Reaches",
-        FindingKind.SharedMutableState => "Written by",
-        FindingKind.ChangeCost => "Changing it reaches",
-        FindingKind.BugBlastRadius => "A defect here reaches",
-        _ => "Most complex member",
-    };
-
-    private static string QualifierText(string qualifier) => qualifier switch
-    {
-        Qualifiers.LowAbsoluteConnectivity => "genuinely low connectivity",
-        Qualifiers.CarriesRealLogic => "carries real logic",
-        Qualifiers.TooLargeToHold => "too large to hold at once",
-        Qualifiers.PartOfAnUnreadGroup => "one of several unread on its type",
-        Qualifiers.AnAttributeMayDirectIt => "an attribute may direct something to it",
-        Qualifiers.TestUsageUnobservable => "test usage not visible here",
-        Qualifiers.GloballyExtremeFanIn => "extreme fan-in solution-wide",
-        Qualifiers.GloballyExtremeComplexity => "extreme complexity solution-wide",
-        _ => qualifier,
-    };
 }
