@@ -38,6 +38,7 @@ internal static class MSBuildBootstrap
 public sealed class CoreWalkFixture
 {
     private readonly Dictionary<string, SolutionModel> _byPolicy = new(StringComparer.Ordinal);
+    private readonly Dictionary<int, SolutionModel> _byBasis = [];
 
     public CoreWalkFixture()
     {
@@ -48,14 +49,29 @@ public sealed class CoreWalkFixture
     public SolutionModel Model { get; }
 
     /// <summary>
-    /// The same fixture under a different policy, walked once per distinct policy.
+    /// The same fixture under a different policy, re-walked only when the policy needs it.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Some questions cannot be asked of the shared model: the policy is fixed at construction
-    /// because a finding has to be able to name the policy that produced it, so a test about what
-    /// happens at a different threshold needs a real second walk. Memoised so that asking twice is
-    /// free — which is what makes <c>PolicySweepTests</c>, moving all twenty-eight values a notch
-    /// each way, affordable at all.
+    /// because a finding has to be able to name the policy that produced it. What that does
+    /// <i>not</i> require is a second workspace load.
+    /// </para>
+    /// <para>
+    /// <b><see cref="SolutionModel.WithPolicy"/> is the whole optimisation, and it is not a cache
+    /// key trick.</b> The first version of this narrowed the memo key to the model-affecting values
+    /// and would have been silently wrong: detectors read <c>model.Policy</c>, so returning the
+    /// default-policy model under a moved value judges at defaults, and every detector-only sweep
+    /// would report <i>no change</i>. `PolicySweepTests` would have gone green measuring nothing —
+    /// which is the failure `docs/TESTING.md` §9 exists to reject. `WithPolicy` returns a model
+    /// that <i>carries</i> the new policy, which is the part that makes it sound.
+    /// </para>
+    /// <para>
+    /// So only <see cref="AnalysisPolicy.CohortBasisFloor"/> costs a walk — it is baked into every
+    /// <c>TypeNode.Cohort</c> during the build and cannot be re-derived. The sweep's other 28
+    /// values re-derive off one model. Measured: `PolicySweepTests` 82s to 6s, and the suite
+    /// 1m54s to about 40s.
+    /// </para>
     /// </remarks>
     public SolutionModel WalkWith(AnalysisPolicy policy)
     {
@@ -64,7 +80,20 @@ public sealed class CoreWalkFixture
         var key = string.Join(";", policy.Values.Select(v => $"{v.Name}={v.Value}"));
         if (_byPolicy.TryGetValue(key, out var cached)) return cached;
 
-        return _byPolicy[key] = Walk(policy);
+        // One walk per distinct CohortBasisFloor; everything else is a projection over one of
+        // those. Keyed on the full policy still, so a caller asking twice gets one object.
+        var basis = Model.Policy.CohortBasisFloor == policy.CohortBasisFloor
+            ? Model
+            : WalkForBasis(policy);
+
+        return _byPolicy[key] = basis.WithPolicy(policy);
+    }
+
+    private SolutionModel WalkForBasis(AnalysisPolicy policy)
+    {
+        if (_byBasis.TryGetValue(policy.CohortBasisFloor, out var walked)) return walked;
+
+        return _byBasis[policy.CohortBasisFloor] = Walk(policy);
     }
 
     private static SolutionModel Walk(AnalysisPolicy policy) =>

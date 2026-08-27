@@ -11,7 +11,23 @@ public sealed record WalkOptions
     /// <summary>Path to the solution.</summary>
     public required string SolutionPath { get; init; }
 
-    /// <summary>Thresholds. Only <see cref="AnalysisPolicy.MinCohort"/> affects the walk itself.</summary>
+    /// <summary>Thresholds. Almost none of them affects the walk itself.</summary>
+    /// <remarks>
+    /// <b>Exactly one of the 29 values is read while the model is built:</b>
+    /// <see cref="AnalysisPolicy.CohortBasisFloor"/>, which <c>ModelBuilder</c> hands to
+    /// <c>CohortSet.Assign</c> and which is then written onto every <c>TypeNode.Cohort</c>.
+    /// <see cref="AnalysisPolicy.MinCohort"/> and <see cref="AnalysisPolicy.MinTangle"/> are read
+    /// by lazy caches on <see cref="SolutionModel"/>, and the other 26 only by detectors — so
+    /// <see cref="SolutionModel.WithPolicy"/> can re-judge a finished model under a new policy
+    /// without re-reading the solution, and refuses only when the basis floor moves.
+    /// <para>
+    /// This line said <i>"only <c>MinCohort</c> affects the walk itself"</i> until 2026-08-27.
+    /// <c>MinCohort</c> is not read here at all, and the audit finding that proposed lifting
+    /// cohort assignment out of the walk was quoting this comment as its evidence.
+    /// <b>Cohort assignment was never in the walk</b> — it is the last step of the build, after
+    /// the expensive work is done.
+    /// </para>
+    /// </remarks>
     public AnalysisPolicy Policy { get; init; } = AnalysisPolicy.Default;
 
     /// <summary>Whether to analyse projects that look like test projects.</summary>

@@ -719,6 +719,61 @@ public sealed class SolutionModel
         Coverage = coverage;
     }
 
+    /// <summary>
+    /// The same analysis, judged under a different policy — without re-reading the solution.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Analysis is a function of <c>(solution, policy)</c>, and this is the seam that says so.</b>
+    /// §5 states the entry point conceptually; the implementation fused two stages that want to be
+    /// separable, so the only way to ask *what would this policy produce* was to pay the
+    /// <c>MSBuildWorkspace</c> open and the Roslyn compile again. It is about 2.6 seconds a time,
+    /// and <c>PolicySweepTests</c> was paying it roughly thirty times a run.
+    /// </para>
+    /// <para>
+    /// <b>Exactly one policy value is baked in, and this refuses to move it.</b> Of the 29 values,
+    /// <see cref="AnalysisPolicy.CohortBasisFloor"/> is the only one read while the model is being
+    /// built — <c>ModelBuilder</c> hands it to <c>CohortSet.Assign</c>, and the answer is written
+    /// onto every <see cref="TypeNode.Cohort"/>. It cannot be re-derived from a finished model, so
+    /// changing it is the one case that still needs a walk, and asking for it throws rather than
+    /// returning a model that is quietly wrong about its own cohorts.
+    /// </para>
+    /// <para>
+    /// <b>Everything else is safe because it is read lazily or not at all.</b>
+    /// <see cref="AnalysisPolicy.MinCohort"/> is read by <see cref="Statistics"/> and
+    /// <see cref="AnalysisPolicy.MinTangle"/> by <see cref="TypeTangles"/> — both caches on this
+    /// instance, so the new model recomputes them under the new policy. The remaining 26 are read
+    /// only by detectors, downstream of the model entirely.
+    /// </para>
+    /// <para>
+    /// <b>The type and edge lists are shared, not copied, and that is safe for a reason worth
+    /// stating.</b> <see cref="TypeNode.Cohort"/> is settable, but only by <c>ModelBuilder</c>
+    /// during construction; nothing mutates a node after a model exists. Since
+    /// <c>CohortBasisFloor</c> cannot differ, the cohorts on those shared nodes are correct for
+    /// both models by construction rather than by copying.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="policy"/> changes <see cref="AnalysisPolicy.CohortBasisFloor"/>, which
+    /// decides cohort membership during the walk and cannot be re-derived here.
+    /// </exception>
+    public SolutionModel WithPolicy(AnalysisPolicy policy)
+    {
+        ArgumentNullException.ThrowIfNull(policy);
+
+        if (policy.CohortBasisFloor != Policy.CohortBasisFloor)
+        {
+            throw new ArgumentException(
+                $"CohortBasisFloor decides cohort membership while the model is built, so it "
+                + $"cannot be changed here — {Policy.CohortBasisFloor} to {policy.CohortBasisFloor} "
+                + "needs a fresh walk.",
+                nameof(policy));
+        }
+
+        return new SolutionModel(
+            SolutionPath, policy, ToolVersion, Projects, Types, Edges, Coverage, _externalOrigins);
+    }
+
     /// <summary>The solution that was analysed.</summary>
     public string SolutionPath { get; }
 

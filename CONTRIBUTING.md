@@ -2,7 +2,7 @@
 
 ```
 dotnet build Bearing.sln      # warnings are errors
-dotnet test  Bearing.sln      # ~550 tests, ~2 minutes (docs/TESTING.md has the breakdown)
+dotnet test  Bearing.sln      # ~560 tests, ~35s (docs/TESTING.md has the breakdown)
 ```
 
 > **This repository is developed against private specifications, and outside contributions

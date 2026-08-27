@@ -4,30 +4,45 @@
 dotnet test Bearing.sln
 ```
 
-**Roughly 550 tests, about two minutes** (measured 2026-08-26: 552 in 1m56s). The workspace
-load is the cost centre, not the analysis, so most of the suite shares one analyzed fixture —
-but `PolicySweepTests` does not, and that is where the two minutes go.
+**Roughly 560 tests, about half a minute** (measured 2026-08-27: 564 in 34s). The workspace load
+is the cost centre, not the analysis, so the suite shares one analyzed fixture — including, since
+R2's seam landed, the policy sweep, which used to be two thirds of the runtime on its own.
 
 > This figure and the one in `CONTRIBUTING.md` have each been wrong by a wide margin at different
 > times — 43 here against 202 there, and both said *281 tests, ~10s* against a real 552 and 1m56s
 > until 2026-08-26. Nothing holds either of them. Treat both as an order of magnitude, and see §6
 > for what happens to a number in this repository that no test holds.
 
-> **Where the time actually goes**, three filtered wall-clock runs on 2026-08-26:
+> **Where the time goes**, filtered wall-clock runs on 2026-08-27, with the same three from the
+> day before for comparison:
 >
-> | filter | tests | wall clock |
-> |---|---|---|
-> | `ToolInfoTests` (no walk) | 7 | 0.9s — test host startup |
-> | `StructureTests` (one shared walk) | 20 | 3.5s — so one walk ≈ 2.6s |
-> | `PolicySweepTests` | **2** | **82s** |
-> | whole suite | 552 | 116s |
+> | filter | tests | wall clock | before R2 |
+> |---|---|---|---|
+> | `ToolInfoTests` (no walk) | 7 | 0.8s — test host startup | 0.9s |
+> | `StructureTests` (one shared walk) | 20 | 3.5s — so one walk ≈ 2.6s | 3.5s |
+> | `PolicySweepTests` | 2 | **7.2s** | **82s** |
+> | whole suite | 564 | **34s** | 116s |
 >
-> **Two tests are 70% of the suite.** The sweep calls `WalkWith` for each of 29 policy values one
-> notch each way, and every distinct policy is a full `MSBuildWorkspace` open plus a Roslyn
-> compile — so it re-loads the workspace about thirty times to move twenty-eight values that, by
-> `WalkOptions`' own comment, the walk does not read. There is no seam that lets anything
-> re-analyse without re-loading, and that is a design gap rather than a slow test: it is also what
-> a `--policy` retune or any drift comparison would pay. Filed as **R2**; undecided.
+> **Two tests used to be 70% of the suite.** The sweep calls `WalkWith` for each of 29 policy
+> values one notch each way, and every distinct policy was a full `MSBuildWorkspace` open plus a
+> Roslyn compile — about thirty reloads to move values the build does not read.
+>
+> **`SolutionModel.WithPolicy` is the seam that closed it.** Exactly one policy value is baked into
+> a built model — `CohortBasisFloor`, written onto every `TypeNode.Cohort` by `ModelBuilder` — so
+> that is the only value that still costs a walk. `MinCohort` and `MinTangle` are read by lazy
+> caches on the model and recompute on the new instance; the other 26 are read only by detectors.
+>
+> **The obvious version of this optimisation is silently wrong, which is why the seam is in Core
+> and not in the fixture.** Narrowing the fixture's memo key to the model-affecting values returns
+> the *default-policy* model under a moved value — and detectors read `model.Policy`, so every
+> detector-only sweep would judge at defaults and report *no change*. The sweep would go green
+> having measured nothing, which is §9's rejected shape exactly. `WithPolicy` returns a model that
+> carries the new policy, and `PolicySeamTests` holds the premise: it reads the IL of
+> `SolutionWalker` and `ModelBuilder` and fails if either reads a policy value other than
+> `CohortBasisFloor`. Add one and it names it.
+>
+> The accepted sweep table did not move, which is the other half of the evidence: same 29 values,
+> same verdicts, a twelfth of the time.
 
 ---
 
