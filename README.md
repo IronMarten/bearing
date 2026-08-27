@@ -14,11 +14,14 @@ Zero configuration. No account. No network call.
 
 ---
 
-> ### Status: early preview
+> ### Status: first analysing release
 >
-> `0.0.1-preview` is a **placeholder release and performs no analysis.** It is published
-> so the package identity is established while the first real version is built. The
-> analysis engine is validated and being productised; watch the repo for `0.1`.
+> **Bearing analyses.** The engine is validated against nopCommerce, Jellyfin and Umbraco,
+> and every threshold it cites was set by measurement on those rather than chosen.
+>
+> **It is 0.x, and the output shape is not a contract yet.** One deliverable is still
+> unbuilt and it will add fields. Read *The JSON and CSV are unstable* below before you
+> build anything on the exports.
 
 ---
 
@@ -29,6 +32,25 @@ Zero configuration. No account. No network call.
 Not *"is my code healthy?"* — that is a different question, it is well served by other
 tools, and its audience is architecture specialists. The first question gets asked
 constantly by people who are not specialists, usually right before they change something.
+
+## What you get
+
+A terminal report, which opens with one claim per kind of risk the run found and then
+describes the structure. Everything else is a flag, and nothing is written unless you ask
+for it:
+
+```
+--html <file>          one shareable page, self-contained, no network
+--diagram <file.svg>   the project map, sized for pasting into chat
+--mosaic <file.svg>    every type as one cell
+--plot <file.svg>      projects by reach and density
+--json <file>          the whole model and every finding, versioned
+--csv <dir>            types.csv, members.csv, edges.csv
+--full                 enumerate every finding rather than one per kind
+```
+
+`bearing --help` lists these and every threshold the report cites, each with its default.
+All of them can be moved.
 
 ## How it reports
 
@@ -97,8 +119,18 @@ produce confident, plausible, wrong output.
 
 ## Requirements
 
-.NET SDK 8.0 or later. The target solution must restore before analysis, or projects load
-with missing references and the results are silently understated.
+.NET SDK 8.0 or later.
+
+**Restore the target solution first.** A project that loads with unresolved references is
+missing edges, so fan-in and everything derived from it reads low. Bearing does not fail on
+this and does not hide it: every report names the projects affected and how many type names
+did not resolve, and says that the numbers below are a lower bound. It states the reassuring
+case too — *"every project resolved every reference it names"* — because the absence of a
+warning is not the same as being told.
+
+The cause is usually an unrestored solution and is not always: a fully restored project can
+still name a type nothing declares, and the missing edge is identical. Bearing reports the
+consequence, which it can see, and stays quiet about the cause, which it cannot.
 
 ## Licence
 
