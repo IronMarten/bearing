@@ -265,6 +265,12 @@ public static class CommandLine
                 IncludeTests = includeTests,
                 DefaultExcludesCleared = clearDefaultExcludes,
                 ExcludedPathFragments = fragments,
+                // Reading the environment is the host's job. Core classifies an external reference
+                // as a package by where restore put it, and a relocated cache is the one thing it
+                // cannot know from its inputs — so the variable is read here and handed over, the
+                // same call Bearing.Cli.csproj records for MSBuildLocator. There is no flag: this
+                // is not a choice a user makes, it is a fact about the machine restore ran on.
+                NuGetCachePath = Environment.GetEnvironmentVariable("NUGET_PACKAGES"),
             },
             ShowHelp: false,
             ShowVersion: false,

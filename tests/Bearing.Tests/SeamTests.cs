@@ -38,6 +38,39 @@ public sealed class SeamTests
             + "in Bearing.Cli present it — that is the whole seam."),
     ];
 
+    /// <summary>
+    /// Calls Bearing.Core may not make, where the type itself is legitimate.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Why a second list rather than another entry in the first.</b> The first attempt at the
+    /// entry below forbade <c>System.Environment</c> outright and failed immediately — on
+    /// <c>get_CurrentManagedThreadId</c>, which the compiler emits into every async state machine.
+    /// Core is full of async, so the type reference is not Core's to remove and a type-level ban
+    /// there can only ever be a gate nobody can satisfy. The call is what §5 forbids, so the call
+    /// is what this matches.
+    /// </para>
+    /// <para>
+    /// Same evidence as above — compiled metadata, so a mention in a comment cannot trip it — one
+    /// level finer. <see cref="MemberReference"/> carries the declaring type and the member name,
+    /// which is exactly the granularity "not from the environment" is stated at.
+    /// </para>
+    /// </remarks>
+    private static readonly (string TypeName, string Member, string Why)[] ForbiddenCallsInCore =
+    [
+        ("System.Environment", "GetEnvironmentVariable",
+            "Core would be reading the machine instead of its arguments, and ARCHITECTURE.md §5 "
+            + "requires the same inputs to give the same output every time. This entry exists "
+            + "because Core did read one: OriginOfPath took NUGET_PACKAGES out of the "
+            + "environment, so two machines classified the same external reference differently "
+            + "and the classification reached the integration map. It is "
+            + "WalkOptions.NuGetCachePath now, filled by the host — which is where any other "
+            + "environment read belongs too."),
+        ("System.Environment", "GetEnvironmentVariables",
+            "The bulk form of the above, and the way round it if only the single read were "
+            + "listed. Same rule, same remedy: take it as an argument."),
+    ];
+
     [Fact]
     public void Core_does_not_reference_forbidden_types()
     {
@@ -50,6 +83,22 @@ public sealed class SeamTests
 
         Assert.True(violations.Count == 0,
             "Bearing.Core references types it is not allowed to use:"
+            + Environment.NewLine
+            + string.Join(Environment.NewLine, violations));
+    }
+
+    [Fact]
+    public void Core_does_not_make_forbidden_calls()
+    {
+        var called = MemberReferencesOf(CoreAssemblyPath);
+
+        var violations = ForbiddenCallsInCore
+            .Where(f => called.Contains((f.TypeName, f.Member)))
+            .Select(f => $"  {f.TypeName}.{f.Member}{Environment.NewLine}    {f.Why}")
+            .ToList();
+
+        Assert.True(violations.Count == 0,
+            "Bearing.Core makes calls it is not allowed to make:"
             + Environment.NewLine
             + string.Join(Environment.NewLine, violations));
     }
@@ -100,10 +149,32 @@ public sealed class SeamTests
             + "cannot fail without it, so they prove nothing until this is fixed.");
 
         Assert.NotEmpty(TypeReferencesOf(CoreAssemblyPath));
+        Assert.NotEmpty(MemberReferencesOf(CoreAssemblyPath));
+    }
+
+    [Fact]
+    public void The_forbidden_call_check_finds_the_call_where_it_is_allowed_to_live()
+    {
+        // The mutation test for Core_does_not_make_forbidden_calls, and the positive half of
+        // the rule. "Not from the environment" is only half a decision; the other half is that
+        // the host does it, so NUGET_PACKAGES is read exactly once, in CommandLine.cs, and
+        // handed to Core as WalkOptions.NuGetCachePath.
+        //
+        // Asserting it here means the detector is shown to detect against a real assembly
+        // rather than passing because nothing anywhere makes the call — which is the shape
+        // docs/TESTING.md §9 rejects. Delete the read in CommandLine.cs and this fails; move it
+        // back into Core and the test above fails. One of the two always fires.
+        var called = MemberReferencesOf(CliAssemblyPath);
+
+        Assert.Contains(("System.Environment", "GetEnvironmentVariable"), called);
     }
 
     private static string CoreAssemblyPath =>
         Path.Combine(RepoPaths.BinDirectory, "Bearing.Core.dll");
+
+    /// <summary>The Cli assembly. <c>bearing</c> is the assembly name and the tool command.</summary>
+    private static string CliAssemblyPath =>
+        Path.Combine(RepoPaths.BinDirectory, "bearing.dll");
 
     /// <summary>Every type the assembly's IL actually refers to, as <c>Namespace.Name</c>.</summary>
     private static HashSet<string> TypeReferencesOf(string assemblyPath)
@@ -124,6 +195,41 @@ public sealed class SeamTests
         }
 
         return names;
+    }
+
+    /// <summary>
+    /// Every member the assembly's IL calls on a type it does not declare, as
+    /// <c>(Namespace.Type, Member)</c>.
+    /// </summary>
+    /// <remarks>
+    /// Only <see cref="HandleKind.TypeReference"/> parents are read. A member reference can also
+    /// hang off a type specification (a constructed generic) or a module, and neither can name
+    /// the plain BCL static this list is about — including them would mean resolving signatures
+    /// to get back to the same answer.
+    /// </remarks>
+    private static HashSet<(string Type, string Member)> MemberReferencesOf(string assemblyPath)
+    {
+        using var stream = File.OpenRead(assemblyPath);
+        using var pe = new PEReader(stream);
+        var reader = pe.GetMetadataReader();
+
+        var calls = new HashSet<(string, string)>();
+
+        foreach (var handle in reader.MemberReferences)
+        {
+            var member = reader.GetMemberReference(handle);
+            if (member.Parent.Kind != HandleKind.TypeReference) continue;
+
+            var declaring = reader.GetTypeReference((TypeReferenceHandle)member.Parent);
+            var ns = reader.GetString(declaring.Namespace);
+            var name = reader.GetString(declaring.Name);
+
+            calls.Add((
+                string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}",
+                reader.GetString(member.Name)));
+        }
+
+        return calls;
     }
 
     private static HashSet<string> AssemblyReferencesOf(string assemblyPath)

@@ -38855,6 +38855,7 @@
       "reference.cs",
       "assemblyinfo.cs",
       "globalusings.cs"
-    ]
+    ],
+    "nuGetCachePath": null
   }
 }

@@ -64,6 +64,12 @@ public static class JsonOutput
     /// was judged against.
     /// </para>
     /// <para>
+    /// <b>And <c>configuration.nuGetCachePath</c>, added 2026-08-26 on the same argument.</b> It
+    /// arrived with the fix that stopped Core reading <c>NUGET_PACKAGES</c> itself; the setting
+    /// moves the package-versus-unknown classification, so §3 requires it recorded rather than
+    /// inferred. Additive, and 2.1 is still unpublished.
+    /// </para>
+    /// <para>
     /// <b>It rode 2.1 rather than becoming 2.2 because 2.1 has never been published.</b> Nothing has
     /// been released to NuGet, so no 2.1 file exists that was not produced on a machine that can
     /// produce another — the two stored exports were regenerated with these fields on the day. §2's
@@ -601,7 +607,11 @@ public static class JsonOutput
             [.. judgement.Unmatched.Select(a => new UnmatchedBlock(a.Key, a.Note, a.Line))]);
 
     private static ConfigurationBlock Configuration(WalkOptions options) =>
-        new(options.IncludeTests, options.DefaultExcludesCleared, options.ExcludedPathFragments);
+        new(
+            options.IncludeTests,
+            options.DefaultExcludesCleared,
+            options.ExcludedPathFragments,
+            options.NuGetCachePath);
 
     private sealed record FindingBlock(
         string Key,
@@ -707,10 +717,29 @@ public static class JsonOutput
 
     private sealed record UnmatchedBlock(string Key, string? Note, int Line);
 
+    /// <param name="NuGetCachePath">
+    /// Where NuGet restored packages to, when it was not the default. Null is the ordinary case
+    /// and means the default location, not "no cache".
+    /// </param>
+    /// <remarks>
+    /// <b><c>nuGetCachePath</c> is here because it moves an answer.</b> It decides whether an
+    /// external reference reads as a package or as unknown, so two runs of one solution on two
+    /// machines can differ on the integration map and on nothing else. A consumer diffing exports
+    /// has to be able to see that, and §3's rule — configuration is recorded, never inferred —
+    /// applies to a setting that came from the machine exactly as it does to one that came from a
+    /// flag. There is no flag for this one, which is why the block is the only place it can be
+    /// read.
+    /// <para>
+    /// <b>It rides 2.1 rather than becoming 2.2 for the reason the version comment already gives
+    /// twice: 2.1 has never been published.</b> The stored exports were regenerated with the field
+    /// on the day it was added. The key is additive, and no reader has read the old shape.
+    /// </para>
+    /// </remarks>
     private sealed record ConfigurationBlock(
         bool IncludeTests,
         bool DefaultExcludesCleared,
-        IReadOnlyList<string> ExcludedPathFragments);
+        IReadOnlyList<string> ExcludedPathFragments,
+        string? NuGetCachePath);
 
     private sealed record SiteBlock(string File, int Line);
 }

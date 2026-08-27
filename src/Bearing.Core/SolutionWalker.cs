@@ -61,6 +61,29 @@ public sealed record WalkOptions
     public string ToolVersion { get; init; } = ToolInfo.UnknownVersion;
 
     /// <summary>
+    /// Where NuGet restores packages to, when it is not the default <c>~/.nuget/packages</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>It is an argument because §5 forbids the alternative.</b> This decides
+    /// <see cref="ExternalOrigin.Package"/> versus <see cref="ExternalOrigin.Unknown"/> for every
+    /// external reference, which reaches the integration map and the external-surface section.
+    /// Core read <c>NUGET_PACKAGES</c> out of the environment to get it, so two machines analysing
+    /// the same solution classified it differently — the one property §5 opens by requiring, "same
+    /// inputs, same output, every time", broken by the only ambient read in Core. Reading the
+    /// environment is the host's job, the same call <c>Bearing.Cli.csproj</c> records for
+    /// <c>MSBuildLocator</c>.
+    /// </para>
+    /// <para>
+    /// <b>Null is not "no cache".</b> The default <c>~/.nuget/packages</c> is matched by path
+    /// regardless, because that is a fact about NuGet rather than about this machine. This carries
+    /// only the relocation, so a host that says nothing gets the behaviour the variable being
+    /// unset always gave.
+    /// </para>
+    /// </remarks>
+    public string? NuGetCachePath { get; init; }
+
+    /// <summary>
     /// Path fragments that exclude a file from analysis.
     /// </summary>
     /// <remarks>
@@ -235,7 +258,10 @@ public sealed class SolutionWalker
 
         var indexed = WalkClock.Now();
         var builder = new ModelBuilder(
-            _options, InSolutionOf(compilations), OriginOfAssembly(compilations), clock);
+            _options,
+            InSolutionOf(compilations),
+            OriginOfAssembly(compilations, _options.NuGetCachePath),
+            clock);
         clock.Add(WalkStage.Index, indexed);
 
         var walked = WalkClock.Now();
@@ -423,7 +449,8 @@ public sealed class SolutionWalker
     /// Unknown, so a NuGet copy of something that also ships in the SDK reads as a package.
     /// </remarks>
     private static Func<ISymbol?, ExternalOrigin> OriginOfAssembly(
-        List<(Project Project, Compilation Compilation)> compilations)
+        List<(Project Project, Compilation Compilation)> compilations,
+        string? nuGetCachePath)
     {
         var byAssembly = new Dictionary<string, ExternalOrigin>(StringComparer.Ordinal);
 
@@ -433,7 +460,7 @@ public sealed class SolutionWalker
             {
                 if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assembly) continue;
 
-                var origin = OriginOfPath(reference.FilePath);
+                var origin = OriginOfPath(reference.FilePath, nuGetCachePath);
                 if (origin == ExternalOrigin.Unknown) continue;
                 if (byAssembly.TryGetValue(assembly.Name, out var seen) && seen >= origin) continue;
 
@@ -530,8 +557,15 @@ public sealed class SolutionWalker
     /// <b>What each path means.</b> The SDK resolves framework references out of the targeting
     /// packs (<c>packs/Microsoft.NETCore.App.Ref/…</c>) and the shared framework
     /// (<c>shared/Microsoft.NETCore.App/…</c>); NuGet restores packages into its global cache,
-    /// which is <c>NUGET_PACKAGES</c> when set and <c>~/.nuget/packages</c> otherwise. Those are
-    /// facts about how restore works rather than about what anything is called.
+    /// which is the default <c>~/.nuget/packages</c> unless it was relocated. Those are facts
+    /// about how restore works rather than about what anything is called.
+    /// </para>
+    /// <para>
+    /// <b>The relocated cache arrives as an argument.</b> <paramref name="nuGetCachePath"/> is
+    /// <see cref="WalkOptions.NuGetCachePath"/> and the host reads <c>NUGET_PACKAGES</c> to fill
+    /// it; Core used to read the variable here, which made the classification a function of the
+    /// machine rather than of the inputs. The default path below is a fact about NuGet and holds
+    /// without asking anyone.
     /// </para>
     /// <para>
     /// Anything else is <see cref="ExternalOrigin.Unknown"/> and stays unknown — a solution-local
@@ -540,13 +574,13 @@ public sealed class SolutionWalker
     /// name-based plumbing filter still applies to whatever lands here.
     /// </para>
     /// </remarks>
-    private static ExternalOrigin OriginOfPath(string? path)
+    private static ExternalOrigin OriginOfPath(string? path, string? nuGetCachePath)
     {
         if (string.IsNullOrEmpty(path)) return ExternalOrigin.Unknown;
 
         var normalized = path.Replace('\\', '/');
 
-        var cache = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+        var cache = nuGetCachePath;
         if (!string.IsNullOrEmpty(cache)
             && normalized.StartsWith(cache.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase))
         {

@@ -99,11 +99,16 @@ So the rule is enforced mechanically, in `tests/Bearing.Tests/SeamTests.cs`:
 | Enforced | How |
 |---|---|
 | Core references no `System.Console` | type references in the compiled assembly |
+| Core calls no `Environment.GetEnvironmentVariable` | member references in the compiled assembly |
 | Core does not depend on Cli | assembly references, plus the `ProjectReference` items |
-| The check is not vacuous | the assembly exists and has type references at all |
+| The check is not vacuous | the assembly exists, and both reference sets are non-empty |
+| The call check detects | the same detector fires on the Cli, where the read belongs |
 
-The forbidden-type list is a table in that file with a sentence per entry explaining what
-including it would mean. Add to it when a new way to leak presentation into Core turns up.
+Two lists, both tables in that file with a sentence per entry explaining what including it
+would mean: `ForbiddenInCore` for a type Core may not touch at all, `ForbiddenCallsInCore`
+for a call on a type that is otherwise legitimate. Add to whichever fits when a new way to
+leak presentation — or the machine — into Core turns up; `CONTRIBUTING.md` §*Adding an
+architectural rule* has the choice between them and why the second list had to exist.
 
 **What this buys.** Every Job A deliverable — terminal output, JSON, the HTML report, the
 architecture diagram, the dependency graph — is a renderer over one model rather than five
@@ -336,6 +341,13 @@ every time.
   runner, which would make it untestable in exactly the place it needs a test. It is four
   lines long and it still follows the rule, because the rule is only worth anything if it
   is not negotiated case by case.
+
+  It was negotiated case by case once, and the audit found it: `SolutionWalker.OriginOfPath`
+  read `NUGET_PACKAGES` out of the environment to decide package-versus-unknown for every
+  external reference, so two machines analysing the same solution produced different
+  integration maps. It is `WalkOptions.NuGetCachePath` now, filled by the Cli — the same
+  division `Bearing.Cli.csproj` records for `MSBuildLocator`, that registering a global is
+  the host's job. §3's `ForbiddenCallsInCore` is what stops it coming back.
 - **No culture-dependent formatting or comparison.** Enforced as build errors
   (CA1304/CA1305/CA1307/CA1309/CA1310, see `.editorconfig`). Output is compared
   byte-for-byte against a stored baseline; a machine that renders `3.5` as `3,5` produces a

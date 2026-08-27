@@ -104,6 +104,21 @@ that cannot fail is worse than no gate, because it looks like coverage.
 
 ## Adding an architectural rule
 
-If the rule matters, add it to `SeamTests.ForbiddenInCore` with a sentence explaining what
-violating it would mean — not just to `ARCHITECTURE.md`. Prose did not stop `Report.cs`
-becoming 997 lines of computation-inside-a-renderer, and it will not stop the next one.
+If the rule matters, add it to `SeamTests` with a sentence explaining what violating it
+would mean — not just to `ARCHITECTURE.md`. Prose did not stop `Report.cs` becoming 997
+lines of computation-inside-a-renderer, and it will not stop the next one.
+
+There are two lists, and the choice between them is whether the type or the call is the
+thing being forbidden:
+
+- **`ForbiddenInCore`** — a type Core may not touch at all. `System.Console` is the case:
+  there is no legitimate use of it in a layer that returns data.
+- **`ForbiddenCallsInCore`** — a call Core may not make on a type that is otherwise fine.
+  `Environment.GetEnvironmentVariable` is the case, and it is why the second list exists:
+  banning `System.Environment` outright fails on `get_CurrentManagedThreadId`, which the
+  compiler emits into every async state machine. A rule nobody can satisfy is not a rule.
+
+Both read compiled metadata rather than source, so a mention in a comment cannot trip them.
+Mutation-test the entry either way: `The_forbidden_call_check_finds_the_call_where_it_is_allowed_to_live`
+is the shape to copy — it asserts the same detector *does* fire against the assembly where
+the call belongs, so the gate cannot pass because nothing anywhere makes it.
