@@ -29,7 +29,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bearing</ToolCommandName>
     <PackageId>IronMarten.Bearing</PackageId>
-    <Version>0.0.1-preview.1</Version>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <!--
