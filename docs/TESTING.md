@@ -349,10 +349,43 @@ losing one:
 
 ### The leave-one-out verdict table
 
-**Re-run 2026-08-24 after P11, against the same 30 guards, and every verdict is unchanged again** —
-25 / 4 / 1, the same `suite-only` four and the same single `DEAD` gate (`BlastRadius.cs:41`,
-`MinCohort`). **Five consecutive runs, identical verdicts, across five plants.** The sanity check
-this box asks for passes: there are `suite-only` rows, so the run measured something.
+**Re-run 2026-08-26 from a clean tree at `278ffd7`, against a corrected inventory of 28 guards** —
+**23 / 4 / 1**. The `suite-only` four are the same four and the `DEAD` gate is the same one
+(`BlastRadius.cs:41`, `MinCohort`), now for the **sixth consecutive run**. The sanity check this
+box asks for passes: there are `suite-only` rows, so the run measured something.
+
+> **The inventory changed between runs, so read 30 → 28 and 25 → 23 as arithmetic rather than as
+> movement.** Every entry that still exists gave the verdict it gave before. The two that vanished
+> are `ConcealedDecision`'s two `MinCohort` gates, deleted outright by **D10** (`be63f29`) — and
+> both had been `output-moves`, which is exactly the 25 → 23. Nothing became more or less
+> observable.
+>
+> **Three further entries were re-pointed rather than dropped, and this run is the first to measure
+> them.** X16 (`581a61f`) turned two `TimesMedian < OutlierFactor` ratio gates into dispersion
+> gates and rebased the method rank gate onto `limit`; `2b3d005` then deleted `OutlierFactor`
+> once nothing read it. **All three replacements come back `output-moves`, as all three originals
+> were.** X16 changed what the gates measure and cost nothing in observability, which is the thing
+> a table like this exists to be able to say.
+>
+> **All five drifted entries were caused by commits landing after the previous run** — X16 on
+> 2026-08-25, D10 and `2b3d005` on 2026-08-26. The 2026-08-24 table was accurate when taken and
+> described gates that no longer existed within two days. That is M7's *"one plant behind"* in its
+> sharper form, and it is the reason §6 now has a *Retiring a gate* checklist.
+>
+> **The run also found the instrument, before it found a table.** The staleness check that exists
+> to abort on exactly this drift could not fire: `grep -c` prints `0` *and* exits 1 on no match, so
+> `|| echo 0` made `$found` the two-line string `"0\n0"` and the comparison errored instead of
+> being true. Every stale entry was invisible to the check written to catch stale entries. Repaired
+> in `278ffd7` — `|| found=0`, one word — and the check is one-directional even now: it catches an
+> entry that no longer matches and is blind to a gate the source gained. Surveyed separately on the
+> same day; nothing is missing.
+
+**With this table, `Core/UnanalysedEdgeTrap.cs` (D63) is landed by §6's own definition.** It was
+item 3 of three that had not been done, and it is now done.
+
+**Previously, re-run 2026-08-24 after P11, against 30 guards** — 25 / 4 / 1, the same `suite-only`
+four and the same single `DEAD` gate. **Five consecutive runs, identical verdicts, across five
+plants.**
 
 > **P11 is the plant that tests this table's own premise, and it holds.** It landed alongside three
 > new detectors and a new predicate — the largest change to the finding set since the track began —
@@ -382,18 +415,31 @@ predecessor was after P6, and the inventory had drifted onto doc comments in bet
 
 | verdict | count | what it means |
 |---|---|---|
-| `output-moves` | 25 | deleting the gate changes the report at defaults |
+| `output-moves` | 23 | deleting the gate changes the report at defaults |
 | `suite-only` | 4 | the report is byte-identical, but a test fails — the gate decides off the default path and is held by a test that deliberately moves a threshold |
 | `DEAD` | **1** | no change at defaults and the whole suite green |
 
-**`suite-only`:** blast radius' `BlastFanInMultiple`, boundary-carries-logic's `HighCc`, the surface
-outlier threshold, and change cost's `MinFanIn` floor.
+**`suite-only`:** blast radius' `BlastFanInMultiple` (`BlastRadius.cs:59`),
+boundary-carries-logic's `HighCc` (`BoundaryMarking.cs:80`), the surface outlier threshold
+(`BoundaryMarking.cs:149`), and change cost's `MinFanIn` floor (`ChangeCost.cs:73`). Unchanged
+across all six runs — the line numbers are this run's and are the volatile part, which is why the
+inventory is keyed on the line's text and not on them.
 
 **`DEAD`, and it is the only one: `BlastRadius`'s `MinCohort` cohort floor.** Already recorded — it
 is item 3 of `FixtureCoverageTests.The_new_findings_have_gates_the_fixture_cannot_observe`, and the
 measurement confirms the record rather than adding to it. It survived the X14 plant, which is worth
 saying: two new types in the biggest cohort did not make a cohort floor observable, so the reason it
 is dead is not a shortage of types.
+
+> **Six runs now, and the sibling that shared its cause is gone.** `ConcealedDecision` carried two
+> `MinCohort` gates of its own until D10 deleted them, on the finding that the floor was not what
+> decided who got nominated there either. `Distribution.Read` already refuses below `IsComparable`,
+> which is why both were redundant — the same reason this one is dead. So the remaining entry is
+> the last `MinCohort` gate in the codebase, and the argument for deleting it is now the argument
+> that was already accepted once for its siblings. `ARCHITECTURE.md` X16 named its deletion as part
+> of that decision's deliverable and shipped without it. **Either delete it or record beside it
+> what it is retained for** — leaving it a sixth time is the choice that costs the most, because a
+> line that reads as a working safeguard and is not is worse than either.
 
 **Two entries that were on the board as owed plants are not owed.** P1 existed to make blast
 radius' absolute fan-in floor observable and P2 its `FanInXMedian` gate; the two verdicts above are
