@@ -18,8 +18,12 @@ namespace Bearing.Tests;
 /// </para>
 /// <para>
 /// The real measurement is a real solution, and it reproduced the spike's number: nopCommerce
-/// draws at <b>580 × 642px in 10 boxes</b> where the spike's unfolded map was <b>1444px at 27</b>.
-/// Jellyfin, which is not a plugin host and folds almost not at all, comes out 952 × 1074px at 21.
+/// draws at <b>580px wide in 10 boxes</b> where the spike's unfolded map was <b>1444px at 27</b>.
+/// Jellyfin, which is not a plugin host and folds almost not at all, comes out 952px at 21;
+/// Umbraco 766px at 18. <b>Width is the criterion and height is not</b>, which is why only the
+/// widths are recorded here — the heights were, and the Jellyfin figure was 68px stale by the time
+/// anyone read it, because naming folded members and captioning coverage both spend height freely.
+/// Measured 2026-08-26: 952 × 1047, 766 × 917, 580 × 897.
 /// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
@@ -230,7 +234,8 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
     /// <remarks>
     /// The measurement the reopening turned on. <see cref="ArchitectureDiagram"/> shortens a
     /// label to twenty characters, so a member line cannot outrun the box it sits in — which is
-    /// why naming everyone costs height and no width. nopCommerce went 580 × 642 to 580 × 841.
+    /// why naming everyone costs height and no width. nopCommerce went 580 × 642 to 580 × 841,
+    /// and the coverage caption later took it to 580 × 897 on the same 580.
     /// If a future label rule lets a name run wider, this fails rather than the drawing quietly
     /// overflowing its boxes.
     /// </remarks>
@@ -247,6 +252,72 @@ public sealed class ArchitectureDiagramTests(CoreWalkFixture core)
         Assert.Single(boxes.Select(b => b.W).Distinct());
         Assert.True(boxes.Any(b => b.H > boxes.Min(x => x.H)), "no box grew, so this asserts nothing");
     }
+
+    /// <summary>
+    /// The drawing says how much of the solution it is not showing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Invariant 8, in the one view that had none and the one that was built to travel.</b> §7
+    /// asks every view to state what it stayed silent about. The terminal report, the page and the
+    /// JSON all did; this drew the projects in the model and said nothing about the rest — and it
+    /// is the artifact §5.4 specifies to survive being pasted into Slack, so it is the view whose
+    /// silence a reader has the least chance of recovering from. Measured 2026-08-26:
+    /// <b>Jellyfin draws 21 of its 37 projects</b>, Umbraco 22 of 30, nopCommerce 27 of 28.
+    /// </para>
+    /// <para>
+    /// Asserted against the model's own counts rather than against the sentence, so re-wording the
+    /// caption is free and changing what it counts is not.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_drawing_states_what_it_did_not_draw()
+    {
+        var coverage = core.Model.Coverage;
+        var drawn = core.Model.ProjectGraph.Groups.Sum(g => g.Size);
+        var total = core.Model.Projects.Count
+                    + coverage.SkippedProjects.Count
+                    + coverage.ProjectsNotLoaded.Count;
+
+        Assert.True(total > drawn, "the fixture omits no project, so this asserts nothing");
+        Assert.True(coverage.ExcludedTypes > 0, "the fixture excludes no type, so this asserts nothing");
+
+        var caption = Caption(Svg);
+
+        Assert.Contains($"{drawn} of {total} projects drawn", caption, StringComparison.Ordinal);
+        Assert.Contains(
+            $"{coverage.SkippedProjects.Count} project", caption, StringComparison.Ordinal);
+        Assert.Contains($"{coverage.ExcludedTypes} types excluded by path", caption, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The caption wraps inside the drawing instead of widening it.
+    /// </summary>
+    /// <remarks>
+    /// Width is §5.4's acceptance criterion and height explicitly is not — the same trade naming
+    /// a folded box's members makes. A caption that ran past the right edge would spend the
+    /// budget the fold exists to protect, and it would do it invisibly in every renderer that
+    /// crops rather than scales. The character width is an estimate (there is no font metric
+    /// here), so this asserts against the same generous one the wrap uses: if that estimate is
+    /// ever tightened, this is what says the lines no longer fit.
+    /// </remarks>
+    [Fact]
+    public void The_caption_wraps_inside_the_drawing()
+    {
+        var svg = Svg;
+        var width = int.Parse(Regex.Match(svg, @"\swidth=""(\d+)""").Groups[1].Value);
+        var lines = CaptionLines(svg);
+
+        Assert.True(lines.Count > 1, "the caption fits on one line, so the wrap asserts nothing");
+
+        foreach (var line in lines)
+            Assert.True((line.Length * 6.0) + 40 <= width, $"caption line runs past the drawing: {line}");
+    }
+
+    private static List<string> CaptionLines(string svg) =>
+        [.. Regex.Matches(svg, """<text class="cv"[^>]*>([^<]*)</text>""").Select(m => m.Groups[1].Value)];
+
+    private static string Caption(string svg) => string.Join(" ", CaptionLines(svg));
 
     private static List<string> Labels(string svg) =>
         [.. Regex.Matches(svg, """<text class="nm"[^>]*>([^<]*)</text>""").Select(m => m.Groups[1].Value)];

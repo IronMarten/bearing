@@ -37,6 +37,13 @@ namespace IronMarten.Bearing.Cli;
 /// including both tax plugins, which is the task A11 round 1 watched the map lose. Naming them
 /// costs height and no width at all.
 /// </para>
+/// <para>
+/// <b>And it says what it did not draw</b> — see <see cref="CaptionLines"/>. Invariant 8 asks
+/// every view to state what it stayed silent about, and this was the one view with no such
+/// statement, in the artifact §5.4 specifies to leave its report behind: Jellyfin draws 21 boxes
+/// for 21 of its 37 projects, and nothing on the page said so. One line of caption, and height is
+/// free.
+/// </para>
 /// </remarks>
 /// <summary>
 /// One row of the project map.
@@ -136,8 +143,14 @@ public static class ArchitectureDiagram
             return Empty("No project declared an analysed type.");
 
         var placed = Place(graph);
-        var width = placed.Max(p => p.X + BoxWidth) + Margin;
-        var height = placed.Max(p => p.Y + HeightOf(p.Group)) + Margin;
+        var drawing = placed.Max(p => p.X + BoxWidth) + Margin;
+        var bottom = placed.Max(p => p.Y + HeightOf(p.Group));
+
+        // The caption may need more room than a narrow drawing has, and widening a 208px
+        // one-box map to 380px costs nothing a screenshot notices. It never narrows.
+        var width = Math.Max(drawing, MinCaptionWidth);
+        var caption = CaptionLines(model, width);
+        var height = bottom + CaptionTop + (caption.Count * CaptionLine) + Margin;
 
         var svg = new StringBuilder();
         svg.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ad\" viewBox=\"0 0 {width} {height}\" width=\"{width}\" height=\"{height}\" font-family=\"system-ui,-apple-system,Segoe UI,Roboto,sans-serif\">\n");
@@ -151,8 +164,9 @@ public static class ArchitectureDiagram
         svg.Append(".ad .mb{font-size:11px;fill:#3a3a3a}\n");
         svg.Append(".ad .ed{stroke:#b9b7b2;stroke-width:1.1;fill:none;opacity:.72}\n");
         svg.Append(".ad .lr{stroke:#dedcd7;stroke-width:1;stroke-dasharray:2 6}\n");
+        svg.Append(".ad .cv{font-size:11px;fill:#6b6b6b}\n");
         svg.Append("@media(prefers-color-scheme:dark){.ad .bx{fill:#1d1e22;stroke:#3c3f47}.ad .bx.pain{fill:#2c2219;stroke:#c88a4a}");
-        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .mb{fill:#c9c8c5}.ad .ed{stroke:#5a5e68}.ad .lr{stroke:#33363d}}\n");
+        svg.Append(".ad .bx.useless{fill:#232230;stroke:#9a95b5}.ad .nm{fill:#e9e8e6}.ad .sm{fill:#9a9a97}.ad .mb{fill:#c9c8c5}.ad .ed{stroke:#5a5e68}.ad .lr{stroke:#33363d}.ad .cv{fill:#9a9a97}}\n");
         svg.Append("</style>\n");
 
         LayerRules(svg, placed, width);
@@ -166,6 +180,16 @@ public static class ArchitectureDiagram
         Boxes(svg, placed, zones, Labels(graph));
         Edges(svg, graph, placed);
 
+        // Last, so it is under the drawing rather than over it, and so a reader who screenshots
+        // the top of a tall map still crops from the picture down rather than from the caption up.
+        var line = bottom + CaptionTop;
+        foreach (var text in caption)
+        {
+            svg.Append(CultureInfo.InvariantCulture,
+                $"<text class=\"cv\" x=\"{Margin}\" y=\"{line}\">{Html.Text(text)}</text>\n");
+            line += CaptionLine;
+        }
+
         svg.Append("</svg>\n");
         return svg.ToString();
     }
@@ -176,6 +200,135 @@ public static class ArchitectureDiagram
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
         File.WriteAllText(path, Render(model), new UTF8Encoding(false));
+    }
+
+    /// <summary>The gap between the lowest box and the first caption line.</summary>
+    private const int CaptionTop = 26;
+
+    /// <summary>The height of one caption line, at the 11px the <c>cv</c> class sets.</summary>
+    private const int CaptionLine = 15;
+
+    /// <summary>
+    /// The narrowest the drawing may be once it carries a caption.
+    /// </summary>
+    /// <remarks>
+    /// A three-box map is 574px and needs nothing; a one-box map is 208px and would wrap the
+    /// caption into six lines. 380px is about 60 characters at <see cref="CaptionCharWidth"/>,
+    /// which fits the longest clause below on one line, and it is still well inside the
+    /// screenshot bound the width acceptance is about — <b>the widest reference solution draws
+    /// at 952px</b>, so this never engages on anything real.
+    /// </remarks>
+    private const int MinCaptionWidth = 380;
+
+    /// <summary>
+    /// How wide one caption character is assumed to be, for wrapping.
+    /// </summary>
+    /// <remarks>
+    /// <b>An estimate, and it is allowed to be one because it is only ever used to decide where
+    /// to break.</b> An SVG renderer measures the real glyphs, and there is no font metric
+    /// available here — so this is deliberately generous: system-ui at 11px averages nearer 5.4px
+    /// for this vocabulary, and 6.0 buys about 10% of slack so a line that is estimated to fit
+    /// does fit. Over-estimating costs a line break; under-estimating overflows the drawing, and
+    /// only one of those is visible in a screenshot.
+    /// </remarks>
+    private const double CaptionCharWidth = 6.0;
+
+    /// <summary>
+    /// What the drawing left out, as lines of caption text.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Invariant 8 in the one view that was missing it, and the one that was built to
+    /// travel.</b> §7 asks every view to state what it stayed silent about; the terminal report,
+    /// the HTML page and the JSON all do. This one did not, and it is the artifact
+    /// <c>TECHREQ-job-a.md</c> §5.4 specifies to survive being pasted into Slack — so it is the
+    /// view whose silence is least recoverable. <b>Measured 2026-08-26 on all three reference
+    /// solutions</b>: Jellyfin draws 21 of 37 projects, Umbraco 22 of 30, nopCommerce 27 of 28 —
+    /// and 152, 220 and 818 types were excluded by path under them. Umbraco is the one that
+    /// earns the last clause: two of its projects did not resolve every reference, so arrows are
+    /// missing from the drawing and were missing silently.
+    /// </para>
+    /// <para>
+    /// <b>Counts, never names.</b> Naming the omitted projects is what the report is for, and a
+    /// list of sixteen would cost the width this drawing spends its whole design protecting. The
+    /// last clause says where the names are.
+    /// </para>
+    /// <para>
+    /// <b>Stated when nothing was omitted too.</b> "All 3 projects drawn" is the reassurance; the
+    /// absence of a caption is not, which is the whole of invariant 8's argument.
+    /// </para>
+    /// </remarks>
+    internal static IReadOnlyList<string> CaptionLines(SolutionModel model, int width)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        var coverage = model.Coverage;
+        var drawn = model.ProjectGraph.Groups.Sum(g => g.Size);
+
+        // Every project the run could have drawn, by where it stopped being drawable: analysed
+        // (whether or not it declared a type), skipped before analysis, or selected and failed.
+        var silent = model.Projects.Count - drawn;
+        var total = model.Projects.Count + coverage.SkippedProjects.Count + coverage.ProjectsNotLoaded.Count;
+
+        var clauses = new List<string>
+        {
+            drawn == total
+                ? $"All {Sentences.Plural(total, "project")} drawn."
+                : $"{drawn} of {Sentences.Plural(total, "project")} drawn.",
+        };
+
+        if (coverage.SkippedProjects.Count > 0)
+            clauses.Add($"{Sentences.Plural(coverage.SkippedProjects.Count, "project")} skipped as tests.");
+
+        if (coverage.ProjectsNotLoaded.Count > 0)
+            clauses.Add($"{Sentences.Plural(coverage.ProjectsNotLoaded.Count, "project")} did not load.");
+
+        if (silent > 0)
+            clauses.Add($"{Sentences.Plural(silent, "project")} declared no analysed type.");
+
+        clauses.Add(coverage.ExcludedTypes > 0
+            ? $"{Sentences.Plural(coverage.ExcludedTypes, "type")} excluded by path."
+            : "No type was excluded by path.");
+
+        // The edges are half of what this picture claims, so an incompleteness in them belongs
+        // here and not only in the report. Unresolved references are missing edges, never
+        // spurious ones, so the drawing understates dependency in one direction only.
+        if (coverage.ProjectsWithUnresolvedReferences.Count > 0)
+        {
+            clauses.Add($"{Sentences.Plural(coverage.ProjectsWithUnresolvedReferences.Count, "project")} "
+                        + "did not resolve every reference, so some arrows are missing.");
+        }
+
+        clauses.Add("The report names them.");
+
+        return Wrap(clauses, (int)((width - (2 * Margin)) / CaptionCharWidth));
+    }
+
+    /// <summary>Greedily packs whole clauses onto lines of at most <paramref name="chars"/>.</summary>
+    /// <remarks>
+    /// Breaks between clauses and never inside one, so a line is always a set of complete
+    /// sentences and a clause longer than the budget takes a line of its own rather than being cut
+    /// in half. <see cref="MinCaptionWidth"/> is what keeps that case from overflowing.
+    /// </remarks>
+    private static List<string> Wrap(IReadOnlyList<string> clauses, int chars)
+    {
+        var lines = new List<string>();
+        var current = new StringBuilder();
+
+        foreach (var clause in clauses)
+        {
+            if (current.Length > 0 && current.Length + 1 + clause.Length > chars)
+            {
+                lines.Add(current.ToString());
+                current.Clear();
+            }
+
+            if (current.Length > 0) current.Append(' ');
+            current.Append(clause);
+        }
+
+        if (current.Length > 0) lines.Add(current.ToString());
+        return lines;
     }
 
     private static string Empty(string why) =>
