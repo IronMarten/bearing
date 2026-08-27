@@ -32,6 +32,16 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
     private string Text =>
         string.Join("\n", IronMarten.Bearing.Cli.Report.For(core.Model, Analysis.Judge(core.Model)));
 
+    /// <summary>The default page — one finding per kind.</summary>
+    private string Page =>
+        HtmlReport.Render(core.Model, Analysis.Judge(core.Model), Instant);
+
+    /// <summary>The page with every section enumerated — <c>--full</c>.</summary>
+    private string FullPage =>
+        HtmlReport.Render(core.Model, Analysis.Judge(core.Model), Instant, full: true);
+
+    private static readonly DateTimeOffset Instant = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     /// <summary>§5.6's acceptance criterion, literally: none of the three plants is nominated.</summary>
     /// <remarks>
     /// <c>AuditPolicySink</c> is registered by a convention scan that names no type,
@@ -108,13 +118,34 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
     }
 
     /// <summary>
-    /// Invariant 4: no output implies that removing anything is safe.
+    /// Invariant 4: no rendered output implies that removing anything is safe.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b><c>TECHREQ-job-a.md</c> §7's table, asserted at last.</b> §5.6 forbids the word "dead"
     /// outright and forbids implying safety, and this is the finding that could break both. The
     /// list is the vocabulary a reader would take as permission — checked over the whole report
     /// rather than over the section, because the highlights and the coverage line quote it too.
+    /// </para>
+    /// <para>
+    /// <b>Over every prose surface, not just the terminal.</b> It ran on <c>Report.For</c> alone
+    /// until 2026-08-26, which left the invariant with the highest stated stakes — §8, *the one
+    /// whose violation would do real damage* — guarded on one of the two renderers that can
+    /// violate it. <c>TESTING.md</c> names renderer divergence as **the** thing to watch, and
+    /// records two defects a week apart that were both of that shape.
+    /// </para>
+    /// <para>
+    /// <b>Both HTML shapes, and the <c>--full</c> one is the one that earns its place.</b> The
+    /// default page renders one finding per kind, so a violating sentence on any finding that is
+    /// not a lead would not appear in it at all. The terminal needs no such pair — it has no
+    /// <c>full</c> parameter and always enumerates.
+    /// </para>
+    /// <para>
+    /// <b>This is a fixture-scoped guard and cannot be anything else.</b> It reads the rendered
+    /// string, so a real solution declaring a type named <c>UnusedEntryPruner</c> would trip it
+    /// while the tool implied nothing. What it holds is that Bearing's own vocabulary stays clear
+    /// of these five words, which is the half that is Bearing's to control.
+    /// </para>
     /// </remarks>
     [Theory]
     [InlineData("safe to delete")]
@@ -122,9 +153,11 @@ public sealed class NoStaticReferencesTests(CoreWalkFixture core)
     [InlineData("dead code")]
     [InlineData("unused")]
     [InlineData("unreachable")]
-    public void The_report_never_implies_that_removing_something_is_safe(string forbidden)
+    public void No_render_ever_implies_that_removing_something_is_safe(string forbidden)
     {
         Assert.DoesNotContain(forbidden, Text, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(forbidden, Page, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(forbidden, FullPage, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>The prescribed label is used, and it is used on the claim itself.</summary>

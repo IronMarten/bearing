@@ -39,6 +39,28 @@ namespace Bearing.Tests;
 /// The control is unchanged: remove an <c>OrderBy</c> that a renderer or the builder relies on
 /// and this fails while the snapshots stay green, because a snapshot only ever sees one order.
 /// </para>
+/// <para>
+/// <b>Which <c>OrderBy</c>, measured when the four graph artifacts were added.</b> Not every sort
+/// is load-bearing on a four-project fixture, and writing down which are is what stops a future
+/// green run being read as more than it is. Three mutations, run:
+/// </para>
+/// <list type="bullet">
+/// <item>Deleting <c>ModelBuilder</c>'s sort of <c>SolutionModel.Projects</c> — the one R2 found —
+/// fails <c>Json</c> and nothing else. The drawings never read that collection.</item>
+/// <item>Deleting the <c>ThenBy</c> tiebreaks in <c>ProjectGraph.Fold</c> or <c>Mosaic.Blocks</c>
+/// fails nothing, because no two projects here tie on layer or on weight. Those tiebreaks are
+/// correct and this fixture cannot exercise them; that is a gap in the fixture, not in them.</item>
+/// <item>Making <c>Mosaic</c> enumerate <c>model.Projects</c> rather than grouping
+/// <c>model.Types</c>, with that sort also removed, fails the mosaic and both pages. That is the
+/// regression these four assertions exist for, and it fires.</item>
+/// </list>
+/// <para>
+/// So the four drawings are stable <b>by construction</b>: they derive from <c>Types</c> and
+/// <c>Edges</c>, which the model canonicalises, and never from an insertion-ordered collection.
+/// That is the property being pinned, and it is worth pinning precisely because it is invisible —
+/// reaching for <c>model.Projects</c> is the natural thing to write, and it is what
+/// <c>JsonOutput</c> did until R2.
+/// </para>
 /// </remarks>
 [Collection(FixtureCollection.Name)]
 public sealed class OrderingTests(CoreWalkFixture core)
@@ -92,21 +114,83 @@ public sealed class OrderingTests(CoreWalkFixture core)
         AssertStable(model => string.Join("\n", Report.For(model, Analysis.Judge(model))));
 
     /// <summary>
+    /// The page, in both its shapes.
+    /// </summary>
+    /// <remarks>
+    /// <b>Both, because they are different artifacts.</b> The default page shows one finding per
+    /// kind, so an unstable ordering inside a section it does not enumerate would not appear in
+    /// it at all; <c>--full</c> is where every list is rendered. <c>HtmlReportTests</c> keeps two
+    /// snapshots for the same reason.
+    /// </remarks>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void The_page_does_not_depend_on_declaration_order(bool full)
+    {
+        var stamp = new DateTimeOffset(2026, 8, 20, 0, 0, 0, TimeSpan.Zero);
+
+        AssertStable(model => HtmlReport.Render(model, Analysis.Judge(model), stamp, full));
+    }
+
+    /// <summary>
+    /// The project map — the artifact this test was built to catch, arriving four writers late.
+    /// </summary>
+    /// <remarks>
+    /// <b>It groups and lays out by project, and project enumeration order is precisely what this
+    /// file exists for.</b> The remark at the top records that reversing <c>TestBed.sln</c> moved
+    /// 98.5% of <c>edges.csv</c>; a drawing whose every box is positioned from a project list is
+    /// the same exposure with no rows to diff. <c>TESTING.md</c> §5 gives the standing instruction
+    /// — <i>when you add a writer or a nomination list, give it a total key</i> — and four writers
+    /// were added without any of them being added to the instrument that checks the instruction
+    /// was followed.
+    /// </remarks>
+    [Fact]
+    public void The_diagram_does_not_depend_on_declaration_order() =>
+        AssertStable(ArchitectureDiagram.Render);
+
+    /// <summary>Every type as one cell, grouped by project.</summary>
+    [Fact]
+    public void The_mosaic_does_not_depend_on_declaration_order() =>
+        AssertStable(model => Mosaic.Render(model, Analysis.FindingsFor(model)));
+
+    /// <summary>Projects by reach and density — the other one laid out from a project list.</summary>
+    [Fact]
+    public void The_plot_does_not_depend_on_declaration_order() =>
+        AssertStable(model => ReachPlot.Render(model, Analysis.FindingsFor(model)));
+
+    /// <summary>
     /// Renders both walks and requires the two to be byte-identical.
     /// </summary>
     /// <remarks>
-    /// The solution's file name is normalised out of the reversed render first. The two walks were
+    /// <para>
+    /// The solution's name is normalised out of the reversed render first. The two walks were
     /// handed different files on purpose, and a renderer that prints the path it was given is
     /// reporting an argument rather than an ordering — <c>JsonOutput</c> and the report header
     /// both do.
+    /// </para>
+    /// <para>
+    /// <b>Normalised on the stem rather than the file name, and that is what adding the four
+    /// graph artifacts found.</b> This replaced <c>TestBed.ordering-probe.sln</c> only, and the
+    /// mosaic and the plot title themselves <c>TestBed</c> — no extension — so all four new
+    /// assertions failed on a name in a caption while every ordering in them was already stable.
+    /// The stem is the more general of the two and subsumes it: replacing
+    /// <c>TestBed.ordering-probe</c> turns the bare title and the file name and any absolute path
+    /// into the straight walk's form in one pass.
+    /// </para>
+    /// <para>
+    /// It is worth being precise about what that was. It was a gap in this instrument, not a
+    /// defect in a renderer — the drawings were stable the first time they were asked. What the
+    /// four assertions cost was one normalisation; what they buy is that the two artifacts laid
+    /// out from a project list are now watched by the test built for exactly that exposure.
+    /// </para>
     /// </remarks>
     private void AssertStable(Func<SolutionModel, string> render)
     {
         var straight = render(core.Model);
 
         var reversed = render(Reversed).Replace(
-            Path.GetFileName(Reversed.SolutionPath),
-            Path.GetFileName(core.Model.SolutionPath),
+            Path.GetFileNameWithoutExtension(Reversed.SolutionPath),
+            Path.GetFileNameWithoutExtension(core.Model.SolutionPath),
             StringComparison.Ordinal);
 
         Assert.Equal(straight, reversed);
