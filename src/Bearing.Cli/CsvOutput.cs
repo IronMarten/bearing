@@ -36,6 +36,26 @@ namespace IronMarten.Bearing.Cli;
 /// A5 is scoped to what the model already holds. <b>This is a capability the free tool loses when
 /// the oracle retires at R2</b>, so it wants deciding before then rather than discovering after.
 /// </para>
+/// <para>
+/// <b>What is also deliberately absent, and this one is a decision rather than a gap: these files
+/// carry no coverage statement.</b> The terminal report, the page and the JSON all disclose what
+/// was not analysed — invariant 8 — and these three do not. Recorded here because invariant 8's
+/// whole argument is that silence must not read as a clean bill of health, so an omission nobody
+/// chose is the one thing this could not be.
+/// </para>
+/// <para>
+/// <b>The reason is that a row is not a view.</b> Invariant 8 binds a <i>view</i>: something that
+/// makes a claim a reader could mistake for the whole picture. `types.csv` makes no claim at all —
+/// it is the analysed set, enumerated, and the honest disclosure for it would be a comment row or
+/// a fourth file, one of which breaks every parser and the other of which is the JSON.
+/// A consumer that needs the coverage block has it, in the format built for consumers.
+/// </para>
+/// <para>
+/// <b>What would change the decision.</b> If these ever grow a column that is a judgement rather
+/// than a measurement — a percentile, a rank, anything a reader could act on without opening the
+/// report — then they become a view and this reasoning expires with them. The cohort statistics
+/// above are exactly that column, which is why the two paragraphs sit together.
+/// </para>
 /// </remarks>
 public static class CsvOutput
 {

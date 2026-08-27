@@ -80,6 +80,22 @@ public sealed record AnalysisPolicy
     public int MinFanIn { get; init; } = 5;
 
     /// <summary>Display cap per message.</summary>
+    /// <remarks>
+    /// <b>It is here for <c>--top</c> alone, and nothing in Core may read it.</b> Every other
+    /// value on this object is a judgement; this one is how many rows a reader asked to see, and
+    /// §4 is explicit that applying it in the model leaves every renderer unable to say how much
+    /// it is not showing. Core honours that — there is no <c>Take</c> anywhere it matters — but
+    /// the value still sits in the object Core owns, which is what makes the next
+    /// <c>Top / something</c> look natural.
+    /// <para>
+    /// <b>That is not hypothetical.</b> The roll-call threshold was <c>Top / RollCallDivisor</c>
+    /// until D54: a judgement scaled by a display cap, so <c>SpansArchitecturalLayers</c> tested a
+    /// pattern group's size against the number of rows the user wanted. D54 deleted it rather than
+    /// re-basing it, having measured that no threshold survived contact with a real solution.
+    /// <b>If a second one is ever wanted, the answer is a policy value with its own measurement,
+    /// not an arithmetic expression over this one.</b>
+    /// </para>
+    /// </remarks>
     public int Top { get; init; } = 15;
 
     // ------------------------------------------------------------- complexity ----

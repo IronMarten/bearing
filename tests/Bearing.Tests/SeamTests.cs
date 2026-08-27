@@ -36,6 +36,20 @@ public sealed class SeamTests
         ("System.Console",
             "Core would be deciding how something looks. Return the data and let a renderer "
             + "in Bearing.Cli present it — that is the whole seam."),
+        // System.Text.StringBuilder was the fourth candidate and it is not expressible. Core
+        // references it in every record's compiler-generated ToString and PrintMembers —
+        // Acknowledgment, Judged, AnalysisPolicy, TypeShape, CohortCandidate, CohortSubject and
+        // the rest — so the reference is not Core's to remove, and a member-level entry fails
+        // the same way because the generated code calls Append. Same shape as System.Environment
+        // in the call list below, and the general rule is in CONTRIBUTING.md: a type the compiler
+        // emits for a language feature cannot be banned by either list, however much you would
+        // like to ban it.
+        ("System.Drawing",
+            "Geometry is presentation. The map, the mosaic and the plot decide their own layout "
+            + "in Bearing.Cli from a model that knows nothing about pixels — ARCHITECTURE.md §3 — "
+            + "and a size or a colour computed in Core would be judgement wearing a renderer's "
+            + "clothes. Matched as a namespace prefix, because it is the whole namespace that is "
+            + "wrong here rather than any one type in it."),
     ];
 
     /// <summary>
@@ -76,8 +90,14 @@ public sealed class SeamTests
     {
         var referenced = TypeReferencesOf(CoreAssemblyPath);
 
+        // Exact match or namespace prefix. `System.Console` is a type and matches itself;
+        // `System.Drawing` is a namespace and has to match everything under it, because the
+        // entry is about the whole namespace rather than about any one type in it. A prefix
+        // cannot over-match here: `System.Console` has no types nested beneath it.
         var violations = ForbiddenInCore
-            .Where(f => referenced.Contains(f.TypeName))
+            .Where(f => referenced.Any(r =>
+                string.Equals(r, f.TypeName, StringComparison.Ordinal)
+                || r.StartsWith(f.TypeName + ".", StringComparison.Ordinal)))
             .Select(f => $"  {f.TypeName}{Environment.NewLine}    {f.Why}")
             .ToList();
 

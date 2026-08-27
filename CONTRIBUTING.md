@@ -118,6 +118,19 @@ thing being forbidden:
   banning `System.Environment` outright fails on `get_CurrentManagedThreadId`, which the
   compiler emits into every async state machine. A rule nobody can satisfy is not a rule.
 
+**A type the compiler emits for a language feature cannot go in either list**, and finding
+that out three times is what the two lists cost:
+
+| wanted to ban | why it is not bannable |
+|---|---|
+| `System.Environment` | `get_CurrentManagedThreadId`, emitted into every async state machine |
+| `System.Text.StringBuilder` | `ToString` and `PrintMembers`, emitted for every `record` |
+| `System.Globalization` | not a distinction metadata carries — Core legitimately calls `CultureInfo.InvariantCulture`, and CA1304/CA1305 already make the misuse a build error |
+
+The test reads IL, which is the right call — a mention in a comment cannot trip it, and a real
+call cannot hide from it — and the price is that it sees what the compiler wrote as well as what
+you wrote. Check the entry passes on a clean tree before writing its reason, not after.
+
 Both read compiled metadata rather than source, so a mention in a comment cannot trip them.
 Mutation-test the entry either way: `The_forbidden_call_check_finds_the_call_where_it_is_allowed_to_live`
 is the shape to copy — it asserts the same detector *does* fire against the assembly where
