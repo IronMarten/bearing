@@ -17,9 +17,9 @@ namespace IronMarten.Bearing.Cli;
 /// </para>
 /// <para>
 /// <b>Versioned from the first release</b> (<see cref="SchemaVersion"/>) because it is free now
-/// and a breaking change later. That is separate from whether the schema is a public contract —
-/// <c>ARCHITECTURE.md</c> §11 still has that open, and "documented as unstable" is a valid answer
-/// to it that does not change a line here.
+/// and a breaking change later. That is separate from whether the schema is a public contract,
+/// which it became at 1.0: through 0.x it was documented as unstable, and from 1.0 a removal, a
+/// rename or a change of meaning here is 2.0. <c>ARCHITECTURE.md</c> §10 records both.
 /// </para>
 /// <para>
 /// <b>Everything emitted is already ordered by a total key</b>, because the model orders it. This

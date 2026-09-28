@@ -14,14 +14,14 @@ Zero configuration. No account. No network call.
 
 ---
 
-> ### Status: first analysing release
+> ### Status: 1.0
 >
 > **Bearing analyses.** The engine is validated against nopCommerce, Jellyfin and Umbraco,
 > and every threshold it cites was set by measurement on those rather than chosen.
 >
-> **It is 0.x, and the output shape is not a contract yet.** One deliverable is still
-> unbuilt and it will add fields. Read *The JSON and CSV are unstable* below before you
-> build anything on the exports.
+> **The output is a contract.** From 1.0, a breaking change to the command line, the
+> acknowledgment file, the JSON or the CSV is a new major version. *The JSON and CSV are stable* below says exactly what that
+> covers and what it does not.
 
 ---
 
@@ -88,11 +88,18 @@ rather than a re-indented array.
 `acknowledged`, and an entry that stops matching anything — which is what a rename does — is
 reported rather than dropped.
 
-**The JSON and CSV are unstable while the tool is 0.x.** `--json` carries a `schemaVersion`,
-independent of the tool's version and moved only when a consumer would have to change to keep
-reading. Pin against it if you build on the output. The shape is not a public contract before
-1.0 — one deliverable is still unbuilt and it will add fields — and it becomes one at 1.0 if
-anyone is depending on it by then.
+**The JSON and CSV are stable from 1.0.** A change that would make a consumer change to keep
+reading — a field or column removed, renamed or given a new meaning, a flag removed, or a line the
+acknowledgment file used to accept being refused — is 2.0.
+Fields, columns and flags can be added in any release, so read the CSV by header rather than by
+position. `--json` carries a `schemaVersion`, independent of the tool's version; an addition
+moves its minor, and throughout Bearing 1.x its major stays where it is.
+
+**What the promise does not cover.** *Which* findings a run reports: a release can refine a
+detector, and that is most of what releases are for. A finding's key, which can change when its
+detector changes what it measures — an acknowledgment whose key stops matching is reported as
+unmatched, never silently dropped. And the terminal report and the HTML page, which are written
+for people and change freely.
 
 ## Design constraints
 

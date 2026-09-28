@@ -6,10 +6,10 @@ namespace IronMarten.Bearing;
 /// <remarks>
 /// <para>
 /// <b>Constants rather than an enum, for now.</b> <see cref="TypeClassification.Kind"/> is a
-/// string because it is written to CSV and JSON, and whether that shape is a public contract from
-/// v0.1 is an open decision — <c>docs/ARCHITECTURE.md</c> §11. An enum is the stronger form and
-/// costs nothing to adopt once that is settled; naming the values first is what makes the change
-/// mechanical when it happens.
+/// string because it is written to CSV and JSON, and from 1.0 these exact strings are part of that
+/// contract — <c>docs/ARCHITECTURE.md</c> §10. An enum is still the stronger form in code, and
+/// adopting one stays mechanical as long as it serialises to these same names; renaming a value is
+/// 2.0.
 /// </para>
 /// <para>
 /// <b>What this closes.</b> The five values were spelled out as literals at eighteen sites across
