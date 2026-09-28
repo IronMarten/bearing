@@ -728,12 +728,16 @@ public static class JsonOutput
     /// </param>
     /// <remarks>
     /// <b><c>nuGetCachePath</c> is here because it moves an answer.</b> It decides whether an
-    /// external reference reads as a package or as unknown, so two runs of one solution on two
-    /// machines can differ on the integration map and on nothing else. A consumer diffing exports
-    /// has to be able to see that, and §3's rule — configuration is recorded, never inferred —
-    /// applies to a setting that came from the machine exactly as it does to one that came from a
-    /// flag. There is no flag for this one, which is why the block is the only place it can be
-    /// read.
+    /// external reference reads as a package or as unknown, and whether a targeting pack restored
+    /// into a relocated cache reads as the framework — <c>SolutionWalker.OriginOfPath</c> checks
+    /// that by layout — so two runs of one solution on two machines can differ on the integration
+    /// map and on nothing else. A consumer diffing exports has to be able to see that, and §3's
+    /// rule — configuration is recorded, never inferred — applies to a setting that came from the
+    /// machine exactly as it does to one that came from a flag. There is no flag for this one,
+    /// which is why the block is the only place it can be read.
+    /// <b>Kept at 1.0, decided 2026-09-28 (Z5)</b>: null unless the cache was relocated, read by no
+    /// consumer and rejected by none, and required by
+    /// <c>Configuration_covers_every_non_policy_walk_setting</c>.
     /// <para>
     /// <b>It rides 2.1 rather than becoming 2.2 for the reason the version comment already gives
     /// twice: 2.1 has never been published.</b> The stored exports were regenerated with the field
