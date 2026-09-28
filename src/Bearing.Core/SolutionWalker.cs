@@ -584,6 +584,17 @@ public sealed class SolutionWalker
     /// without asking anyone.
     /// </para>
     /// <para>
+    /// <b>A targeting pack can live in the NuGet cache, and it is still the framework.</b> An SDK
+    /// that does not carry the pack for an older target framework restores it as a package: SDK
+    /// 10 building a <c>net8.0</c> project resolves <c>System.Data</c> out of
+    /// <c>~/.nuget/packages/microsoft.netcore.app.ref/8.0.x/</c>. Read by path alone, every
+    /// framework reference in every <c>net8.0</c> solution analysed under SDK 10 became a
+    /// package — the fixture caught it the day Bearing moved off .NET 8. What tells a targeting
+    /// pack apart is its layout, not its name: it carries <c>data/FrameworkList.xml</c> at its
+    /// root, which is the file the SDK reads to know what the framework contains, and no ordinary
+    /// package does.
+    /// </para>
+    /// <para>
     /// Anything else is <see cref="ExternalOrigin.Unknown"/> and stays unknown — a solution-local
     /// <c>packages/</c> folder, a checked-in lib directory, a reference assembly somebody points at
     /// directly. Guessing there would reintroduce exactly the failure this avoids, and the
@@ -596,15 +607,17 @@ public sealed class SolutionWalker
 
         var normalized = path.Replace('\\', '/');
 
-        var cache = nuGetCachePath;
+        var cache = nuGetCachePath?.Replace('\\', '/').TrimEnd('/');
         if (!string.IsNullOrEmpty(cache)
-            && normalized.StartsWith(cache.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase))
+            && normalized.StartsWith(cache + "/", StringComparison.OrdinalIgnoreCase))
         {
-            return ExternalOrigin.Package;
+            return FromCache(normalized, cache.Length + 1);
         }
 
-        if (normalized.Contains("/.nuget/packages/", StringComparison.OrdinalIgnoreCase))
-            return ExternalOrigin.Package;
+        const string DefaultCache = "/.nuget/packages/";
+        var inDefault = normalized.IndexOf(DefaultCache, StringComparison.OrdinalIgnoreCase);
+        if (inDefault >= 0)
+            return FromCache(normalized, inDefault + DefaultCache.Length);
 
         if (normalized.Contains("/packs/", StringComparison.OrdinalIgnoreCase)
             || normalized.Contains("/shared/microsoft.", StringComparison.OrdinalIgnoreCase))
@@ -613,6 +626,20 @@ public sealed class SolutionWalker
         }
 
         return ExternalOrigin.Unknown;
+    }
+
+    /// <summary>
+    /// A path inside a NuGet cache: the framework when the package is a targeting pack, a package
+    /// otherwise. <paramref name="start"/> is where <c>&lt;id&gt;/&lt;version&gt;/</c> begins.
+    /// </summary>
+    private static ExternalOrigin FromCache(string normalized, int start)
+    {
+        var afterId = normalized.IndexOf('/', start);
+        var afterVersion = afterId < 0 ? -1 : normalized.IndexOf('/', afterId + 1);
+        if (afterVersion < 0) return ExternalOrigin.Package;
+
+        var root = normalized[..afterVersion];
+        return File.Exists(root + "/data/FrameworkList.xml") ? ExternalOrigin.Framework : ExternalOrigin.Package;
     }
 
     /// <summary>
