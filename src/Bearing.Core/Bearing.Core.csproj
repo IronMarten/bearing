@@ -29,14 +29,30 @@
   </ItemGroup>
 
   <!--
-    Microsoft.Build.* must be resolved from the located SDK at runtime, not from our bin.
-    Registering the SDK is the host's job — Bearing.Cli calls MSBuildLocator — because a
-    library that registers a global singleton on load cannot be composed.
+    Microsoft.Build.* is compiled against and never shipped: what loads at runtime is the
+    located SDK's MSBuild. Registering the SDK is the host's job — Bearing.Cli calls
+    MSBuildLocator — because a library that registers a global singleton on load cannot be
+    composed.
+
+    These references exist because Workspaces.MSBuild asks for 17.7.2, which carries
+    CVE-2025-26646. Pinning the patched 17.14 line raises the version for every project that
+    references this one; ExcludeAssets keeps its runtime out of this project's output.
+
+    ExcludeAssets does NOT flow to a referencing project, so Bearing.Cli carries the same four.
+    This file used to do the exclusion with a RemoveMSBuildAssemblies target, which removed the
+    assemblies from this project's output only — and IronMarten.Bearing 0.1.0 shipped all four,
+    at 17.7.2, from Bearing.Cli's. Deleting them from that build changed nothing but the
+    timestamp in a Jellyfin run, so they were never what loaded.
+
+    System.Security.Cryptography.Xml is Microsoft.Build.Tasks.Core's, pinned for the same reason:
+    17.14 asks for 9.0.0, which carries CVE-2026-50648 among others.
   -->
-  <Target Name="RemoveMSBuildAssemblies" AfterTargets="ResolveAssemblyReferences">
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Microsoft.Build'&#xA;                                       or '%(Filename)' == 'Microsoft.Build.Framework'&#xA;                                       or '%(Filename)' == 'Microsoft.Build.Tasks.Core'&#xA;                                       or '%(Filename)' == 'Microsoft.Build.Utilities.Core'" />
-    </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
+  </ItemGroup>
 
 </Project>

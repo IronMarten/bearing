@@ -24,6 +24,20 @@
     <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
   </ItemGroup>
 
+  <!--
+    The same four references Bearing.Core carries, and for the same reason: MSBuild loads from
+    the located SDK, never from this package. They are repeated here because ExcludeAssets does
+    not flow through a project reference, and this is the project that packs — without them the
+    tool ships Microsoft.Build.* beside bearing.dll, as 0.1.0 did. Bearing.Core.csproj has the
+    history.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.28" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" ExcludeAssets="runtime" />
+  </ItemGroup>
+
   <!-- dotnet tool packaging -->
   <PropertyGroup>
     <PackAsTool>true</PackAsTool>

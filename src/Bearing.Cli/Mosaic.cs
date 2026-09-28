@@ -378,7 +378,7 @@ public static class Mosaic
     /// them back against the items they came from.
     /// </para>
     /// </remarks>
-    private static List<Rect> Squarify(IReadOnlyList<double> weights, Rect area)
+    private static List<Rect> Squarify(List<double> weights, Rect area)
     {
         var placed = new Rect[weights.Count];
         var total = weights.Sum();
@@ -433,7 +433,7 @@ public static class Mosaic
 
     /// <summary>Places one row along the shorter side and returns what is left over.</summary>
     private static Rect LayOut(
-        IReadOnlyList<double> weights, double scale, List<int> row, double sum, Rect area, Rect[] placed)
+        List<double> weights, double scale, List<int> row, double sum, Rect area, Rect[] placed)
     {
         var horizontal = area.W <= area.H;
         var side = horizontal ? area.W : area.H;

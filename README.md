@@ -119,7 +119,9 @@ produce confident, plausible, wrong output.
 
 ## Requirements
 
-.NET SDK 8.0 or later.
+The .NET 10 SDK. Bearing runs on .NET 10 and loads the solution with the newest SDK the machine
+has, so a solution that targets `net8.0` or `net9.0` is analysed as it is — it does not need to
+move.
 
 **Restore the target solution first.** A project that loads with unresolved references is
 missing edges, so fan-in and everything derived from it reads low. Bearing does not fail on

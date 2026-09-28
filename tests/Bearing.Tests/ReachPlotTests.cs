@@ -135,7 +135,7 @@ public sealed class ReachPlotTests(CoreWalkFixture core)
         var points = ReachPlot.Points(core.Model, Findings);
 
         Assert.Equal(core.Model.ProjectCouplings.Count, points.Count);
-        Assert.Equal(points.Count, Regex.Matches(Svg, "<circle").Count);
+        Assert.Equal(points.Count, Regex.Count(Svg, "<circle"));
         Assert.Equal(points.Count, points.Select(p => p.Project).Distinct(StringComparer.Ordinal).Count());
     }
 

@@ -50,7 +50,7 @@ public sealed class HighlightsTests(CoreWalkFixture core)
         // rows are counted separately on purpose: a page that rendered two cards, or a rail with a
         // row for the kind already on the card, would still have the right total.
         Assert.Single(Regex.Matches(Page, """<div class="anat">"""));
-        Assert.Equal(expected - 1, Regex.Matches(Page, """<div class="row">""").Count);
+        Assert.Equal(expected - 1, Regex.Count(Page, """<div class="row">"""));
         Assert.Contains($"{expected} claims, one for each kind of risk this run found", Terminal, StringComparison.Ordinal);
     }
 

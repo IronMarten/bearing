@@ -399,8 +399,6 @@ public static class Sentences
     /// </remarks>
     public static string PeerGroup(Cohort cohort, int size)
     {
-        ArgumentNullException.ThrowIfNull(cohort);
-
         var name = ShortName(cohort.Key);
 
         return cohort.Basis switch
@@ -430,8 +428,6 @@ public static class Sentences
     /// </remarks>
     public static string PeerGroupNoun(Cohort cohort)
     {
-        ArgumentNullException.ThrowIfNull(cohort);
-
         var name = ShortName(cohort.Key);
 
         return cohort.Basis switch

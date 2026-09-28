@@ -4,7 +4,7 @@ namespace Bearing.Tests;
 /// Locates repository files from the test binaries.
 /// </summary>
 /// <remarks>
-/// Tests run out of <c>bin/Debug/net8.0</c>, so anything on disk has to be found by walking
+/// Tests run out of <c>bin/Debug/net10.0</c>, so anything on disk has to be found by walking
 /// up. Doing that in one place matters more than it looks: the alternative is each test
 /// deciding for itself what "the repo" means, and the golden baseline was already broken
 /// once by a path that was correct on one machine and meaningless everywhere else.

@@ -478,7 +478,7 @@ public static class ArchitectureDiagram
         StringBuilder svg,
         List<Placed> placed,
         IReadOnlyDictionary<string, MainSequenceZone> zones,
-        IReadOnlyDictionary<string, string> labels)
+        Dictionary<string, string> labels)
     {
         foreach (var box in placed)
         {
@@ -514,7 +514,7 @@ public static class ArchitectureDiagram
         }
     }
 
-    private static string Title(ProjectGroup group, IReadOnlyDictionary<string, string> labels)
+    private static string Title(ProjectGroup group, Dictionary<string, string> labels)
     {
         var first = labels[group.Projects[0]];
         return group.Size == 1 ? first : $"{first} +{group.Size - 1}";

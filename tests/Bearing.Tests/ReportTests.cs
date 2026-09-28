@@ -23,7 +23,7 @@ namespace Bearing.Tests;
 [Collection(FixtureCollection.Name)]
 public sealed class ReportTests(CoreWalkFixture core)
 {
-    private IReadOnlyList<string> Lines =>
+    private List<string> Lines =>
         Report.For(core.Model, Analysis.Judge(core.Model)).ToList();
 
     private string Text => string.Join(Environment.NewLine, Lines);

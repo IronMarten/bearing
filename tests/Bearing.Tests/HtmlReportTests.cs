@@ -245,8 +245,8 @@ public sealed class HtmlReportTests(CoreWalkFixture core)
 
         foreach (var tag in paired)
         {
-            var open = Regex.Matches(Page, $"<{tag}[ >]", RegexOptions.IgnoreCase).Count;
-            var close = Regex.Matches(Page, $"</{tag}>", RegexOptions.IgnoreCase).Count;
+            var open = Regex.Count(Page, $"<{tag}[ >]", RegexOptions.IgnoreCase);
+            var close = Regex.Count(Page, $"</{tag}>", RegexOptions.IgnoreCase);
 
             Assert.True(open == close, $"<{tag}> opened {open} times and closed {close}.");
         }

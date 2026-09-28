@@ -184,7 +184,7 @@ public static class Graphs
             ? next.Distinct(StringComparer.Ordinal).OrderBy(n => n, StringComparer.Ordinal)
             : [];
 
-    private static List<string> Walk(IReadOnlyDictionary<string, string> previous, string last, string seed)
+    private static List<string> Walk(Dictionary<string, string> previous, string last, string seed)
     {
         var reversed = new List<string> { last };
 
